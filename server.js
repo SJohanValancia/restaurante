@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -9,22 +10,22 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Conexión a MongoDB Atlas
-mongoose.connect(process.env.MONGODB_URI, {
+mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
 .then(() => console.log('✅ Conectado a MongoDB Atlas'))
-.catch((err) => console.error('❌ Error de conexión a MongoDB:', err));
+.catch((err) => console.error('❌ Error de conexión a MongoDB:', err.message));
 
-// Rutas
+// Rutas API
 app.use('/api/products', require('./routes/Products'));
 
-// Ruta principal
+// Ruta principal (sirve index.html desde public)
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/public/index.html');
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Manejo de errores 404
@@ -37,7 +38,7 @@ app.use((req, res) => {
 
 // Manejo de errores global
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('❌ Error:', err.stack);
   res.status(500).json({
     success: false,
     message: 'Error interno del servidor',
@@ -45,7 +46,8 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Puerto dinámico (Render asigna PORT)
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
 });
