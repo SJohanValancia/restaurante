@@ -10,8 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(express.static(__dirname));
 // Conexión a MongoDB Atlas
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Conectado a MongoDB Atlas'))
@@ -21,9 +20,12 @@ mongoose.connect(process.env.MONGO_URI)
 app.use('/api/products', require('./routes/Products'));
 
 // Ruta principal (sirve index.html desde /public)
+
+
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
+
 
 // Manejo de errores 404
 app.use((req, res) => {
