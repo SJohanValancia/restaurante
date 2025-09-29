@@ -13,17 +13,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Conexión a MongoDB Atlas
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log('✅ Conectado a MongoDB Atlas'))
-.catch((err) => console.error('❌ Error de conexión a MongoDB:', err.message));
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('✅ Conectado a MongoDB Atlas'))
+  .catch((err) => console.error('❌ Error de conexión a MongoDB:', err.message));
 
 // Rutas API
 app.use('/api/products', require('./routes/Products'));
 
-// Ruta principal (sirve index.html desde public)
+// Ruta principal (sirve index.html desde /public)
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -46,7 +43,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Puerto dinámico (Render asigna PORT)
+// Puerto dinámico (Render asigna PORT automáticamente)
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
