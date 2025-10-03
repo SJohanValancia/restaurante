@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Productos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-name {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .btn-logout {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-logout:hover {
+            background: #c0392b;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+
+        .form-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+
+        .form-section h2 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #555;
+            font-size: 13px;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-primary {
+            flex: 1;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            display: none;
+        }
+
+        .btn-cancel:hover {
+            background: #7f8c8d;
+        }
+
+        .products-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .products-header h2 {
+            color: #333;
+            font-size: 18px;
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .filter-section select {
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .product-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s;
+        }
+
+        .product-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .product-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .product-category {
+            display: inline-block;
+            padding: 3px 8px;
+            background: #667eea;
+            color: white;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .product-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #27ae60;
+            margin: 8px 0;
+        }
+
+        .product-description {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .product-info {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+
+        .info-badge {
+            padding: 3px 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            color: #666;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-edit,
+        .btn-delete {
+            flex: 1;
+            padding: 6px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .btn-edit {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #2980b9;
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c0392b;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .status-available {
+            color: #27ae60;
+        }
+
+        .status-unavailable {
+            color: #e74c3c;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍽️ Gestión de Productos</h1>
+            <div class="user-info">
+                <span class="user-name" id="userName">Cargando...</span>
+                <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="form-section">
+                <h2 id="formTitle">Agregar Producto</h2>
+                <form id="productForm">
+                    <input type="hidden" id="productId">
+                    
+                    <div class="form-group">
+                        <label for="nombre">Nombre *</label>
+                        <input type="text" id="nombre" required maxlength="100">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="precio">Precio *</label>
+                        <input type="number" id="precio" required min="0" step="100">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="categoria">Categoría *</label>
+                        <select id="categoria" required>
+                            <option value="Comidas">Comidas</option>
+                            <option value="Bebidas">Bebidas</option>
+                            <option value="Postres">Postres</option>
+                            <option value="Entradas">Entradas</option>
+                            <option value="Otros">Otros</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descripcion">Descripción</label>
+                        <textarea id="descripcion" maxlength="500"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stock">Stock</label>
+                        <input type="number" id="stock" value="0" min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="disponible">Disponibilidad</label>
+                        <select id="disponible">
+                            <option value="true">Disponible</option>
+                            <option value="false">No Disponible</option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary" id="btnSubmit">Agregar Producto</button>
+                        <button type="button" class="btn-cancel" id="btnCancel" onclick="cancelEdit()">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="products-section">
+                <div class="products-header">
+                    <h2>Mis Productos (<span id="productCount">0</span>)</h2>
+                </div>
+
+                <div class="filter-section">
+                    <select id="filterCategoria" onchange="loadProducts()">
+                        <option value="">Todas las categorías</option>
+                        <option value="Comidas">Comidas</option>
+                        <option value="Bebidas">Bebidas</option>
+                        <option value="Postres">Postres</option>
+                        <option value="Entradas">Entradas</option>
+                        <option value="Otros">Otros</option>
+                    </select>
+
+                    <select id="filterDisponible" onchange="loadProducts()">
+                        <option value="">Todos</option>
+                        <option value="true">Disponibles</option>
+                        <option value="false">No Disponibles</option>
+                    </select>
+                </div>
+
+                <div class="products-grid" id="productsGrid">
+                    <div class="loading">Cargando productos...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        let currentUser = null;
+
+        // Verificar autenticación al cargar
+        window.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/auth/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('No autorizado');
+                }
+
+                const data = await response.json();
+                currentUser = data.data;
+                document.getElementById('userName').textContent = currentUser.nombre;
+                
+                loadProducts();
+            } catch (error) {
+                console.error('Error:', error);
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Cargar productos
+        async function loadProducts() {
+            const token = localStorage.getItem('token');
+            const categoria = document.getElementById('filterCategoria').value;
+            const disponible = document.getElementById('filterDisponible').value;
+
+            let url = `${API_URL}/products?userId=${currentUser._id}`;
+            if (categoria) url += `&categoria=${categoria}`;
+            if (disponible) url += `&disponible=${disponible}`;
+
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayProducts(data.data);
+                    document.getElementById('productCount').textContent = data.count;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('productsGrid').innerHTML = 
+                    '<div class="empty-state"><p>Error al cargar productos</p></div>';
+            }
+        }
+
+        // Mostrar productos
+        function displayProducts(products) {
+            const grid = document.getElementById('productsGrid');
+            
+            if (products.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <p>📦 No hay productos registrados</p>
+                        <small>Comienza agregando tu primer producto</small>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = products.map(product => `
+                <div class="product-card">
+                    <div class="product-header">
+                        <div>
+                            <div class="product-title">${product.nombre}</div>
+                            <span class="product-category">${product.categoria}</span>
+                        </div>
+                    </div>
+                    <div class="product-price">$${product.precio.toLocaleString('es-CO')}</div>
+                    ${product.descripcion ? `<div class="product-description">${product.descripcion}</div>` : ''}
+                    <div class="product-info">
+                        <span class="info-badge">Stock: ${product.stock}</span>
+                        <span class="info-badge ${product.disponible ? 'status-available' : 'status-unavailable'}">
+                            ${product.disponible ? '✓ Disponible' : '✗ No disponible'}
+                        </span>
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn-edit" onclick="editProduct('${product._id}')">Editar</button>
+                        <button class="btn-delete" onclick="deleteProduct('${product._id}', '${product.nombre}')">Eliminar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Enviar formulario
+        document.getElementById('productForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const token = localStorage.getItem('token');
+            const productId = document.getElementById('productId').value;
+
+            const productData = {
+                nombre: document.getElementById('nombre').value,
+                precio: parseFloat(document.getElementById('precio').value),
+                categoria: document.getElementById('categoria').value,
+                descripcion: document.getElementById('descripcion').value,
+                stock: parseInt(document.getElementById('stock').value),
+                disponible: document.getElementById('disponible').value === 'true',
+                userId: currentUser._id
+            };
+
+            try {
+                const url = productId 
+                    ? `${API_URL}/products/${productId}`
+                    : `${API_URL}/products`;
+                
+                const method = productId ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(productData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(data.message);
+                    document.getElementById('productForm').reset();
+                    document.getElementById('productId').value = '';
+                    document.getElementById('formTitle').textContent = 'Agregar Producto';
+                    document.getElementById('btnSubmit').textContent = 'Agregar Producto';
+                    document.getElementById('btnCancel').style.display = 'none';
+                    loadProducts();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al guardar el producto');
+            }
+        });
+
+        // Editar producto
+        async function editProduct(id) {
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch(`${API_URL}/products/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const product = data.data;
+                    document.getElementById('productId').value = product._id;
+                    document.getElementById('nombre').value = product.nombre;
+                    document.getElementById('precio').value = product.precio;
+                    document.getElementById('categoria').value = product.categoria;
+                    document.getElementById('descripcion').value = product.descripcion || '';
+                    document.getElementById('stock').value = product.stock;
+                    document.getElementById('disponible').value = product.disponible.toString();
+                    
+                    document.getElementById('formTitle').textContent = 'Editar Producto';
+                    document.getElementById('btnSubmit').textContent = 'Actualizar Producto';
+                    document.getElementById('btnCancel').style.display = 'block';
+                    
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar el producto');
+            }
+        }
+
+        // Cancelar edición
+        function cancelEdit() {
+            document.getElementById('productForm').reset();
+            document.getElementById('productId').value = '';
+            document.getElementById('formTitle').textContent = 'Agregar Producto';
+            document.getElementById('btnSubmit').textContent = 'Agregar Producto';
+            document.getElementById('btnCancel').style.display = 'none';
+        }
+
+        // Eliminar producto
+        async function deleteProduct(id, nombre) {
+            if (!confirm(`¿Estás seguro de eliminar "${nombre}"?`)) {
+                return;
+            }
+
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch(`${API_URL}/products/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(data.message);
+                    loadProducts();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al eliminar el producto');
+            }
+        }
+
+        // Cerrar sesión
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

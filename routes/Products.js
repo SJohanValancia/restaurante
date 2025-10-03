@@ -3,12 +3,12 @@ const router = express.Router();
 const Product = require('../models/Product');
 
 // Obtener todos los productos
+// Obtener todos los productos (filtrar por userId)
 router.get('/', async (req, res) => {
   try {
-    const { categoria, disponible, search } = req.query;
-    let query = {};
+    const { categoria, disponible, search, userId } = req.query;
+    let query = { userId }; // Filtrar por usuario
 
-    // Filtros opcionales
     if (categoria) query.categoria = categoria;
     if (disponible !== undefined) query.disponible = disponible === 'true';
     if (search) {

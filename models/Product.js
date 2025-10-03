@@ -35,23 +35,26 @@ const productSchema = new mongoose.Schema({
     type: Number,
     default: 0,
     min: [0, 'El stock no puede ser negativo']
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   }
 }, {
   timestamps: true,
   versionKey: false
 });
 
-// Índices para mejorar las búsquedas
 productSchema.index({ nombre: 1 });
 productSchema.index({ categoria: 1 });
 productSchema.index({ disponible: 1 });
+productSchema.index({ userId: 1 });
 
-// Método virtual para formatear el precio
 productSchema.virtual('precioFormateado').get(function() {
   return `$${this.precio.toLocaleString('es-CO')}`;
 });
 
-// Configurar para incluir virtuals en JSON
 productSchema.set('toJSON', { virtuals: true });
 productSchema.set('toObject', { virtuals: true });
 
