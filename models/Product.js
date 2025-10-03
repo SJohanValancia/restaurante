@@ -12,11 +12,11 @@ const productSchema = new mongoose.Schema({
     required: [true, 'El precio es obligatorio'],
     min: [0, 'El precio no puede ser negativo']
   },
-  categoria: {
+categoria: {
     type: String,
     required: [true, 'La categoría es obligatoria'],
-    enum: ['Comidas', 'Bebidas', 'Postres', 'Entradas', 'Otros'],
-    default: 'Otros'
+    trim: true,
+    maxlength: [50, 'La categoría no puede exceder 50 caracteres']
   },
   descripcion: {
     type: String,
