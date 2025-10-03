@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/user');
+const User = require('../models/user'); // Asegúrate que la ruta sea correcta
 const jwt = require('jsonwebtoken');
 
 // Generar JWT Token
@@ -15,6 +15,8 @@ const generarToken = (userId) => {
 // Registro de usuario
 router.post('/register', async (req, res) => {
   try {
+    console.log('Solicitud de registro recibida:', req.body);
+    
     const { nombre, email, password, rol } = req.body;
 
     // Validar que todos los campos estén presentes
@@ -25,25 +27,51 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    // Verificar si el email ya existe
-    const usuarioExistente = await User.findOne({ email });
+    // Validar longitud del nombre
+    if (nombre.length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'El nombre debe tener al menos 2 caracteres'
+      });
+    }
+
+    // Validar longitud del usuario
+    if (email.length < 3) {
+      return res.status(400).json({
+        success: false,
+        message: 'El usuario debe tener al menos 3 caracteres'
+      });
+    }
+
+    // Validar longitud de la contraseña
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'La contraseña debe tener al menos 6 caracteres'
+      });
+    }
+
+    // Verificar si el usuario ya existe
+    const usuarioExistente = await User.findOne({ email: email.toLowerCase() });
     if (usuarioExistente) {
       return res.status(400).json({
         success: false,
-        message: 'El email ya está registrado'
+        message: 'El usuario ya está registrado'
       });
     }
 
     // Crear nuevo usuario
     const usuario = await User.create({
       nombre,
-      email,
+      email: email.toLowerCase(),
       password,
       rol: rol || 'mesero'
     });
 
     // Generar token
     const token = generarToken(usuario._id);
+
+    console.log('Usuario registrado exitosamente:', usuario.email);
 
     res.status(201).json({
       success: true,
@@ -54,6 +82,15 @@ router.post('/register', async (req, res) => {
 
   } catch (error) {
     console.error('Error en registro:', error);
+    
+    // Error de duplicado (por si acaso)
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: 'El usuario ya está registrado'
+      });
+    }
+    
     res.status(500).json({
       success: false,
       message: 'Error al registrar usuario',
@@ -65,18 +102,20 @@ router.post('/register', async (req, res) => {
 // Login de usuario
 router.post('/login', async (req, res) => {
   try {
+    console.log('Solicitud de login recibida:', req.body.email);
+    
     const { email, password } = req.body;
 
     // Validar campos
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Por favor ingrese email y contraseña'
+        message: 'Por favor ingrese usuario y contraseña'
       });
     }
 
     // Buscar usuario e incluir password
-    const usuario = await User.findOne({ email }).select('+password');
+    const usuario = await User.findOne({ email: email.toLowerCase() }).select('+password');
     
     if (!usuario) {
       return res.status(401).json({
@@ -110,6 +149,8 @@ router.post('/login', async (req, res) => {
     // Generar token
     const token = generarToken(usuario._id);
 
+    console.log('Login exitoso:', usuario.email);
+
     res.json({
       success: true,
       message: 'Login exitoso',
@@ -127,7 +168,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Verificar token (middleware para otras rutas)
+// Verificar token
 router.get('/verify', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
