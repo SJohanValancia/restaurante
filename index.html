@@ -518,7 +518,7 @@
                     showAlert('¡Inicio de sesión exitoso! Redirigiendo...', 'success');
                     
                     setTimeout(() => {
-                        window.location.href = 'dashboard.html';
+                        window.location.href = 'index.html';
                     }, 1500);
                 } else {
                     showAlert(data.message || 'Error al iniciar sesión', 'error');
@@ -535,7 +535,7 @@
         window.addEventListener('load', () => {
             const token = localStorage.getItem('token');
             if (token) {
-                window.location.href = 'dashboard.html';
+                window.location.href = 'index.html';
             }
         });
     </script>
