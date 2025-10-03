@@ -518,7 +518,7 @@
                     showAlert('¡Inicio de sesión exitoso! Redirigiendo...', 'success');
                     
                     setTimeout(() => {
-                        window.location.href = 'index.html';
+                        window.location.href = 'productos.html';
                     }, 1500);
                 } else {
                     showAlert(data.message || 'Error al iniciar sesión', 'error');
@@ -531,13 +531,7 @@
             }
         });
 
-        // Verificar si ya hay sesión activa
-        window.addEventListener('load', () => {
-            const token = localStorage.getItem('token');
-            if (token) {
-                window.location.href = 'index.html';
-            }
-        });
+
     </script>
 </body>
 </html>
