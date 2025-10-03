@@ -428,7 +428,7 @@
 
         .product-actions {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 8px;
         }
 
@@ -458,6 +458,24 @@
 
         .btn-delete:hover {
             background: #f56565;
+        }
+
+        .btn-agotar {
+            background: #ed8936;
+            color: white;
+        }
+
+        .btn-agotar:hover {
+            background: #dd6b20;
+        }
+
+        .btn-disponible {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-disponible:hover {
+            background: #38a169;
         }
 
         .empty-state {
@@ -553,16 +571,9 @@
                             </div>
                         </div>
 
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label" for="precio">Precio (COP) *</label>
-                                <input type="number" id="precio" class="form-input" required min="0" step="100" placeholder="15000">
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="stock">Stock</label>
-                                <input type="number" id="stock" class="form-input" value="0" min="0" placeholder="0">
-                            </div>
+                        <div class="form-group">
+                            <label class="form-label" for="precio">Precio (COP) *</label>
+                            <input type="number" id="precio" class="form-input" required min="0" step="100" placeholder="15000">
                         </div>
 
                         <div class="form-group">
@@ -642,6 +653,22 @@
 
                 const data = await response.json();
                 currentUser = data.data;
+                
+                // Normalizar el ID del usuario (puede venir como 'id' o '_id')
+                if (currentUser.id && !currentUser._id) {
+                    currentUser._id = currentUser.id;
+                }
+                
+                // Verificar que currentUser tenga _id
+                if (!currentUser || !currentUser._id) {
+                    console.error('Error: currentUser no tiene _id:', currentUser);
+                    alert('Error al cargar datos del usuario');
+                    localStorage.removeItem('token');
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                console.log('Usuario cargado correctamente:', currentUser);
                 document.getElementById('userName').textContent = currentUser.nombre;
                 document.getElementById('userAvatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
                 
@@ -769,19 +796,18 @@
                             <span class="product-category-badge">${product.categoria}</span>
                         </div>
                     </div>
-                    <div class="product-price">$${product.precio.toLocaleString('es-CO')}</div>
+                    <div class="product-price">${product.precio.toLocaleString('es-CO')}</div>
                     ${product.descripcion ? `<div class="product-description">${product.descripcion}</div>` : ''}
                     <div class="product-meta">
-                        <div class="meta-item">
-                            <span class="meta-icon">📦</span>
-                            <span>Stock: ${product.stock}</span>
-                        </div>
                         <span class="status-badge ${product.disponible ? 'status-available' : 'status-unavailable'}">
-                            ${product.disponible ? '✓ Disponible' : '✗ No disponible'}
+                            ${product.disponible ? '✓ Disponible' : '✗ Agotado'}
                         </span>
                     </div>
                     <div class="product-actions">
                         <button class="btn-action btn-edit" onclick="editProduct('${product._id}')">✏️ Editar</button>
+                        <button class="btn-action ${product.disponible ? 'btn-agotar' : 'btn-disponible'}" onclick="toggleDisponibilidad('${product._id}', ${!product.disponible})">
+                            ${product.disponible ? '⏸️ Agotar' : '✓ Disponible'}
+                        </button>
                         <button class="btn-action btn-delete" onclick="deleteProduct('${product._id}', '${product.nombre}')">🗑️ Eliminar</button>
                     </div>
                 </div>
@@ -794,12 +820,18 @@
             const token = localStorage.getItem('token');
             const productId = document.getElementById('productId').value;
 
+            // Verificar que el usuario esté cargado
+            if (!currentUser || !currentUser._id) {
+                alert('Error: Usuario no identificado. Por favor, recargue la página.');
+                console.error('currentUser no está definido:', currentUser);
+                return;
+            }
+
             // Validar campos
             const nombre = document.getElementById('nombre').value.trim();
             const precio = document.getElementById('precio').value;
             const categoria = document.getElementById('categoria').value.trim();
             const descripcion = document.getElementById('descripcion').value.trim();
-            const stock = document.getElementById('stock').value;
 
             if (!nombre || !precio || !categoria) {
                 alert('Por favor complete todos los campos obligatorios');
@@ -811,11 +843,11 @@
                 precio: parseFloat(precio),
                 categoria: categoria,
                 descripcion: descripcion,
-                stock: parseInt(stock) || 0,
                 disponible: document.getElementById('disponible').value === 'true',
                 userId: currentUser._id
             };
 
+            console.log('Usuario actual:', currentUser);
             console.log('Enviando datos:', productData);
 
             try {
@@ -874,7 +906,6 @@
                     document.getElementById('precio').value = product.precio;
                     document.getElementById('categoria').value = product.categoria;
                     document.getElementById('descripcion').value = product.descripcion || '';
-                    document.getElementById('stock').value = product.stock;
                     document.getElementById('disponible').value = product.disponible.toString();
                     
                     document.getElementById('formTitle').innerHTML = '✏️ Editar Producto';
@@ -929,6 +960,33 @@
         function logout() {
             localStorage.removeItem('token');
             window.location.href = 'index.html';
+        }
+
+        // Nueva función para cambiar disponibilidad
+        async function toggleDisponibilidad(id, nuevoEstado) {
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch(`${API_URL}/products/${id}/disponibilidad`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ disponible: nuevoEstado })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    await loadProducts();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al actualizar la disponibilidad');
+            }
         }
     </script>
 </body>
