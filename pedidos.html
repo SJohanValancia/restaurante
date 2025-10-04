@@ -18,111 +18,247 @@
             color: #1a202c;
         }
 
-        .topbar {
-            background: white;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 0 2rem;
-            position: sticky;
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            left: 0;
             top: 0;
-            z-index: 100;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
+            padding: 0;
+            z-index: 1000;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
         }
 
-        .topbar-content {
-            max-width: 1600px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 70px;
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2);
         }
 
-        .logo-section {
+        .sidebar-brand {
             display: flex;
             align-items: center;
             gap: 12px;
+            color: white;
+            text-decoration: none;
         }
 
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            border-radius: 10px;
+        .brand-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
 
-        .logo-text h1 {
-            font-size: 20px;
+        .brand-text h2 {
+            font-size: 18px;
             font-weight: 700;
-            color: #1a202c;
-            letter-spacing: -0.5px;
+            margin: 0;
         }
 
-        .logo-text p {
-            font-size: 12px;
-            color: #718096;
-            margin-top: 2px;
+        .brand-text p {
+            font-size: 11px;
+            color: rgba(255,255,255,0.7);
+            margin: 2px 0 0 0;
         }
 
-        .user-section {
-            display: flex;
-            align-items: center;
-            gap: 20px;
+        .sidebar-nav {
+            padding: 1rem 0;
         }
 
-        .user-info-box {
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section-title {
+            padding: 0.5rem 1.5rem;
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 8px 16px;
-            background: #f7fafc;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
+            padding: 12px 1.5rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
         }
 
-        .user-avatar {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.2) 0%, transparent 100%);
+            color: white;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .user-avatar-sidebar {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 14px;
+            font-weight: 700;
+            font-size: 16px;
         }
 
-        .user-name {
+        .user-details h4 {
             font-size: 14px;
             font-weight: 600;
-            color: #2d3748;
+            margin: 0;
         }
 
-        .btn-logout {
-            background: #e53e3e;
-            color: white;
-            border: none;
-            padding: 10px 20px;
+        .user-details p {
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+            margin: 2px 0 0 0;
+        }
+
+        .btn-logout-sidebar {
+            width: 100%;
+            padding: 10px;
+            background: rgba(229, 62, 62, 0.2);
+            color: #fc8181;
+            border: 1px solid rgba(229, 62, 62, 0.3);
             border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-logout-sidebar:hover {
+            background: #e53e3e;
+            color: white;
+            border-color: #e53e3e;
+        }
+
+        /* MENU TOGGLE - Solo visible en móvil */
+        .menu-toggle {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1001;
+            display: none; /* Oculto por defecto */
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
             transition: all 0.2s;
         }
 
-        .btn-logout:hover {
-            background: #c53030;
-            transform: translateY(-1px);
+        .menu-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* CONTENIDO PRINCIPAL */
+        .content-wrapper {
+            margin-left: 280px;
+            transition: margin-left 0.3s ease;
+            min-height: 100vh;
         }
 
         .container {
             max-width: 1600px;
             margin: 0 auto;
             padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            color: #718096;
         }
 
         .layout {
@@ -247,11 +383,6 @@
 
         .product-item:last-child {
             border-bottom: none;
-        }
-
-        .product-item.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
         }
 
         .product-info h4 {
@@ -592,350 +723,158 @@
             opacity: 0.5;
         }
 
+        /* RESPONSIVE */
         @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-280px);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .menu-toggle {
+                display: flex; /* Mostrar en móvil */
+            }
+
+            .content-wrapper {
+                margin-left: 0;
+            }
+
             .layout {
                 grid-template-columns: 1fr;
             }
         }
-
-   .sidebar {
-        position: fixed;
-        left: 0;
-        top: 0;
-        width: 280px;
-        height: 100vh;
-        background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
-        padding: 0;
-        z-index: 1000;
-        box-shadow: 4px 0 20px rgba(0,0,0,0.1);
-        transition: transform 0.3s ease;
-    }
-
-    .sidebar.collapsed {
-        transform: translateX(-280px);
-    }
-
-    .sidebar-header {
-        padding: 1.5rem;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        background: rgba(0,0,0,0.2);
-    }
-
-    .sidebar-brand {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        color: white;
-        text-decoration: none;
-    }
-
-    .brand-icon {
-        width: 45px;
-        height: 45px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-    }
-
-    .brand-text h2 {
-        font-size: 18px;
-        font-weight: 700;
-        margin: 0;
-    }
-
-    .brand-text p {
-        font-size: 11px;
-        color: rgba(255,255,255,0.7);
-        margin: 2px 0 0 0;
-    }
-
-    .sidebar-nav {
-        padding: 1rem 0;
-    }
-
-    .nav-section {
-        margin-bottom: 1.5rem;
-    }
-
-    .nav-section-title {
-        padding: 0.5rem 1.5rem;
-        font-size: 11px;
-        font-weight: 700;
-        color: rgba(255,255,255,0.5);
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    .nav-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 12px 1.5rem;
-        color: rgba(255,255,255,0.8);
-        text-decoration: none;
-        transition: all 0.2s;
-        font-size: 14px;
-        font-weight: 500;
-        position: relative;
-    }
-
-    .nav-item:hover {
-        background: rgba(255,255,255,0.1);
-        color: white;
-    }
-
-    .nav-item.active {
-        background: linear-gradient(90deg, rgba(102, 126, 234, 0.2) 0%, transparent 100%);
-        color: white;
-        border-left: 3px solid #667eea;
-    }
-
-    .nav-item.active::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 3px;
-        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-    }
-
-    .nav-icon {
-        font-size: 20px;
-        width: 24px;
-        text-align: center;
-    }
-
-    .sidebar-footer {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        padding: 1.5rem;
-        border-top: 1px solid rgba(255,255,255,0.1);
-        background: rgba(0,0,0,0.2);
-    }
-
-    .user-info {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        color: white;
-        margin-bottom: 1rem;
-    }
-
-    .user-avatar-sidebar {
-        width: 42px;
-        height: 42px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 16px;
-    }
-
-    .user-details h4 {
-        font-size: 14px;
-        font-weight: 600;
-        margin: 0;
-    }
-
-    .user-details p {
-        font-size: 11px;
-        color: rgba(255,255,255,0.6);
-        margin: 2px 0 0 0;
-    }
-
-    .btn-logout-sidebar {
-        width: 100%;
-        padding: 10px;
-        background: rgba(229, 62, 62, 0.2);
-        color: #fc8181;
-        border: 1px solid rgba(229, 62, 62, 0.3);
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 13px;
-        font-weight: 600;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-    }
-
-    .btn-logout-sidebar:hover {
-        background: #e53e3e;
-        color: white;
-        border-color: #e53e3e;
-    }
-
-    .menu-toggle {
-        position: fixed;
-        left: 20px;
-        top: 20px;
-        width: 45px;
-        height: 45px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        border-radius: 12px;
-        color: white;
-        font-size: 20px;
-        cursor: pointer;
-        z-index: 1001;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        transition: all 0.2s;
-    }
-
-    .menu-toggle:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
-    }
-
-    .content-wrapper {
-        margin-left: 280px;
-        transition: margin-left 0.3s ease;
-    }
-
-    .content-wrapper.expanded {
-        margin-left: 0;
-    }
-
-    .sidebar-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0,0,0,0.5);
-        z-index: 999;
-        display: none;
-    }
-
-    .sidebar-overlay.active {
-        display: block;
-    }
-
-    @media (max-width: 1024px) {
-        .sidebar {
-            transform: translateX(-280px);
-        }
-
-        .sidebar.active {
-            transform: translateX(0);
-        }
-
-        .menu-toggle {
-            display: flex;
-        }
-
-        .content-wrapper {
-            margin-left: 0;
-        }
-    }
-
     </style>
 </head>
 <body>
-    <div class="topbar">
-        <div class="topbar-content">
-            <div class="logo-section">
-                <div class="logo-icon">🍽️</div>
-                <div class="logo-text">
-                    <h1>Gestión de Pedidos</h1>
-                    <p>Sistema de órdenes</p>
+    <!-- Menú Toggle - Solo visible en móvil -->
+    <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">☰</button>
+    
+    <!-- Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="productos.html" class="sidebar-brand">
+                <div class="brand-icon">🍽️</div>
+                <div class="brand-text">
+                    <h2>RestaurantApp</h2>
+                    <p>Sistema de gestión</p>
                 </div>
-            </div>
-            <div class="user-section">
-                <div class="user-info-box">
-                    <div class="user-avatar" id="userAvatar">U</div>
-                    <span class="user-name" id="userName">Cargando...</span>
-                </div>
-                <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
-            </div>
+            </a>
         </div>
-    </div>
 
-    <div class="container">
-        <div class="layout">
-            <!-- Formulario de nuevo pedido -->
-            <div class="card">
-                <div class="card-header">
-                    <h2>➕ Nuevo Pedido</h2>
-                    <p>Complete los datos para crear un pedido</p>
-                </div>
-                <div class="card-body">
-                    <form id="orderForm">
-                        <div class="form-group">
-                            <label class="form-label" for="mesa">Número de Mesa *</label>
-                            <input type="number" id="mesa" class="form-input" required min="1" placeholder="Ej: 5">
-                        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Principal</div>
+                <a href="productos.html" class="nav-item">
+                    <span class="nav-icon">📦</span>
+                    <span>Productos</span>
+                </a>
+                <a href="pedidos.html" class="nav-item active">
+                    <span class="nav-icon">🍽️</span>
+                    <span>Pedidos</span>
+                </a>
+            </div>
+        </nav>
 
-                        <div class="products-selector">
-                            <label class="form-label">Seleccionar Productos *</label>
-                            <div class="search-box">
-                                <span class="search-icon">🔍</span>
-                                <input type="text" id="searchProduct" class="form-input search-input" placeholder="Buscar producto...">
-                            </div>
-                            <div class="products-list" id="productsList"></div>
-                        </div>
-
-                        <div class="selected-products" id="selectedProducts"></div>
-
-                        <div class="form-group">
-                            <label class="form-label" for="notas">Notas del Pedido</label>
-                            <textarea id="notas" class="form-textarea" maxlength="500" placeholder="Observaciones especiales del cliente..."></textarea>
-                        </div>
-
-                        <div class="order-summary" id="orderSummary" style="display: none;">
-                            <div class="summary-row">
-                                <span>Productos:</span>
-                                <span id="summaryItems">0</span>
-                            </div>
-                            <div class="summary-row total">
-                                <span>Total:</span>
-                                <span id="summaryTotal">$0</span>
-                            </div>
-                        </div>
-
-                        <button type="submit" class="btn-submit" id="btnSubmit" disabled>Crear Pedido</button>
-                    </form>
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar-sidebar" id="sidebarUserAvatar">U</div>
+                <div class="user-details">
+                    <h4 id="sidebarUserName">Cargando...</h4>
+                    <p>Administrador</p>
                 </div>
             </div>
+            <button class="btn-logout-sidebar" onclick="logout()">
+                <span>🚪</span>
+                <span>Cerrar Sesión</span>
+            </button>
+        </div>
+    </aside>
 
-            <!-- Lista de pedidos -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="orders-header">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <h2>📋 Pedidos</h2>
-                            <span class="order-count" id="orderCount">0</span>
-                        </div>
-                        <div class="filters">
-                            <select id="filterEstado" class="filter-select" onchange="loadOrders()">
-                                <option value="">Todos los estados</option>
-                                <option value="pendiente">Pendientes</option>
-                                <option value="preparando">Preparando</option>
-                                <option value="listo">Listos</option>
-                                <option value="entregado">Entregados</option>
-                                <option value="cancelado">Cancelados</option>
-                            </select>
-                        </div>
+    <!-- Contenido Principal -->
+    <div class="content-wrapper" id="contentWrapper">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">🍽️ Gestión de Pedidos</h1>
+                <p class="page-subtitle">Administra los pedidos de tu restaurante</p>
+            </div>
+
+            <div class="layout">
+                <!-- Formulario de nuevo pedido -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>➕ Nuevo Pedido</h2>
+                        <p>Complete los datos para crear un pedido</p>
+                    </div>
+                    <div class="card-body">
+                        <form id="orderForm">
+                            <div class="form-group">
+                                <label class="form-label" for="mesa">Número de Mesa *</label>
+                                <input type="number" id="mesa" class="form-input" required min="1" placeholder="Ej: 5">
+                            </div>
+
+                            <div class="products-selector">
+                                <label class="form-label">Seleccionar Productos *</label>
+                                <div class="search-box">
+                                    <span class="search-icon">🔍</span>
+                                    <input type="text" id="searchProduct" class="form-input search-input" placeholder="Buscar producto...">
+                                </div>
+                                <div class="products-list" id="productsList"></div>
+                            </div>
+
+                            <div class="selected-products" id="selectedProducts"></div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="notas">Notas del Pedido</label>
+                                <textarea id="notas" class="form-textarea" maxlength="500" placeholder="Observaciones especiales del cliente..."></textarea>
+                            </div>
+
+                            <div class="order-summary" id="orderSummary" style="display: none;">
+                                <div class="summary-row">
+                                    <span>Productos:</span>
+                                    <span id="summaryItems">0</span>
+                                </div>
+                                <div class="summary-row total">
+                                    <span>Total:</span>
+                                    <span id="summaryTotal">$0</span>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn-submit" id="btnSubmit" disabled>Crear Pedido</button>
+                        </form>
                     </div>
                 </div>
-                <div class="card-body">
-                    <div class="orders-list" id="ordersList">
-                        <div class="empty-state">
-                            <div class="empty-icon">📋</div>
-                            <p>Cargando pedidos...</p>
+
+                <!-- Lista de pedidos -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="orders-header">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <h2>📋 Pedidos</h2>
+                                <span class="order-count" id="orderCount">0</span>
+                            </div>
+                            <div class="filters">
+                                <select id="filterEstado" class="filter-select" onchange="loadOrders()">
+                                    <option value="">Todos los estados</option>
+                                    <option value="pendiente">Pendientes</option>
+                                    <option value="preparando">Preparando</option>
+                                    <option value="listo">Listos</option>
+                                    <option value="entregado">Entregados</option>
+                                    <option value="cancelado">Cancelados</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="orders-list" id="ordersList">
+                            <div class="empty-state">
+                                <div class="empty-icon">📋</div>
+                                <p>Cargando pedidos...</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -949,6 +888,7 @@
         let availableProducts = [];
         let selectedItems = [];
 
+        // CARGA INICIAL
         window.addEventListener('DOMContentLoaded', async () => {
             const token = localStorage.getItem('token');
             if (!token) {
@@ -969,14 +909,19 @@
                 if (currentUser.id && !currentUser._id) {
                     currentUser._id = currentUser.id;
                 }
+
+                if (!currentUser || !currentUser._id) {
+                    throw new Error('Datos de usuario incompletos');
+                }
                 
-                document.getElementById('userName').textContent = currentUser.nombre;
-                document.getElementById('userAvatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
+                console.log('✅ Usuario cargado:', currentUser);
+                document.getElementById('sidebarUserName').textContent = currentUser.nombre;
+                document.getElementById('sidebarUserAvatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
                 
                 await loadProducts();
                 await loadOrders();
             } catch (error) {
-                console.error('Error:', error);
+                console.error('❌ Error:', error);
                 localStorage.removeItem('token');
                 window.location.href = 'index.html';
             }
@@ -1013,7 +958,7 @@
                         <h4>${p.nombre}</h4>
                         <p>${p.categoria}</p>
                     </div>
-                    <div class="product-price">${p.precio.toLocaleString('es-CO')}</div>
+                    <div class="product-price">$${p.precio.toLocaleString('es-CO')}</div>
                 </div>
             `).join('');
         }
@@ -1070,7 +1015,7 @@
                                 <button type="button" class="qty-btn" onclick="changeQuantity(${index}, -1)">-</button>
                                 <span class="qty-display">${item.cantidad}</span>
                                 <button type="button" class="qty-btn" onclick="changeQuantity(${index}, 1)">+</button>
-                                <span class="item-price">${(item.producto.precio * item.cantidad).toLocaleString('es-CO')}</span>
+                                <span class="item-price">$${(item.producto.precio * item.cantidad).toLocaleString('es-CO')}</span>
                             </div>
                         </div>
                         <button type="button" class="btn-remove" onclick="removeItem(${index})">Eliminar</button>
@@ -1201,7 +1146,7 @@
                             <div class="order-item">
                                 <span class="item-name">${item.producto.nombre}</span>
                                 <span class="item-qty">x${item.cantidad}</span>
-                                <span>${(item.precio * item.cantidad).toLocaleString('es-CO')}</span>
+                                <span>$${(item.precio * item.cantidad).toLocaleString('es-CO')}</span>
                             </div>
                         `).join('')}
                     </div>
@@ -1268,13 +1213,23 @@
 
         async function cancelOrder(orderId) {
             if (!confirm('¿Está seguro de cancelar este pedido?')) return;
-
             await updateOrderStatus(orderId, 'cancelado');
         }
 
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
         function logout() {
-            localStorage.removeItem('token');
-            window.location.href = 'index.html';
+            if (confirm('¿Cerrar sesión?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('usuario');
+                window.location.href = 'index.html';
+            }
         }
     </script>
 </body>

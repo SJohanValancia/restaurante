@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Gastos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            color: #1a202c;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
+            padding: 0;
+            z-index: 1000;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .brand-text h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .brand-text p {
+            font-size: 11px;
+            color: rgba(255,255,255,0.7);
+            margin: 2px 0 0 0;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section-title {
+            padding: 0.5rem 1.5rem;
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 1.5rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.2) 0%, transparent 100%);
+            color: white;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .user-avatar-sidebar {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .user-details h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .user-details p {
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+            margin: 2px 0 0 0;
+        }
+
+        .btn-logout-sidebar {
+            width: 100%;
+            padding: 10px;
+            background: rgba(229, 62, 62, 0.2);
+            color: #fc8181;
+            border: 1px solid rgba(229, 62, 62, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-logout-sidebar:hover {
+            background: #e53e3e;
+            color: white;
+            border-color: #e53e3e;
+        }
+
+        .menu-toggle {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1001;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            transition: all 0.2s;
+        }
+
+        .menu-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        .content-wrapper {
+            margin-left: 280px;
+            transition: margin-left 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            color: #718096;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 450px 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f7fafc;
+        }
+
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a202c;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-header p {
+            font-size: 13px;
+            color: #718096;
+            margin-top: 4px;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 6px;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .expense-fields {
+            margin-top: 1rem;
+        }
+
+        .expense-item {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .expense-item-header {
+            font-size: 12px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .expense-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 10px;
+        }
+
+        .summary-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 1rem;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 4px;
+        }
+
+        .summary-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .expenses-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .expense-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+
+        .expense-card:hover {
+            border-color: #cbd5e0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .expense-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .expense-date {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 4px;
+        }
+
+        .expense-count {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .expense-total {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .expense-items {
+            margin-bottom: 1rem;
+        }
+
+        .expense-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 13px;
+            border-bottom: 1px solid #f7fafc;
+        }
+
+        .expense-detail:last-child {
+            border-bottom: none;
+        }
+
+        .expense-description {
+            color: #4a5568;
+        }
+
+        .expense-amount {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .expense-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 1rem;
+        }
+
+        .btn-action {
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-edit {
+            background: #4299e1;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #3182ce;
+        }
+
+        .btn-delete {
+            background: #fc8181;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #f56565;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #a0aec0;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 13px;
+            background: white;
+            cursor: pointer;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-280px);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .content-wrapper {
+                margin-left: 0;
+            }
+
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #718096;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+        }
+
+        .btn-close:hover {
+            background: #f7fafc;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">☰</button>
+    
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="productos.html" class="sidebar-brand">
+                <div class="brand-icon">🍽️</div>
+                <div class="brand-text">
+                    <h2>RestaurantApp</h2>
+                    <p>Sistema de gestión</p>
+                </div>
+            </a>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Principal</div>
+                <a href="productos.html" class="nav-item">
+                    <span class="nav-icon">📦</span>
+                    <span>Productos</span>
+                </a>
+                <a href="pedidos.html" class="nav-item">
+                    <span class="nav-icon">🍽️</span>
+                    <span>Pedidos</span>
+                </a>
+                <a href="gastos.html" class="nav-item active">
+                    <span class="nav-icon">💰</span>
+                    <span>Gastos</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar-sidebar" id="sidebarUserAvatar">U</div>
+                <div class="user-details">
+                    <h4 id="sidebarUserName">Cargando...</h4>
+                    <p>Administrador</p>
+                </div>
+            </div>
+            <button class="btn-logout-sidebar" onclick="logout()">
+                <span>🚪</span>
+                <span>Cerrar Sesión</span>
+            </button>
+        </div>
+    </aside>
+
+    <div class="content-wrapper" id="contentWrapper">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">💰 Gestión de Gastos</h1>
+                <p class="page-subtitle">Registra y administra los gastos de tu restaurante</p>
+            </div>
+
+            <div class="layout">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>➕ Registrar Gastos</h2>
+                        <p>Complete la información de los gastos del día</p>
+                    </div>
+                    <div class="card-body">
+                        <form id="expenseForm">
+                            <div class="form-group">
+                                <label class="form-label" for="fecha">Fecha *</label>
+                                <input type="date" id="fecha" class="form-input" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="cantidad">¿Cuántos gastos va a registrar? *</label>
+                                <input type="number" id="cantidad" class="form-input" required min="1" max="20" placeholder="Ej: 5">
+                            </div>
+
+                            <div class="expense-fields" id="expenseFields"></div>
+
+                            <div class="summary-box" id="summaryBox" style="display: none;">
+                                <div class="summary-label">Total de gastos</div>
+                                <div class="summary-value" id="totalAmount">$0</div>
+                            </div>
+
+                            <button type="submit" class="btn-submit" id="btnSubmit" disabled>Guardar Gastos</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>📋 Historial de Gastos</h2>
+                        <div class="filter-bar">
+                            <input type="month" id="filterMonth" class="filter-select" onchange="loadExpenses()">
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="expenses-list" id="expensesList">
+                            <div class="empty-state">
+                                <div class="empty-icon">📋</div>
+                                <p>Cargando gastos...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Editar Gastos</h3>
+                <button class="btn-close" onclick="closeEditModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <input type="hidden" id="editExpenseId">
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="editFecha">Fecha *</label>
+                        <input type="date" id="editFecha" class="form-input" required>
+                    </div>
+
+                    <div class="expense-fields" id="editExpenseFields"></div>
+
+                    <div class="summary-box">
+                        <div class="summary-label">Total de gastos</div>
+                        <div class="summary-value" id="editTotalAmount">$0</div>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Actualizar Gastos</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://restaurante-co77.onrender.com/api';
+        let currentUser = null;
+        let expenseItems = [];
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('No autorizado');
+
+                const data = await response.json();
+                currentUser = data.data;
+                
+                if (currentUser.id && !currentUser._id) {
+                    currentUser._id = currentUser.id;
+                }
+
+                document.getElementById('sidebarUserName').textContent = currentUser.nombre;
+                document.getElementById('sidebarUserAvatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
+                
+                document.getElementById('fecha').valueAsDate = new Date();
+                
+                const today = new Date();
+                const currentMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+                document.getElementById('filterMonth').value = currentMonth;
+                
+                await loadExpenses();
+            } catch (error) {
+                console.error('Error:', error);
+                localStorage.removeItem('token');
+                window.location.href = 'index.html';
+            }
+        });
+
+        document.getElementById('cantidad').addEventListener('input', (e) => {
+            const count = parseInt(e.target.value) || 0;
+            generateExpenseFields(count);
+        });
+
+        function generateExpenseFields(count) {
+            const container = document.getElementById('expenseFields');
+            const btnSubmit = document.getElementById('btnSubmit');
+            
+            if (count < 1 || count > 20) {
+                container.innerHTML = '';
+                btnSubmit.disabled = true;
+                document.getElementById('summaryBox').style.display = 'none';
+                return;
+            }
+
+            expenseItems = Array(count).fill(null).map(() => ({ descripcion: '', monto: 0 }));
+            
+            container.innerHTML = Array(count).fill(null).map((_, index) => `
+                <div class="expense-item">
+                    <div class="expense-item-header">Gasto #${index + 1}</div>
+                    <div class="expense-row">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <input 
+                                type="text" 
+                                class="form-input" 
+                                placeholder="Descripción del gasto" 
+                                required 
+                                maxlength="200"
+                                onchange="updateExpenseItem(${index}, 'descripcion', this.value)"
+                            >
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <input 
+                                type="number" 
+                                class="form-input" 
+                                placeholder="Monto" 
+                                required 
+                                min="0"
+                                step="0.01"
+                                onchange="updateExpenseItem(${index}, 'monto', this.value)"
+                            >
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            btnSubmit.disabled = false;
+            document.getElementById('summaryBox').style.display = 'block';
+            updateTotal();
+        }
+
+        function updateExpenseItem(index, field, value) {
+            if (field === 'monto') {
+                expenseItems[index][field] = parseFloat(value) || 0;
+            } else {
+                expenseItems[index][field] = value;
+            }
+            updateTotal();
+        }
+
+        function updateTotal() {
+            const total = expenseItems.reduce((sum, item) => sum + item.monto, 0);
+            document.getElementById('totalAmount').textContent = `$${total.toLocaleString('es-CO')}`;
+        }
+
+        document.getElementById('expenseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const fecha = document.getElementById('fecha').value;
+            
+            const validItems = expenseItems.filter(item => item.descripcion.trim() && item.monto > 0);
+            
+            if (validItems.length === 0) {
+                alert('Debe completar al menos un gasto con descripción y monto válidos');
+                return;
+            }
+
+            const expenseData = {
+                fecha: fecha,
+                gastos: validItems,
+                userId: currentUser._id
+            };
+
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch(`${API_URL}/expenses`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(expenseData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ Gastos registrados exitosamente');
+                    document.getElementById('expenseForm').reset();
+                    document.getElementById('expenseFields').innerHTML = '';
+                    document.getElementById('summaryBox').style.display = 'none';
+                    document.getElementById('btnSubmit').disabled = true;
+                    document.getElementById('fecha').valueAsDate = new Date();
+                    expenseItems = [];
+                    await loadExpenses();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al registrar los gastos');
+            }
+        });
+
+        async function loadExpenses() {
+            const token = localStorage.getItem('token');
+            const filterMonth = document.getElementById('filterMonth').value;
+
+            let url = `${API_URL}/expenses?userId=${currentUser._id}`;
+            if (filterMonth) {
+                url += `&month=${filterMonth}`;
+            }
+
+            try {
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayExpenses(data.data);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function displayExpenses(expenses) {
+            const list = document.getElementById('expensesList');
+            
+            if (expenses.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <p>No hay gastos registrados</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = expenses.map(expense => `
+                <div class="expense-card">
+                    <div class="expense-header">
+                        <div>
+                            <div class="expense-date">${new Date(expense.fecha).toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                            <div class="expense-count">${expense.gastos.length} gasto(s) registrado(s)</div>
+                        </div>
+                        <div class="expense-total">$${expense.total.toLocaleString('es-CO')}</div>
+                    </div>
+                    <div class="expense-items">
+                        ${expense.gastos.map(gasto => `
+                            <div class="expense-detail">
+                                <span class="expense-description">${gasto.descripcion}</span>
+                                <span class="expense-amount">$${gasto.monto.toLocaleString('es-CO')}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="expense-actions">
+                        <button class="btn-action btn-edit" onclick="editExpense('${expense._id}')">✏️ Editar</button>
+                        <button class="btn-action btn-delete" onclick="deleteExpense('${expense._id}')">🗑️ Eliminar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function editExpense(expenseId) {
+            const token = localStorage.getItem('token');try {
+                const response = await fetch(`${API_URL}/expenses/${expenseId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    const expense = data.data;
+                    
+                    document.getElementById('editExpenseId').value = expense._id;
+                    document.getElementById('editFecha').value = expense.fecha.split('T')[0];
+                    
+                    const container = document.getElementById('editExpenseFields');
+                    container.innerHTML = expense.gastos.map((gasto, index) => `
+                        <div class="expense-item">
+                            <div class="expense-item-header">Gasto #${index + 1}</div>
+                            <div class="expense-row">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <input 
+                                        type="text" 
+                                        class="form-input edit-descripcion" 
+                                        placeholder="Descripción del gasto" 
+                                        required 
+                                        maxlength="200"
+                                        value="${gasto.descripcion}"
+                                        data-index="${index}"
+                                    >
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <input 
+                                        type="number" 
+                                        class="form-input edit-monto" 
+                                        placeholder="Monto" 
+                                        required 
+                                        min="0"
+                                        step="0.01"
+                                        value="${gasto.monto}"
+                                        data-index="${index}"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    updateEditTotal(expense.gastos);
+                    
+                    document.querySelectorAll('.edit-descripcion, .edit-monto').forEach(input => {
+                        input.addEventListener('input', updateEditTotalFromInputs);
+                    });
+                    
+                    document.getElementById('editModal').classList.add('active');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar el gasto');
+            }
+        }
+
+        function updateEditTotalFromInputs() {
+            const descripciones = document.querySelectorAll('.edit-descripcion');
+            const montos = document.querySelectorAll('.edit-monto');
+            
+            let total = 0;
+            montos.forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+            
+            document.getElementById('editTotalAmount').textContent = `$${total.toLocaleString('es-CO')}`;
+        }
+
+        function updateEditTotal(gastos) {
+            const total = gastos.reduce((sum, gasto) => sum + gasto.monto, 0);
+            document.getElementById('editTotalAmount').textContent = `$${total.toLocaleString('es-CO')}`;
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        document.getElementById('editForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const expenseId = document.getElementById('editExpenseId').value;
+            const fecha = document.getElementById('editFecha').value;
+            
+            const descripciones = document.querySelectorAll('.edit-descripcion');
+            const montos = document.querySelectorAll('.edit-monto');
+            
+            const gastos = [];
+            descripciones.forEach((desc, index) => {
+                const descripcion = desc.value.trim();
+                const monto = parseFloat(montos[index].value) || 0;
+                
+                if (descripcion && monto > 0) {
+                    gastos.push({ descripcion, monto });
+                }
+            });
+
+            if (gastos.length === 0) {
+                alert('Debe tener al menos un gasto válido');
+                return;
+            }
+
+            const expenseData = {
+                fecha: fecha,
+                gastos: gastos,
+                userId: currentUser._id
+            };
+
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch(`${API_URL}/expenses/${expenseId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(expenseData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ Gastos actualizados exitosamente');
+                    closeEditModal();
+                    await loadExpenses();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al actualizar los gastos');
+            }
+        });
+
+        async function deleteExpense(expenseId) {
+            if (!confirm('¿Está seguro de eliminar este registro de gastos?')) return;
+
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch(`${API_URL}/expenses/${expenseId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ Gastos eliminados exitosamente');
+                    await loadExpenses();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al eliminar los gastos');
+            }
+        }
+
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function logout() {
+            if (confirm('¿Cerrar sesión?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('usuario');
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>
