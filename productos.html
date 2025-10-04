@@ -492,407 +492,288 @@
     </div>
 
     <script>
-        const API_URL = 'https://restaurante-co77.onrender.com/api';
-        let currentUser = null;
+      const API_URL = 'https://restaurante-co77.onrender.com/api';
+let currentUser = null;
+let allCategories = [];
 
-        // Tu código JavaScript existente de productos...
+// CARGA INICIAL
+window.addEventListener('DOMContentLoaded', async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = 'index.html';
+        return;
+    }
 
-       
-        let allCategories = [];
-
-        window.addEventListener('DOMContentLoaded', async () => {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                window.location.href = 'index.html';
-                return;
-            }
-
-            try {
-                const response = await fetch(`${API_URL}/auth/me`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('No autorizado');
-                }
-
-                const data = await response.json();
-                currentUser = data.data;
-                
-                // Normalizar el ID del usuario (puede venir como 'id' o '_id')
-                if (currentUser.id && !currentUser._id) {
-                    currentUser._id = currentUser.id;
-                }
-                
-                // Verificar que currentUser tenga _id
-                if (!currentUser || !currentUser._id) {
-                    console.error('Error: currentUser no tiene _id:', currentUser);
-                    alert('Error al cargar datos del usuario');
-                    localStorage.removeItem('token');
-                    window.location.href = 'index.html';
-                    return;
-                }
-                
-                console.log('Usuario cargado correctamente:', currentUser);
-                document.getElementById('userName').textContent = currentUser.nombre;
-                document.getElementById('userAvatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
-                
-                await loadCategories();
-                await loadProducts();
-            } catch (error) {
-                console.error('Error:', error);
-                localStorage.removeItem('token');
-                window.location.href = 'index.html';
+    try {
+        const response = await fetch(`${API_URL}/auth/me`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
             }
         });
 
+        if (!response.ok) {
+            throw new Error('No autorizado');
+        }
 
+        const data = await response.json();
+        currentUser = data.data;
         
-        async function loadCategories() {
-            const token = localStorage.getItem('token');
-            try {
-                const response = await fetch(`${API_URL}/products?userId=${currentUser._id}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                const data = await response.json();
-                
-                if (data.success) {
-                    const categories = [...new Set(data.data.map(p => p.categoria))].sort();
-                    allCategories = categories;
-                    
-                    const filterSelect = document.getElementById('filterCategoria');
-                    filterSelect.innerHTML = '<option value="">Todas las categorías</option>';
-                    categories.forEach(cat => {
-                        filterSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
-                    });
-                }
-            } catch (error) {
-                console.error('Error al cargar categorías:', error);
-            }
+        // Normalizar el ID
+        if (currentUser.id && !currentUser._id) {
+            currentUser._id = currentUser.id;
         }
+        
+        // Verificar que tenga _id
+        if (!currentUser || !currentUser._id) {
+            console.error('Error: currentUser no tiene _id:', currentUser);
+            throw new Error('Datos de usuario incompletos');
+        }
+        
+        console.log('✅ Usuario cargado:', currentUser);
+        
+        // Actualizar SOLO los elementos que existen
+        document.getElementById('sidebarUserName').textContent = currentUser.nombre;
+        document.getElementById('sidebarUserAvatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
+        
+        await loadProducts();
+    } catch (error) {
+        console.error('❌ Error de autenticación:', error);
+        localStorage.removeItem('token');
+        window.location.href = 'index.html';
+    }
+});
 
-        const categoriaInput = document.getElementById('categoria');
-        const suggestionBox = document.getElementById('categorySuggestions');
+// CARGAR PRODUCTOS
+async function loadProducts() {
+    const token = localStorage.getItem('token');
 
-        categoriaInput.addEventListener('input', (e) => {
-            const value = e.target.value.toLowerCase();
-            if (value.length === 0) {
-                suggestionBox.classList.remove('active');
-                return;
-            }
-
-            const filtered = allCategories.filter(cat => 
-                cat.toLowerCase().includes(value)
-            );
-
-            if (filtered.length > 0) {
-                suggestionBox.innerHTML = filtered.map(cat => 
-                    `<div class="category-suggestion-item" onclick="selectCategory('${cat}')">${cat}</div>`
-                ).join('');
-                suggestionBox.classList.add('active');
-            } else {
-                suggestionBox.classList.remove('active');
+    try {
+        const response = await fetch(`${API_URL}/products?userId=${currentUser._id}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
             }
         });
 
-        function selectCategory(category) {
-            document.getElementById('categoria').value = category;
-            document.getElementById('categorySuggestions').classList.remove('active');
+        const data = await response.json();
+        
+        if (data.success) {
+            displayProducts(data.data);
+            // Extraer categorías únicas
+            allCategories = [...new Set(data.data.map(p => p.categoria))].sort();
         }
+    } catch (error) {
+        console.error('Error al cargar productos:', error);
+        document.getElementById('productsGrid').innerHTML = 
+            `<div style="text-align: center; padding: 2rem; color: #718096;">
+                <p>⚠️ Error al cargar productos</p>
+            </div>`;
+    }
+}
 
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.category-input-wrapper')) {
-                document.getElementById('categorySuggestions').classList.remove('active');
-            }
+// MOSTRAR PRODUCTOS
+function displayProducts(products) {
+    const grid = document.getElementById('productsGrid');
+    
+    if (products.length === 0) {
+        grid.innerHTML = `
+            <div style="text-align: center; padding: 2rem; color: #718096;">
+                <p style="font-size: 3rem; margin-bottom: 1rem;">📦</p>
+                <p style="font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem;">No hay productos</p>
+                <p>Comienza agregando tu primer producto</p>
+            </div>
+        `;
+        return;
+    }
+
+    grid.innerHTML = products.map(product => `
+        <div class="product-card">
+            <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">${product.nombre}</h3>
+            <span style="display: inline-block; background: #e2e8f0; padding: 4px 12px; border-radius: 12px; font-size: 0.85rem; margin-bottom: 0.75rem;">${product.categoria}</span>
+            <p style="font-size: 1.5rem; font-weight: 700; color: #2d3748; margin-bottom: 0.5rem;">$${product.precio.toLocaleString('es-CO')}</p>
+            ${product.descripcion ? `<p style="color: #718096; margin-bottom: 1rem;">${product.descripcion}</p>` : ''}
+            <div style="margin-top: 1rem;">
+                <span style="display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; background: ${product.disponible ? '#d1fae5' : '#fee2e2'}; color: ${product.disponible ? '#065f46' : '#991b1b'};">
+                    ${product.disponible ? '✓ Disponible' : '✗ Agotado'}
+                </span>
+            </div>
+            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button onclick="editProduct('${product._id}')" style="flex: 1; min-width: 80px; padding: 8px 12px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">✏️ Editar</button>
+                <button onclick="toggleDisponibilidad('${product._id}', ${!product.disponible})" style="flex: 1; min-width: 80px; padding: 8px 12px; background: ${product.disponible ? '#f59e0b' : '#10b981'}; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
+                    ${product.disponible ? '⏸️ Agotar' : '✓ Activar'}
+                </button>
+                <button onclick="deleteProduct('${product._id}', '${product.nombre}')" style="flex: 1; min-width: 80px; padding: 8px 12px; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">🗑️ Eliminar</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// FORMULARIO DE PRODUCTOS
+document.getElementById('productForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const token = localStorage.getItem('token');
+    const productId = document.getElementById('productId').value;
+
+    if (!currentUser || !currentUser._id) {
+        alert('Error: Usuario no identificado. Recargue la página.');
+        return;
+    }
+
+    const nombre = document.getElementById('nombre').value.trim();
+    const precio = document.getElementById('precio').value;
+    const categoria = document.getElementById('categoria').value.trim();
+    const descripcion = document.getElementById('descripcion').value.trim();
+
+    if (!nombre || !precio || !categoria) {
+        alert('Complete todos los campos obligatorios');
+        return;
+    }
+
+    const productData = {
+        nombre,
+        precio: parseFloat(precio),
+        categoria,
+        descripcion,
+        disponible: true,
+        userId: currentUser._id
+    };
+
+    try {
+        const url = productId 
+            ? `${API_URL}/products/${productId}`
+            : `${API_URL}/products`;
+        
+        const method = productId ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+            method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(productData)
         });
 
-        async function loadProducts() {
-            const token = localStorage.getItem('token');
-            const categoria = document.getElementById('filterCategoria').value;
-            const disponible = document.getElementById('filterDisponible').value;
+        const data = await response.json();
 
-            let url = `${API_URL}/products?userId=${currentUser._id}`;
-            if (categoria) url += `&categoria=${categoria}`;
-            if (disponible) url += `&disponible=${disponible}`;
-
-            try {
-                const response = await fetch(url, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                const data = await response.json();
-                
-                if (data.success) {
-                    displayProducts(data.data);
-                    document.getElementById('productCount').textContent = data.count;
-                    await loadCategories();
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('productsGrid').innerHTML = 
-                    `<div class="empty-state">
-                        <div class="empty-icon">⚠️</div>
-                        <p class="empty-title">Error al cargar productos</p>
-                    </div>`;
-            }
-        }
-
-        function displayProducts(products) {
-            const grid = document.getElementById('productsGrid');
-            
-            if (products.length === 0) {
-                grid.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">📦</div>
-                        <p class="empty-title">No hay productos registrados</p>
-                        <p class="empty-text">Comienza agregando tu primer producto</p>
-                    </div>
-                `;
-                return;
-            }
-
-            grid.innerHTML = products.map(product => `
-                <div class="product-card">
-                    <div class="product-card-header">
-                        <div>
-                            <div class="product-name">${product.nombre}</div>
-                            <span class="product-category-badge">${product.categoria}</span>
-                        </div>
-                    </div>
-                    <div class="product-price">${product.precio.toLocaleString('es-CO')}</div>
-                    ${product.descripcion ? `<div class="product-description">${product.descripcion}</div>` : ''}
-                    <div class="product-meta">
-                        <span class="status-badge ${product.disponible ? 'status-available' : 'status-unavailable'}">
-                            ${product.disponible ? '✓ Disponible' : '✗ Agotado'}
-                        </span>
-                    </div>
-                    <div class="product-actions">
-                        <button class="btn-action btn-edit" onclick="editProduct('${product._id}')">✏️ Editar</button>
-                        <button class="btn-action ${product.disponible ? 'btn-agotar' : 'btn-disponible'}" onclick="toggleDisponibilidad('${product._id}', ${!product.disponible})">
-                            ${product.disponible ? '⏸️ Agotar' : '✓ Disponible'}
-                        </button>
-                        <button class="btn-action btn-delete" onclick="deleteProduct('${product._id}', '${product.nombre}')">🗑️ Eliminar</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        document.getElementById('productForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const token = localStorage.getItem('token');
-            const productId = document.getElementById('productId').value;
-
-            // Verificar que el usuario esté cargado
-            if (!currentUser || !currentUser._id) {
-                alert('Error: Usuario no identificado. Por favor, recargue la página.');
-                console.error('currentUser no está definido:', currentUser);
-                return;
-            }
-
-            // Validar campos
-            const nombre = document.getElementById('nombre').value.trim();
-            const precio = document.getElementById('precio').value;
-            const categoria = document.getElementById('categoria').value.trim();
-            const descripcion = document.getElementById('descripcion').value.trim();
-
-            if (!nombre || !precio || !categoria) {
-                alert('Por favor complete todos los campos obligatorios');
-                return;
-            }
-
-            const productData = {
-                nombre: nombre,
-                precio: parseFloat(precio),
-                categoria: categoria,
-                descripcion: descripcion,
-                disponible: document.getElementById('disponible').value === 'true',
-                userId: currentUser._id
-            };
-
-            console.log('Usuario actual:', currentUser);
-            console.log('Enviando datos:', productData);
-
-            try {
-                const url = productId 
-                    ? `${API_URL}/products/${productId}`
-                    : `${API_URL}/products`;
-                
-                const method = productId ? 'PUT' : 'POST';
-
-                const response = await fetch(url, {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify(productData)
-                });
-
-                const data = await response.json();
-                console.log('Respuesta del servidor:', data);
-
-                if (data.success) {
-                    alert(data.message);
-                    document.getElementById('productForm').reset();
-                    document.getElementById('productId').value = '';
-                    document.getElementById('formTitle').innerHTML = '➕ Agregar Producto';
-                    document.getElementById('btnSubmit').textContent = 'Agregar Producto';
-                    document.getElementById('btnCancel').style.display = 'none';
-                    await loadProducts();
-                } else {
-                    alert('Error: ' + (data.message || 'Error desconocido'));
-                    console.error('Error del servidor:', data);
-                }
-            } catch (error) {
-                console.error('Error completo:', error);
-                alert('Error al guardar el producto. Revise la consola para más detalles.');
-            }
-        });
-
-        async function editProduct(id) {
-            const token = localStorage.getItem('token');
-
-            try {
-                const response = await fetch(`${API_URL}/products/${id}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    const product = data.data;
-                    document.getElementById('productId').value = product._id;
-                    document.getElementById('nombre').value = product.nombre;
-                    document.getElementById('precio').value = product.precio;
-                    document.getElementById('categoria').value = product.categoria;
-                    document.getElementById('descripcion').value = product.descripcion || '';
-                    document.getElementById('disponible').value = product.disponible.toString();
-                    
-                    document.getElementById('formTitle').innerHTML = '✏️ Editar Producto';
-                    document.getElementById('btnSubmit').textContent = 'Actualizar Producto';
-                    document.getElementById('btnCancel').style.display = 'block';
-                    
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error al cargar el producto');
-            }
-        }
-
-        function cancelEdit() {
+        if (data.success) {
+            alert(data.message);
             document.getElementById('productForm').reset();
             document.getElementById('productId').value = '';
-            document.getElementById('formTitle').innerHTML = '➕ Agregar Producto';
-            document.getElementById('btnSubmit').textContent = 'Agregar Producto';
-            document.getElementById('btnCancel').style.display = 'none';
+            document.getElementById('formTitle').textContent = 'Agregar Producto';
+            await loadProducts();
+        } else {
+            alert('Error: ' + (data.message || 'Error desconocido'));
         }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al guardar el producto');
+    }
+});
 
-        async function deleteProduct(id, nombre) {
-            if (!confirm(`¿Estás seguro de eliminar "${nombre}"?`)) {
-                return;
-            }
+// EDITAR PRODUCTO
+async function editProduct(id) {
+    const token = localStorage.getItem('token');
 
-            const token = localStorage.getItem('token');
-
-            try {
-                const response = await fetch(`${API_URL}/products/${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    alert(data.message);
-                    await loadProducts();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error al eliminar el producto');
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('token');
-            window.location.href = 'index.html';
-        }
-
-        // Nueva función para cambiar disponibilidad
-        async function toggleDisponibilidad(id, nuevoEstado) {
-            const token = localStorage.getItem('token');
-
-            try {
-                const response = await fetch(`${API_URL}/products/${id}/disponibilidad`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ disponible: nuevoEstado })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    await loadProducts();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error al actualizar la disponibilidad');
-            }
-        }
-
-         function toggleMenu() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            const contentWrapper = document.getElementById('contentWrapper');
-            
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-            
-            if (window.innerWidth > 1024) {
-                sidebar.classList.toggle('collapsed');
-                contentWrapper.classList.toggle('expanded');
-            }
-        }
-
-        function logout() {
-            if (confirm('¿Está seguro que desea cerrar sesión?')) {
-                localStorage.removeItem('token');
-                window.location.href = 'index.html';
-            }
-        }
-
-        // Sincronizar usuario en sidebar
-        window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                const mainUserName = document.getElementById('userName');
-                const mainUserAvatar = document.getElementById('userAvatar');
-                
-                if (mainUserName) {
-                    document.getElementById('sidebarUserName').textContent = mainUserName.textContent;
-                    document.getElementById('sidebarUserAvatar').textContent = mainUserAvatar.textContent;
-                }
-            }, 500);
+    try {
+        const response = await fetch(`${API_URL}/products/${id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
 
+        const data = await response.json();
 
+        if (data.success) {
+            const product = data.data;
+            document.getElementById('productId').value = product._id;
+            document.getElementById('nombre').value = product.nombre;
+            document.getElementById('precio').value = product.precio;
+            document.getElementById('categoria').value = product.categoria;
+            document.getElementById('descripcion').value = product.descripcion || '';
+            document.getElementById('formTitle').textContent = 'Editar Producto';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al cargar el producto');
+    }
+}
+
+// ELIMINAR PRODUCTO
+async function deleteProduct(id, nombre) {
+    if (!confirm(`¿Eliminar "${nombre}"?`)) return;
+
+    const token = localStorage.getItem('token');
+
+    try {
+        const response = await fetch(`${API_URL}/products/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert(data.message);
+            await loadProducts();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al eliminar');
+    }
+}
+
+// CAMBIAR DISPONIBILIDAD
+async function toggleDisponibilidad(id, nuevoEstado) {
+    const token = localStorage.getItem('token');
+
+    try {
+        const response = await fetch(`${API_URL}/products/${id}/disponibilidad`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ disponible: nuevoEstado })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            await loadProducts();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al actualizar disponibilidad');
+    }
+}
+
+// MENU TOGGLE
+function toggleMenu() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const contentWrapper = document.getElementById('contentWrapper');
+    
+    sidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
+    
+    if (window.innerWidth > 1024) {
+        sidebar.classList.toggle('collapsed');
+        contentWrapper.classList.toggle('expanded');
+    }
+}
+
+// LOGOUT
+function logout() {
+    if (confirm('¿Cerrar sesión?')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('usuario');
+        window.location.href = 'index.html';
+    }
+}
     </script>
 </body>
 </html>

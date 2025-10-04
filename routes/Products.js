@@ -1,60 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
 
-// Middleware para verificar el token
-const verifyToken = async (req, res, next) => {
-    try {
-        const token = req.headers.authorization?.split(' ')[1];
-        
-        if (!token) {
-            return res.status(401).json({
-                success: false,
-                message: 'No se proporcionó token de autenticación'
-            });
-        }
-
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findById(decoded.userId).select('-password');
-        
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'Usuario no encontrado'
-            });
-        }
-
-        req.user = user;
-        next();
-    } catch (error) {
-        res.status(401).json({
-            success: false,
-            message: 'Token inválido o expirado'
-        });
-    }
-};
-
-// Endpoint para obtener datos del usuario autenticado
-router.get('/me', verifyToken, async (req, res) => {
-    try {
-        res.json({
-            success: true,
-            data: {
-                _id: req.user._id,
-                id: req.user._id,
-                nombre: req.user.nombre,
-                email: req.user.email
-            }
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Error al obtener datos del usuario'
-        });
-    }
-});
 
 
 // Obtener todos los productos

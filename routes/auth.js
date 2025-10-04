@@ -225,7 +225,8 @@ router.get('/me', async (req, res) => {
       process.env.JWT_SECRET || 'secreto-super-seguro-cambiar-en-produccion'
     );
 
-    const usuario = await User.findById(decoded.id);
+    // Buscar con decoded.userId o decoded.id (dependiendo de cómo lo generaste)
+    const usuario = await User.findById(decoded.userId || decoded.id);
 
     if (!usuario) {
       return res.status(404).json({
@@ -236,15 +237,21 @@ router.get('/me', async (req, res) => {
 
     res.json({
       success: true,
-      data: usuario.obtenerDatosPublicos()
+      data: {
+        _id: usuario._id,
+        id: usuario._id,  // Incluir ambos para compatibilidad
+        nombre: usuario.nombre,
+        email: usuario.email,
+        rol: usuario.rol
+      }
     });
 
   } catch (error) {
+    console.error('Error en /me:', error);
     res.status(401).json({
       success: false,
       message: 'Token inválido'
     });
   }
 });
-
 module.exports = router;
