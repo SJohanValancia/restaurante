@@ -13,6 +13,8 @@ const generarToken = (userId) => {
 };
 
 
+
+
 // Registro de usuario
 router.post('/register', async (req, res) => {
   try {
