@@ -22,7 +22,7 @@ mongoose.connect(process.env.MONGO_URI)
 app.use('/api/products', require('./routes/Products'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/orders', require('./routes/Orders')); // Nueva ruta para pedidos
-app.use('/api/expenses', expensesRoutes);
+app.use('/api/Expenses', expensesRoutes);
 
 // Ruta principal (sirve index.html)
 app.get('/', (req, res) => {
