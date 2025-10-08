@@ -42,12 +42,75 @@
             opacity: 0.9;
         }
 
+        /* Indicador de actualización en tiempo real */
+        .live-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.95);
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #2d3748;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #48bb78;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.2);
+            }
+        }
+
         .info-card {
             background: white;
             border-radius: 16px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .info-card.updating {
+            animation: cardPulse 0.5s ease;
+        }
+
+        @keyframes cardPulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.02);
+            }
         }
 
         .info-card h2 {
@@ -88,6 +151,11 @@
             padding: 1.5rem;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .order-card.updating {
+            animation: cardPulse 0.5s ease;
         }
 
         .order-header {
@@ -118,6 +186,26 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+
+        .status-badge.changed {
+            animation: statusChange 0.6s ease;
+        }
+
+        @keyframes statusChange {
+            0%, 100% {
+                transform: scale(1);
+            }
+            25% {
+                transform: scale(1.15);
+            }
+            50% {
+                transform: scale(0.95);
+            }
+            75% {
+                transform: scale(1.05);
+            }
         }
 
         .status-pendiente {
@@ -167,6 +255,7 @@
             gap: 12px;
             padding: 10px 0;
             position: relative;
+            transition: all 0.3s ease;
         }
 
         .timeline-item::before {
@@ -194,6 +283,7 @@
             flex-shrink: 0;
             z-index: 1;
             border: 2px solid;
+            transition: all 0.3s ease;
         }
 
         .timeline-icon.active {
@@ -208,6 +298,24 @@
             color: #cbd5e0;
         }
 
+        .timeline-icon.just-activated {
+            animation: iconActivate 0.6s ease;
+        }
+
+        @keyframes iconActivate {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
         .timeline-content {
             flex: 1;
         }
@@ -216,6 +324,7 @@
             font-size: 14px;
             font-weight: 600;
             color: #2d3748;
+            transition: all 0.3s ease;
         }
 
         .timeline-label.inactive {
@@ -370,24 +479,48 @@
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
 
-        .refresh-button {
+        /* Notificación de cambio */
+        .change-notification {
             position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            width: 56px;
-            height: 56px;
+            top: 80px;
+            right: 20px;
             background: white;
-            border: none;
-            border-radius: 50%;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            transition: all 0.2s;
-            z-index: 1000;
+            padding: 16px 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1001;
+            animation: slideInNotification 0.3s ease;
+            border-left: 4px solid #48bb78;
         }
 
-        .refresh-button:hover {
-            transform: scale(1.1) rotate(180deg);
+        @keyframes slideInNotification {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification-icon {
+            font-size: 24px;
+        }
+
+        .notification-content h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 2px;
+        }
+
+        .notification-content p {
+            font-size: 12px;
+            color: #718096;
         }
 
         @media (max-width: 600px) {
@@ -406,10 +539,29 @@
             .total-amount {
                 font-size: 24px;
             }
+
+            .live-indicator {
+                top: 10px;
+                right: 10px;
+                font-size: 11px;
+                padding: 6px 12px;
+            }
+
+            .change-notification {
+                top: 60px;
+                right: 10px;
+                left: 10px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Indicador de conexión en tiempo real -->
+    <div class="live-indicator">
+        <div class="live-dot"></div>
+        <span>Actualización en tiempo real</span>
+    </div>
+
     <div class="container">
         <div class="header">
             <h1>📱 Seguimiento de Pedido</h1>
@@ -424,11 +576,11 @@
         </div>
     </div>
 
-    <button class="refresh-button" onclick="loadOrder()" title="Actualizar">🔄</button>
-
     <script>
         const API_URL = 'https://restaurante-co77.onrender.com/api';
         let orderData = null;
+        let previousStatus = null;
+        let pollingInterval = null;
 
         // Obtener parámetros de la URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -442,14 +594,22 @@
                 return;
             }
 
+            // Cargar pedido inicial
             loadOrder();
-            // Auto-actualizar cada 30 segundos
-            setInterval(loadOrder, 30000);
+            
+            // Configurar polling cada 3 segundos para actualizaciones en tiempo real
+            pollingInterval = setInterval(checkForUpdates, 3000);
+        });
+
+        // Limpiar intervalo al salir de la página
+        window.addEventListener('beforeunload', () => {
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+            }
         });
 
         async function loadOrder() {
             try {
-                // Buscar pedido más reciente para esta mesa
                 const response = await fetch(`${API_URL}/orders/mesa/${mesa}?restaurante=${encodeURIComponent(restaurante)}${sede ? '&sede=' + encodeURIComponent(sede) : ''}`);
                 
                 if (!response.ok) {
@@ -460,7 +620,8 @@
 
                 if (data.success && data.data) {
                     orderData = data.data;
-                    displayOrder();
+                    previousStatus = data.data.estado;
+                    displayOrder(false);
                 } else {
                     showError('Sin pedidos', 'No hay pedidos activos para esta mesa en este momento.');
                 }
@@ -470,16 +631,101 @@
             }
         }
 
-        function displayOrder() {
+        async function checkForUpdates() {
+            try {
+                const response = await fetch(`${API_URL}/orders/mesa/${mesa}?restaurante=${encodeURIComponent(restaurante)}${sede ? '&sede=' + encodeURIComponent(sede) : ''}`);
+                
+                if (!response.ok) return;
+
+                const data = await response.json();
+
+                if (data.success && data.data) {
+                    const newOrder = data.data;
+                    
+                    // Verificar si hay cambios en el estado
+                    if (orderData && newOrder.estado !== orderData.estado) {
+                        console.log('🔔 Cambio detectado:', orderData.estado, '→', newOrder.estado);
+                        
+                        // Mostrar notificación de cambio
+                        showChangeNotification(orderData.estado, newOrder.estado);
+                        
+                        // Actualizar datos
+                        previousStatus = orderData.estado;
+                        orderData = newOrder;
+                        
+                        // Actualizar vista con animación
+                        displayOrder(true);
+                    } else if (!orderData) {
+                        // Primera carga
+                        orderData = newOrder;
+                        previousStatus = newOrder.estado;
+                        displayOrder(false);
+                    }
+                }
+            } catch (error) {
+                console.error('Error al verificar actualizaciones:', error);
+            }
+        }
+
+        function showChangeNotification(oldStatus, newStatus) {
+            const statusInfo = getStatusInfo(newStatus);
+            
+            // Crear notificación
+            const notification = document.createElement('div');
+            notification.className = 'change-notification';
+            notification.innerHTML = `
+                <div class="notification-icon">${statusInfo.emoji}</div>
+                <div class="notification-content">
+                    <h4>¡Estado actualizado!</h4>
+                    <p>${statusInfo.title}</p>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Reproducir sonido (opcional)
+            playNotificationSound();
+            
+            // Eliminar después de 4 segundos
+            setTimeout(() => {
+                notification.style.animation = 'slideInNotification 0.3s ease reverse';
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+        }
+
+        function playNotificationSound() {
+            // Crear un sonido simple con Web Audio API
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+            } catch (error) {
+                console.log('No se pudo reproducir sonido de notificación');
+            }
+        }
+
+        function displayOrder(isUpdate = false) {
             const content = document.getElementById('content');
             const order = orderData;
 
             const statusInfo = getStatusInfo(order.estado);
-            const timeline = getTimeline(order.estado);
+            const timeline = getTimeline(order.estado, isUpdate ? previousStatus : null);
 
             content.innerHTML = `
                 <!-- Información del establecimiento -->
-                <div class="info-card">
+                <div class="info-card ${isUpdate ? 'updating' : ''}">
                     <h2>🏪 Información</h2>
                     <div class="info-row">
                         <span class="info-label">Restaurante:</span>
@@ -502,7 +748,7 @@
                 </div>
 
                 <!-- Tarjeta del pedido -->
-                <div class="order-card">
+                <div class="order-card ${isUpdate ? 'updating' : ''}">
                     <div class="order-header">
                         <div class="order-info">
                             <h3>${statusInfo.emoji} ${statusInfo.title}</h3>
@@ -510,7 +756,7 @@
                                 ${statusInfo.message}
                             </div>
                         </div>
-                        <span class="status-badge status-${order.estado}">${order.estado}</span>
+                        <span class="status-badge status-${order.estado} ${isUpdate ? 'changed' : ''}">${order.estado}</span>
                     </div>
 
                     <!-- Timeline del estado -->
@@ -518,7 +764,7 @@
                         <div class="timeline-title">Progreso del Pedido</div>
                         ${timeline.map(item => `
                             <div class="timeline-item">
-                                <div class="timeline-icon ${item.active ? 'active' : 'inactive'}">
+                                <div class="timeline-icon ${item.active ? 'active' : 'inactive'} ${item.justActivated ? 'just-activated' : ''}">
                                     ${item.icon}
                                 </div>
                                 <div class="timeline-content">
@@ -593,7 +839,7 @@
             return statusMap[estado] || statusMap['pendiente'];
         }
 
-        function getTimeline(currentStatus) {
+        function getTimeline(currentStatus, previousStatus = null) {
             const allStatuses = [
                 { key: 'pendiente', icon: '📋', label: 'Pedido Recibido' },
                 { key: 'preparando', icon: '👨‍🍳', label: 'En Preparación' },
@@ -603,19 +849,28 @@
 
             const statusOrder = ['pendiente', 'preparando', 'listo', 'entregado'];
             const currentIndex = statusOrder.indexOf(currentStatus);
+            const previousIndex = previousStatus ? statusOrder.indexOf(previousStatus) : -1;
 
             // Si está cancelado, marcar solo el primero como activo
             if (currentStatus === 'cancelado') {
                 return allStatuses.map((status, index) => ({
                     ...status,
-                    active: index === 0
+                    active: index === 0,
+                    justActivated: false
                 }));
             }
 
-            return allStatuses.map((status, index) => ({
-                ...status,
-                active: statusOrder.indexOf(status.key) <= currentIndex
-            }));
+            return allStatuses.map((status, index) => {
+                const statusIndex = statusOrder.indexOf(status.key);
+                const isActive = statusIndex <= currentIndex;
+                const wasJustActivated = previousStatus && statusIndex === currentIndex && currentIndex > previousIndex;
+
+                return {
+                    ...status,
+                    active: isActive,
+                    justActivated: wasJustActivated
+                };
+            });
         }
 
         function showError(title, message) {
@@ -625,7 +880,7 @@
                     <div class="error-icon">😕</div>
                     <h2 class="error-title">${title}</h2>
                     <p class="error-message">${message}</p>
-                    <button class="btn-refresh" onclick="loadOrder()">
+                    <button class="btn-refresh" onclick="location.reload()">
                         🔄 Intentar Nuevamente
                     </button>
                 </div>
