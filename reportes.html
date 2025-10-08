@@ -820,6 +820,10 @@
                     <span>Reportes</span>
                 </a>
 
+                                <a href="historial-pedidos.html" class="nav-item">
+    <span class="nav-icon">📜</span>
+    <span>Historial</span>
+</a>
                 
             </div>
         </nav>
@@ -1030,50 +1034,142 @@
 
     function setDefaultDates() {
         const today = new Date();
-        const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
-
-        document.getElementById('fechaHasta').valueAsDate = today;
-        document.getElementById('fechaDesde').valueAsDate = today;
+        
+        // Establecer fecha de hoy
+        const todayStr = today.toISOString().split('T')[0];
+        document.getElementById('fechaHasta').value = todayStr;
+        document.getElementById('fechaDesde').value = todayStr;
+        
+        console.log('📅 Fechas establecidas:', todayStr);
     }
 
-    function selectPeriod(period, event) {
+    function selectPeriod(period) {
         currentPeriod = period;
 
+        // Actualizar botones activos
         document.querySelectorAll('.period-btn').forEach(btn => {
             btn.classList.remove('active');
         });
-        if (event && event.target) {
-            event.target.classList.add('active');
-        }
+        event.target.classList.add('active');
 
         const today = new Date();
-        const fechaHasta = document.getElementById('fechaHasta');
-        const fechaDesde = document.getElementById('fechaDesde');
-
-        fechaHasta.valueAsDate = today;
+        const todayStr = today.toISOString().split('T')[0];
+        
+        document.getElementById('fechaHasta').value = todayStr;
 
         switch (period) {
             case 'hoy':
-                fechaDesde.valueAsDate = today;
+                document.getElementById('fechaDesde').value = todayStr;
                 break;
             case 'semana':
                 const semana = new Date(today);
                 semana.setDate(semana.getDate() - 7);
-                fechaDesde.valueAsDate = semana;
+                document.getElementById('fechaDesde').value = semana.toISOString().split('T')[0];
                 break;
             case 'mes':
                 const mes = new Date(today);
                 mes.setMonth(mes.getMonth() - 1);
-                fechaDesde.valueAsDate = mes;
+                document.getElementById('fechaDesde').value = mes.toISOString().split('T')[0];
                 break;
             case 'custom':
-                break;
+                // No hacer nada, dejar que el usuario seleccione
+                return;
         }
 
         if (period !== 'custom') {
             applyFilters();
         }
+    }
+
+    async function loadProducts() {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch(`${API_URL}/products?userId=${currentUser._id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                allProducts = data.data;
+                const select = document.getElementById('filterProducto');
+                select.innerHTML = '<option value="">Todos los productos</option>' +
+                    allProducts.map(p => `<option value="${p._id}">${p.nombre}</option>`).join('');
+            }
+        } catch (error) {
+            console.error('Error al cargar productos:', error);
+        }
+    }
+
+    async function loadOrders() {
+        const token = localStorage.getItem('token');
+        try {
+            console.log('🔍 Cargando pedidos para userId:', currentUser._id);
+            
+            const response = await fetch(`${API_URL}/orders?userId=${currentUser._id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+
+            console.log('📦 Respuesta del servidor:', data);
+
+            if (data.success) {
+                allOrders = data.data;
+                console.log(`✅ Total de pedidos cargados: ${allOrders.length}`);
+                
+                // Mostrar fechas de los pedidos para debug
+                allOrders.forEach((order, index) => {
+                    console.log(`Pedido ${index + 1}: Mesa ${order.mesa}, Fecha: ${new Date(order.createdAt).toLocaleString('es-CO')}, Estado: ${order.estado}`);
+                });
+                
+                applyFilters();
+            }
+        } catch (error) {
+            console.error('❌ Error al cargar pedidos:', error);
+        }
+    }
+
+    function applyFilters() {
+        const fechaDesdeValue = document.getElementById('fechaDesde').value;
+        const fechaHastaValue = document.getElementById('fechaHasta').value;
+        
+        console.log('🔎 Aplicando filtros:');
+        console.log('  - Fecha desde:', fechaDesdeValue);
+        console.log('  - Fecha hasta:', fechaHastaValue);
+        
+        // Crear fechas correctamente
+        const fechaDesde = new Date(fechaDesdeValue + 'T00:00:00');
+        const fechaHasta = new Date(fechaHastaValue + 'T23:59:59.999');
+        
+        const estado = document.getElementById('filterEstado').value;
+        const producto = document.getElementById('filterProducto').value;
+
+        console.log('  - Estado:', estado || 'Todos');
+        console.log('  - Producto:', producto || 'Todos');
+
+        filteredOrders = allOrders.filter(order => {
+            const orderDate = new Date(order.createdAt);
+            const dateMatch = orderDate >= fechaDesde && orderDate <= fechaHasta;
+            const estadoMatch = !estado || order.estado === estado;
+
+            let productoMatch = !producto;
+            if (producto) {
+                productoMatch = order.items.some(item => item.producto._id === producto);
+            }
+
+            // Debug para cada pedido
+            if (!dateMatch) {
+                console.log(`❌ Pedido excluido por fecha: Mesa ${order.mesa}, Fecha: ${orderDate.toLocaleString('es-CO')}`);
+            }
+
+            return dateMatch && estadoMatch && productoMatch;
+        });
+
+        console.log(`✅ Pedidos filtrados: ${filteredOrders.length} de ${allOrders.length}`);
+
+        updateStatistics();
+        updateProductsRanking();
+        displayOrders();
+        displayOrdersCards();
     }
 
     function displayOrdersCards() {
@@ -1149,68 +1245,6 @@
         `).join('');
     }
 
-    async function loadProducts() {
-        const token = localStorage.getItem('token');
-        try {
-            const response = await fetch(`${API_URL}/products?userId=${currentUser._id}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const data = await response.json();
-
-            if (data.success) {
-                allProducts = data.data;
-                const select = document.getElementById('filterProducto');
-                select.innerHTML = '<option value="">Todos los productos</option>' +
-                    allProducts.map(p => `<option value="${p._id}">${p.nombre}</option>`).join('');
-            }
-        } catch (error) {
-            console.error('Error al cargar productos:', error);
-        }
-    }
-
-    async function loadOrders() {
-        const token = localStorage.getItem('token');
-        try {
-            const response = await fetch(`${API_URL}/orders?userId=${currentUser._id}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const data = await response.json();
-
-            if (data.success) {
-                allOrders = data.data;
-                applyFilters();
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-
-function applyFilters() {
-        const fechaDesde = new Date(document.getElementById('fechaDesde').value);
-        const fechaHasta = new Date(document.getElementById('fechaHasta').value);
-        fechaHasta.setHours(23, 59, 59, 999);
-
-        const estado = document.getElementById('filterEstado').value;
-        const producto = document.getElementById('filterProducto').value;
-
-        filteredOrders = allOrders.filter(order => {
-            const orderDate = new Date(order.createdAt);
-            const dateMatch = orderDate >= fechaDesde && orderDate <= fechaHasta;
-            const estadoMatch = !estado || order.estado === estado;
-
-            let productoMatch = !producto;
-            if (producto) {
-                productoMatch = order.items.some(item => item.producto._id === producto);
-            }
-
-            return dateMatch && estadoMatch && productoMatch;
-        });
-
-        updateStatistics();
-        updateProductsRanking();
-        displayOrders();
-        displayOrdersCards(); // ← AGREGAR ESTA LÍNEA
-    }
     function updateStatistics() {
         const totalPedidos = filteredOrders.length;
         const totalIngresos = filteredOrders
@@ -1230,12 +1264,14 @@ function applyFilters() {
         document.getElementById('totalProductos').textContent = totalProductos;
         document.getElementById('ticketPromedio').textContent = `$${Math.round(ticketPromedio).toLocaleString('es-CO')}`;
 
-        const periodDays = Math.ceil((new Date(document.getElementById('fechaHasta').value) -
-            new Date(document.getElementById('fechaDesde').value)) / (1000 * 60 * 60 * 24)) + 1;
+        // Calcular cambios vs período anterior
+        const fechaDesde = new Date(document.getElementById('fechaDesde').value + 'T00:00:00');
+        const fechaHasta = new Date(document.getElementById('fechaHasta').value + 'T23:59:59.999');
+        const periodDays = Math.ceil((fechaHasta - fechaDesde) / (1000 * 60 * 60 * 24)) + 1;
 
-        const previousStart = new Date(document.getElementById('fechaDesde').value);
+        const previousStart = new Date(fechaDesde);
         previousStart.setDate(previousStart.getDate() - periodDays);
-        const previousEnd = new Date(document.getElementById('fechaDesde').value);
+        const previousEnd = new Date(fechaDesde);
         previousEnd.setDate(previousEnd.getDate() - 1);
 
         const previousOrders = allOrders.filter(order => {
@@ -1379,6 +1415,10 @@ function applyFilters() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    }
+
+    function printReport() {
+        window.print();
     }
 
     function toggleMenu() {

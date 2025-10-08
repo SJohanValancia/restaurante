@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Pedidos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            color: #1a202c;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
+            padding: 0;
+            z-index: 1000;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .brand-text h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .brand-text p {
+            font-size: 11px;
+            color: rgba(255,255,255,0.7);
+            margin: 2px 0 0 0;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section-title {
+            padding: 0.5rem 1.5rem;
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 1.5rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.2) 0%, transparent 100%);
+            color: white;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .user-avatar-sidebar {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .user-details h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .user-details p {
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+            margin: 2px 0 0 0;
+        }
+
+        .btn-logout-sidebar {
+            width: 100%;
+            padding: 10px;
+            background: rgba(229, 62, 62, 0.2);
+            color: #fc8181;
+            border: 1px solid rgba(229, 62, 62, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-logout-sidebar:hover {
+            background: #e53e3e;
+            color: white;
+            border-color: #e53e3e;
+        }
+
+        .menu-toggle {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1001;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            transition: all 0.2s;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        .content-wrapper {
+            margin-left: 280px;
+            transition: margin-left 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            color: #718096;
+        }
+
+        /* ESTADÍSTICAS RÁPIDAS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .stat-icon.blue { background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); }
+        .stat-icon.green { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); }
+        .stat-icon.purple { background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%); }
+        .stat-icon.orange { background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); }
+        .stat-icon.red { background: linear-gradient(135deg, #fc8181 0%, #f56565 100%); }
+
+        .stat-label {
+            font-size: 12px;
+            color: #718096;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1a202c;
+        }
+
+        /* FILTROS */
+        .filters-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .filters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .filters-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #2d3748;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-input,
+        .filter-select {
+            padding: 10px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .filter-input:focus,
+        .filter-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-clear {
+            padding: 10px 20px;
+            background: white;
+            color: #718096;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-clear:hover {
+            background: #f7fafc;
+            border-color: #cbd5e0;
+        }
+
+        /* PEDIDOS */
+        .orders-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .orders-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a202c;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .order-count {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .orders-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .order-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+
+        .order-card:hover {
+            border-color: #cbd5e0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .order-info h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 6px;
+        }
+
+        .order-meta {
+            font-size: 12px;
+            color: #718096;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .meta-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .meta-icon {
+            font-size: 14px;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pendiente {
+            background: #feebc8;
+            color: #7c2d12;
+        }
+
+        .status-preparando {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+
+        .status-listo {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-entregado {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .status-cancelado {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .order-items {
+            margin-bottom: 1rem;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 13px;
+        }
+
+        .item-name {
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .item-qty {
+            color: #718096;
+            margin: 0 8px;
+        }
+
+        .order-notes {
+            background: #fff5e1;
+            border-left: 3px solid #f6ad55;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .order-notes p {
+            font-size: 12px;
+            color: #744210;
+            font-style: italic;
+            margin: 0;
+        }
+
+        .order-total {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 1rem;
+            border-top: 2px solid #e2e8f0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #48bb78;
+        }
+
+        .order-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+            margin-top: 1rem;
+        }
+
+        .btn-action {
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-preparar {
+            background: #4299e1;
+            color: white;
+        }
+
+        .btn-preparar:hover {
+            background: #3182ce;
+        }
+
+        .btn-listo {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-listo:hover {
+            background: #38a169;
+        }
+
+        .btn-entregar {
+            background: #9f7aea;
+            color: white;
+        }
+
+        .btn-entregar:hover {
+            background: #805ad5;
+        }
+
+        .btn-cancelar {
+            background: #fc8181;
+            color: white;
+        }
+
+        .btn-cancelar:hover {
+            background: #f56565;
+        }
+
+        .btn-reabrir {
+            background: #ed8936;
+            color: white;
+        }
+
+        .btn-reabrir:hover {
+            background: #dd6b20;
+        }
+
+        .btn-eliminar {
+            background: #718096;
+            color: white;
+        }
+
+        .btn-eliminar:hover {
+            background: #4a5568;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #a0aec0;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-280px);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .content-wrapper {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">☰</button>
+    
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="productos.html" class="sidebar-brand">
+                <div class="brand-icon">🍽️</div>
+                <div class="brand-text">
+                    <h2>RestaurantApp</h2>
+                    <p>Sistema de gestión</p>
+                </div>
+            </a>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Principal</div>
+                <a href="productos.html" class="nav-item">
+                    <span class="nav-icon">📦</span>
+                    <span>Productos</span>
+                </a>
+                <a href="pedidos.html" class="nav-item">
+                    <span class="nav-icon">🍽️</span>
+                    <span>Pedidos</span>
+                </a>
+                <a href="historial.html" class="nav-item active">
+                    <span class="nav-icon">📜</span>
+                    <span>Historial</span>
+                </a>
+                <a href="gastos.html" class="nav-item">
+                    <span class="nav-icon">🧾</span>
+                    <span>Gastos</span>
+                </a>
+                <a href="qr-generator.html" class="nav-item">
+                    <span class="nav-icon">📱</span>
+                    <span>QR generador</span>
+                </a>
+                <a href="reportes.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>Reportes</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar-sidebar" id="sidebarUserAvatar">U</div>
+                <div class="user-details">
+                    <h4 id="sidebarUserName">Cargando...</h4>
+                    <p>Administrador</p>
+                </div>
+            </div>
+            <button class="btn-logout-sidebar" onclick="logout()">
+                <span>🚪</span>
+                <span>Cerrar Sesión</span>
+            </button>
+        </div>
+    </aside>
+
+    <div class="content-wrapper">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">📜 Historial Completo de Pedidos</h1>
+                <p class="page-subtitle">Gestiona todos los pedidos de tu restaurante en un solo lugar</p>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon blue">📋</div>
+                    </div>
+                    <div class="stat-label">Total Pedidos</div>
+                    <div class="stat-value" id="statTotal">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon orange">⏳</div>
+                    </div>
+                    <div class="stat-label">Pendientes</div>
+                    <div class="stat-value" id="statPendientes">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon purple">👨‍🍳</div>
+                    </div>
+                    <div class="stat-label">Preparando</div>
+                    <div class="stat-value" id="statPreparando">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon green">✅</div>
+                    </div>
+                    <div class="stat-label">Completados</div>
+                    <div class="stat-value" id="statCompletados">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon red">❌</div>
+                    </div>
+                    <div class="stat-label">Cancelados</div>
+                    <div class="stat-value" id="statCancelados">0</div>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="filters-card">
+                <div class="filters-header">
+                    <h2 class="filters-title">🔍 Filtros de Búsqueda</h2>
+                    <button class="btn-clear" onclick="clearFilters()">Limpiar Filtros</button>
+                </div>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label class="filter-label">Estado</label>
+                        <select id="filterEstado" class="filter-select" onchange="applyFilters()">
+                            <option value="">Todos los estados</option>
+                            <option value="pendiente">Pendientes</option>
+                            <option value="preparando">Preparando</option>
+                            <option value="listo">Listos</option>
+                            <option value="entregado">Entregados</option>
+                            <option value="cancelado">Cancelados</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Mesa</label>
+                        <input type="number" id="filterMesa" class="filter-input" placeholder="Número de mesa" min="1" onchange="applyFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Desde</label>
+                        <input type="date" id="filterFechaDesde" class="filter-input" onchange="applyFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Hasta</label>
+                        <input type="date" id="filterFechaHasta" class="filter-input" onchange="applyFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Buscar</label>
+                        <input type="text" id="filterSearch" class="filter-input" placeholder="Producto, notas..." oninput="applyFilters()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Pedidos -->
+            <div class="orders-header">
+                <h2 class="orders-title">
+                    📋 Lista de Pedidos
+                    <span class="order-count" id="orderCount">0</span>
+                </h2>
+            </div>
+
+            <div class="orders-grid" id="ordersGrid">
+                <div class="empty-state">
+                    <div class="empty-icon">📋</div>
+                    <p>Cargando pedidos...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://restaurante-co77.onrender.com/api';
+        let currentUser = null;
+        let allOrders = [];
+        let filteredOrders = [];
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('No autorizado');
+
+                const data = await response.json();
+                currentUser = data.data;
+                
+                if (currentUser.id && !currentUser._id) {
+                    currentUser._id = currentUser.id;
+                }
+
+                document.getElementById('sidebarUserName').textContent = currentUser.nombre;
+                document.getElementById('sidebarUserAvatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
+                
+                setDefaultDates();
+                await loadOrders();
+            } catch (error) {
+                console.error('Error:', error);
+                localStorage.removeItem('token');
+                window.location.href = 'index.html';
+            }
+        });
+
+        function setDefaultDates() {
+            const today = new Date();
+            const thirtyDaysAgo = new Date(today);
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+            document.getElementById('filterFechaHasta').value = today.toISOString().split('T')[0];
+            document.getElementById('filterFechaDesde').value = thirtyDaysAgo.toISOString().split('T')[0];
+        }
+
+        async function loadOrders() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_URL}/orders?userId=${currentUser._id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    allOrders = data.data;
+                    applyFilters();
+                }
+            } catch (error) {
+                console.error('Error al cargar pedidos:', error);
+            }
+        }
+
+        function applyFilters() {
+            const estado = document.getElementById('filterEstado').value;
+            const mesa = document.getElementById('filterMesa').value;
+            const fechaDesde = document.getElementById('filterFechaDesde').value;
+            const fechaHasta = document.getElementById('filterFechaHasta').value;
+            const search = document.getElementById('filterSearch').value.toLowerCase();
+
+            filteredOrders = allOrders.filter(order => {
+                const estadoMatch = !estado || order.estado === estado;
+                const mesaMatch = !mesa || order.mesa === parseInt(mesa);
+
+                let fechaMatch = true;
+                if (fechaDesde || fechaHasta) {
+                    const orderDate = new Date(order.createdAt);
+                    const desde = fechaDesde ? new Date(fechaDesde + 'T00:00:00') : null;
+                    const hasta = fechaHasta ? new Date(fechaHasta + 'T23:59:59.999') : null;
+                    
+                    if (desde && orderDate < desde) fechaMatch = false;
+                    if (hasta && orderDate > hasta) fechaMatch = false;
+                }
+
+                let searchMatch = true;
+                if (search) {
+                    const notasMatch = order.notas?.toLowerCase().includes(search);
+                    const productMatch = order.items.some(item => 
+                        item.producto?.nombre?.toLowerCase().includes(search)
+                    );
+                    searchMatch = notasMatch || productMatch;
+                }
+
+                return estadoMatch && mesaMatch && fechaMatch && searchMatch;
+            });
+
+            updateStatistics();
+            displayOrders();
+        }
+
+        function updateStatistics() {
+            const total = filteredOrders.length;
+            const pendientes = filteredOrders.filter(o => o.estado === 'pendiente').length;
+            const preparando = filteredOrders.filter(o => o.estado === 'preparando').length;
+            const completados = filteredOrders.filter(o => o.estado === 'entregado').length;
+            const cancelados = filteredOrders.filter(o => o.estado === 'cancelado').length;
+
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statPendientes').textContent = pendientes;
+            document.getElementById('statPreparando').textContent = preparando;
+            document.getElementById('statCompletados').textContent = completados;
+            document.getElementById('statCancelados').textContent = cancelados;
+            document.getElementById('orderCount').textContent = total;
+        }
+
+        function displayOrders() {
+            const grid = document.getElementById('ordersGrid');
+            
+            if (filteredOrders.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🔍</div>
+                        <p>No se encontraron pedidos con los filtros seleccionados</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filteredOrders.map(order => `
+                <div class="order-card">
+                    <div class="order-header">
+                        <div class="order-info">
+                            <h3>Mesa ${order.mesa}</h3>
+                            <div class="order-meta">
+                                <div class="meta-row">
+                                    <span class="meta-icon">📅</span>
+                                    <span>${new Date(order.createdAt).toLocaleDateString('es-CO', {
+                                        day: '2-digit',
+                                        month: 'long',
+                                        year: 'numeric'
+                                    })}</span>
+                                </div>
+                                <div class="meta-row">
+                                    <span class="meta-icon">🕐</span>
+                                    <span>${new Date(order.createdAt).toLocaleTimeString('es-CO', {
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    })}</span>
+                                </div>
+                                <div class="meta-row">
+                                    <span class="meta-icon">🔖</span>
+                                    <span>#${order._id.slice(-6).toUpperCase()}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="status-badge status-${order.estado}">${order.estado}</span>
+                    </div>
+                    <div class="order-items">
+                        ${order.items.map(item => `
+                            <div class="order-item">
+                                <span class="item-name">${item.producto.nombre}</span>
+                                <span class="item-qty">x${item.cantidad}</span>
+                                <span>${(item.precio * item.cantidad).toLocaleString('es-CO')}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    ${order.notas ? `
+                    <div class="order-notes">
+                        <p>📝 ${order.notas}</p>
+                    </div>
+                    ` : ''}
+                    <div class="order-total">
+                        <span>Total:</span>
+                        <span>${order.total.toLocaleString('es-CO')}</span>
+                    </div>
+                    ${getOrderActions(order)}
+                </div>
+            `).join('');
+        }
+
+        function getOrderActions(order) {
+            let actions = '<div class="order-actions">';
+            
+            if (order.estado === 'pendiente') {
+                actions += `<button class="btn-action btn-preparar" onclick="updateOrderStatus('${order._id}', 'preparando')">👨‍🍳 Preparar</button>`;
+                actions += `<button class="btn-action btn-cancelar" onclick="cancelOrder('${order._id}')">❌ Cancelar</button>`;
+            }
+            
+            if (order.estado === 'preparando') {
+                actions += `<button class="btn-action btn-listo" onclick="updateOrderStatus('${order._id}', 'listo')">✅ Listo</button>`;
+                actions += `<button class="btn-action btn-cancelar" onclick="cancelOrder('${order._id}')">❌ Cancelar</button>`;
+            }
+            
+            if (order.estado === 'listo') {
+                actions += `<button class="btn-action btn-entregar" onclick="updateOrderStatus('${order._id}', 'entregado')">🍽️ Entregar</button>`;
+                actions += `<button class="btn-action btn-cancelar" onclick="cancelOrder('${order._id}')">❌ Cancelar</button>`;
+            }
+            
+            if (order.estado === 'entregado') {
+                actions += `<button class="btn-action btn-eliminar" onclick="deleteOrder('${order._id}')">🗑️ Eliminar</button>`;
+            }
+            
+            if (order.estado === 'cancelado') {
+                actions += `<button class="btn-action btn-reabrir" onclick="updateOrderStatus('${order._id}', 'pendiente')">🔄 Reabrir</button>`;
+                actions += `<button class="btn-action btn-eliminar" onclick="deleteOrder('${order._id}')">🗑️ Eliminar</button>`;
+            }
+            
+            actions += '</div>';
+            return actions;
+        }
+
+        async function updateOrderStatus(orderId, newStatus) {
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch(`${API_URL}/orders/${orderId}/estado`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ estado: newStatus })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    await loadOrders();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al actualizar el estado');
+            }
+        }
+
+        async function cancelOrder(orderId) {
+            if (!confirm('¿Está seguro de cancelar este pedido?')) return;
+            await updateOrderStatus(orderId, 'cancelado');
+        }
+
+        async function deleteOrder(orderId) {
+            if (!confirm('⚠️ ¿Está seguro de eliminar este pedido?\n\nEsta acción no se puede deshacer y el pedido se eliminará permanentemente del sistema.')) return;
+
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch(`${API_URL}/orders/${orderId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ Pedido eliminado exitosamente');
+                    await loadOrders();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al eliminar el pedido');
+            }
+        }
+
+        function clearFilters() {
+            document.getElementById('filterEstado').value = '';
+            document.getElementById('filterMesa').value = '';
+            document.getElementById('filterSearch').value = '';
+            setDefaultDates();
+            applyFilters();
+        }
+
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function logout() {
+            if (confirm('¿Cerrar sesión?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('usuario');
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>
