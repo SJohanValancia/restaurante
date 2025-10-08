@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Códigos QR</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 900px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            padding: 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .section {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .section h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 6px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-generate {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .qr-preview {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+        }
+
+        #qrcode {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+        }
+
+        #qrcode canvas {
+            display: block !important;
+        }
+
+        .qr-info {
+            text-align: center;
+            color: #718096;
+            font-size: 14px;
+            margin-bottom: 1rem;
+        }
+
+        .qr-details {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            width: 100%;
+            max-width: 280px;
+        }
+
+        .qr-details div {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 13px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .qr-details div:last-child {
+            border-bottom: none;
+        }
+
+        .qr-details strong {
+            color: #2d3748;
+        }
+
+        .qr-details span {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .btn-download {
+            padding: 10px 24px;
+            background: #48bb78;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-download:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+        }
+
+        .empty-qr {
+            text-align: center;
+            color: #a0aec0;
+        }
+
+        .empty-qr .icon {
+            font-size: 64px;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            margin-bottom: 1rem;
+        }
+
+        .nav-link:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateX(-4px);
+        }
+
+        @media (max-width: 768px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 Generador de Códigos QR</h1>
+            <p>Crea códigos QR para que tus clientes sigan sus pedidos</p>
+        </div>
+
+        <div class="content">
+            <a href="pedidos.html" class="nav-link">
+                <span>←</span>
+                <span>Volver a Pedidos</span>
+            </a>
+
+            <div class="layout">
+                <!-- Formulario -->
+                <div class="section">
+                    <h2>📝 Información de la Mesa</h2>
+                    
+                    <form id="qrForm">
+                        <div class="form-group">
+                            <label class="form-label" for="nombreRestaurante">Nombre del Restaurante *</label>
+                            <input 
+                                type="text" 
+                                id="nombreRestaurante" 
+                                class="form-input" 
+                                placeholder="Ej: Restaurante El Sabor"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="numeroMesa">Número de Mesa *</label>
+                            <input 
+                                type="number" 
+                                id="numeroMesa" 
+                                class="form-input" 
+                                placeholder="Ej: 5"
+                                min="1"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="sede">Sede (Opcional)</label>
+                            <input 
+                                type="text" 
+                                id="sede" 
+                                class="form-input" 
+                                placeholder="Ej: Centro, Norte, etc."
+                            >
+                        </div>
+
+                        <button type="submit" class="btn-generate">
+                            🎨 Generar Código QR
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Preview del QR -->
+                <div class="section">
+                    <h2>🔍 Vista Previa</h2>
+                    
+                    <div class="qr-preview" id="qrPreview">
+                        <div class="empty-qr">
+                            <div class="icon">📱</div>
+                            <p>Complete el formulario para generar el código QR</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentQR = null;
+
+        document.getElementById('qrForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const nombreRestaurante = document.getElementById('nombreRestaurante').value.trim();
+            const numeroMesa = document.getElementById('numeroMesa').value;
+            const sede = document.getElementById('sede').value.trim();
+
+            if (!nombreRestaurante || !numeroMesa) {
+                alert('Por favor complete los campos obligatorios');
+                return;
+            }
+
+            generateQR(nombreRestaurante, numeroMesa, sede);
+        });
+
+        function generateQR(restaurante, mesa, sede) {
+            // Limpiar QR anterior
+            const qrPreview = document.getElementById('qrPreview');
+            qrPreview.innerHTML = '';
+
+            // Obtener la URL base actual
+            const baseUrl = window.location.origin + window.location.pathname.replace('qr-generator.html', '');
+            
+            // Crear URL con parámetros
+            const params = new URLSearchParams({
+                restaurante: restaurante,
+                mesa: mesa
+            });
+
+            if (sede) {
+                params.append('sede', sede);
+            }
+
+            const url = `${baseUrl}seguimiento.html?${params.toString()}`;
+
+            // Crear contenedor del QR
+            const qrContainer = document.createElement('div');
+            qrContainer.id = 'qrcode';
+            qrPreview.appendChild(qrContainer);
+
+            // Generar QR
+            currentQR = new QRCode(qrContainer, {
+                text: url,
+                width: 256,
+                height: 256,
+                colorDark: "#1a202c",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            // Mostrar detalles
+            const details = document.createElement('div');
+            details.className = 'qr-details';
+            details.innerHTML = `
+                <div>
+                    <strong>Restaurante:</strong>
+                    <span>${restaurante}</span>
+                </div>
+                <div>
+                    <strong>Mesa:</strong>
+                    <span>#${mesa}</span>
+                </div>
+                ${sede ? `
+                <div>
+                    <strong>Sede:</strong>
+                    <span>${sede}</span>
+                </div>
+                ` : ''}
+            `;
+            qrPreview.appendChild(details);
+
+            // Botón de descarga
+            const btnDownload = document.createElement('button');
+            btnDownload.className = 'btn-download';
+            btnDownload.innerHTML = '💾 Descargar QR';
+            btnDownload.onclick = () => downloadQR(restaurante, mesa, sede);
+            qrPreview.appendChild(btnDownload);
+        }
+
+        function downloadQR(restaurante, mesa, sede) {
+            const canvas = document.querySelector('#qrcode canvas');
+            if (!canvas) return;
+
+            // Crear un canvas más grande con información adicional
+            const finalCanvas = document.createElement('canvas');
+            const ctx = finalCanvas.getContext('2d');
+            
+            // Tamaño del canvas final
+            finalCanvas.width = 400;
+            finalCanvas.height = 550;
+
+            // Fondo blanco
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+
+            // Título
+            ctx.fillStyle = '#1a202c';
+            ctx.font = 'bold 24px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(restaurante, 200, 40);
+
+            // Subtítulo
+            ctx.font = '16px Inter, sans-serif';
+            ctx.fillStyle = '#718096';
+            ctx.fillText('Escanea para seguir tu pedido', 200, 70);
+
+            // Dibujar el QR en el centro
+            const qrSize = 280;
+            const qrX = (finalCanvas.width - qrSize) / 2;
+            const qrY = 100;
+            ctx.drawImage(canvas, qrX, qrY, qrSize, qrSize);
+
+            // Información de la mesa
+            ctx.font = 'bold 32px Inter, sans-serif';
+            ctx.fillStyle = '#667eea';
+            ctx.fillText(`Mesa ${mesa}`, 200, 430);
+
+            if (sede) {
+                ctx.font = '18px Inter, sans-serif';
+                ctx.fillStyle = '#4a5568';
+                ctx.fillText(sede, 200, 460);
+            }
+
+            // Instrucciones
+            ctx.font = '12px Inter, sans-serif';
+            ctx.fillStyle = '#a0aec0';
+            ctx.fillText('Escanea este código con tu cámara', 200, 510);
+            ctx.fillText('para ver el estado de tu pedido', 200, 530);
+
+            // Descargar
+            const link = document.createElement('a');
+            const fileName = `QR_Mesa${mesa}${sede ? '_' + sede.replace(/\s+/g, '_') : ''}.png`;
+            link.download = fileName;
+            link.href = finalCanvas.toDataURL('image/png');
+            link.click();
+        }
+    </script>
+</body>
+</html>

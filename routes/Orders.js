@@ -268,4 +268,71 @@ router.get('/stats/resumen', async (req, res) => {
   }
 });
 
+// Agregar esta ruta ANTES de la ruta '/:id' en Orders.js
+
+// Obtener el pedido más reciente de una mesa específica (para seguimiento público)
+router.get('/mesa/:numeroMesa', async (req, res) => {
+  try {
+    const { numeroMesa } = req.params;
+    const { restaurante, sede } = req.query;
+
+    if (!restaurante) {
+      return res.status(400).json({
+        success: false,
+        message: 'El nombre del restaurante es obligatorio'
+      });
+    }
+
+    // Buscar el pedido más reciente para esta mesa
+    // Nota: Esto busca entre TODOS los usuarios, por lo que necesitamos
+    // una forma de filtrar por restaurante. Puedes agregar un campo
+    // "restaurante" y "sede" al modelo Order, o usar el nombre del usuario.
+    
+    // Por ahora, buscaremos el pedido más reciente de cualquier usuario
+    // que coincida con el número de mesa y esté activo (no entregado/cancelado)
+    const query = {
+      mesa: parseInt(numeroMesa),
+      estado: { $in: ['pendiente', 'preparando', 'listo'] }
+    };
+
+    const order = await Order.findOne(query)
+      .populate('items.producto', 'nombre categoria precio')
+      .populate('userId', 'nombre')
+      .sort({ createdAt: -1 })
+      .limit(1);
+
+    // Si no hay pedidos activos, buscar el último entregado
+    if (!order) {
+      const lastOrder = await Order.findOne({ mesa: parseInt(numeroMesa) })
+        .populate('items.producto', 'nombre categoria precio')
+        .populate('userId', 'nombre')
+        .sort({ createdAt: -1 })
+        .limit(1);
+
+      if (!lastOrder) {
+        return res.status(404).json({
+          success: false,
+          message: 'No se encontraron pedidos para esta mesa'
+        });
+      }
+
+      return res.json({
+        success: true,
+        data: lastOrder
+      });
+    }
+
+    res.json({
+      success: true,
+      data: order
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener el pedido',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;
