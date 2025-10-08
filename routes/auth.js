@@ -12,18 +12,15 @@ const generarToken = (userId) => {
   );
 };
 
-
-
-
 // Registro de usuario
 router.post('/register', async (req, res) => {
   try {
     console.log('Solicitud de registro recibida:', req.body);
     
-    const { nombre, email, password, rol } = req.body;
+    const { nombre, email, password, rol, nombreRestaurante, sede } = req.body;
 
-    // Validar que todos los campos estén presentes
-    if (!nombre || !email || !password) {
+    // Validar que todos los campos obligatorios estén presentes
+    if (!nombre || !email || !password || !nombreRestaurante) {
       return res.status(400).json({
         success: false,
         message: 'Por favor complete todos los campos obligatorios'
@@ -54,6 +51,14 @@ router.post('/register', async (req, res) => {
       });
     }
 
+    // Validar longitud del nombre del restaurante
+    if (nombreRestaurante.length < 3) {
+      return res.status(400).json({
+        success: false,
+        message: 'El nombre del restaurante debe tener al menos 3 caracteres'
+      });
+    }
+
     // Verificar si el usuario ya existe
     const usuarioExistente = await User.findOne({ email: email.toLowerCase() });
     if (usuarioExistente) {
@@ -68,6 +73,8 @@ router.post('/register', async (req, res) => {
       nombre,
       email: email.toLowerCase(),
       password,
+      nombreRestaurante: nombreRestaurante.trim(),
+      sede: sede ? sede.trim() : '',
       rol: rol || 'mesero'
     });
 
@@ -86,7 +93,6 @@ router.post('/register', async (req, res) => {
   } catch (error) {
     console.error('Error en registro:', error);
     
-    // Error de duplicado (por si acaso)
     if (error.code === 11000) {
       return res.status(400).json({
         success: false,
@@ -227,7 +233,6 @@ router.get('/me', async (req, res) => {
       process.env.JWT_SECRET || 'secreto-super-seguro-cambiar-en-produccion'
     );
 
-    // Buscar con decoded.userId o decoded.id (dependiendo de cómo lo generaste)
     const usuario = await User.findById(decoded.userId || decoded.id);
 
     if (!usuario) {
@@ -241,10 +246,12 @@ router.get('/me', async (req, res) => {
       success: true,
       data: {
         _id: usuario._id,
-        id: usuario._id,  // Incluir ambos para compatibilidad
+        id: usuario._id,
         nombre: usuario.nombre,
         email: usuario.email,
-        rol: usuario.rol
+        rol: usuario.rol,
+        nombreRestaurante: usuario.nombreRestaurante,
+        sede: usuario.sede
       }
     });
 
@@ -256,4 +263,5 @@ router.get('/me', async (req, res) => {
     });
   }
 });
+
 module.exports = router;

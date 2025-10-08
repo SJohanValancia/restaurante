@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Order = require('../models/order');
+const User = require('../models/User');
+
 
 // Obtener todos los pedidos (con filtros)
 router.get('/', async (req, res) => {
@@ -283,19 +285,29 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
       });
     }
 
-    // Buscar el pedido más reciente para esta mesa
-    // Nota: Esto busca entre TODOS los usuarios, por lo que necesitamos
-    // una forma de filtrar por restaurante. Puedes agregar un campo
-    // "restaurante" y "sede" al modelo Order, o usar el nombre del usuario.
-    
-    // Por ahora, buscaremos el pedido más reciente de cualquier usuario
-    // que coincida con el número de mesa y esté activo (no entregado/cancelado)
-    const query = {
+    // Buscar el usuario que corresponde a este restaurante y sede
+    const query = { nombreRestaurante: restaurante };
+    if (sede) {
+      query.sede = sede;
+    }
+
+    const usuario = await User.findOne(query);
+
+    if (!usuario) {
+      return res.status(404).json({
+        success: false,
+        message: 'Restaurante no encontrado'
+      });
+    }
+
+    // Buscar el pedido más reciente de esta mesa para este usuario/restaurante
+    const orderQuery = {
       mesa: parseInt(numeroMesa),
+      userId: usuario._id,
       estado: { $in: ['pendiente', 'preparando', 'listo'] }
     };
 
-    const order = await Order.findOne(query)
+    const order = await Order.findOne(orderQuery)
       .populate('items.producto', 'nombre categoria precio')
       .populate('userId', 'nombre')
       .sort({ createdAt: -1 })
@@ -303,7 +315,10 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
 
     // Si no hay pedidos activos, buscar el último entregado
     if (!order) {
-      const lastOrder = await Order.findOne({ mesa: parseInt(numeroMesa) })
+      const lastOrder = await Order.findOne({ 
+        mesa: parseInt(numeroMesa),
+        userId: usuario._id
+      })
         .populate('items.producto', 'nombre categoria precio')
         .populate('userId', 'nombre')
         .sort({ createdAt: -1 })

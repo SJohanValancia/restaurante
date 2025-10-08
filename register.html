@@ -58,11 +58,13 @@
             border-radius: 24px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             overflow: hidden;
-            max-width: 450px;
+            max-width: 500px;
             width: 100%;
             position: relative;
             z-index: 1;
             animation: slideUp 0.6s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         @keyframes slideUp {
@@ -78,7 +80,7 @@
 
         .register-header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            padding: 40px 40px 50px;
+            padding: 30px 40px 40px;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -101,8 +103,8 @@
         }
 
         .logo {
-            font-size: 3.5rem;
-            margin-bottom: 15px;
+            font-size: 3rem;
+            margin-bottom: 10px;
             position: relative;
             z-index: 1;
             filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
@@ -110,34 +112,34 @@
 
         .register-header h1 {
             color: white;
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             position: relative;
             z-index: 1;
         }
 
         .register-header p {
             color: rgba(255, 255, 255, 0.9);
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             position: relative;
             z-index: 1;
         }
 
         .register-body {
-            padding: 45px 40px;
+            padding: 35px 40px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         .form-label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: var(--text-dark);
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .input-wrapper {
@@ -146,20 +148,20 @@
 
         .input-icon {
             position: absolute;
-            left: 16px;
+            left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: var(--text-light);
             transition: color 0.3s;
         }
 
         .form-input, .form-select {
             width: 100%;
-            padding: 14px 16px 14px 48px;
+            padding: 12px 14px 12px 42px;
             border: 2px solid var(--border);
-            border-radius: 12px;
-            font-size: 0.95rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
             transition: all 0.3s;
             background: #f8fafc;
         }
@@ -178,14 +180,14 @@
 
         .password-toggle {
             position: absolute;
-            right: 16px;
+            right: 14px;
             top: 50%;
             transform: translateY(-50%);
             background: none;
             border: none;
             color: var(--text-light);
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             padding: 5px;
             transition: color 0.3s;
         }
@@ -196,19 +198,19 @@
 
         .btn-register {
             width: 100%;
-            padding: 15px;
+            padding: 13px;
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             border: none;
-            border-radius: 12px;
-            font-size: 1rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
             position: relative;
             overflow: hidden;
-            margin-top: 10px;
+            margin-top: 8px;
         }
 
         .btn-register::before {
@@ -252,9 +254,9 @@
         .divider {
             display: flex;
             align-items: center;
-            margin: 30px 0;
+            margin: 25px 0;
             color: var(--text-light);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
 
         .divider::before,
@@ -266,13 +268,13 @@
         }
 
         .divider span {
-            padding: 0 15px;
+            padding: 0 12px;
         }
 
         .login-link {
             text-align: center;
             color: var(--text-light);
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
         .login-link a {
@@ -288,10 +290,10 @@
         }
 
         .alert {
-            padding: 14px 16px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-size: 0.85rem;
             display: none;
             animation: slideDown 0.3s ease-out;
         }
@@ -325,8 +327,8 @@
 
         .loading-spinner {
             display: none;
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border: 3px solid rgba(255, 255, 255, 0.3);
             border-top-color: white;
             border-radius: 50%;
@@ -343,9 +345,9 @@
         }
 
         .helper-text {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-light);
-            margin-top: 5px;
+            margin-top: 4px;
         }
 
         @media (max-width: 480px) {
@@ -354,19 +356,19 @@
             }
 
             .register-header {
-                padding: 30px 25px 40px;
+                padding: 25px 20px 35px;
             }
 
             .register-header h1 {
-                font-size: 1.5rem;
+                font-size: 1.4rem;
             }
 
             .logo {
-                font-size: 2.8rem;
+                font-size: 2.5rem;
             }
 
             .register-body {
-                padding: 35px 25px;
+                padding: 30px 20px;
             }
         }
     </style>
@@ -384,7 +386,36 @@
 
             <form id="registerForm">
                 <div class="form-group">
-                    <label class="form-label" for="nombre">Nombre Completo</label>
+                    <label class="form-label" for="nombreRestaurante">Nombre del Restaurante *</label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="text" 
+                            id="nombreRestaurante" 
+                            class="form-input" 
+                            placeholder="Ej: Restaurante El Sabor"
+                            required
+                            minlength="3"
+                        >
+                        <span class="input-icon">🏪</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="sede">Sede (Opcional)</label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="text" 
+                            id="sede" 
+                            class="form-input" 
+                            placeholder="Ej: Centro, Norte, Sur, etc."
+                        >
+                        <span class="input-icon">📍</span>
+                    </div>
+                    <div class="helper-text">Si tienes varias sedes, especifica cuál es</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="nombre">Nombre Completo *</label>
                     <div class="input-wrapper">
                         <input 
                             type="text" 
@@ -393,13 +424,14 @@
                             placeholder="Johan Mejía"
                             required
                             autocomplete="name"
+                            minlength="2"
                         >
                         <span class="input-icon">👤</span>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="email">Usuario</label>
+                    <label class="form-label" for="email">Usuario *</label>
                     <div class="input-wrapper">
                         <input 
                             type="text" 
@@ -408,14 +440,15 @@
                             placeholder="johan"
                             required
                             autocomplete="username"
+                            minlength="3"
                         >
                         <span class="input-icon">🔑</span>
                     </div>
-                    <div class="helper-text">Puedes usar un nombre de usuario simple (ej: johan)</div>
+                    <div class="helper-text">Puedes usar un nombre de usuario simple</div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="password">Contraseña</label>
+                    <label class="form-label" for="password">Contraseña *</label>
                     <div class="input-wrapper">
                         <input 
                             type="password" 
@@ -433,7 +466,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="confirmPassword">Confirmar Contraseña</label>
+                    <label class="form-label" for="confirmPassword">Confirmar Contraseña *</label>
                     <div class="input-wrapper">
                         <input 
                             type="password" 
@@ -449,7 +482,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="rol">Rol</label>
+                    <label class="form-label" for="rol">Rol *</label>
                     <div class="input-wrapper">
                         <select id="rol" class="form-select" required>
                             <option value="mesero">Mesero</option>
@@ -521,6 +554,8 @@
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            const nombreRestaurante = document.getElementById('nombreRestaurante').value.trim();
+            const sede = document.getElementById('sede').value.trim();
             const nombre = document.getElementById('nombre').value.trim();
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
@@ -528,8 +563,13 @@
             const rol = document.getElementById('rol').value;
 
             // Validaciones
-            if (!nombre || !email || !password || !confirmPassword) {
-                showAlert('Por favor complete todos los campos', 'error');
+            if (!nombreRestaurante || !nombre || !email || !password || !confirmPassword) {
+                showAlert('Por favor complete todos los campos obligatorios', 'error');
+                return;
+            }
+
+            if (nombreRestaurante.length < 3) {
+                showAlert('El nombre del restaurante debe tener al menos 3 caracteres', 'error');
                 return;
             }
 
@@ -562,6 +602,8 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ 
+                        nombreRestaurante,
+                        sede,
                         nombre, 
                         email, 
                         password, 
@@ -579,7 +621,7 @@
                     localStorage.setItem('usuario', JSON.stringify(data.usuario));
                     
                     setTimeout(() => {
-                        window.location.href = 'dashboard.html';
+                        window.location.href = 'productos.html';
                     }, 1500);
                 } else {
                     showAlert(data.message || 'Error al crear la cuenta', 'error');
@@ -596,7 +638,7 @@
         window.addEventListener('load', () => {
             const token = localStorage.getItem('token');
             if (token) {
-                window.location.href = 'dashboard.html';
+                window.location.href = 'productos.html';
             }
         });
     </script>

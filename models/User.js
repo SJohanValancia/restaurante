@@ -15,14 +15,27 @@ const userSchema = new mongoose.Schema({
     unique: true,
     lowercase: true,
     trim: true,
-    // CAMBIO: Removida la validación de formato de email
     minlength: [3, 'El usuario debe tener al menos 3 caracteres']
   },
   password: {
     type: String,
     required: [true, 'La contraseña es obligatoria'],
     minlength: [6, 'La contraseña debe tener al menos 6 caracteres'],
-    select: false // No incluir password por defecto en las consultas
+    select: false
+  },
+  // NUEVOS CAMPOS
+  nombreRestaurante: {
+    type: String,
+    required: [true, 'El nombre del restaurante es obligatorio'],
+    trim: true,
+    minlength: [3, 'El nombre del restaurante debe tener al menos 3 caracteres'],
+    maxlength: [100, 'El nombre del restaurante no puede exceder 100 caracteres']
+  },
+  sede: {
+    type: String,
+    trim: true,
+    default: '',
+    maxlength: [50, 'La sede no puede exceder 50 caracteres']
   },
   rol: {
     type: String,
@@ -45,10 +58,10 @@ const userSchema = new mongoose.Schema({
 // Índices
 userSchema.index({ email: 1 });
 userSchema.index({ activo: 1 });
+userSchema.index({ nombreRestaurante: 1, sede: 1 }); // Nuevo índice
 
 // Encriptar password antes de guardar
 userSchema.pre('save', async function(next) {
-  // Solo encriptar si el password fue modificado
   if (!this.isModified('password')) {
     return next();
   }
@@ -75,6 +88,8 @@ userSchema.methods.obtenerDatosPublicos = function() {
     email: this.email,
     rol: this.rol,
     activo: this.activo,
+    nombreRestaurante: this.nombreRestaurante,
+    sede: this.sede,
     createdAt: this.createdAt
   };
 };
