@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liquidación del Día</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            color: #1a202c;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
+            padding: 0;
+            z-index: 1000;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .brand-text h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .brand-text p {
+            font-size: 11px;
+            color: rgba(255,255,255,0.7);
+            margin: 2px 0 0 0;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section-title {
+            padding: 0.5rem 1.5rem;
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 1.5rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.2) 0%, transparent 100%);
+            color: white;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .user-avatar-sidebar {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .user-details h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .user-details p {
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+            margin: 2px 0 0 0;
+        }
+
+        .btn-logout-sidebar {
+            width: 100%;
+            padding: 10px;
+            background: rgba(229, 62, 62, 0.2);
+            color: #fc8181;
+            border: 1px solid rgba(229, 62, 62, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-logout-sidebar:hover {
+            background: #e53e3e;
+            color: white;
+            border-color: #e53e3e;
+        }
+
+        .menu-toggle {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1001;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        .content-wrapper {
+            margin-left: 280px;
+            transition: margin-left 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            color: #718096;
+        }
+
+        .btn-control-caja {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-control-caja:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f7fafc;
+        }
+
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a202c;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon.blue {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+        }
+
+        .stat-icon.green {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+
+        .stat-icon.red {
+            background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+        }
+
+        .stat-icon.purple {
+            background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #718096;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: #1a202c;
+            margin-bottom: 4px;
+        }
+
+        .stat-detail {
+            font-size: 12px;
+            color: #a0aec0;
+            font-weight: 500;
+        }
+
+        .details-section {
+            margin-top: 1rem;
+        }
+
+        .btn-details {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #2d3748;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-details:hover {
+            background: #f7fafc;
+            border-color: #cbd5e0;
+        }
+
+        .items-list {
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .items-list.active {
+            display: block;
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: #f7fafc;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            align-items: center;
+        }
+
+        .item-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+
+        .item-info p {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .item-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .resumen-final {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+
+        .resumen-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .resumen-row:last-child {
+            border-bottom: none;
+            padding-top: 1.5rem;
+            margin-top: 0.5rem;
+            border-top: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .resumen-label {
+            font-size: 16px;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        .resumen-value {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .resumen-row:last-child .resumen-label {
+            font-size: 20px;
+        }
+
+        .resumen-row:last-child .resumen-value {
+            font-size: 36px;
+        }
+
+        .btn-liquidar {
+            width: 100%;
+            padding: 16px;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 1.5rem;
+        }
+
+        .btn-liquidar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn-modal {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-modal-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-modal-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-modal-secondary {
+            background: white;
+            color: #2d3748;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-modal-secondary:hover {
+            background: #f7fafc;
+        }
+
+        .movimientos-list {
+            margin-top: 1rem;
+        }
+
+        .movimiento-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: #f7fafc;
+            border-left: 3px solid;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+        }
+
+        .movimiento-item.ingreso {
+            border-color: #48bb78;
+        }
+
+        .movimiento-item.retiro {
+            border-color: #fc8181;
+        }
+
+        .movimiento-info h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 2px;
+        }
+
+        .movimiento-info p {
+            font-size: 11px;
+            color: #718096;
+        }
+
+        .movimiento-monto {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .movimiento-monto.ingreso {
+            color: #48bb78;
+        }
+
+        .movimiento-monto.retiro {
+            color: #fc8181;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #a0aec0;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-280px);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .content-wrapper {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">☰</button>
+    
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="productos.html" class="sidebar-brand">
+                <div class="brand-icon">🍽️</div>
+                <div class="brand-text">
+                    <h2>RestaurantApp</h2>
+                    <p>Sistema de gestión</p>
+                </div>
+            </a>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Principal</div>
+                <a href="productos.html" class="nav-item">
+                    <span class="nav-icon">📦</span>
+                    <span>Productos</span>
+                </a>
+                <a href="pedidos.html" class="nav-item">
+                    <span class="nav-icon">🍽️</span>
+                    <span>Pedidos</span>
+                </a>
+                <a href="gastos.html" class="nav-item">
+                    <span class="nav-icon">💰</span>
+                    <span>Gastos</span>
+                </a>
+                <a href="qr-generator.html" class="nav-item">
+                    <span class="nav-icon">📱</span>
+                    <span>QR generador</span>
+                </a>
+                <a href="reportes.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>Reportes</span>
+                </a>
+                <a href="historial-pedidos.html" class="nav-item">
+                    <span class="nav-icon">📜</span>
+                    <span>Historial</span>
+                </a>
+                <a href="liquidacion.html" class="nav-item active">
+                    <span class="nav-icon">💵</span>
+                    <span>Liquidación</span>
+                </a>
+                <a href="catalogo-productos.html" class="nav-item">
+                    <span class="nav-icon">📜📦</span>
+                    <span>Inventario</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar-sidebar" id="sidebarUserAvatar">U</div>
+                <div class="user-details">
+                    <h4 id="sidebarUserName">Cargando...</h4>
+                    <p>Administrador</p>
+                </div>
+            </div>
+            <button class="btn-logout-sidebar" onclick="logout()">
+                <span>🚪</span>
+                <span>Cerrar Sesión</span>
+            </button>
+        </div>
+    </aside>
+
+    <div class="content-wrapper">
+        <div class="container">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">💵 Liquidación del Día</h1>
+                    <p class="page-subtitle">Cierre de caja y resumen financiero</p>
+                </div>
+                <button class="btn-control-caja" onclick="openControlCajaModal()">
+                    <span>💰</span>
+                    <span>Control de Caja</span>
+                </button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">💵</div>
+                    <div class="stat-label">Caja Inicial</div>
+                    <div class="stat-value" id="cajaInicial">$0</div>
+                    <div class="stat-detail">De la última liquidación</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon green">📈</div>
+                    <div class="stat-label">Total Ingresos</div>
+                    <div class="stat-value" id="totalIngresos">$0</div>
+                    <div class="stat-detail" id="cantidadPedidos">0 pedidos</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon red">📉</div>
+                    <div class="stat-label">Total Egresos</div>
+                    <div class="stat-value" id="totalEgresos">$0</div>
+                    <div class="stat-detail" id="cantidadGastos">0 gastos</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon purple">💰</div>
+                    <div class="stat-label">Movimientos de Caja</div>
+                    <div class="stat-value" id="totalMovimientos">$0</div>
+                    <div class="stat-detail" id="cantidadMovimientos">0 movimientos</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>📋 Ingresos del Día</h2>
+                </div>
+                <div class="card-body">
+                    <div class="details-section">
+                        <button class="btn-details" onclick="toggleDetails('pedidos')">
+                            <span id="iconPedidos">▶</span>
+                            <span>Ver detalles de pedidos</span>
+                        </button>
+                    </div>
+                    <div class="items-list" id="listaPedidos">
+                        <!-- Se llenará con JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>💸 Egresos del Día</h2>
+                </div>
+                <div class="card-body">
+                    <div class="details-section">
+                        <button class="btn-details" onclick="toggleDetails('gastos')">
+                            <span id="iconGastos">▶</span>
+                            <span>Ver detalles de gastos</span>
+                        </button>
+                    </div>
+                    <div class="items-list" id="listaGastos">
+                        <!-- Se llenará con JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>💰 Movimientos de Caja</h2>
+                </div>
+                <div class="card-body">
+                    <div class="movimientos-list" id="listaMovimientos">
+                        <div class="empty-state">
+                            <div class="empty-icon">💰</div>
+                            <p>No hay movimientos de caja registrados</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="resumen-final">
+                <div class="resumen-row">
+                    <span class="resumen-label">Caja Inicial:</span>
+                    <span class="resumen-value" id="resumenCajaInicial">$0</span>
+                </div>
+                <div class="resumen-row">
+                    <span class="resumen-label">+ Ingresos:</span>
+                    <span class="resumen-value" id="resumenIngresos">$0</span>
+                </div>
+                <div class="resumen-row">
+                    <span class="resumen-label">- Egresos:</span>
+                    <span class="resumen-value" id="resumenEgresos">$0</span>
+                </div>
+                <div class="resumen-row">
+                    <span class="resumen-label">+/- Movimientos:</span>
+                    <span class="resumen-value" id="resumenMovimientos">$0</span>
+                </div>
+                <div class="resumen-row">
+                    <span class="resumen-label">💵 Caja Final:</span>
+                    <span class="resumen-value" id="cajaFinal">$0</span>
+                </div>
+                <button class="btn-liquidar" onclick="realizarLiquidacion()">
+                    ✅ Realizar Liquidación del Día
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Control de Caja -->
+    <div class="modal" id="modalControlCaja">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>💰 Control de Caja</h2>
+            </div>
+            <form onsubmit="agregarMovimiento(event)">
+                <div class="form-group">
+                    <label class="form-label">Tipo de Movimiento</label>
+                    <select id="tipoMovimiento" class="form-select" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="ingreso">💵 Ingreso</option>
+                        <option value="retiro">💸 Retiro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Monto</label>
+                    <input type="number" id="montoMovimiento" class="form-input" 
+                           placeholder="0" min="0" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Motivo</label>
+                    <textarea id="motivoMovimiento" class="form-textarea" 
+                              placeholder="Descripción del movimiento..." required></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-modal btn-modal-secondary" 
+                            onclick="closeControlCajaModal()">Cancelar</button>
+                    <button type="submit" class="btn-modal btn-modal-primary">
+                        Agregar Movimiento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Observaciones -->
+    <div class="modal" id="modalObservaciones">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📝 Observaciones de la Liquidación</h2>
+            </div>
+            <form onsubmit="confirmarLiquidacion(event)">
+                <div class="form-group">
+                    <label class="form-label">Observaciones (opcional)</label>
+                    <textarea id="observaciones" class="form-textarea" 
+                              placeholder="Agregar notas o comentarios sobre la liquidación..."></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-modal btn-modal-secondary" 
+                            onclick="closeObservacionesModal()">Cancelar</button>
+                    <button type="submit" class="btn-modal btn-modal-primary">
+                        ✅ Confirmar Liquidación
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://restaurante-co77.onrender.com/api';
+        let currentUser = null;
+        let cajaInicialValue = 0;
+        let datosPendientes = {
+            pedidos: [],
+            gastos: [],
+            totalPedidos: 0,
+            totalGastos: 0
+        };
+        let movimientosCaja = [];
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('No autorizado');
+
+                const data = await response.json();
+                currentUser = data.data;
+
+                if (currentUser.id && !currentUser._id) {
+                    currentUser._id = currentUser.id;
+                }
+
+                document.getElementById('sidebarUserName').textContent = currentUser.nombre;
+                document.getElementById('sidebarUserAvatar').textContent = 
+                    currentUser.nombre.charAt(0).toUpperCase();
+
+                await cargarDatos();
+            } catch (error) {
+                console.error('Error:', error);
+                localStorage.removeItem('token');
+                window.location.href = 'index.html';
+            }
+        });
+
+        async function cargarDatos() {
+            await cargarUltimaLiquidacion();
+            await cargarDatosPendientes();
+            actualizarResumen();
+        }
+
+        async function cargarUltimaLiquidacion() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(
+                    `${API_URL}/liquidaciones/ultima?userId=${currentUser._id}`,
+                    { headers: { 'Authorization': `Bearer ${token}` } }
+                );
+                const data = await response.json();
+
+                if (data.success && data.data) {
+                    cajaInicialValue = data.data.cajaFinal;
+                } else {
+                    cajaInicialValue = 0;
+                }
+
+                document.getElementById('cajaInicial').textContent = 
+                    `${cajaInicialValue.toLocaleString('es-CO')}`;
+            } catch (error) {
+                console.error('Error al cargar última liquidación:', error);
+                cajaInicialValue = 0;
+            }
+        }
+
+        async function cargarDatosPendientes() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(
+                    `${API_URL}/liquidaciones/pendientes?userId=${currentUser._id}`,
+                    { headers: { 'Authorization': `Bearer ${token}` } }
+                );
+                const data = await response.json();
+
+                if (data.success) {
+                    datosPendientes = data.data;
+                    mostrarPedidos();
+                    mostrarGastos();
+                }
+            } catch (error) {
+                console.error('Error al cargar datos pendientes:', error);
+            }
+        }
+
+        function mostrarPedidos() {
+            const lista = document.getElementById('listaPedidos');
+            
+            if (datosPendientes.pedidos.length === 0) {
+                lista.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <p>No hay pedidos pendientes de liquidar</p>
+                    </div>
+                `;
+                return;
+            }
+
+            lista.innerHTML = datosPendientes.pedidos.map(pedido => `
+                <div class="item-row">
+                    <div class="item-info">
+                        <h4>Pedido #${pedido._id.slice(-6).toUpperCase()} - Mesa ${pedido.mesa}</h4>
+                        <p>${new Date(pedido.createdAt).toLocaleString('es-CO')} | 
+                           ${pedido.items.length} producto(s)</p>
+                    </div>
+                    <div class="item-value">${pedido.total.toLocaleString('es-CO')}</div>
+                </div>
+            `).join('');
+        }
+
+        function mostrarGastos() {
+            const lista = document.getElementById('listaGastos');
+            
+            if (datosPendientes.gastos.length === 0) {
+                lista.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">💸</div>
+                        <p>No hay gastos pendientes de liquidar</p>
+                    </div>
+                `;
+                return;
+            }
+
+            lista.innerHTML = datosPendientes.gastos.map(gasto => `
+                <div class="item-row">
+                    <div class="item-info">
+                        <h4>${new Date(gasto.fecha).toLocaleDateString('es-CO')}</h4>
+                        <p>${gasto.gastos.length} gasto(s) registrado(s)</p>
+                    </div>
+                    <div class="item-value">${gasto.total.toLocaleString('es-CO')}</div>
+                </div>
+            `).join('');
+        }
+
+        function toggleDetails(tipo) {
+            const lista = document.getElementById(tipo === 'pedidos' ? 'listaPedidos' : 'listaGastos');
+            const icon = document.getElementById(tipo === 'pedidos' ? 'iconPedidos' : 'iconGastos');
+            
+            lista.classList.toggle('active');
+            icon.textContent = lista.classList.contains('active') ? '▼' : '▶';
+        }
+
+        function actualizarResumen() {
+            const totalIngresos = datosPendientes.totalPedidos;
+            const totalEgresos = datosPendientes.totalGastos;
+            const totalMovimientos = movimientosCaja.reduce((sum, mov) => {
+                return mov.tipo === 'ingreso' ? sum + mov.monto : sum - mov.monto;
+            }, 0);
+            const cajaFinal = cajaInicialValue + totalIngresos - totalEgresos + totalMovimientos;
+
+            // Actualizar tarjetas
+            document.getElementById('totalIngresos').textContent = 
+                `${totalIngresos.toLocaleString('es-CO')}`;
+            document.getElementById('cantidadPedidos').textContent = 
+                `${datosPendientes.pedidos.length} pedidos`;
+            
+            document.getElementById('totalEgresos').textContent = 
+                `${totalEgresos.toLocaleString('es-CO')}`;
+            document.getElementById('cantidadGastos').textContent = 
+                `${datosPendientes.gastos.length} gastos`;
+            
+            document.getElementById('totalMovimientos').textContent = 
+                `${totalMovimientos.toLocaleString('es-CO')}`;
+            document.getElementById('cantidadMovimientos').textContent = 
+                `${movimientosCaja.length} movimientos`;
+
+            // Actualizar resumen final
+            document.getElementById('resumenCajaInicial').textContent = 
+                `${cajaInicialValue.toLocaleString('es-CO')}`;
+            document.getElementById('resumenIngresos').textContent = 
+                `${totalIngresos.toLocaleString('es-CO')}`;
+            document.getElementById('resumenEgresos').textContent = 
+                `${totalEgresos.toLocaleString('es-CO')}`;
+            document.getElementById('resumenMovimientos').textContent = 
+                `${totalMovimientos.toLocaleString('es-CO')}`;
+            document.getElementById('cajaFinal').textContent = 
+                `${cajaFinal.toLocaleString('es-CO')}`;
+        }
+
+        function openControlCajaModal() {
+            document.getElementById('modalControlCaja').classList.add('active');
+        }
+
+        function closeControlCajaModal() {
+            document.getElementById('modalControlCaja').classList.remove('active');
+            document.getElementById('tipoMovimiento').value = '';
+            document.getElementById('montoMovimiento').value = '';
+            document.getElementById('motivoMovimiento').value = '';
+        }
+
+        function agregarMovimiento(event) {
+            event.preventDefault();
+            
+            const tipo = document.getElementById('tipoMovimiento').value;
+            const monto = parseFloat(document.getElementById('montoMovimiento').value);
+            const motivo = document.getElementById('motivoMovimiento').value;
+
+            movimientosCaja.push({
+                tipo,
+                monto,
+                motivo,
+                fecha: new Date()
+            });
+
+            mostrarMovimientos();
+            actualizarResumen();
+            closeControlCajaModal();
+        }
+
+        function mostrarMovimientos() {
+            const lista = document.getElementById('listaMovimientos');
+            
+            if (movimientosCaja.length === 0) {
+                lista.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">💰</div>
+                        <p>No hay movimientos de caja registrados</p>
+                    </div>
+                `;
+                return;
+            }
+
+            lista.innerHTML = movimientosCaja.map((mov, index) => `
+                <div class="movimiento-item ${mov.tipo}">
+                    <div class="movimiento-info">
+                        <h4>${mov.tipo === 'ingreso' ? '💵 Ingreso' : '💸 Retiro'}: ${mov.motivo}</h4>
+                        <p>${new Date(mov.fecha).toLocaleString('es-CO')}</p>
+                    </div>
+                    <div class="movimiento-monto ${mov.tipo}">
+                        ${mov.tipo === 'ingreso' ? '+' : '-'}${mov.monto.toLocaleString('es-CO')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function realizarLiquidacion() {
+            if (datosPendientes.pedidos.length === 0 && datosPendientes.gastos.length === 0) {
+                alert('No hay datos para liquidar');
+                return;
+            }
+
+            document.getElementById('modalObservaciones').classList.add('active');
+        }
+
+        function closeObservacionesModal() {
+            document.getElementById('modalObservaciones').classList.remove('active');
+            document.getElementById('observaciones').value = '';
+        }
+
+        async function confirmarLiquidacion(event) {
+            event.preventDefault();
+            
+            const observaciones = document.getElementById('observaciones').value;
+            const token = localStorage.getItem('token');
+
+            const liquidacionData = {
+                userId: currentUser._id,
+                cajaInicial: cajaInicialValue,
+                movimientosCaja: movimientosCaja,
+                observaciones
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/liquidaciones`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(liquidacionData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ Liquidación realizada exitosamente');
+                    closeObservacionesModal();
+                    
+                    // Reiniciar valores
+                    movimientosCaja = [];
+                    await cargarDatos();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error al realizar liquidación:', error);
+                alert('Error al realizar la liquidación');
+            }
+        }
+
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function logout() {
+            if (confirm('¿Cerrar sesión?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('usuario');
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>
