@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 const expensesRoutes = require('./routes/Expenses');
+const liquidacionesRoutes = require('./routes/liquidaciones');
 require('dotenv').config();
 
 const app = express();
@@ -23,6 +24,7 @@ app.use('/api/products', require('./routes/Products'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/orders', require('./routes/Orders')); // Nueva ruta para pedidos
 app.use('/api/expenses', expensesRoutes);
+app.use('/api/liquidaciones', liquidacionesRoutes);
 
 // Ruta principal (sirve index.html)
 app.get('/', (req, res) => {
