@@ -251,17 +251,21 @@ router.get('/', async (req, res) => {
     }
 
     const liquidaciones = await Liquidacion.find(query)
-      .populate({
-        path: 'ingresos.pedidos',
-        select: 'mesa total createdAt estado',
-        options: { strictPopulate: false } // Ignora referencias rotas
-      })
-      .populate({
-        path: 'egresos.gastos',
-        select: 'fecha total gastos',
-        options: { strictPopulate: false } // Ignora referencias rotas
-      })
-      .sort({ fecha: -1 });
+      .populate('ingresos.pedidos', 'mesa total createdAt estado')
+      .populate('egresos.gastos', 'fecha total gastos')
+      .sort({ fecha: -1 })
+      .lean(); // Convertir a objetos planos
+
+    // Limpiar referencias rotas (pedidos/gastos eliminados)
+    liquidaciones.forEach(liq => {
+      if (liq.ingresos && Array.isArray(liq.ingresos.pedidos)) {
+        liq.ingresos.pedidos = liq.ingresos.pedidos.filter(p => p !== null);
+      }
+      
+      if (liq.egresos && Array.isArray(liq.egresos.gastos)) {
+        liq.egresos.gastos = liq.egresos.gastos.filter(g => g !== null);
+      }
+    });
 
     res.json({
       success: true,
@@ -282,21 +286,25 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const liquidacion = await Liquidacion.findById(req.params.id)
-      .populate({
-        path: 'ingresos.pedidos',
-        options: { strictPopulate: false }
-      })
-      .populate({
-        path: 'egresos.gastos',
-        options: { strictPopulate: false }
-      })
-      .populate('userId', 'nombre email');
+      .populate('ingresos.pedidos')
+      .populate('egresos.gastos')
+      .populate('userId', 'nombre email')
+      .lean();
 
     if (!liquidacion) {
       return res.status(404).json({
         success: false,
         message: 'Liquidación no encontrada'
       });
+    }
+
+    // Limpiar referencias rotas
+    if (liquidacion.ingresos && Array.isArray(liquidacion.ingresos.pedidos)) {
+      liquidacion.ingresos.pedidos = liquidacion.ingresos.pedidos.filter(p => p !== null);
+    }
+    
+    if (liquidacion.egresos && Array.isArray(liquidacion.egresos.gastos)) {
+      liquidacion.egresos.gastos = liquidacion.egresos.gastos.filter(g => g !== null);
     }
 
     res.json({
