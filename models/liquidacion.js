@@ -57,7 +57,7 @@ const liquidacionSchema = new mongoose.Schema({
   },
   cajaFinal: {
     type: Number,
-    required: flase
+    required: false
   },
   observaciones: {
     type: String,
