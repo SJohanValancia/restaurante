@@ -335,6 +335,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // Obtener estadísticas de pedidos
+// Obtener estadísticas de pedidos
 router.get('/stats/resumen', async (req, res) => {
   try {
     const { userId } = req.query;
@@ -349,8 +350,9 @@ router.get('/stats/resumen', async (req, res) => {
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
 
+    // SIN usar ObjectId en el aggregate
     const stats = await Order.aggregate([
-      { $match: { userId: new mongoose.Types.ObjectId(userId), createdAt: { $gte: hoy } } },
+      { $match: { userId: mongoose.Types.ObjectId(userId), createdAt: { $gte: hoy } } },
       {
         $group: {
           _id: '$estado',
@@ -361,6 +363,7 @@ router.get('/stats/resumen', async (req, res) => {
     ]);
 
     const totalPedidos = await Order.countDocuments({ userId, createdAt: { $gte: hoy } });
+    
     const totalVentas = await Order.aggregate([
       { $match: { userId: mongoose.Types.ObjectId(userId), createdAt: { $gte: hoy }, estado: { $ne: 'cancelado' } } },
       { $group: { _id: null, total: { $sum: '$total' } } }
@@ -375,6 +378,7 @@ router.get('/stats/resumen', async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('Error al obtener estadísticas:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener estadísticas',

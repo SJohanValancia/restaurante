@@ -50,17 +50,9 @@ router.get('/pendientes', async (req, res) => {
       });
     }
 
-    // Validar que userId sea un ObjectId válido
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(400).json({
-        success: false,
-        message: 'userId no es válido'
-      });
-    }
-
     // Buscar pedidos entregados que NO han sido liquidados
     const pedidos = await Order.find({
-      userId: new mongoose.Types.ObjectId(userId),
+      userId,
       estado: 'entregado',
       reciboDia: false
     })
@@ -69,7 +61,7 @@ router.get('/pendientes', async (req, res) => {
 
     // Buscar gastos que NO han sido liquidados
     const gastos = await Expense.find({
-      userId: new mongoose.Types.ObjectId(userId),
+      userId,
       reciboDia: false
     }).sort({ fecha: -1 });
 
@@ -110,19 +102,9 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Validar que userId sea un ObjectId válido
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(400).json({
-        success: false,
-        message: 'userId no es válido'
-      });
-    }
-
-    const userObjectId = new mongoose.Types.ObjectId(userId);
-
     // Obtener pedidos entregados NO liquidados
     const pedidos = await Order.find({
-      userId: userObjectId,
+      userId,
       estado: 'entregado',
       reciboDia: false
     });
@@ -131,7 +113,7 @@ router.post('/', async (req, res) => {
 
     // Obtener gastos NO liquidados
     const gastos = await Expense.find({
-      userId: userObjectId,
+      userId,
       reciboDia: false
     });
 
@@ -157,7 +139,7 @@ router.post('/', async (req, res) => {
       },
       movimientosCaja: movimientosCaja || [],
       observaciones,
-      userId: userObjectId,
+      userId,
       cerrada: true
     });
 
@@ -208,15 +190,7 @@ router.get('/', async (req, res) => {
       });
     }
 
-    // Validar que userId sea un ObjectId válido
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(400).json({
-        success: false,
-        message: 'userId no es válido'
-      });
-    }
-
-    let query = { userId: new mongoose.Types.ObjectId(userId) };
+    let query = { userId };
 
     if (startDate && endDate) {
       query.fecha = {
@@ -341,15 +315,7 @@ router.get('/stats/resumen', async (req, res) => {
       });
     }
 
-    // Validar que userId sea un ObjectId válido
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(400).json({
-        success: false,
-        message: 'userId no es válido'
-      });
-    }
-
-    let query = { userId: new mongoose.Types.ObjectId(userId) };
+    let query = { userId };
 
     if (startDate && endDate) {
       query.fecha = {
