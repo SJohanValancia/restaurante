@@ -38,7 +38,7 @@ router.get('/ultima', async (req, res) => {
   }
 });
 
-// Obtener datos pendientes de liquidación (pedidos y gastos del día)
+// Obtener datos pendientes de liquidación (pedidos y gastos sin liquidar)
 router.get('/pendientes', async (req, res) => {
   try {
     const { userId } = req.query;
@@ -50,34 +50,19 @@ router.get('/pendientes', async (req, res) => {
       });
     }
 
-    // Obtener la última liquidación cerrada
-    const ultimaLiquidacion = await Liquidacion.findOne({ 
-      userId,
-      cerrada: true 
-    }).sort({ fecha: -1 });
-
-    // Fecha desde la última liquidación o desde hoy 00:00
-    let fechaDesde;
-    if (ultimaLiquidacion) {
-      fechaDesde = new Date(ultimaLiquidacion.fecha);
-    } else {
-      fechaDesde = new Date();
-      fechaDesde.setHours(0, 0, 0, 0);
-    }
-
-    // Buscar pedidos entregados después de la última liquidación
+    // Buscar pedidos entregados que NO han sido liquidados
     const pedidos = await Order.find({
       userId,
       estado: 'entregado',
-      createdAt: { $gte: fechaDesde }
+      reciboDia: false
     })
       .populate('items.producto', 'nombre precio')
       .sort({ createdAt: -1 });
 
-    // Buscar gastos después de la última liquidación
+    // Buscar gastos que NO han sido liquidados
     const gastos = await Expense.find({
       userId,
-      fecha: { $gte: fechaDesde }
+      reciboDia: false
     }).sort({ fecha: -1 });
 
     // Calcular totales
@@ -90,8 +75,7 @@ router.get('/pendientes', async (req, res) => {
         pedidos,
         gastos,
         totalPedidos,
-        totalGastos,
-        fechaDesde
+        totalGastos
       }
     });
   } catch (error) {
@@ -116,31 +100,17 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Obtener la última liquidación
-    const ultimaLiquidacion = await Liquidacion.findOne({ 
-      userId,
-      cerrada: true 
-    }).sort({ fecha: -1 });
-
-    let fechaDesde;
-    if (ultimaLiquidacion) {
-      fechaDesde = new Date(ultimaLiquidacion.fecha);
-    } else {
-      fechaDesde = new Date();
-      fechaDesde.setHours(0, 0, 0, 0);
-    }
-
-    // Obtener pedidos entregados
+    // Obtener pedidos entregados NO liquidados
     const pedidos = await Order.find({
       userId,
       estado: 'entregado',
-      createdAt: { $gte: fechaDesde }
+      reciboDia: false
     });
 
-    // Obtener gastos
+    // Obtener gastos NO liquidados
     const gastos = await Expense.find({
       userId,
-      fecha: { $gte: fechaDesde }
+      reciboDia: false
     });
 
     // Calcular totales
@@ -164,6 +134,18 @@ router.post('/', async (req, res) => {
       userId,
       cerrada: true
     });
+
+    // Marcar pedidos como liquidados
+    await Order.updateMany(
+      { _id: { $in: pedidos.map(p => p._id) } },
+      { $set: { reciboDia: true } }
+    );
+
+    // Marcar gastos como liquidados
+    await Expense.updateMany(
+      { _id: { $in: gastos.map(g => g._id) } },
+      { $set: { reciboDia: true } }
+    );
 
     res.status(201).json({
       success: true,

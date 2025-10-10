@@ -33,6 +33,10 @@ const orderSchema = new mongoose.Schema({
     enum: ['pendiente', 'preparando', 'listo', 'entregado', 'cancelado'],
     default: 'pendiente'
   },
+  reciboDia: {
+    type: Boolean,
+    default: false
+  },
   notas: {
     type: String,
     trim: true,
@@ -54,13 +58,12 @@ const orderSchema = new mongoose.Schema({
   versionKey: false
 });
 
-// Índices para mejorar el rendimiento
 orderSchema.index({ mesa: 1 });
 orderSchema.index({ estado: 1 });
 orderSchema.index({ userId: 1 });
 orderSchema.index({ createdAt: -1 });
+orderSchema.index({ reciboDia: 1 });
 
-// Calcular total antes de guardar
 orderSchema.pre('save', function(next) {
   if (this.items && this.items.length > 0) {
     this.total = this.items.reduce((sum, item) => {
@@ -70,12 +73,10 @@ orderSchema.pre('save', function(next) {
   next();
 });
 
-// Virtual para obtener el total formateado
 orderSchema.virtual('totalFormateado').get(function() {
   return `$${this.total.toLocaleString('es-CO')}`;
 });
 
-// Virtual para obtener el número de items
 orderSchema.virtual('totalItems').get(function() {
   return this.items.reduce((sum, item) => sum + item.cantidad, 0);
 });
