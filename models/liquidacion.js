@@ -57,7 +57,7 @@ const liquidacionSchema = new mongoose.Schema({
   },
   cajaFinal: {
     type: Number,
-    required: true
+    required: flase
   },
   observaciones: {
     type: String,
@@ -94,7 +94,11 @@ liquidacionSchema.pre('save', function(next) {
     }
   }, 0);
 
-
+  // Calcular caja final (siempre, incluso si viene del frontend)
+  this.cajaFinal = (this.cajaInicial || 0) + 
+                   (this.ingresos?.totalPedidos || 0) - 
+                   (this.egresos?.totalGastos || 0) + 
+                   (this.totalMovimientos || 0);
   
   next();
 });
