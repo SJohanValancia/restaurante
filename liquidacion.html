@@ -1199,46 +1199,144 @@
             document.getElementById('observaciones').value = '';
         }
 
-        async function confirmarLiquidacion(event) {
-            event.preventDefault();
-            
-            const observaciones = document.getElementById('observaciones').value;
-            const token = localStorage.getItem('token');
+// REEMPLAZA la función confirmarLiquidacion completa por este bloque
+// REEMPLAZA toda la función confirmarLiquidacion por este bloque
+async function confirmarLiquidacion(event) {
+    event.preventDefault();
 
-            const liquidacionData = {
-                userId: currentUser._id,
-                cajaInicial: cajaInicialValue,
-                movimientosCaja: movimientosCaja,
-                observaciones
-            };
+    // Valores del DOM / estado
+    const observaciones = (document.getElementById('observaciones') && document.getElementById('observaciones').value) || '';
+    const token = localStorage.getItem('token');
 
+    // Aseguramos números (ajusta los nombres si en tu código están diferentes)
+    const cajaInicialNum = Number(typeof cajaInicialValue !== 'undefined' ? cajaInicialValue : 0);
+
+    // Totales: intenta leer de datosPendientes con varios nombres posibles
+    const totalIngresos = Number(
+        (typeof datosPendientes !== 'undefined' && (datosPendientes.totalPedidos ?? datosPendientes.totalIngresos)) || 0
+    );
+    const totalEgresos = Number(
+        (typeof datosPendientes !== 'undefined' && (datosPendientes.totalGastos ?? datosPendientes.totalEgresos)) || 0
+    );
+
+    // Calculamos movimientosCaja si existe
+    const totalMovimientos = Array.isArray(movimientosCaja)
+        ? movimientosCaja.reduce((sum, mov) => {
+            const monto = Number(mov?.monto ?? mov?.amount ?? 0);
+            // Por defecto tratamos 'ingreso' como suma, cualquier otro tipo resta
+            return (mov?.tipo === 'ingreso' ? sum + monto : sum - monto);
+        }, 0)
+        : 0;
+
+    // Calculamos cajaFinal (si tienes una variable cajaFinal ya definida, la ignoramos y recalculamos para evitar undefined)
+    const cajaFinalCalc = Number(cajaInicialNum + totalIngresos - totalEgresos + totalMovimientos);
+
+    // Normalizamos pedidos/gastos para que cada item sea { _id: '...' }
+    const pedidosArray = (datosPendientes && Array.isArray(datosPendientes.pedidos) ? datosPendientes.pedidos : [])
+        .map(p => {
+            if (!p) return null;
+            if (typeof p === 'string') return { _id: p };
+            if (p._id) return p;
+            if (p.id) return { _id: p.id };
+            return p;
+        })
+        .filter(Boolean);
+
+    const gastosArray = (datosPendientes && Array.isArray(datosPendientes.gastos) ? datosPendientes.gastos : [])
+        .map(g => {
+            if (!g) return null;
+            if (typeof g === 'string') return { _id: g };
+            if (g._id) return g;
+            if (g.id) return { _id: g.id };
+            return g;
+        })
+        .filter(Boolean);
+
+    // Construimos el payload exactamente en la forma que el backend espera
+    const liquidacionData = {
+        fecha: new Date().toISOString(),
+        cajaInicial: Number(cajaInicialNum || 0),
+        ingresos: {
+            totalPedidos: Number(totalIngresos || 0),
+            pedidos: pedidosArray
+        },
+        egresos: {
+            totalGastos: Number(totalEgresos || 0),
+            gastos: gastosArray
+        },
+        movimientosCaja: Array.isArray(movimientosCaja) ? movimientosCaja : [],
+        observaciones: observaciones || '',
+        userId: (typeof currentUser !== 'undefined' && (currentUser?._id || currentUser?.id)) || null,
+        // campo requerido por el backend
+        cajaFinal: Number.isFinite(cajaFinalCalc) ? cajaFinalCalc : 0
+    };
+
+    // Verificación previa al envío
+    console.log('Enviando liquidación payload (formato esperado):', liquidacionData);
+    if (!liquidacionData.userId) {
+        console.error('Error: userId indefinido en currentUser. currentUser:', currentUser);
+        alert('Error: usuario no identificado. Vuelve a iniciar sesión.');
+        return;
+    }
+    if (typeof liquidacionData.cajaFinal === 'undefined' || liquidacionData.cajaFinal === null || Number.isNaN(Number(liquidacionData.cajaFinal))) {
+        console.error('cajaFinal inválida antes de enviar:', liquidacionData.cajaFinal);
+        alert('Error interno: cajaFinal no calculada. Revisa la consola.');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/liquidaciones`, {
+            method: 'POST',
+            headers: {
+                'Authorization': token ? `Bearer ${token}` : '',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(liquidacionData)
+        });
+
+        // Si no fue ok: intentar leer JSON, sino texto
+        if (!response.ok) {
+            let errText = '';
             try {
-                const response = await fetch(`${API_URL}/liquidaciones`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(liquidacionData)
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    alert('✅ Liquidación realizada exitosamente');
-                    closeObservacionesModal();
-                    
-                    // Reiniciar valores
-                    movimientosCaja = [];
-                    await cargarDatos();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            } catch (error) {
-                console.error('Error al realizar liquidación:', error);
-                alert('Error al realizar la liquidación');
+                const errJson = await response.json();
+                errText = errJson.message || JSON.stringify(errJson);
+            } catch (e) {
+                errText = await response.text();
             }
+            console.error('Error al realizar liquidación:', response.status, errText);
+            alert(`Error ${response.status}: ${errText || 'Bad request'}`);
+            return;
         }
+
+        // Parseamos respuesta (si viene JSON)
+        let data = null;
+        try {
+            data = await response.json();
+        } catch (e) {
+            const txt = await response.text();
+            console.warn('Respuesta no-JSON del servidor (status ok):', txt);
+            alert('✅ Liquidación realizada (respuesta no-JSON).');
+            if (typeof closeObservacionesModal === 'function') closeObservacionesModal();
+            movimientosCaja = [];
+            if (typeof cargarDatos === 'function') await cargarDatos();
+            return;
+        }
+
+        // Manejo del resultado según el backend
+        if (data && (data.success === true || response.status === 201)) {
+            alert('✅ Liquidación realizada exitosamente');
+            if (typeof closeObservacionesModal === 'function') closeObservacionesModal();
+            movimientosCaja = [];
+            if (typeof cargarDatos === 'function') await cargarDatos();
+        } else {
+            console.error('Respuesta inesperada del servidor:', data);
+            alert('Error al realizar la liquidación: ' + (data.message || JSON.stringify(data)));
+        }
+    } catch (error) {
+        console.error('Error al realizar liquidación (fetch):', error);
+        alert('Error de red o problema en el servidor. Revisa la consola y la pestaña Network.');
+    }
+}
 
         function toggleMenu() {
             const sidebar = document.getElementById('sidebar');

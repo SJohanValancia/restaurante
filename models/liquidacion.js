@@ -94,11 +94,7 @@ liquidacionSchema.pre('save', function(next) {
     }
   }, 0);
 
-  // Calcular caja final
-  this.cajaFinal = this.cajaInicial + 
-                   this.ingresos.totalPedidos - 
-                   this.egresos.totalGastos + 
-                   this.totalMovimientos;
+
   
   next();
 });
