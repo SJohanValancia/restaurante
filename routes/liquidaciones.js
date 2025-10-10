@@ -88,6 +88,57 @@ router.get('/pendientes', async (req, res) => {
   }
 });
 
+// ⚠️ IMPORTANTE: Esta ruta debe ir ANTES de '/:id'
+// Obtener estadísticas de liquidaciones
+router.get('/stats/resumen', async (req, res) => {
+  try {
+    const { userId, startDate, endDate } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: 'userId es requerido'
+      });
+    }
+
+    let query = { userId };
+
+    if (startDate && endDate) {
+      query.fecha = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate)
+      };
+    }
+
+    const liquidaciones = await Liquidacion.find(query);
+
+    const stats = {
+      totalLiquidaciones: liquidaciones.length,
+      totalIngresos: liquidaciones.reduce((sum, l) => sum + (l.ingresos?.totalPedidos || 0), 0),
+      totalEgresos: liquidaciones.reduce((sum, l) => sum + (l.egresos?.totalGastos || 0), 0),
+      totalMovimientos: liquidaciones.reduce((sum, l) => sum + (l.totalMovimientos || 0), 0),
+      promedioIngresosPorDia: liquidaciones.length > 0 
+        ? liquidaciones.reduce((sum, l) => sum + (l.ingresos?.totalPedidos || 0), 0) / liquidaciones.length 
+        : 0,
+      promedioEgresosPorDia: liquidaciones.length > 0 
+        ? liquidaciones.reduce((sum, l) => sum + (l.egresos?.totalGastos || 0), 0) / liquidaciones.length 
+        : 0
+    };
+
+    res.json({
+      success: true,
+      data: stats
+    });
+  } catch (error) {
+    console.error('Error al obtener estadísticas:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener estadísticas',
+      error: error.message
+    });
+  }
+});
+
 // Crear nueva liquidación
 router.post('/', async (req, res) => {
   try {
@@ -200,8 +251,16 @@ router.get('/', async (req, res) => {
     }
 
     const liquidaciones = await Liquidacion.find(query)
-      .populate('ingresos.pedidos', 'mesa total createdAt')
-      .populate('egresos.gastos', 'fecha total')
+      .populate({
+        path: 'ingresos.pedidos',
+        select: 'mesa total createdAt estado',
+        options: { strictPopulate: false } // Ignora referencias rotas
+      })
+      .populate({
+        path: 'egresos.gastos',
+        select: 'fecha total gastos',
+        options: { strictPopulate: false } // Ignora referencias rotas
+      })
       .sort({ fecha: -1 });
 
     res.json({
@@ -223,8 +282,14 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const liquidacion = await Liquidacion.findById(req.params.id)
-      .populate('ingresos.pedidos')
-      .populate('egresos.gastos')
+      .populate({
+        path: 'ingresos.pedidos',
+        options: { strictPopulate: false }
+      })
+      .populate({
+        path: 'egresos.gastos',
+        options: { strictPopulate: false }
+      })
       .populate('userId', 'nombre email');
 
     if (!liquidacion) {
@@ -239,6 +304,7 @@ router.get('/:id', async (req, res) => {
       data: liquidacion
     });
   } catch (error) {
+    console.error('Error al obtener liquidación:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener la liquidación',
@@ -298,55 +364,6 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error al eliminar la liquidación',
-      error: error.message
-    });
-  }
-});
-
-// Obtener estadísticas de liquidaciones
-router.get('/stats/resumen', async (req, res) => {
-  try {
-    const { userId, startDate, endDate } = req.query;
-
-    if (!userId) {
-      return res.status(400).json({
-        success: false,
-        message: 'userId es requerido'
-      });
-    }
-
-    let query = { userId };
-
-    if (startDate && endDate) {
-      query.fecha = {
-        $gte: new Date(startDate),
-        $lte: new Date(endDate)
-      };
-    }
-
-    const liquidaciones = await Liquidacion.find(query);
-
-    const stats = {
-      totalLiquidaciones: liquidaciones.length,
-      totalIngresos: liquidaciones.reduce((sum, l) => sum + l.ingresos.totalPedidos, 0),
-      totalEgresos: liquidaciones.reduce((sum, l) => sum + l.egresos.totalGastos, 0),
-      totalMovimientos: liquidaciones.reduce((sum, l) => sum + l.totalMovimientos, 0),
-      promedioIngresosPorDia: liquidaciones.length > 0 
-        ? liquidaciones.reduce((sum, l) => sum + l.ingresos.totalPedidos, 0) / liquidaciones.length 
-        : 0,
-      promedioEgresosPorDia: liquidaciones.length > 0 
-        ? liquidaciones.reduce((sum, l) => sum + l.egresos.totalGastos, 0) / liquidaciones.length 
-        : 0
-    };
-
-    res.json({
-      success: true,
-      data: stats
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error al obtener estadísticas',
       error: error.message
     });
   }

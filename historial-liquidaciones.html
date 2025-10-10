@@ -913,38 +913,39 @@
             }
         }
 
-        async function cargarEstadisticas(fechaInicio = null, fechaFin = null) {
-            const token = localStorage.getItem('token');
-            
-            try {
-                let url = `${API_URL}/liquidaciones/stats/resumen?userId=${currentUser._id}`;
-                
-                if (fechaInicio && fechaFin) {
-                    url += `&startDate=${fechaInicio}&endDate=${fechaFin}`;
-                }
-
-                const response = await fetch(url, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    const stats = data.data;
-                    document.getElementById('statsContainer').style.display = 'grid';
-                    document.getElementById('totalLiquidaciones').textContent = stats.totalLiquidaciones;
-                    document.getElementById('totalIngresos').textContent = 
-                        `$${stats.totalIngresos.toLocaleString('es-CO')}`;
-                    document.getElementById('totalEgresos').textContent = 
-                        `$${stats.totalEgresos.toLocaleString('es-CO')}`;
-                    document.getElementById('promedioIngresos').textContent = 
-                        `$${Math.round(stats.promedioIngresosporDia).toLocaleString('es-CO')}`;
-                }
-            } catch (error) {
-                console.error('Error al cargar estadísticas:', error);
-            }
+async function cargarEstadisticas(fechaInicio = null, fechaFin = null) {
+    const token = localStorage.getItem('token');
+    
+    try {
+        let url = `${API_URL}/liquidaciones/stats/resumen?userId=${currentUser._id}`;
+        
+        if (fechaInicio && fechaFin) {
+            url += `&startDate=${fechaInicio}&endDate=${fechaFin}`;
         }
 
+        const response = await fetch(url, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            const stats = data.data;
+            document.getElementById('statsContainer').style.display = 'grid';
+            document.getElementById('totalLiquidaciones').textContent = stats.totalLiquidaciones || 0;
+            document.getElementById('totalIngresos').textContent = 
+                `$${(stats.totalIngresos || 0).toLocaleString('es-CO')}`;
+            document.getElementById('totalEgresos').textContent = 
+                `$${(stats.totalEgresos || 0).toLocaleString('es-CO')}`;
+            document.getElementById('promedioIngresos').textContent = 
+                `$${Math.round(stats.promedioIngresosPorDia || 0).toLocaleString('es-CO')}`;
+        }
+    } catch (error) {
+        console.error('Error al cargar estadísticas:', error);
+        // No mostrar las estadísticas si hay error
+        document.getElementById('statsContainer').style.display = 'none';
+    }
+}
         function mostrarLiquidaciones() {
             const container = document.getElementById('liquidacionesContainer');
 
