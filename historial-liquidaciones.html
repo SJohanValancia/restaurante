@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Liquidaciones</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            color: #1a202c;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
+            padding: 0;
+            z-index: 1000;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .brand-text h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .brand-text p {
+            font-size: 11px;
+            color: rgba(255,255,255,0.7);
+            margin: 2px 0 0 0;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section-title {
+            padding: 0.5rem 1.5rem;
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 1.5rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.2) 0%, transparent 100%);
+            color: white;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .user-avatar-sidebar {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .user-details h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .user-details p {
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+            margin: 2px 0 0 0;
+        }
+
+        .btn-logout-sidebar {
+            width: 100%;
+            padding: 10px;
+            background: rgba(229, 62, 62, 0.2);
+            color: #fc8181;
+            border: 1px solid rgba(229, 62, 62, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-logout-sidebar:hover {
+            background: #e53e3e;
+            color: white;
+            border-color: #e53e3e;
+        }
+
+        .menu-toggle {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1001;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        .content-wrapper {
+            margin-left: 280px;
+            transition: margin-left 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            color: #718096;
+        }
+
+        .filters-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .filter-input {
+            padding: 10px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-filter {
+            padding: 10px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-filter:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon.purple {
+            background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+        }
+
+        .stat-icon.green {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+
+        .stat-icon.red {
+            background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+        }
+
+        .stat-icon.blue {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #718096;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1a202c;
+        }
+
+        .liquidaciones-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .liquidacion-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .liquidacion-card:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .liquidacion-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .liquidacion-fecha {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .fecha-icon {
+            font-size: 24px;
+        }
+
+        .fecha-info h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .fecha-info p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .liquidacion-id {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .liquidacion-body {
+            padding: 1.5rem;
+        }
+
+        .resumen-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .resumen-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .resumen-label {
+            font-size: 13px;
+            color: #718096;
+            font-weight: 600;
+        }
+
+        .resumen-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1a202c;
+        }
+
+        .resumen-value.positive {
+            color: #48bb78;
+        }
+
+        .resumen-value.negative {
+            color: #fc8181;
+        }
+
+        .caja-final-section {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid #e2e8f0;
+        }
+
+        .caja-final-label {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .caja-final-value {
+            font-size: 36px;
+            font-weight: 800;
+            color: #667eea;
+        }
+
+        .liquidacion-actions {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-action {
+            padding: 10px 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            color: #2d3748;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-action:hover {
+            background: #f7fafc;
+            border-color: #cbd5e0;
+        }
+
+        .observaciones-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .observaciones-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .observaciones-text {
+            font-size: 14px;
+            color: #718096;
+            line-height: 1.6;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .empty-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .empty-text {
+            font-size: 14px;
+            color: #718096;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            font-size: 16px;
+            color: #718096;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .btn-close {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: #f7fafc;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 20px;
+            color: #718096;
+            transition: all 0.2s;
+        }
+
+        .btn-close:hover {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .detalle-section {
+            margin-bottom: 2rem;
+        }
+
+        .detalle-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .items-table th {
+            background: #f7fafc;
+            padding: 12px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .items-table td {
+            padding: 12px;
+            font-size: 14px;
+            color: #4a5568;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .items-table tr:hover {
+            background: #f7fafc;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-280px);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .content-wrapper {
+                margin-left: 0;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-summary {
+                grid-template-columns: 1fr;
+            }
+
+            .resumen-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">☰</button>
+    
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="productos.html" class="sidebar-brand">
+                <div class="brand-icon">🍽️</div>
+                <div class="brand-text">
+                    <h2>RestaurantApp</h2>
+                    <p>Sistema de gestión</p>
+                </div>
+            </a>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Principal</div>
+                <a href="productos.html" class="nav-item">
+                    <span class="nav-icon">📦</span>
+                    <span>Productos</span>
+                </a>
+                <a href="pedidos.html" class="nav-item">
+                    <span class="nav-icon">🍽️</span>
+                    <span>Pedidos</span>
+                </a>
+                <a href="gastos.html" class="nav-item">
+                    <span class="nav-icon">💰</span>
+                    <span>Gastos</span>
+                </a>
+                <a href="qr-generator.html" class="nav-item">
+                    <span class="nav-icon">📱</span>
+                    <span>QR generador</span>
+                </a>
+                <a href="reportes.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>Reportes</span>
+                </a>
+                <a href="historial-pedidos.html" class="nav-item">
+                    <span class="nav-icon">📜</span>
+                    <span>Historial</span>
+                </a>
+                <a href="liquidacion.html" class="nav-item">
+                    <span class="nav-icon">💵</span>
+                    <span>Liquidación</span>
+                </a>
+                <a href="historial-liquidaciones.html" class="nav-item active">
+                    <span class="nav-icon">📋</span>
+                    <span>Hist. Liquidaciones</span>
+                </a>
+                <a href="catalogo-productos.html" class="nav-item">
+                    <span class="nav-icon">📜📦</span>
+                    <span>Inventario</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar-sidebar" id="sidebarUserAvatar">U</div>
+                <div class="user-details">
+                    <h4 id="sidebarUserName">Cargando...</h4>
+                    <p>Administrador</p>
+                </div>
+            </div>
+            <button class="btn-logout-sidebar" onclick="logout()">
+                <span>🚪</span>
+                <span>Cerrar Sesión</span>
+            </button>
+        </div>
+    </aside>
+
+    <div class="content-wrapper">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">📋 Historial de Liquidaciones</h1>
+                <p class="page-subtitle">Consulta todas tus liquidaciones realizadas</p>
+            </div>
+
+            <div class="filters-section">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label class="filter-label">Fecha Inicio</label>
+                        <input type="date" id="fechaInicio" class="filter-input">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Fecha Fin</label>
+                        <input type="date" id="fechaFin" class="filter-input">
+                    </div>
+                    <div class="filter-group">
+                        <button class="btn-filter" onclick="aplicarFiltros()">
+                            🔍 Buscar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-summary" id="statsContainer" style="display: none;">
+                <div class="stat-card">
+                    <div class="stat-icon purple">📋</div>
+                    <div class="stat-label">Total Liquidaciones</div>
+                    <div class="stat-value" id="totalLiquidaciones">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">💵</div>
+                    <div class="stat-label">Total Ingresos</div>
+                    <div class="stat-value" id="totalIngresos">$0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">💸</div>
+                    <div class="stat-label">Total Egresos</div>
+                    <div class="stat-value" id="totalEgresos">$0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon blue">💰</div>
+                    <div class="stat-label">Promedio Ingresos</div>
+                    <div class="stat-value" id="promedioIngresos">$0</div>
+                </div>
+            </div>
+
+            <div id="liquidacionesContainer">
+                <div class="loading">Cargando liquidaciones...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detalle -->
+    <div class="modal" id="modalDetalle">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📋 Detalle de Liquidación</h2>
+                <button class="btn-close" onclick="cerrarModal()">×</button>
+            </div>
+            <div id="detalleContent">
+                <!-- Se llenará con JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://restaurante-co77.onrender.com/api';
+        let currentUser = null;
+        let liquidaciones = [];
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('No autorizado');
+
+                const data = await response.json();
+                currentUser = data.data;
+
+                if (currentUser.id && !currentUser._id) {
+                    currentUser._id = currentUser.id;
+                }
+
+                document.getElementById('sidebarUserName').textContent = currentUser.nombre;
+                document.getElementById('sidebarUserAvatar').textContent = 
+                    currentUser.nombre.charAt(0).toUpperCase();
+
+                await cargarLiquidaciones();
+            } catch (error) {
+                console.error('Error:', error);
+                localStorage.removeItem('token');
+                window.location.href = 'index.html';
+            }
+        });
+
+        async function cargarLiquidaciones(fechaInicio = null, fechaFin = null) {
+            const token = localStorage.getItem('token');
+            const container = document.getElementById('liquidacionesContainer');
+            
+            try {
+                let url = `${API_URL}/liquidaciones?userId=${currentUser._id}`;
+                
+                if (fechaInicio && fechaFin) {
+                    url += `&startDate=${fechaInicio}&endDate=${fechaFin}`;
+                }
+
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    liquidaciones = data.data;
+                    mostrarLiquidaciones();
+                    await cargarEstadisticas(fechaInicio, fechaFin);
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">⚠️</div>
+                            <div class="empty-title">Error al cargar</div>
+                            <div class="empty-text">${data.message}</div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error al cargar liquidaciones:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">❌</div>
+                        <div class="empty-title">Error de conexión</div>
+                        <div class="empty-text">No se pudieron cargar las liquidaciones</div>
+                    </div>
+                `;
+            }
+        }
+
+        async function cargarEstadisticas(fechaInicio = null, fechaFin = null) {
+            const token = localStorage.getItem('token');
+            
+            try {
+                let url = `${API_URL}/liquidaciones/stats/resumen?userId=${currentUser._id}`;
+                
+                if (fechaInicio && fechaFin) {
+                    url += `&startDate=${fechaInicio}&endDate=${fechaFin}`;
+                }
+
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const stats = data.data;
+                    document.getElementById('statsContainer').style.display = 'grid';
+                    document.getElementById('totalLiquidaciones').textContent = stats.totalLiquidaciones;
+                    document.getElementById('totalIngresos').textContent = 
+                        `$${stats.totalIngresos.toLocaleString('es-CO')}`;
+                    document.getElementById('totalEgresos').textContent = 
+                        `$${stats.totalEgresos.toLocaleString('es-CO')}`;
+                    document.getElementById('promedioIngresos').textContent = 
+                        `$${Math.round(stats.promedioIngresosporDia).toLocaleString('es-CO')}`;
+                }
+            } catch (error) {
+                console.error('Error al cargar estadísticas:', error);
+            }
+        }
+
+        function mostrarLiquidaciones() {
+            const container = document.getElementById('liquidacionesContainer');
+
+            if (liquidaciones.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <div class="empty-title">No hay liquidaciones</div>
+                        <div class="empty-text">Aún no has realizado ninguna liquidación</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="liquidaciones-list">
+                    ${liquidaciones.map(liq => crearTarjetaLiquidacion(liq)).join('')}
+                </div>
+            `;
+        }
+
+        function crearTarjetaLiquidacion(liquidacion) {
+            const fecha = new Date(liquidacion.fecha);
+            const fechaFormato = fecha.toLocaleDateString('es-CO', { 
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            const horaFormato = fecha.toLocaleTimeString('es-CO', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            return `
+                <div class="liquidacion-card">
+                    <div class="liquidacion-header">
+                        <div class="liquidacion-fecha">
+                            <span class="fecha-icon">📅</span>
+                            <div class="fecha-info">
+                                <h3>${fechaFormato}</h3>
+                                <p>${horaFormato}</p>
+                            </div>
+                        </div>
+                        <div class="liquidacion-id">
+                            #${liquidacion._id.slice(-8).toUpperCase()}
+                        </div>
+                    </div>
+                    <div class="liquidacion-body">
+                        <div class="resumen-grid">
+                            <div class="resumen-item">
+                                <span class="resumen-label">💵 Caja Inicial</span>
+                                <span class="resumen-value">$${liquidacion.cajaInicial.toLocaleString('es-CO')}</span>
+                            </div>
+                            <div class="resumen-item">
+                                <span class="resumen-label">📈 Ingresos</span>
+                                <span class="resumen-value positive">+$${liquidacion.ingresos.totalPedidos.toLocaleString('es-CO')}</span>
+                            </div>
+                            <div class="resumen-item">
+                                <span class="resumen-label">📉 Egresos</span>
+                                <span class="resumen-value negative">-$${liquidacion.egresos.totalGastos.toLocaleString('es-CO')}</span>
+                            </div>
+                            <div class="resumen-item">
+                                <span class="resumen-label">💰 Movimientos</span>
+                                <span class="resumen-value">${liquidacion.totalMovimientos >= 0 ? '+' : ''}$${liquidacion.totalMovimientos.toLocaleString('es-CO')}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="caja-final-section">
+                            <span class="caja-final-label">💵 Caja Final</span>
+                            <span class="caja-final-value">$${liquidacion.cajaFinal.toLocaleString('es-CO')}</span>
+                        </div>
+
+                        ${liquidacion.observaciones ? `
+                            <div class="observaciones-section">
+                                <div class="observaciones-title">📝 Observaciones</div>
+                                <div class="observaciones-text">${liquidacion.observaciones}</div>
+                            </div>
+                        ` : ''}
+
+                        <div class="liquidacion-actions">
+                            <button class="btn-action" onclick="verDetalle('${liquidacion._id}')">
+                                <span>👁️</span>
+                                Ver Detalle Completo
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function verDetalle(liquidacionId) {
+            const token = localStorage.getItem('token');
+            
+            try {
+                const response = await fetch(`${API_URL}/liquidaciones/${liquidacionId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    mostrarModalDetalle(data.data);
+                } else {
+                    alert('Error al cargar el detalle');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar el detalle de la liquidación');
+            }
+        }
+
+        function mostrarModalDetalle(liquidacion) {
+            const fecha = new Date(liquidacion.fecha);
+            const fechaFormato = fecha.toLocaleDateString('es-CO', { 
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const content = `
+                <div class="detalle-section">
+                    <h3 style="font-size: 18px; color: #667eea; margin-bottom: 1rem;">
+                        📅 ${fechaFormato}
+                    </h3>
+                </div>
+
+                <div class="detalle-section">
+                    <div class="detalle-title">💵 Resumen Financiero</div>
+                    <div class="resumen-grid">
+                        <div class="resumen-item">
+                            <span class="resumen-label">Caja Inicial</span>
+                            <span class="resumen-value">$${liquidacion.cajaInicial.toLocaleString('es-CO')}</span>
+                        </div>
+                        <div class="resumen-item">
+                            <span class="resumen-label">Total Ingresos</span>
+                            <span class="resumen-value positive">$${liquidacion.ingresos.totalPedidos.toLocaleString('es-CO')}</span>
+                        </div>
+                        <div class="resumen-item">
+                            <span class="resumen-label">Total Egresos</span>
+                            <span class="resumen-value negative">$${liquidacion.egresos.totalGastos.toLocaleString('es-CO')}</span>
+                        </div>
+                        <div class="resumen-item">
+                            <span class="resumen-label">Movimientos Caja</span>
+                            <span class="resumen-value">$${liquidacion.totalMovimientos.toLocaleString('es-CO')}</span>
+                        </div>
+                    </div>
+                    <div class="caja-final-section" style="margin-top: 1rem;">
+                        <span class="caja-final-label">💵 Caja Final</span>
+                        <span class="caja-final-value">$${liquidacion.cajaFinal.toLocaleString('es-CO')}</span>
+                    </div>
+                </div>
+
+                ${liquidacion.ingresos.pedidos && liquidacion.ingresos.pedidos.length > 0 ? `
+                    <div class="detalle-section">
+                        <div class="detalle-title">📋 Pedidos (${liquidacion.ingresos.pedidos.length})</div>
+                        <table class="items-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Mesa</th>
+                                    <th>Fecha</th>
+                                    <th>Estado</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${liquidacion.ingresos.pedidos.map(pedido => `
+                                    <tr>
+                                        <td>#${pedido._id.slice(-6).toUpperCase()}</td>
+                                        <td>Mesa ${pedido.mesa}</td>
+                                        <td>${new Date(pedido.createdAt).toLocaleDateString('es-CO')}</td>
+                                        <td>${pedido.estado || 'N/A'}</td>
+                                        <td style="font-weight: 700;">$${pedido.total.toLocaleString('es-CO')}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                ` : ''}
+
+                ${liquidacion.egresos.gastos && liquidacion.egresos.gastos.length > 0 ? `
+                    <div class="detalle-section">
+                        <div class="detalle-title">💸 Gastos (${liquidacion.egresos.gastos.length})</div>
+                        <table class="items-table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Cantidad</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${liquidacion.egresos.gastos.map(gasto => `
+                                    <tr>
+                                        <td>${new Date(gasto.fecha).toLocaleDateString('es-CO')}</td>
+                                        <td>${gasto.gastos ? gasto.gastos.length : 0} gasto(s)</td>
+                                        <td style="font-weight: 700; color: #fc8181;">$${gasto.total.toLocaleString('es-CO')}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                ` : ''}
+
+                ${liquidacion.movimientosCaja && liquidacion.movimientosCaja.length > 0 ? `
+                    <div class="detalle-section">
+                        <div class="detalle-title">💰 Movimientos de Caja (${liquidacion.movimientosCaja.length})</div>
+                        <table class="items-table">
+                            <thead>
+                                <tr>
+                                    <th>Tipo</th>
+                                    <th>Motivo</th>
+                                    <th>Fecha</th>
+                                    <th>Monto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${liquidacion.movimientosCaja.map(mov => `
+                                    <tr>
+                                        <td>${mov.tipo === 'ingreso' ? '💵 Ingreso' : '💸 Retiro'}</td>
+                                        <td>${mov.motivo}</td>
+                                        <td>${new Date(mov.fecha).toLocaleDateString('es-CO')}</td>
+                                        <td style="font-weight: 700; color: ${mov.tipo === 'ingreso' ? '#48bb78' : '#fc8181'};">
+                                            ${mov.tipo === 'ingreso' ? '+' : '-'}$${mov.monto.toLocaleString('es-CO')}
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                ` : ''}
+
+                ${liquidacion.observaciones ? `
+                    <div class="detalle-section">
+                        <div class="detalle-title">📝 Observaciones</div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 8px; font-size: 14px; color: #4a5568; line-height: 1.6;">
+                            ${liquidacion.observaciones}
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+
+            document.getElementById('detalleContent').innerHTML = content;
+            document.getElementById('modalDetalle').classList.add('active');
+        }
+
+
+        function aplicarFiltros() {
+            const fechaInicio = document.getElementById('fechaInicio').value;
+            const fechaFin = document.getElementById('fechaFin').value;
+
+            if (fechaInicio && fechaFin) {
+                if (new Date(fechaInicio) > new Date(fechaFin)) {
+                    alert('La fecha de inicio no puede ser mayor a la fecha fin');
+                    return;
+                }
+                cargarLiquidaciones(fechaInicio, fechaFin);
+            } else if (fechaInicio || fechaFin) {
+                alert('Por favor selecciona ambas fechas');
+            } else {
+                cargarLiquidaciones();
+            }
+        }
+
+        function cerrarModal() {
+            document.getElementById('modalDetalle').classList.remove('active');
+        }
+
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function logout() {
+            if (confirm('¿Cerrar sesión?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('usuario');
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('modalDetalle').addEventListener('click', function(e) {
+            if (e.target === this) {
+                cerrarModal();
+            }
+        });
+    </script>
+</body>
+</html>

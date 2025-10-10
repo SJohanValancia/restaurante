@@ -350,7 +350,7 @@ router.get('/stats/resumen', async (req, res) => {
     hoy.setHours(0, 0, 0, 0);
 
     const stats = await Order.aggregate([
-      { $match: { userId: mongoose.Types.ObjectId(userId), createdAt: { $gte: hoy } } },
+      { $match: { userId: new mongoose.Types.ObjectId(userId), createdAt: { $gte: hoy } } },
       {
         $group: {
           _id: '$estado',

@@ -50,9 +50,17 @@ router.get('/pendientes', async (req, res) => {
       });
     }
 
+    // Validar que userId sea un ObjectId válido
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'userId no es válido'
+      });
+    }
+
     // Buscar pedidos entregados que NO han sido liquidados
     const pedidos = await Order.find({
-      userId,
+      userId: new mongoose.Types.ObjectId(userId),
       estado: 'entregado',
       reciboDia: false
     })
@@ -61,7 +69,7 @@ router.get('/pendientes', async (req, res) => {
 
     // Buscar gastos que NO han sido liquidados
     const gastos = await Expense.find({
-      userId,
+      userId: new mongoose.Types.ObjectId(userId),
       reciboDia: false
     }).sort({ fecha: -1 });
 
@@ -93,6 +101,8 @@ router.post('/', async (req, res) => {
   try {
     const { userId, cajaInicial, movimientosCaja, observaciones } = req.body;
 
+    console.log('📥 Datos recibidos:', { userId, cajaInicial, movimientosCaja, observaciones });
+
     if (!userId) {
       return res.status(400).json({
         success: false,
@@ -100,22 +110,38 @@ router.post('/', async (req, res) => {
       });
     }
 
+    // Validar que userId sea un ObjectId válido
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'userId no es válido'
+      });
+    }
+
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+
     // Obtener pedidos entregados NO liquidados
     const pedidos = await Order.find({
-      userId,
+      userId: userObjectId,
       estado: 'entregado',
       reciboDia: false
     });
 
+    console.log(`📋 Pedidos encontrados: ${pedidos.length}`);
+
     // Obtener gastos NO liquidados
     const gastos = await Expense.find({
-      userId,
+      userId: userObjectId,
       reciboDia: false
     });
+
+    console.log(`💸 Gastos encontrados: ${gastos.length}`);
 
     // Calcular totales
     const totalPedidos = pedidos.reduce((sum, pedido) => sum + pedido.total, 0);
     const totalGastos = gastos.reduce((sum, gasto) => sum + gasto.total, 0);
+
+    console.log('💰 Totales calculados:', { totalPedidos, totalGastos });
 
     // Crear liquidación
     const liquidacion = await Liquidacion.create({
@@ -131,21 +157,29 @@ router.post('/', async (req, res) => {
       },
       movimientosCaja: movimientosCaja || [],
       observaciones,
-      userId,
+      userId: userObjectId,
       cerrada: true
     });
 
+    console.log('✅ Liquidación creada:', liquidacion._id);
+
     // Marcar pedidos como liquidados
-    await Order.updateMany(
-      { _id: { $in: pedidos.map(p => p._id) } },
-      { $set: { reciboDia: true } }
-    );
+    if (pedidos.length > 0) {
+      await Order.updateMany(
+        { _id: { $in: pedidos.map(p => p._id) } },
+        { $set: { reciboDia: true } }
+      );
+      console.log(`✅ ${pedidos.length} pedidos marcados como liquidados`);
+    }
 
     // Marcar gastos como liquidados
-    await Expense.updateMany(
-      { _id: { $in: gastos.map(g => g._id) } },
-      { $set: { reciboDia: true } }
-    );
+    if (gastos.length > 0) {
+      await Expense.updateMany(
+        { _id: { $in: gastos.map(g => g._id) } },
+        { $set: { reciboDia: true } }
+      );
+      console.log(`✅ ${gastos.length} gastos marcados como liquidados`);
+    }
 
     res.status(201).json({
       success: true,
@@ -153,7 +187,7 @@ router.post('/', async (req, res) => {
       data: liquidacion
     });
   } catch (error) {
-    console.error('Error al crear liquidación:', error);
+    console.error('❌ Error al crear liquidación:', error);
     res.status(400).json({
       success: false,
       message: 'Error al crear la liquidación',
@@ -174,7 +208,15 @@ router.get('/', async (req, res) => {
       });
     }
 
-    let query = { userId };
+    // Validar que userId sea un ObjectId válido
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'userId no es válido'
+      });
+    }
+
+    let query = { userId: new mongoose.Types.ObjectId(userId) };
 
     if (startDate && endDate) {
       query.fecha = {
@@ -299,7 +341,15 @@ router.get('/stats/resumen', async (req, res) => {
       });
     }
 
-    let query = { userId };
+    // Validar que userId sea un ObjectId válido
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'userId no es válido'
+      });
+    }
+
+    let query = { userId: new mongoose.Types.ObjectId(userId) };
 
     if (startDate && endDate) {
       query.fecha = {
@@ -315,10 +365,10 @@ router.get('/stats/resumen', async (req, res) => {
       totalIngresos: liquidaciones.reduce((sum, l) => sum + l.ingresos.totalPedidos, 0),
       totalEgresos: liquidaciones.reduce((sum, l) => sum + l.egresos.totalGastos, 0),
       totalMovimientos: liquidaciones.reduce((sum, l) => sum + l.totalMovimientos, 0),
-      promedioIngresosporDia: liquidaciones.length > 0 
+      promedioIngresosPorDia: liquidaciones.length > 0 
         ? liquidaciones.reduce((sum, l) => sum + l.ingresos.totalPedidos, 0) / liquidaciones.length 
         : 0,
-      promedioEgresosporDia: liquidaciones.length > 0 
+      promedioEgresosPorDia: liquidaciones.length > 0 
         ? liquidaciones.reduce((sum, l) => sum + l.egresos.totalGastos, 0) / liquidaciones.length 
         : 0
     };
