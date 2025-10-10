@@ -140,11 +140,12 @@ router.get('/stats/resumen', async (req, res) => {
 });
 
 // Crear nueva liquidación
+// Crear nueva liquidación
 router.post('/', async (req, res) => {
   try {
     const { userId, cajaInicial, movimientosCaja, observaciones } = req.body;
 
-    console.log('📥 Datos recibidos:', { userId, cajaInicial, movimientosCaja, observaciones });
+    console.log('🔥 Datos recibidos:', { userId, cajaInicial, movimientosCaja, observaciones });
 
     if (!userId) {
       return res.status(400).json({
@@ -176,7 +177,7 @@ router.post('/', async (req, res) => {
 
     console.log('💰 Totales calculados:', { totalPedidos, totalGastos });
 
-    // Crear liquidación
+    // Crear liquidación (PERMITIR INCLUSO SIN DATOS)
     const liquidacion = await Liquidacion.create({
       fecha: new Date(),
       cajaInicial: cajaInicial || 0,
@@ -196,7 +197,7 @@ router.post('/', async (req, res) => {
 
     console.log('✅ Liquidación creada:', liquidacion._id);
 
-    // Marcar pedidos como liquidados
+    // Marcar pedidos como liquidados (solo si hay)
     if (pedidos.length > 0) {
       await Order.updateMany(
         { _id: { $in: pedidos.map(p => p._id) } },
@@ -205,7 +206,7 @@ router.post('/', async (req, res) => {
       console.log(`✅ ${pedidos.length} pedidos marcados como liquidados`);
     }
 
-    // Marcar gastos como liquidados
+    // Marcar gastos como liquidados (solo si hay)
     if (gastos.length > 0) {
       await Expense.updateMany(
         { _id: { $in: gastos.map(g => g._id) } },
@@ -228,7 +229,6 @@ router.post('/', async (req, res) => {
     });
   }
 });
-
 // Obtener todas las liquidaciones de un usuario
 router.get('/', async (req, res) => {
   try {

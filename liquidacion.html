@@ -889,33 +889,33 @@
             <div class="modal-header">
                 <h2>💰 Control de Caja</h2>
             </div>
-            <form onsubmit="agregarMovimiento(event)">
-                <div class="form-group">
-                    <label class="form-label">Tipo de Movimiento</label>
-                    <select id="tipoMovimiento" class="form-select" required>
-                        <option value="">Seleccionar...</option>
-                        <option value="ingreso">💵 Ingreso</option>
-                        <option value="retiro">💸 Retiro</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Monto</label>
-                    <input type="number" id="montoMovimiento" class="form-input" 
-                           placeholder="0" min="0" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Motivo</label>
-                    <textarea id="motivoMovimiento" class="form-textarea" 
-                              placeholder="Descripción del movimiento..." required></textarea>
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="btn-modal btn-modal-secondary" 
-                            onclick="closeControlCajaModal()">Cancelar</button>
-                    <button type="submit" class="btn-modal btn-modal-primary">
-                        Agregar Movimiento
-                    </button>
-                </div>
-            </form>
+         <form onsubmit="agregarMovimiento(event)">
+    <div class="form-group">
+        <label class="form-label">Tipo de Movimiento</label>
+        <select id="tipoMovimiento" class="form-select" required>
+            <option value="">Seleccionar...</option>
+            <option value="ingreso">💵 Ingreso</option>
+            <option value="retiro">💸 Retiro</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label class="form-label">Monto</label>
+        <input type="number" id="montoMovimiento" class="form-input" 
+               placeholder="0" min="0" step="0.01" required>
+    </div>
+    <div class="form-group">
+        <label class="form-label">Motivo (opcional)</label>
+        <textarea id="motivoMovimiento" class="form-textarea" 
+                  placeholder="Descripción del movimiento..."></textarea>
+    </div>
+    <div class="modal-buttons">
+        <button type="button" class="btn-modal btn-modal-secondary" 
+                onclick="closeControlCajaModal()">Cancelar</button>
+        <button type="submit" class="btn-modal btn-modal-primary">
+            Agregar Movimiento
+        </button>
+    </div>
+</form>
         </div>
     </div>
 
@@ -1141,58 +1141,54 @@
         }
 
         function agregarMovimiento(event) {
-            event.preventDefault();
-            
-            const tipo = document.getElementById('tipoMovimiento').value;
-            const monto = parseFloat(document.getElementById('montoMovimiento').value);
-            const motivo = document.getElementById('motivoMovimiento').value;
+    event.preventDefault();
+    
+    const tipo = document.getElementById('tipoMovimiento').value;
+    const monto = parseFloat(document.getElementById('montoMovimiento').value);
+    const motivo = document.getElementById('motivoMovimiento').value || 'Sin descripción';
 
-            movimientosCaja.push({
-                tipo,
-                monto,
-                motivo,
-                fecha: new Date()
-            });
+    movimientosCaja.push({
+        tipo,
+        monto,
+        motivo,
+        fecha: new Date()
+    });
 
-            mostrarMovimientos();
-            actualizarResumen();
-            closeControlCajaModal();
-        }
+    mostrarMovimientos();
+    actualizarResumen();
+    closeControlCajaModal();
+}
 
-        function mostrarMovimientos() {
-            const lista = document.getElementById('listaMovimientos');
-            
-            if (movimientosCaja.length === 0) {
-                lista.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">💰</div>
-                        <p>No hay movimientos de caja registrados</p>
-                    </div>
-                `;
-                return;
-            }
 
-            lista.innerHTML = movimientosCaja.map((mov, index) => `
-                <div class="movimiento-item ${mov.tipo}">
-                    <div class="movimiento-info">
-                        <h4>${mov.tipo === 'ingreso' ? '💵 Ingreso' : '💸 Retiro'}: ${mov.motivo}</h4>
-                        <p>${new Date(mov.fecha).toLocaleString('es-CO')}</p>
-                    </div>
-                    <div class="movimiento-monto ${mov.tipo}">
-                        ${mov.tipo === 'ingreso' ? '+' : '-'}${mov.monto.toLocaleString('es-CO')}
-                    </div>
-                </div>
-            `).join('');
-        }
+function mostrarMovimientos() {
+    const lista = document.getElementById('listaMovimientos');
+    
+    if (movimientosCaja.length === 0) {
+        lista.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">💰</div>
+                <p>No hay movimientos de caja registrados</p>
+            </div>
+        `;
+        return;
+    }
 
-        function realizarLiquidacion() {
-            if (datosPendientes.pedidos.length === 0 && datosPendientes.gastos.length === 0) {
-                alert('No hay datos para liquidar');
-                return;
-            }
-
-            document.getElementById('modalObservaciones').classList.add('active');
-        }
+    lista.innerHTML = movimientosCaja.map((mov, index) => `
+        <div class="movimiento-item ${mov.tipo}">
+            <div class="movimiento-info">
+                <h4>${mov.tipo === 'ingreso' ? '💵 Ingreso' : '💸 Retiro'}: ${mov.motivo || 'Sin descripción'}</h4>
+                <p>${new Date(mov.fecha).toLocaleString('es-CO')}</p>
+            </div>
+            <div class="movimiento-monto ${mov.tipo}">
+                ${mov.tipo === 'ingreso' ? '+' : '-'}$${mov.monto.toLocaleString('es-CO')}
+            </div>
+        </div>
+    `).join('');
+}
+function realizarLiquidacion() {
+    // ELIMINAR LA VALIDACIÓN - permitir liquidar siempre
+    document.getElementById('modalObservaciones').classList.add('active');
+}
 
         function closeObservacionesModal() {
             document.getElementById('modalObservaciones').classList.remove('active');

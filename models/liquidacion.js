@@ -31,7 +31,7 @@ const liquidacionSchema = new mongoose.Schema({
       ref: 'Expense'
     }]
   },
-  movimientosCaja: [{
+movimientosCaja: [{
     tipo: {
       type: String,
       enum: ['ingreso', 'retiro'],
@@ -43,8 +43,9 @@ const liquidacionSchema = new mongoose.Schema({
     },
     motivo: {
       type: String,
-      required: true,
-      trim: true
+      required: false,  // CAMBIAR A FALSE
+      trim: true,
+      default: 'Sin descripción'  // AGREGAR DEFAULT
     },
     fecha: {
       type: Date,
