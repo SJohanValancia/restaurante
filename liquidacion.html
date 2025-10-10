@@ -689,6 +689,226 @@
                 gap: 1rem;
             }
         }
+
+        /* Animación de éxito */
+.success-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.success-overlay.active {
+    display: flex;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.success-message {
+    background: white;
+    border-radius: 20px;
+    padding: 3rem 2.5rem;
+    text-align: center;
+    max-width: 450px;
+    width: 90%;
+    transform: scale(0.7);
+    opacity: 0;
+    animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.2s forwards;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0.7);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.success-icon-wrapper {
+    margin: 0 auto 1.5rem;
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    animation: scaleIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.4s both;
+}
+
+@keyframes scaleIn {
+    0% {
+        transform: scale(0);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.success-icon-wrapper::before {
+    content: '';
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    border: 3px solid #48bb78;
+    border-radius: 50%;
+    opacity: 0;
+    animation: ripple 1s ease-out 0.6s;
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0.8);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+.success-checkmark {
+    font-size: 50px;
+    animation: checkmarkPop 0.3s ease 0.7s both;
+}
+
+@keyframes checkmarkPop {
+    0% {
+        transform: scale(0);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.success-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: #1a202c;
+    margin-bottom: 0.5rem;
+    animation: slideUp 0.4s ease 0.8s both;
+}
+
+.success-subtitle {
+    font-size: 16px;
+    color: #718096;
+    margin-bottom: 1.5rem;
+    animation: slideUp 0.4s ease 0.9s both;
+}
+
+@keyframes slideUp {
+    0% {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.success-details {
+    background: #f7fafc;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    animation: slideUp 0.4s ease 1s both;
+}
+
+.success-detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.success-detail-row:last-child {
+    border-bottom: none;
+    padding-top: 0.75rem;
+    margin-top: 0.25rem;
+    border-top: 2px solid #e2e8f0;
+}
+
+.success-detail-label {
+    font-size: 13px;
+    color: #718096;
+    font-weight: 600;
+}
+
+.success-detail-value {
+    font-size: 14px;
+    color: #1a202c;
+    font-weight: 700;
+}
+
+.success-detail-row:last-child .success-detail-label {
+    font-size: 15px;
+    color: #2d3748;
+}
+
+.success-detail-row:last-child .success-detail-value {
+    font-size: 18px;
+    color: #48bb78;
+}
+
+.loading-dots {
+    display: inline-flex;
+    gap: 4px;
+    margin-left: 4px;
+}
+
+.loading-dots span {
+    width: 6px;
+    height: 6px;
+    background: #718096;
+    border-radius: 50%;
+    animation: dotPulse 1.4s infinite ease-in-out;
+}
+
+.loading-dots span:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.loading-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.loading-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes dotPulse {
+    0%, 80%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
     </style>
 </head>
 <body>
@@ -941,6 +1161,23 @@
             </form>
         </div>
     </div>
+
+    <!-- Overlay de éxito -->
+<div class="success-overlay" id="successOverlay">
+    <div class="success-message">
+        <div class="success-icon-wrapper">
+            <div class="success-checkmark">✓</div>
+        </div>
+        <h2 class="success-title">¡Liquidación Exitosa!</h2>
+        <p class="success-subtitle">La liquidación del día se ha completado correctamente</p>
+        <div class="success-details" id="successDetails">
+            <!-- Se llenará dinámicamente -->
+        </div>
+        <p class="success-subtitle">
+            Recargando página<span class="loading-dots"><span></span><span></span><span></span></span>
+        </p>
+    </div>
+</div>
 
     <script>
         const API_URL = 'https://restaurante-co77.onrender.com/api';
@@ -1195,19 +1432,14 @@ function realizarLiquidacion() {
             document.getElementById('observaciones').value = '';
         }
 
-// REEMPLAZA la función confirmarLiquidacion completa por este bloque
-// REEMPLAZA toda la función confirmarLiquidacion por este bloque
 async function confirmarLiquidacion(event) {
     event.preventDefault();
 
-    // Valores del DOM / estado
     const observaciones = (document.getElementById('observaciones') && document.getElementById('observaciones').value) || '';
     const token = localStorage.getItem('token');
 
-    // Aseguramos números (ajusta los nombres si en tu código están diferentes)
     const cajaInicialNum = Number(typeof cajaInicialValue !== 'undefined' ? cajaInicialValue : 0);
 
-    // Totales: intenta leer de datosPendientes con varios nombres posibles
     const totalIngresos = Number(
         (typeof datosPendientes !== 'undefined' && (datosPendientes.totalPedidos ?? datosPendientes.totalIngresos)) || 0
     );
@@ -1215,19 +1447,15 @@ async function confirmarLiquidacion(event) {
         (typeof datosPendientes !== 'undefined' && (datosPendientes.totalGastos ?? datosPendientes.totalEgresos)) || 0
     );
 
-    // Calculamos movimientosCaja si existe
     const totalMovimientos = Array.isArray(movimientosCaja)
         ? movimientosCaja.reduce((sum, mov) => {
             const monto = Number(mov?.monto ?? mov?.amount ?? 0);
-            // Por defecto tratamos 'ingreso' como suma, cualquier otro tipo resta
             return (mov?.tipo === 'ingreso' ? sum + monto : sum - monto);
         }, 0)
         : 0;
 
-    // Calculamos cajaFinal (si tienes una variable cajaFinal ya definida, la ignoramos y recalculamos para evitar undefined)
     const cajaFinalCalc = Number(cajaInicialNum + totalIngresos - totalEgresos + totalMovimientos);
 
-    // Normalizamos pedidos/gastos para que cada item sea { _id: '...' }
     const pedidosArray = (datosPendientes && Array.isArray(datosPendientes.pedidos) ? datosPendientes.pedidos : [])
         .map(p => {
             if (!p) return null;
@@ -1248,7 +1476,6 @@ async function confirmarLiquidacion(event) {
         })
         .filter(Boolean);
 
-    // Construimos el payload exactamente en la forma que el backend espera
     const liquidacionData = {
         fecha: new Date().toISOString(),
         cajaInicial: Number(cajaInicialNum || 0),
@@ -1263,20 +1490,14 @@ async function confirmarLiquidacion(event) {
         movimientosCaja: Array.isArray(movimientosCaja) ? movimientosCaja : [],
         observaciones: observaciones || '',
         userId: (typeof currentUser !== 'undefined' && (currentUser?._id || currentUser?.id)) || null,
-        // campo requerido por el backend
         cajaFinal: Number.isFinite(cajaFinalCalc) ? cajaFinalCalc : 0
     };
 
-    // Verificación previa al envío
-    console.log('Enviando liquidación payload (formato esperado):', liquidacionData);
+    console.log('Enviando liquidación payload:', liquidacionData);
+    
     if (!liquidacionData.userId) {
-        console.error('Error: userId indefinido en currentUser. currentUser:', currentUser);
+        console.error('Error: userId indefinido');
         alert('Error: usuario no identificado. Vuelve a iniciar sesión.');
-        return;
-    }
-    if (typeof liquidacionData.cajaFinal === 'undefined' || liquidacionData.cajaFinal === null || Number.isNaN(Number(liquidacionData.cajaFinal))) {
-        console.error('cajaFinal inválida antes de enviar:', liquidacionData.cajaFinal);
-        alert('Error interno: cajaFinal no calculada. Revisa la consola.');
         return;
     }
 
@@ -1290,7 +1511,6 @@ async function confirmarLiquidacion(event) {
             body: JSON.stringify(liquidacionData)
         });
 
-        // Si no fue ok: intentar leer JSON, sino texto
         if (!response.ok) {
             let errText = '';
             try {
@@ -1304,36 +1524,69 @@ async function confirmarLiquidacion(event) {
             return;
         }
 
-        // Parseamos respuesta (si viene JSON)
         let data = null;
         try {
             data = await response.json();
         } catch (e) {
-            const txt = await response.text();
-            console.warn('Respuesta no-JSON del servidor (status ok):', txt);
-            alert('✅ Liquidación realizada (respuesta no-JSON).');
-            if (typeof closeObservacionesModal === 'function') closeObservacionesModal();
-            movimientosCaja = [];
-            if (typeof cargarDatos === 'function') await cargarDatos();
-            return;
+            console.warn('Respuesta no-JSON del servidor');
         }
 
-        // Manejo del resultado según el backend
         if (data && (data.success === true || response.status === 201)) {
-            alert('✅ Liquidación realizada exitosamente');
-            if (typeof closeObservacionesModal === 'function') closeObservacionesModal();
-            movimientosCaja = [];
-            if (typeof cargarDatos === 'function') await cargarDatos();
+            // Cerrar modal de observaciones
+            closeObservacionesModal();
+            
+            // Mostrar animación de éxito
+            mostrarExito({
+                cajaInicial: cajaInicialNum,
+                ingresos: totalIngresos,
+                egresos: totalEgresos,
+                movimientos: totalMovimientos,
+                cajaFinal: cajaFinalCalc
+            });
+            
+            // Recargar después de 3 segundos
+            setTimeout(() => {
+                window.location.reload();
+            }, 3000);
         } else {
-            console.error('Respuesta inesperada del servidor:', data);
-            alert('Error al realizar la liquidación: ' + (data.message || JSON.stringify(data)));
+            console.error('Respuesta inesperada:', data);
+            alert('Error al realizar la liquidación: ' + (data?.message || 'Error desconocido'));
         }
     } catch (error) {
-        console.error('Error al realizar liquidación (fetch):', error);
-        alert('Error de red o problema en el servidor. Revisa la consola y la pestaña Network.');
+        console.error('Error al realizar liquidación:', error);
+        alert('Error de red o problema en el servidor.');
     }
 }
 
+function mostrarExito(datos) {
+    const overlay = document.getElementById('successOverlay');
+    const details = document.getElementById('successDetails');
+    
+    details.innerHTML = `
+        <div class="success-detail-row">
+            <span class="success-detail-label">Caja Inicial:</span>
+            <span class="success-detail-value">$${datos.cajaInicial.toLocaleString('es-CO')}</span>
+        </div>
+        <div class="success-detail-row">
+            <span class="success-detail-label">Ingresos:</span>
+            <span class="success-detail-value">+$${datos.ingresos.toLocaleString('es-CO')}</span>
+        </div>
+        <div class="success-detail-row">
+            <span class="success-detail-label">Egresos:</span>
+            <span class="success-detail-value">-$${datos.egresos.toLocaleString('es-CO')}</span>
+        </div>
+        <div class="success-detail-row">
+            <span class="success-detail-label">Movimientos:</span>
+            <span class="success-detail-value">${datos.movimientos >= 0 ? '+' : ''}$${datos.movimientos.toLocaleString('es-CO')}</span>
+        </div>
+        <div class="success-detail-row">
+            <span class="success-detail-label">💰 Caja Final:</span>
+            <span class="success-detail-value">$${datos.cajaFinal.toLocaleString('es-CO')}</span>
+        </div>
+    `;
+    
+    overlay.classList.add('active');
+}
         function toggleMenu() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');

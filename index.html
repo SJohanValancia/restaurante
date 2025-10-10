@@ -510,19 +510,24 @@
 
                 const data = await response.json();
 
-                if (data.success) {
-                    // Guardar token y datos del usuario
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('usuario', JSON.stringify(data.usuario));
-                    
-                    showAlert('¡Inicio de sesión exitoso! Redirigiendo...', 'success');
-                    
-                    setTimeout(() => {
-                        window.location.href = 'productos.html';
-                    }, 1500);
-                } else {
-                    showAlert(data.message || 'Error al iniciar sesión', 'error');
-                }
+if (data.success) {
+    // Guardar token y datos del usuario
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('usuario', JSON.stringify(data.usuario));
+    
+    showAlert('¡Inicio de sesión exitoso! Redirigiendo...', 'success');
+    
+    setTimeout(() => {
+        // Redirigir según el rol
+        if (data.usuario.rol === 'admin') {
+            window.location.href = 'administrador.html';
+        } else {
+            window.location.href = 'productos.html';
+        }
+    }, 1500);
+} else {
+    showAlert(data.message || 'Error al iniciar sesión', 'error');
+}
             } catch (error) {
                 console.error('Error:', error);
                 showAlert('Error de conexión. Por favor intente nuevamente', 'error');

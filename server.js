@@ -4,6 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const expensesRoutes = require('./routes/Expenses');
 const liquidacionesRoutes = require('./routes/liquidaciones');
+const adminMeserosRoutes = require('./routes/adminMeseros'); // NUEVA LÍNEA
 require('dotenv').config();
 
 const app = express();
@@ -22,9 +23,10 @@ mongoose.connect(process.env.MONGO_URI)
 // Rutas API
 app.use('/api/products', require('./routes/Products'));
 app.use('/api/auth', require('./routes/auth'));
-app.use('/api/orders', require('./routes/Orders')); // Nueva ruta para pedidos
+app.use('/api/orders', require('./routes/Orders'));
 app.use('/api/expenses', expensesRoutes);
 app.use('/api/liquidaciones', liquidacionesRoutes);
+app.use('/api/admin-meseros', adminMeserosRoutes); // NUEVA LÍNEA
 
 // Ruta principal (sirve index.html)
 app.get('/', (req, res) => {
@@ -49,7 +51,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Puerto dinámico (Render asigna PORT automáticamente)
+// Puerto dinámico
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
