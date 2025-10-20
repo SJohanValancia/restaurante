@@ -4,7 +4,7 @@ const Expense = require('../models/Expense');
 const { protect } = require('../middleware/auth');
 
 // Obtener todos los gastos del restaurante
-router.get('/', protect, async (req, res) => {
+router.get('/', protect, checkPermission('verGastos'), async (req, res) => {
   try {
     const { month } = req.query;
     let query = { userId: { $in: req.userIdsRestaurante } };
@@ -62,7 +62,7 @@ router.get('/:id', protect, async (req, res) => {
 });
 
 // Crear un nuevo registro de gastos
-router.post('/', protect, async (req, res) => {
+router.post('/', protect, checkPermission('crearGastos'), async (req, res) => {
   try {
     const expenseData = {
       ...req.body,

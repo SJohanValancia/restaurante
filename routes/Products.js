@@ -2,9 +2,11 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
 const { protect } = require('../middleware/auth');
+const { checkPermission } = require('../middleware/permissions');
+
 
 // Obtener todos los productos del restaurante
-router.get('/', protect, async (req, res) => {
+router.get('/', protect, checkPermission('verProductos'), async (req, res) => {
   try {
     const { categoria, disponible, search } = req.query;
     
@@ -56,7 +58,7 @@ router.get('/:id', protect, async (req, res) => {
 });
 
 // Crear un nuevo producto
-router.post('/', protect, async (req, res) => {
+router.post('/', protect, checkPermission('crearProductos'), async (req, res) => {
   try {
     // Asignar el userId del usuario actual
     const productData = {
@@ -80,7 +82,7 @@ router.post('/', protect, async (req, res) => {
 });
 
 // Actualizar un producto
-router.put('/:id', protect, async (req, res) => {
+router.put('/:id', protect, checkPermission('editarProductos'), async (req, res) => {
   try {
     const product = await Product.findByIdAndUpdate(
       req.params.id,
@@ -110,7 +112,7 @@ router.put('/:id', protect, async (req, res) => {
 });
 
 // Eliminar un producto
-router.delete('/:id', protect, async (req, res) => {
+router.delete('/:id', protect, checkPermission('eliminarProductos'), async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
     
@@ -136,7 +138,7 @@ router.delete('/:id', protect, async (req, res) => {
 });
 
 // Actualizar disponibilidad de un producto
-router.patch('/:id/disponibilidad', protect, async (req, res) => {
+router.patch('/:id/disponibilidad', protect, checkPermission('editarProductos'), async (req, res) => {
   try {
     const { disponible } = req.body;
     const product = await Product.findByIdAndUpdate(

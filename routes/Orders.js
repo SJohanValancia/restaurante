@@ -4,8 +4,10 @@ const Order = require('../models/order');
 const User = require('../models/User');
 const mongoose = require('mongoose');
 const { protect } = require('../middleware/auth');
+const { checkPermission } = require('../middleware/permissions');
 
-router.get('/', protect, async (req, res) => {
+
+router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
   try {
     const { estado, mesa, fecha } = req.query;
     
@@ -154,7 +156,7 @@ router.get('/:id', protect, async (req, res) => {
 });
 
 // Crear un nuevo pedido
-router.post('/', protect, async (req, res) => {
+router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
   try {
     const { mesa, items, notas } = req.body;
 
@@ -197,7 +199,7 @@ router.post('/', protect, async (req, res) => {
 
 
 // Actualizar el estado de un pedido
-router.patch('/:id/estado', protect, async (req, res) => {
+router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (req, res) => {
   try {
     const { estado } = req.body;
     
@@ -239,7 +241,7 @@ router.patch('/:id/estado', protect, async (req, res) => {
 });
 
 // Actualizar un pedido completo
-router.put('/:id', protect, async (req, res) => {
+router.put('/:id', protect, checkPermission('editarPedidos'), async (req, res) => {
   try {
     const { items, notas } = req.body;
 
@@ -282,7 +284,7 @@ router.put('/:id', protect, async (req, res) => {
 });
 
 // Eliminar un pedido
-router.delete('/:id', protect, async (req, res) => {
+router.delete('/:id', protect, checkPermission('cancelarPedidos'), async (req, res) => {
   try {
     const order = await Order.findByIdAndDelete(req.params.id);
     
