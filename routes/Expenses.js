@@ -1,12 +1,13 @@
- const express = require('express');
+const express = require('express');
 const router = express.Router();
 const Expense = require('../models/Expense');
+const { protect } = require('../middleware/auth');
 
-// Obtener todos los gastos (filtrar por userId y mes opcional)
-router.get('/', async (req, res) => {
+// Obtener todos los gastos del restaurante
+router.get('/', protect, async (req, res) => {
   try {
-    const { userId, month } = req.query;
-    let query = { userId };
+    const { month } = req.query;
+    let query = { userId: { $in: req.userIdsRestaurante } };
 
     if (month) {
       const [year, monthNum] = month.split('-');
@@ -36,7 +37,7 @@ router.get('/', async (req, res) => {
 });
 
 // Obtener un gasto por ID
-router.get('/:id', async (req, res) => {
+router.get('/:id', protect, async (req, res) => {
   try {
     const expense = await Expense.findById(req.params.id);
     
@@ -61,9 +62,14 @@ router.get('/:id', async (req, res) => {
 });
 
 // Crear un nuevo registro de gastos
-router.post('/', async (req, res) => {
+router.post('/', protect, async (req, res) => {
   try {
-    const expense = await Expense.create(req.body);
+    const expenseData = {
+      ...req.body,
+      userId: req.user._id
+    };
+    
+    const expense = await Expense.create(expenseData);
     
     res.status(201).json({
       success: true,
@@ -79,8 +85,9 @@ router.post('/', async (req, res) => {
   }
 });
 
+
 // Actualizar un registro de gastos
-router.put('/:id', async (req, res) => {
+router.put('/:id', protect, async (req, res) => {
   try {
     const expense = await Expense.findByIdAndUpdate(
       req.params.id,
@@ -110,7 +117,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // Eliminar un registro de gastos
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', protect, async (req, res) => {
   try {
     const expense = await Expense.findByIdAndDelete(req.params.id);
     
@@ -135,12 +142,11 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// Obtener resumen de gastos por período
-router.get('/stats/summary', async (req, res) => {
+router.get('/stats/summary', protect, async (req, res) => {
   try {
-    const { userId, startDate, endDate } = req.query;
+    const { startDate, endDate } = req.query;
     
-    const query = { userId };
+    const query = { userId: { $in: req.userIdsRestaurante } };
     
     if (startDate && endDate) {
       query.fecha = {

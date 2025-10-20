@@ -4,21 +4,13 @@ const Liquidacion = require('../models/liquidacion');
 const Order = require('../models/order');
 const Expense = require('../models/Expense');
 const mongoose = require('mongoose');
+const { protect } = require('../middleware/auth');
 
-// Obtener la última liquidación de un usuario
-router.get('/ultima', async (req, res) => {
+// Obtener la última liquidación del restaurante
+router.get('/ultima', protect, async (req, res) => {
   try {
-    const { userId } = req.query;
-
-    if (!userId) {
-      return res.status(400).json({
-        success: false,
-        message: 'userId es requerido'
-      });
-    }
-
     const ultimaLiquidacion = await Liquidacion.findOne({ 
-      userId,
+      userId: { $in: req.userIdsRestaurante },
       cerrada: true 
     })
       .sort({ fecha: -1 })
@@ -29,7 +21,6 @@ router.get('/ultima', async (req, res) => {
       data: ultimaLiquidacion
     });
   } catch (error) {
-    console.error('Error al obtener última liquidación:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener la última liquidación',
@@ -38,34 +29,22 @@ router.get('/ultima', async (req, res) => {
   }
 });
 
-// Obtener datos pendientes de liquidación (pedidos y gastos sin liquidar)
-router.get('/pendientes', async (req, res) => {
+// Obtener datos pendientes de liquidación
+router.get('/pendientes', protect, async (req, res) => {
   try {
-    const { userId } = req.query;
-
-    if (!userId) {
-      return res.status(400).json({
-        success: false,
-        message: 'userId es requerido'
-      });
-    }
-
-    // Buscar pedidos entregados que NO han sido liquidados
     const pedidos = await Order.find({
-      userId,
+      userId: { $in: req.userIdsRestaurante },
       estado: 'entregado',
       reciboDia: false
     })
       .populate('items.producto', 'nombre precio')
       .sort({ createdAt: -1 });
 
-    // Buscar gastos que NO han sido liquidados
     const gastos = await Expense.find({
-      userId,
+      userId: { $in: req.userIdsRestaurante },
       reciboDia: false
     }).sort({ fecha: -1 });
 
-    // Calcular totales
     const totalPedidos = pedidos.reduce((sum, pedido) => sum + pedido.total, 0);
     const totalGastos = gastos.reduce((sum, gasto) => sum + gasto.total, 0);
 
@@ -79,7 +58,6 @@ router.get('/pendientes', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error al obtener datos pendientes:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener datos pendientes',
@@ -88,20 +66,11 @@ router.get('/pendientes', async (req, res) => {
   }
 });
 
-// ⚠️ IMPORTANTE: Esta ruta debe ir ANTES de '/:id'
-// Obtener estadísticas de liquidaciones
-router.get('/stats/resumen', async (req, res) => {
+router.get('/stats/resumen', protect, async (req, res) => {
   try {
-    const { userId, startDate, endDate } = req.query;
+    const { startDate, endDate } = req.query;
 
-    if (!userId) {
-      return res.status(400).json({
-        success: false,
-        message: 'userId es requerido'
-      });
-    }
-
-    let query = { userId };
+    let query = { userId: { $in: req.userIdsRestaurante } };
 
     if (startDate && endDate) {
       query.fecha = {
@@ -130,7 +99,6 @@ router.get('/stats/resumen', async (req, res) => {
       data: stats
     });
   } catch (error) {
-    console.error('Error al obtener estadísticas:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener estadísticas',
@@ -139,45 +107,24 @@ router.get('/stats/resumen', async (req, res) => {
   }
 });
 
-// Crear nueva liquidación
-// Crear nueva liquidación
-router.post('/', async (req, res) => {
+router.post('/', protect, async (req, res) => {
   try {
-    const { userId, cajaInicial, movimientosCaja, observaciones } = req.body;
+    const { cajaInicial, movimientosCaja, observaciones } = req.body;
 
-    console.log('🔥 Datos recibidos:', { userId, cajaInicial, movimientosCaja, observaciones });
-
-    if (!userId) {
-      return res.status(400).json({
-        success: false,
-        message: 'userId es requerido'
-      });
-    }
-
-    // Obtener pedidos entregados NO liquidados
     const pedidos = await Order.find({
-      userId,
+      userId: { $in: req.userIdsRestaurante },
       estado: 'entregado',
       reciboDia: false
     });
 
-    console.log(`📋 Pedidos encontrados: ${pedidos.length}`);
-
-    // Obtener gastos NO liquidados
     const gastos = await Expense.find({
-      userId,
+      userId: { $in: req.userIdsRestaurante },
       reciboDia: false
     });
 
-    console.log(`💸 Gastos encontrados: ${gastos.length}`);
-
-    // Calcular totales
     const totalPedidos = pedidos.reduce((sum, pedido) => sum + pedido.total, 0);
     const totalGastos = gastos.reduce((sum, gasto) => sum + gasto.total, 0);
 
-    console.log('💰 Totales calculados:', { totalPedidos, totalGastos });
-
-    // Crear liquidación (PERMITIR INCLUSO SIN DATOS)
     const liquidacion = await Liquidacion.create({
       fecha: new Date(),
       cajaInicial: cajaInicial || 0,
@@ -191,28 +138,22 @@ router.post('/', async (req, res) => {
       },
       movimientosCaja: movimientosCaja || [],
       observaciones,
-      userId,
+      userId: req.user._id,
       cerrada: true
     });
 
-    console.log('✅ Liquidación creada:', liquidacion._id);
-
-    // Marcar pedidos como liquidados (solo si hay)
     if (pedidos.length > 0) {
       await Order.updateMany(
         { _id: { $in: pedidos.map(p => p._id) } },
         { $set: { reciboDia: true } }
       );
-      console.log(`✅ ${pedidos.length} pedidos marcados como liquidados`);
     }
 
-    // Marcar gastos como liquidados (solo si hay)
     if (gastos.length > 0) {
       await Expense.updateMany(
         { _id: { $in: gastos.map(g => g._id) } },
         { $set: { reciboDia: true } }
       );
-      console.log(`✅ ${gastos.length} gastos marcados como liquidados`);
     }
 
     res.status(201).json({
@@ -221,7 +162,6 @@ router.post('/', async (req, res) => {
       data: liquidacion
     });
   } catch (error) {
-    console.error('❌ Error al crear liquidación:', error);
     res.status(400).json({
       success: false,
       message: 'Error al crear la liquidación',
@@ -229,19 +169,12 @@ router.post('/', async (req, res) => {
     });
   }
 });
-// Obtener todas las liquidaciones de un usuario
-router.get('/', async (req, res) => {
+
+router.get('/', protect, async (req, res) => {
   try {
-    const { userId, startDate, endDate } = req.query;
+    const { startDate, endDate } = req.query;
 
-    if (!userId) {
-      return res.status(400).json({
-        success: false,
-        message: 'userId es requerido'
-      });
-    }
-
-    let query = { userId };
+    let query = { userId: { $in: req.userIdsRestaurante } };
 
     if (startDate && endDate) {
       query.fecha = {
@@ -254,9 +187,8 @@ router.get('/', async (req, res) => {
       .populate('ingresos.pedidos', 'mesa total createdAt estado')
       .populate('egresos.gastos', 'fecha total gastos')
       .sort({ fecha: -1 })
-      .lean(); // Convertir a objetos planos
+      .lean();
 
-    // Limpiar referencias rotas (pedidos/gastos eliminados)
     liquidaciones.forEach(liq => {
       if (liq.ingresos && Array.isArray(liq.ingresos.pedidos)) {
         liq.ingresos.pedidos = liq.ingresos.pedidos.filter(p => p !== null);
@@ -273,7 +205,6 @@ router.get('/', async (req, res) => {
       data: liquidaciones
     });
   } catch (error) {
-    console.error('Error al obtener liquidaciones:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener las liquidaciones',
@@ -281,9 +212,8 @@ router.get('/', async (req, res) => {
     });
   }
 });
-
 // Obtener una liquidación por ID
-router.get('/:id', async (req, res) => {
+router.get('/:id', protect, async (req, res) => {
   try {
     const liquidacion = await Liquidacion.findById(req.params.id)
       .populate('ingresos.pedidos')
@@ -322,7 +252,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Actualizar una liquidación
-router.put('/:id', async (req, res) => {
+router.put('/:id', protect, async (req, res) => {
   try {
     const liquidacion = await Liquidacion.findByIdAndUpdate(
       req.params.id,
@@ -352,7 +282,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // Eliminar una liquidación
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', protect, async (req, res) => {
   try {
     const liquidacion = await Liquidacion.findByIdAndDelete(req.params.id);
 

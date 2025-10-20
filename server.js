@@ -4,7 +4,8 @@ const cors = require('cors');
 const path = require('path');
 const expensesRoutes = require('./routes/Expenses');
 const liquidacionesRoutes = require('./routes/liquidaciones');
-const adminMeserosRoutes = require('./routes/adminMeseros'); // NUEVA LÍNEA
+const adminMeserosRoutes = require('./routes/adminMeseros');
+const { protect } = require('./middleware/auth'); // IMPORTAR MIDDLEWARE
 require('dotenv').config();
 
 const app = express();
@@ -20,13 +21,15 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Conectado a MongoDB Atlas'))
   .catch((err) => console.error('❌ Error de conexión a MongoDB:', err.message));
 
-// Rutas API
-app.use('/api/products', require('./routes/Products'));
+// Rutas públicas (sin autenticación)
 app.use('/api/auth', require('./routes/auth'));
-app.use('/api/orders', require('./routes/Orders'));
-app.use('/api/expenses', expensesRoutes);
-app.use('/api/liquidaciones', liquidacionesRoutes);
-app.use('/api/admin-meseros', adminMeserosRoutes); // NUEVA LÍNEA
+
+// Rutas protegidas (requieren autenticación)
+app.use('/api/products', protect, require('./routes/Products'));
+app.use('/api/orders', protect, require('./routes/Orders'));
+app.use('/api/expenses', protect, expensesRoutes);
+app.use('/api/liquidaciones', protect, liquidacionesRoutes);
+app.use('/api/admin-meseros', protect, adminMeserosRoutes);
 
 // Ruta principal (sirve index.html)
 app.get('/', (req, res) => {

@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
+const { protect } = require('../middleware/auth');
 
-
-
-// Obtener todos los productos
-// Obtener todos los productos (filtrar por userId)
-router.get('/', async (req, res) => {
+// Obtener todos los productos del restaurante
+router.get('/', protect, async (req, res) => {
   try {
-    const { categoria, disponible, search, userId } = req.query;
-    let query = { userId }; // Filtrar por usuario
+    const { categoria, disponible, search } = req.query;
+    
+    // Filtrar por todos los usuarios del mismo restaurante
+    let query = { userId: { $in: req.userIdsRestaurante } };
 
     if (categoria) query.categoria = categoria;
     if (disponible !== undefined) query.disponible = disponible === 'true';
@@ -33,7 +33,7 @@ router.get('/', async (req, res) => {
 });
 
 // Obtener un producto por ID
-router.get('/:id', async (req, res) => {
+router.get('/:id', protect, async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) {
@@ -56,9 +56,15 @@ router.get('/:id', async (req, res) => {
 });
 
 // Crear un nuevo producto
-router.post('/', async (req, res) => {
+router.post('/', protect, async (req, res) => {
   try {
-    const product = await Product.create(req.body);
+    // Asignar el userId del usuario actual
+    const productData = {
+      ...req.body,
+      userId: req.user._id
+    };
+    
+    const product = await Product.create(productData);
     res.status(201).json({
       success: true,
       message: 'Producto creado exitosamente',
@@ -74,7 +80,7 @@ router.post('/', async (req, res) => {
 });
 
 // Actualizar un producto
-router.put('/:id', async (req, res) => {
+router.put('/:id', protect, async (req, res) => {
   try {
     const product = await Product.findByIdAndUpdate(
       req.params.id,
@@ -104,7 +110,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // Eliminar un producto
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', protect, async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
     
@@ -130,7 +136,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // Actualizar disponibilidad de un producto
-router.patch('/:id/disponibilidad', async (req, res) => {
+router.patch('/:id/disponibilidad', protect, async (req, res) => {
   try {
     const { disponible } = req.body;
     const product = await Product.findByIdAndUpdate(

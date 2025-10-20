@@ -3,8 +3,50 @@ const router = express.Router();
 const Order = require('../models/order');
 const User = require('../models/User');
 const mongoose = require('mongoose');
+const { protect } = require('../middleware/auth');
 
-// IMPORTANTE: Esta ruta debe ir ANTES de '/:id' para evitar conflictos
+router.get('/', protect, async (req, res) => {
+  try {
+    const { estado, mesa, fecha } = req.query;
+    
+    // Filtrar por todos los usuarios del mismo restaurante
+    let query = { userId: { $in: req.userIdsRestaurante } };
+
+    if (estado) query.estado = estado;
+    if (mesa) query.mesa = parseInt(mesa);
+    
+    if (fecha === 'hoy') {
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+      query.createdAt = { $gte: hoy };
+    } else if (fecha === 'semana') {
+      const semana = new Date();
+      semana.setDate(semana.getDate() - 7);
+      query.createdAt = { $gte: semana };
+    } else if (fecha === 'mes') {
+      const mes = new Date();
+      mes.setMonth(mes.getMonth() - 1);
+      query.createdAt = { $gte: mes };
+    }
+
+    const orders = await Order.find(query)
+      .populate('items.producto', 'nombre categoria precio')
+      .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      count: orders.length,
+      data: orders
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener los pedidos',
+      error: error.message
+    });
+  }
+});
+
 // Obtener el pedido más reciente de una mesa específica (para seguimiento público)
 router.get('/mesa/:numeroMesa', async (req, res) => {
   try {
@@ -83,63 +125,9 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
   }
 });
 
-// Obtener todos los pedidos (con filtros)
-router.get('/', async (req, res) => {
-  try {
-    const { estado, mesa, userId, fecha } = req.query;
-    
-    if (!userId) {
-      return res.status(400).json({
-        success: false,
-        message: 'userId es requerido'
-      });
-    }
-
-    let query = { userId };
-
-    if (estado) query.estado = estado;
-    if (mesa) query.mesa = parseInt(mesa);
-    
-    // Filtrar por fecha (hoy, última semana, último mes)
-    if (fecha === 'hoy') {
-      const hoy = new Date();
-      hoy.setHours(0, 0, 0, 0);
-      query.createdAt = { $gte: hoy };
-    } else if (fecha === 'semana') {
-      const semana = new Date();
-      semana.setDate(semana.getDate() - 7);
-      query.createdAt = { $gte: semana };
-    } else if (fecha === 'mes') {
-      const mes = new Date();
-      mes.setMonth(mes.getMonth() - 1);
-      query.createdAt = { $gte: mes };
-    }
-
-    console.log('📊 Query de pedidos:', query); // Para debug
-
-    const orders = await Order.find(query)
-      .populate('items.producto', 'nombre categoria precio')
-      .sort({ createdAt: -1 });
-
-    console.log(`✅ Pedidos encontrados: ${orders.length}`); // Para debug
-
-    res.json({
-      success: true,
-      count: orders.length,
-      data: orders
-    });
-  } catch (error) {
-    console.error('❌ Error al obtener pedidos:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al obtener los pedidos',
-      error: error.message
-    });
-  }
-});
 
 // Obtener un pedido por ID
-router.get('/:id', async (req, res) => {
+router.get('/:id', protect, async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
       .populate('items.producto', 'nombre categoria precio')
@@ -166,13 +154,10 @@ router.get('/:id', async (req, res) => {
 });
 
 // Crear un nuevo pedido
-router.post('/', async (req, res) => {
+router.post('/', protect, async (req, res) => {
   try {
-    const { mesa, items, notas, userId } = req.body;
+    const { mesa, items, notas } = req.body;
 
-    console.log('📝 Creando pedido:', { mesa, items: items?.length, userId }); // Debug
-
-    // Validar que hay items
     if (!items || items.length === 0) {
       return res.status(400).json({
         success: false,
@@ -180,14 +165,6 @@ router.post('/', async (req, res) => {
       });
     }
 
-    if (!userId) {
-      return res.status(400).json({
-        success: false,
-        message: 'userId es requerido'
-      });
-    }
-
-    // Calcular el total
     const total = items.reduce((sum, item) => {
       return sum + (item.precio * item.cantidad);
     }, 0);
@@ -197,16 +174,12 @@ router.post('/', async (req, res) => {
       items,
       total,
       notas,
-      userId,
+      userId: req.user._id, // Usar el usuario actual
       estado: 'pendiente'
     };
 
     const order = await Order.create(orderData);
-    
-    // Poblar los datos del producto
     await order.populate('items.producto', 'nombre categoria precio');
-
-    console.log('✅ Pedido creado:', order._id); // Debug
 
     res.status(201).json({
       success: true,
@@ -214,7 +187,6 @@ router.post('/', async (req, res) => {
       data: order
     });
   } catch (error) {
-    console.error('❌ Error al crear pedido:', error);
     res.status(400).json({
       success: false,
       message: 'Error al crear el pedido',
@@ -223,8 +195,9 @@ router.post('/', async (req, res) => {
   }
 });
 
+
 // Actualizar el estado de un pedido
-router.patch('/:id/estado', async (req, res) => {
+router.patch('/:id/estado', protect, async (req, res) => {
   try {
     const { estado } = req.body;
     
@@ -266,7 +239,7 @@ router.patch('/:id/estado', async (req, res) => {
 });
 
 // Actualizar un pedido completo
-router.put('/:id', async (req, res) => {
+router.put('/:id', protect, async (req, res) => {
   try {
     const { items, notas } = req.body;
 
@@ -309,7 +282,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // Eliminar un pedido
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', protect, async (req, res) => {
   try {
     const order = await Order.findByIdAndDelete(req.params.id);
     
@@ -334,25 +307,19 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// Obtener estadísticas de pedidos
-// Obtener estadísticas de pedidos
-router.get('/stats/resumen', async (req, res) => {
+router.get('/stats/resumen', protect, async (req, res) => {
   try {
-    const { userId } = req.query;
-    
-    if (!userId) {
-      return res.status(400).json({
-        success: false,
-        message: 'userId es requerido'
-      });
-    }
-
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
 
-    // SIN usar ObjectId en el aggregate
+    // Filtrar por todos los usuarios del restaurante
     const stats = await Order.aggregate([
-      { $match: { userId: mongoose.Types.ObjectId(userId), createdAt: { $gte: hoy } } },
+      { 
+        $match: { 
+          userId: { $in: req.userIdsRestaurante.map(id => mongoose.Types.ObjectId(id)) },
+          createdAt: { $gte: hoy } 
+        } 
+      },
       {
         $group: {
           _id: '$estado',
@@ -362,10 +329,19 @@ router.get('/stats/resumen', async (req, res) => {
       }
     ]);
 
-    const totalPedidos = await Order.countDocuments({ userId, createdAt: { $gte: hoy } });
+    const totalPedidos = await Order.countDocuments({ 
+      userId: { $in: req.userIdsRestaurante }, 
+      createdAt: { $gte: hoy } 
+    });
     
     const totalVentas = await Order.aggregate([
-      { $match: { userId: mongoose.Types.ObjectId(userId), createdAt: { $gte: hoy }, estado: { $ne: 'cancelado' } } },
+      { 
+        $match: { 
+          userId: { $in: req.userIdsRestaurante.map(id => mongoose.Types.ObjectId(id)) },
+          createdAt: { $gte: hoy }, 
+          estado: { $ne: 'cancelado' } 
+        } 
+      },
       { $group: { _id: null, total: { $sum: '$total' } } }
     ]);
 
@@ -378,7 +354,6 @@ router.get('/stats/resumen', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error al obtener estadísticas:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener estadísticas',
@@ -386,6 +361,5 @@ router.get('/stats/resumen', async (req, res) => {
     });
   }
 });
-
 
 module.exports = router;
