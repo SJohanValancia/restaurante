@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Expense = require('../models/Expense');
 const { protect } = require('../middleware/auth');
+const { checkPermission } = require('../middleware/permissions');
+
 
 // Obtener todos los gastos del restaurante
 router.get('/', protect, checkPermission('verGastos'), async (req, res) => {
