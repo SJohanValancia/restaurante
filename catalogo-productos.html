@@ -647,48 +647,56 @@
             </a>
         </div>
 
-        <nav class="sidebar-nav">
-            <div class="nav-section">
-                <div class="nav-section-title">Principal</div>
-                <a href="productos.html" class="nav-item active">
-                    <span class="nav-icon">📦</span>
-                    <span>Productos</span>
-                </a>
-                <a href="pedidos.html" class="nav-item">
-                    <span class="nav-icon">🍽️</span>
-                    <span>Pedidos</span>
-                </a>
-                <a href="gastos.html" class="nav-item">
-                    <span class="nav-icon">🧾</span>
-                    <span>Gastos</span>
-                </a>
-                <a href="qr-generator.html" class="nav-item">
-                    <span class="nav-icon">📱</span>
-                    <span>QR generador</span>
-                </a>
-                <a href="reportes.html" class="nav-item">
-                    <span class="nav-icon">📊</span>
-                    <span>Reportes</span>
-                </a>
-                <a href="historial-pedidos.html" class="nav-item">
-                    <span class="nav-icon">📜</span>
-                    <span>Historial</span>
-                </a>
-                                <a href="catalogo-productos.html" class="nav-item">
-                    <span class="nav-icon">📜📦</span>
-                    <span>inventario</span>
-                </a>
-                                <a href="liquidacion.html" class="nav-item active">
-                    <span class="nav-icon">💵</span>
-                    <span>Liquidación</span>
-                </a>
-                                <a href="historial-liquidaciones.html" class="nav-item active">
-                    <span class="nav-icon">📋</span>
-                    <span>Hist. Liquidaciones</span>
-                </a>
-            </div>
-        </nav>
+       <nav class="sidebar-nav">
+    <div class="nav-section">
+        <div class="nav-section-title">Principal</div>
+        <a href="productos.html" class="nav-item">
+            <span class="nav-icon">📦</span>
+            <span>Productos</span>
+        </a>
+        <a href="pedidos.html" class="nav-item">
+            <span class="nav-icon">🍽️</span>
+            <span>Pedidos</span>
+        </a>
+        <a href="gastos.html" class="nav-item">
+            <span class="nav-icon">🧾</span>
+            <span>Gastos</span>
+        </a>
+        <a href="qr-generator.html" class="nav-item">
+            <span class="nav-icon">📱</span>
+            <span>QR Generador</span>
+        </a>
+        <a href="reportes.html" class="nav-item ">
+            <span class="nav-icon">📊</span>
+            <span>Reportes</span>
+        </a>
+        <a href="historial-pedidos.html" class="nav-item">
+            <span class="nav-icon">📜</span>
+            <span>Historial</span>
+        </a>
+        <a href="catalogo-productos.html" class="nav-item active">
+            <span class="nav-icon">📜📦</span>
+            <span>Inventario</span>
+        </a>
+    </div>
 
+    <!-- SOLO PARA ADMINISTRADORES -->
+    <div class="nav-section" id="adminSection" style="display: none;">
+        <div class="nav-section-title">Administración</div>
+        <a href="administrador.html" class="nav-item">
+            <span class="nav-icon">👥</span>
+            <span>Gestión de Meseros</span>
+        </a>
+        <a href="liquidacion.html" class="nav-item">
+            <span class="nav-icon">💵</span>
+            <span>Liquidación</span>
+        </a>
+        <a href="historial-liquidaciones.html" class="nav-item">
+            <span class="nav-icon">📋</span>
+            <span>Hist. Liquidaciones</span>
+        </a>
+    </div>
+</nav>
         <div class="sidebar-footer">
             <div class="user-info">
                 <div class="user-avatar-sidebar" id="sidebarUserAvatar">U</div>
@@ -834,9 +842,18 @@
                     }
                 });
 
-                if (!response.ok) {
-                    throw new Error('No autorizado');
-                }
+if (response.status === 401) {
+    console.warn('⚠️ Token expirado');
+    localStorage.removeItem('token');
+    window.location.href = 'index.html';
+    return;
+}
+
+if (!response.ok) {
+    console.error('Error al cargar usuario');
+    alert('Error al cargar datos. Intente recargar.');
+    return;
+}
 
                 const data = await response.json();
                 currentUser = data.data;
@@ -851,13 +868,17 @@
                 
                 document.getElementById('sidebarUserName').textContent = currentUser.nombre;
                 document.getElementById('sidebarUserAvatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
+
+                // MOSTRAR SECCIÓN DE ADMIN SOLO SI ES ADMINISTRADOR
+if (currentUser.rol === 'admin') {
+    document.getElementById('adminSection').style.display = 'block';
+}
                 
                 await loadProducts();
             } catch (error) {
-                console.error('❌ Error de autenticación:', error);
-                localStorage.removeItem('token');
-                window.location.href = 'index.html';
-            }
+    console.error('❌ Error de red:', error);
+    alert('Error de conexión. Recargue la página.');
+}
         });
 
         // CARGAR PRODUCTOS
