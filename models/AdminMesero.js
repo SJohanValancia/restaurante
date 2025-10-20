@@ -22,6 +22,8 @@ const adminMeseroSchema = new mongoose.Schema({
     cancelarPedidos: { type: Boolean, default: false },
     verGastos: { type: Boolean, default: true },
     crearGastos: { type: Boolean, default: true },
+    editarGastos: { type: Boolean, default: false },     // NUEVO
+    eliminarGastos: { type: Boolean, default: false },   // NUEVO
     verReportes: { type: Boolean, default: false },
     verLiquidaciones: { type: Boolean, default: false }
   },
@@ -34,7 +36,6 @@ const adminMeseroSchema = new mongoose.Schema({
   versionKey: false
 });
 
-// Índice compuesto para evitar duplicados
 adminMeseroSchema.index({ adminId: 1, meseroId: 1 }, { unique: true });
 
 module.exports = mongoose.model('AdminMesero', adminMeseroSchema);

@@ -920,16 +920,23 @@
                     <label for="perm_cancelarPedidos" class="permission-label">Cancelar Pedidos</label>
                 </div>
                 
-                <!-- GASTOS -->
-                <div class="permission-item">
-                    <input type="checkbox" id="perm_verGastos" class="permission-checkbox">
-                    <label for="perm_verGastos" class="permission-label">Ver Gastos</label>
-                </div>
-                <div class="permission-item">
-                    <input type="checkbox" id="perm_crearGastos" class="permission-checkbox">
-                    <label for="perm_crearGastos" class="permission-label">Crear Gastos</label>
-                </div>
-                
+<!-- GASTOS -->
+<div class="permission-item">
+    <input type="checkbox" id="perm_verGastos" class="permission-checkbox">
+    <label for="perm_verGastos" class="permission-label">Ver Gastos</label>
+</div>
+<div class="permission-item">
+    <input type="checkbox" id="perm_crearGastos" class="permission-checkbox">
+    <label for="perm_crearGastos" class="permission-label">Crear Gastos</label>
+</div>
+<div class="permission-item">
+    <input type="checkbox" id="perm_editarGastos" class="permission-checkbox">
+    <label for="perm_editarGastos" class="permission-label">Editar Gastos</label>
+</div>
+<div class="permission-item">
+    <input type="checkbox" id="perm_eliminarGastos" class="permission-checkbox">
+    <label for="perm_eliminarGastos" class="permission-label">Eliminar Gastos</label>
+</div>
                 <!-- OTROS -->
                 <div class="permission-item">
                     <input type="checkbox" id="perm_verReportes" class="permission-checkbox">
@@ -1167,10 +1174,9 @@ if (!response.ok) {
             showAlert('Función de inspección en desarrollo', 'info');
         }
 
-  async function editMeseroPermisos(relacionId, meseroId) {
+async function editMeseroPermisos(relacionId, meseroId) {
     currentRelacionId = relacionId;
     
-    // Cargar permisos actuales
     const token = localStorage.getItem('token');
     
     try {
@@ -1184,7 +1190,6 @@ if (!response.ok) {
             const mesero = data.data.find(m => m.relacionId === relacionId);
             
             if (mesero && mesero.permisos) {
-                // Cargar TODOS los permisos en los checkboxes
                 document.getElementById('perm_verProductos').checked = mesero.permisos.verProductos ?? true;
                 document.getElementById('perm_crearProductos').checked = mesero.permisos.crearProductos || false;
                 document.getElementById('perm_editarProductos').checked = mesero.permisos.editarProductos || false;
@@ -1195,6 +1200,8 @@ if (!response.ok) {
                 document.getElementById('perm_cancelarPedidos').checked = mesero.permisos.cancelarPedidos || false;
                 document.getElementById('perm_verGastos').checked = mesero.permisos.verGastos ?? true;
                 document.getElementById('perm_crearGastos').checked = mesero.permisos.crearGastos ?? true;
+                document.getElementById('perm_editarGastos').checked = mesero.permisos.editarGastos || false;        // NUEVO
+                document.getElementById('perm_eliminarGastos').checked = mesero.permisos.eliminarGastos || false;    // NUEVO
                 document.getElementById('perm_verReportes').checked = mesero.permisos.verReportes || false;
                 document.getElementById('perm_verLiquidaciones').checked = mesero.permisos.verLiquidaciones || false;
             }
@@ -1205,7 +1212,8 @@ if (!response.ok) {
     
     document.getElementById('permissionsModal').classList.add('active');
 }
-        function openPermissionsModal() {
+
+function openPermissionsModal() {
             if (!currentSearchedUser) return;
             document.getElementById('permissionsModal').classList.add('active');
         }
@@ -1223,7 +1231,6 @@ document.getElementById('permissionsForm').addEventListener('submit', async (e) 
         return;
     }
 
-    // TODOS los permisos son editables ahora
     const permisos = {
         verProductos: document.getElementById('perm_verProductos').checked,
         crearProductos: document.getElementById('perm_crearProductos').checked,
@@ -1235,6 +1242,8 @@ document.getElementById('permissionsForm').addEventListener('submit', async (e) 
         cancelarPedidos: document.getElementById('perm_cancelarPedidos').checked,
         verGastos: document.getElementById('perm_verGastos').checked,
         crearGastos: document.getElementById('perm_crearGastos').checked,
+        editarGastos: document.getElementById('perm_editarGastos').checked,          // NUEVO
+        eliminarGastos: document.getElementById('perm_eliminarGastos').checked,      // NUEVO
         verReportes: document.getElementById('perm_verReportes').checked,
         verLiquidaciones: document.getElementById('perm_verLiquidaciones').checked
     };
@@ -1265,7 +1274,8 @@ document.getElementById('permissionsForm').addEventListener('submit', async (e) 
         showAlert('Error al actualizar permisos', 'error');
     }
 });
-        async function deleteMesero(relacionId, nombre) {
+
+async function deleteMesero(relacionId, nombre) {
             if (!confirm(`¿Estás seguro de eliminar a ${nombre}?`)) {
                 return;
             }

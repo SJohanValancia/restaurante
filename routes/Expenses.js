@@ -89,7 +89,7 @@ router.post('/', protect, checkPermission('crearGastos'), async (req, res) => {
 
 
 // Actualizar un registro de gastos
-router.put('/:id', protect, async (req, res) => {
+router.put('/:id', protect, checkPermission('editarGastos'), async (req, res) => {
   try {
     const expense = await Expense.findByIdAndUpdate(
       req.params.id,
@@ -119,7 +119,7 @@ router.put('/:id', protect, async (req, res) => {
 });
 
 // Eliminar un registro de gastos
-router.delete('/:id', protect, async (req, res) => {
+router.delete('/:id', protect, checkPermission('eliminarGastos'), async (req, res) => {
   try {
     const expense = await Expense.findByIdAndDelete(req.params.id);
     
