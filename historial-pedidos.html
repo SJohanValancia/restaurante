@@ -661,6 +661,29 @@
                 grid-template-columns: 1fr;
             }
         }
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+}
+
     </style>
 </head>
 <body>
@@ -898,14 +921,13 @@ if (currentUser.rol === 'admin') {
 }
         });
 
-        function setDefaultDates() {
-            const today = new Date();
-            const thirtyDaysAgo = new Date(today);
-            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-            document.getElementById('filterFechaHasta').value = today.toISOString().split('T')[0];
-            document.getElementById('filterFechaDesde').value = thirtyDaysAgo.toISOString().split('T')[0];
-        }
+function setDefaultDates() {
+    // Dejar los campos de fecha vacíos por defecto
+    document.getElementById('filterFechaHasta').value = '';
+    document.getElementById('filterFechaDesde').value = '';
+    
+    console.log('📅 Filtros de fecha vacíos - Mostrando todos los pedidos');
+}
 
         async function loadOrders() {
             const token = localStorage.getItem('token');
@@ -925,26 +947,39 @@ if (currentUser.rol === 'admin') {
             }
         }
 
-        function applyFilters() {
-            const estado = document.getElementById('filterEstado').value;
-            const mesa = document.getElementById('filterMesa').value;
-            const fechaDesde = document.getElementById('filterFechaDesde').value;
-            const fechaHasta = document.getElementById('filterFechaHasta').value;
-            const search = document.getElementById('filterSearch').value.toLowerCase();
+function applyFilters() {
+    const estado = document.getElementById('filterEstado').value;
+    const mesa = document.getElementById('filterMesa').value;
+    const fechaDesde = document.getElementById('filterFechaDesde').value;
+    const fechaHasta = document.getElementById('filterFechaHasta').value;
+    const search = document.getElementById('filterSearch').value.toLowerCase();
+
+    console.log('🔍 Aplicando filtros:');
+    console.log('  - Estado:', estado || 'Todos');
+    console.log('  - Mesa:', mesa || 'Todas');
+    console.log('  - Fecha desde:', fechaDesde || 'Sin filtro');
+    console.log('  - Fecha hasta:', fechaHasta || 'Sin filtro');
+    console.log('  - Búsqueda:', search || 'Sin búsqueda');
 
             filteredOrders = allOrders.filter(order => {
                 const estadoMatch = !estado || order.estado === estado;
                 const mesaMatch = !mesa || order.mesa === parseInt(mesa);
 
-                let fechaMatch = true;
-                if (fechaDesde || fechaHasta) {
-                    const orderDate = new Date(order.createdAt);
-                    const desde = fechaDesde ? new Date(fechaDesde + 'T00:00:00') : null;
-                    const hasta = fechaHasta ? new Date(fechaHasta + 'T23:59:59.999') : null;
-                    
-                    if (desde && orderDate < desde) fechaMatch = false;
-                    if (hasta && orderDate > hasta) fechaMatch = false;
-                }
+// Filtro de fechas mejorado
+let fechaMatch = true;
+if (fechaDesde || fechaHasta) {
+    const orderDate = new Date(order.createdAt);
+    
+    if (fechaDesde) {
+        const desde = new Date(fechaDesde + 'T00:00:00');
+        if (orderDate < desde) fechaMatch = false;
+    }
+    
+    if (fechaHasta) {
+        const hasta = new Date(fechaHasta + 'T23:59:59.999');
+        if (orderDate > hasta) fechaMatch = false;
+    }
+}
 
                 let searchMatch = true;
                 if (search) {
@@ -1132,12 +1167,43 @@ if (currentUser.rol === 'admin') {
         }
 
         function clearFilters() {
-            document.getElementById('filterEstado').value = '';
-            document.getElementById('filterMesa').value = '';
-            document.getElementById('filterSearch').value = '';
-            setDefaultDates();
-            applyFilters();
-        }
+    // Limpiar todos los filtros
+    document.getElementById('filterEstado').value = '';
+    document.getElementById('filterMesa').value = '';
+    document.getElementById('filterSearch').value = '';
+    document.getElementById('filterFechaDesde').value = '';
+    document.getElementById('filterFechaHasta').value = '';
+    
+    console.log('🧹 Filtros limpiados - Mostrando todos los pedidos');
+    
+    // Aplicar filtros con los valores por defecto
+    applyFilters();
+    
+    // Mostrar notificación visual
+    const notification = document.createElement('div');
+    notification.textContent = '✅ Filtros restablecidos';
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+        z-index: 10000;
+        animation: slideInRight 0.3s ease-out;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => notification.remove(), 300);
+    }, 2000);
+}
 
         function toggleMenu() {
             const sidebar = document.getElementById('sidebar');

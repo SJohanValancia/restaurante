@@ -745,6 +745,30 @@
                 grid-template-columns: 1fr;
             }
         }
+
+.product-item.product-agotado {
+    opacity: 0.6;
+    background: #f7fafc;
+    cursor: not-allowed;
+}
+
+.product-item.product-agotado:hover {
+    background: #edf2f7;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+    20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+}
+
     </style>
 </head>
 <body>
@@ -978,41 +1002,81 @@ if (currentUser.rol === 'admin') {
 }
         });
 
-        async function loadProducts() {
-            const token = localStorage.getItem('token');
-            try {
-                const response = await fetch(`${API_URL}/products?userId=${currentUser._id}&disponible=true`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await response.json();
-                
-                if (data.success) {
-                    availableProducts = data.data;
-                    displayProducts(availableProducts);
-                }
-            } catch (error) {
-                console.error('Error al cargar productos:', error);
-            }
+async function loadProducts() {
+    const token = localStorage.getItem('token');
+    try {
+        // CAMBIAR ESTA LÍNEA - Quitar el filtro de disponible=true
+        const response = await fetch(`${API_URL}/products?userId=${currentUser._id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            availableProducts = data.data;
+            displayProducts(availableProducts);
         }
+    } catch (error) {
+        console.error('Error al cargar productos:', error);
+    }
+}
+  function displayProducts(products) {
+    const list = document.getElementById('productsList');
+    
+    if (products.length === 0) {
+        list.innerHTML = '<div class="empty-state" style="padding: 2rem;"><p>No hay productos disponibles</p></div>';
+        return;
+    }
 
-        function displayProducts(products) {
-            const list = document.getElementById('productsList');
-            
-            if (products.length === 0) {
-                list.innerHTML = '<div class="empty-state" style="padding: 2rem;"><p>No hay productos disponibles</p></div>';
-                return;
-            }
+    list.innerHTML = products.map(p => `
+        <div class="product-item ${!p.disponible ? 'product-agotado' : ''}" 
+             onclick="${p.disponible ? `addProduct('${p._id}')` : `mostrarAgotado(this)`}">
+            <div class="product-info">
+                <h4>${p.nombre} ${!p.disponible ? '<span style="color: #e53e3e; font-size: 12px; font-weight: 700;">● AGOTADO</span>' : ''}</h4>
+                <p>${p.categoria}</p>
+            </div>
+            <div class="product-price" style="${!p.disponible ? 'color: #a0aec0; text-decoration: line-through;' : ''}">
+                $${p.precio.toLocaleString('es-CO')}
+            </div>
+        </div>
+    `).join('');
+}
 
-            list.innerHTML = products.map(p => `
-                <div class="product-item" onclick="addProduct('${p._id}')">
-                    <div class="product-info">
-                        <h4>${p.nombre}</h4>
-                        <p>${p.categoria}</p>
-                    </div>
-                    <div class="product-price">$${p.precio.toLocaleString('es-CO')}</div>
-                </div>
-            `).join('');
-        }
+function mostrarAgotado(elemento) {
+    // Efecto de shake
+    elemento.style.animation = 'shake 0.5s';
+    
+    // Mostrar mensaje temporal
+    const mensaje = document.createElement('div');
+    mensaje.textContent = '❌ Producto agotado';
+    mensaje.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 16px;
+        box-shadow: 0 8px 24px rgba(229, 62, 62, 0.4);
+        z-index: 10000;
+        animation: fadeInOut 2s ease-in-out;
+    `;
+    document.body.appendChild(mensaje);
+    
+    // Remover mensaje después de 2 segundos
+    setTimeout(() => {
+        mensaje.remove();
+    }, 2000);
+    
+    // Resetear animación
+    setTimeout(() => {
+        elemento.style.animation = '';
+    }, 500);
+}
+
+
 
         document.getElementById('searchProduct').addEventListener('input', (e) => {
             const search = e.target.value.toLowerCase();

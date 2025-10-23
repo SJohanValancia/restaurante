@@ -616,6 +616,141 @@
         .modal-body {
             padding: 1.5rem;
         }
+
+.filters-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.filter-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.filter-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    transition: all 0.2s;
+}
+
+.filter-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.btn-clear-filters {
+    width: 100%;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-clear-filters:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(252, 129, 129, 0.4);
+    background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+}
+
+.stats-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-top: 1rem;
+    border-top: 2px solid #e2e8f0;
+}
+
+.stat-summary-card {
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.2s;
+}
+
+.stat-summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.stat-summary-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.stat-summary-content {
+    flex: 1;
+}
+
+.stat-summary-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.stat-summary-value {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1a202c;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-summary {
+        grid-template-columns: 1fr;
+    }
+}
+
     </style>
 </head>
 <body>
@@ -737,8 +872,54 @@
                 </div>
 
                 <div class="card">
-                    <div class="card-header">
-                        <h2>📋 Historial de Gastos</h2>
+<div class="card-header">
+    <h2>📋 Historial de Gastos</h2>
+</div>
+<div class="card-body" style="padding: 1.5rem 1.5rem 0 1.5rem;">
+    <div class="filters-section" style="margin-bottom: 1.5rem;">
+        <div class="filter-group">
+            <label class="filter-label">Desde</label>
+            <input type="date" id="filterFechaDesde" class="filter-input" onchange="applyFilters()">
+        </div>
+        <div class="filter-group">
+            <label class="filter-label">Hasta</label>
+            <input type="date" id="filterFechaHasta" class="filter-input" onchange="applyFilters()">
+        </div>
+        <div style="display: none;" class="filter-group">
+            <label class="filter-label">Mes Rápido</label>
+            <input type="month" id="filterMonth" class="filter-input" onchange="selectMonth()">
+        </div>
+        <div class="filter-group" style="display: flex; align-items: flex-end;">
+            <button class="btn-clear-filters" onclick="clearFilters()">🗑️ Limpiar Filtros</button>
+        </div>
+    </div>
+
+    <!-- ESTADÍSTICAS -->
+    <div class="stats-summary">
+        <div class="stat-summary-card">
+            <div class="stat-summary-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">📋</div>
+            <div class="stat-summary-content">
+                <div class="stat-summary-label">Registros de Gastos</div>
+                <div class="stat-summary-value" id="statTotalRegistros">0</div>
+            </div>
+        </div>
+        <div class="stat-summary-card">
+            <div class="stat-summary-icon" style="background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);">🧾</div>
+            <div class="stat-summary-content">
+                <div class="stat-summary-label">Total de Gastos</div>
+                <div class="stat-summary-value" id="statTotalGastos">0</div>
+            </div>
+        </div>
+        <div class="stat-summary-card">
+            <div class="stat-summary-icon" style="background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);">💰</div>
+            <div class="stat-summary-content">
+                <div class="stat-summary-label">Monto Total</div>
+                <div class="stat-summary-value" id="statMontoTotal">$0</div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card-body">
                         <div class="filter-bar">
                             <input type="month" id="filterMonth" class="filter-select" onchange="loadExpenses()">
                         </div>
@@ -785,418 +966,519 @@
     </div>
 
     <script>
-        const API_URL = 'https://restaurante-co77.onrender.com/api';
-        let currentUser = null;
-        let expenseItems = [];
+       const API_URL = 'https://restaurante-co77.onrender.com/api';
+let currentUser = null;
+let expenseItems = [];
+let allExpenses = [];
+let filteredExpenses = [];
 
-        window.addEventListener('DOMContentLoaded', async () => {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                window.location.href = 'index.html';
-                return;
-            }
+window.addEventListener('DOMContentLoaded', async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = 'index.html';
+        return;
+    }
 
-            try {
-                const response = await fetch(`${API_URL}/auth/me`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-if (response.status === 401) {
-    console.warn('⚠️ Token expirado');
-    localStorage.removeItem('token');
-    window.location.href = 'index.html';
-    return;
-}
-
-if (!response.ok) {
-    console.error('Error al cargar usuario');
-    alert('Error al cargar datos. Intente recargar.');
-    return;
-}
-                const data = await response.json();
-                currentUser = data.data;
-                
-                if (currentUser.id && !currentUser._id) {
-                    currentUser._id = currentUser.id;
-                }
-
-                document.getElementById('sidebarUserName').textContent = currentUser.nombre;
-                document.getElementById('sidebarUserAvatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
-
-                // MOSTRAR SECCIÓN DE ADMIN SOLO SI ES ADMINISTRADOR
-if (currentUser.rol === 'admin') {
-    document.getElementById('adminSection').style.display = 'block';
-}
-                
-                document.getElementById('fecha').valueAsDate = new Date();
-                
-                const today = new Date();
-                const currentMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
-                document.getElementById('filterMonth').value = currentMonth;
-                
-                await loadExpenses();
-            } catch (error) {
-    console.error('❌ Error de red:', error);
-    alert('Error de conexión. Recargue la página.');
-}
+    try {
+        const response = await fetch(`${API_URL}/auth/me`, {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
 
-        document.getElementById('cantidad').addEventListener('input', (e) => {
-            const count = parseInt(e.target.value) || 0;
-            generateExpenseFields(count);
+        if (response.status === 401) {
+            console.warn('⚠️ Token expirado');
+            localStorage.removeItem('token');
+            window.location.href = 'index.html';
+            return;
+        }
+
+        if (!response.ok) {
+            console.error('Error al cargar usuario');
+            alert('Error al cargar datos. Intente recargar.');
+            return;
+        }
+
+        const data = await response.json();
+        currentUser = data.data;
+        
+        if (currentUser.id && !currentUser._id) {
+            currentUser._id = currentUser.id;
+        }
+
+        document.getElementById('sidebarUserName').textContent = currentUser.nombre;
+        document.getElementById('sidebarUserAvatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
+
+        if (currentUser.rol === 'admin') {
+            document.getElementById('adminSection').style.display = 'block';
+        }
+        
+        document.getElementById('fecha').valueAsDate = new Date();
+        
+        // Dejar filtros vacíos por defecto
+        document.getElementById('filterFechaDesde').value = '';
+        document.getElementById('filterFechaHasta').value = '';
+        document.getElementById('filterMonth').value = '';
+        
+        await loadExpenses();
+    } catch (error) {
+        console.error('❌ Error de red:', error);
+        alert('Error de conexión. Recargue la página.');
+    }
+});
+
+document.getElementById('cantidad').addEventListener('input', (e) => {
+    const count = parseInt(e.target.value) || 0;
+    generateExpenseFields(count);
+});
+
+function generateExpenseFields(count) {
+    const container = document.getElementById('expenseFields');
+    const btnSubmit = document.getElementById('btnSubmit');
+    
+    if (count < 1 || count > 20) {
+        container.innerHTML = '';
+        btnSubmit.disabled = true;
+        document.getElementById('summaryBox').style.display = 'none';
+        return;
+    }
+
+    expenseItems = Array(count).fill(null).map(() => ({ descripcion: '', monto: 0 }));
+    
+    container.innerHTML = Array(count).fill(null).map((_, index) => `
+        <div class="expense-item">
+            <div class="expense-item-header">Gasto #${index + 1}</div>
+            <div class="expense-row">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <input 
+                        type="text" 
+                        class="form-input" 
+                        placeholder="Descripción del gasto" 
+                        required 
+                        maxlength="200"
+                        onchange="updateExpenseItem(${index}, 'descripcion', this.value)"
+                    >
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <input 
+                        type="number" 
+                        class="form-input" 
+                        placeholder="Monto" 
+                        required 
+                        min="0"
+                        step="0.01"
+                        onchange="updateExpenseItem(${index}, 'monto', this.value)"
+                    >
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    btnSubmit.disabled = false;
+    document.getElementById('summaryBox').style.display = 'block';
+    updateTotal();
+}
+
+function updateExpenseItem(index, field, value) {
+    if (field === 'monto') {
+        expenseItems[index][field] = parseFloat(value) || 0;
+    } else {
+        expenseItems[index][field] = value;
+    }
+    updateTotal();
+}
+
+function updateTotal() {
+    const total = expenseItems.reduce((sum, item) => sum + item.monto, 0);
+    document.getElementById('totalAmount').textContent = `$${total.toLocaleString('es-CO')}`;
+}
+
+document.getElementById('expenseForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const fecha = document.getElementById('fecha').value;
+    
+    const validItems = expenseItems.filter(item => item.descripcion.trim() && item.monto > 0);
+    
+    if (validItems.length === 0) {
+        alert('Debe completar al menos un gasto con descripción y monto válidos');
+        return;
+    }
+
+    const expenseData = {
+        fecha: fecha,
+        gastos: validItems,
+        userId: currentUser._id
+    };
+
+    const token = localStorage.getItem('token');
+
+    try {
+        const response = await fetch(`${API_URL}/expenses`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(expenseData)
         });
 
-        function generateExpenseFields(count) {
-            const container = document.getElementById('expenseFields');
-            const btnSubmit = document.getElementById('btnSubmit');
-            
-            if (count < 1 || count > 20) {
-                container.innerHTML = '';
-                btnSubmit.disabled = true;
-                document.getElementById('summaryBox').style.display = 'none';
-                return;
-            }
+        const data = await response.json();
 
-            expenseItems = Array(count).fill(null).map(() => ({ descripcion: '', monto: 0 }));
+        if (data.success) {
+            alert('✅ Gastos registrados exitosamente');
+            document.getElementById('expenseForm').reset();
+            document.getElementById('expenseFields').innerHTML = '';
+            document.getElementById('summaryBox').style.display = 'none';
+            document.getElementById('btnSubmit').disabled = true;
+            document.getElementById('fecha').valueAsDate = new Date();
+            expenseItems = [];
+            await loadExpenses();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al registrar los gastos');
+    }
+});
+
+async function loadExpenses() {
+    const token = localStorage.getItem('token');
+
+    try {
+        const response = await fetch(`${API_URL}/expenses?userId=${currentUser._id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            allExpenses = data.data;
+            console.log(`✅ Total gastos cargados: ${allExpenses.length}`);
+            applyFilters();
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+function selectMonth() {
+    const monthValue = document.getElementById('filterMonth').value;
+    
+    if (monthValue) {
+        const [year, month] = monthValue.split('-');
+        const firstDay = `${year}-${month}-01`;
+        const lastDay = new Date(year, month, 0).getDate();
+        const lastDayStr = `${year}-${month}-${String(lastDay).padStart(2, '0')}`;
+        
+        document.getElementById('filterFechaDesde').value = firstDay;
+        document.getElementById('filterFechaHasta').value = lastDayStr;
+    }
+    
+    applyFilters();
+}
+
+function applyFilters() {
+    const fechaDesdeValue = document.getElementById('filterFechaDesde').value;
+    const fechaHastaValue = document.getElementById('filterFechaHasta').value;
+    
+    console.log('🔍 Aplicando filtros:');
+    console.log('  - Fecha desde:', fechaDesdeValue || 'Sin filtro');
+    console.log('  - Fecha hasta:', fechaHastaValue || 'Sin filtro');
+    
+    let fechaDesde = null;
+    let fechaHasta = null;
+    
+    if (fechaDesdeValue) {
+        fechaDesde = new Date(fechaDesdeValue + 'T00:00:00');
+    }
+    
+    if (fechaHastaValue) {
+        fechaHasta = new Date(fechaHastaValue + 'T23:59:59.999');
+    }
+
+    filteredExpenses = allExpenses.filter(expense => {
+        const expenseDate = new Date(expense.fecha);
+        
+        let dateMatch = true;
+        
+        if (fechaDesde && fechaHasta) {
+            dateMatch = expenseDate >= fechaDesde && expenseDate <= fechaHasta;
+        } else if (fechaDesde) {
+            dateMatch = expenseDate >= fechaDesde;
+        } else if (fechaHasta) {
+            dateMatch = expenseDate <= fechaHasta;
+        }
+        
+        return dateMatch;
+    });
+
+    console.log(`✅ Gastos filtrados: ${filteredExpenses.length} de ${allExpenses.length}`);
+    
+    updateStatistics();
+    displayExpenses(filteredExpenses);
+}
+
+function updateStatistics() {
+    const totalRegistros = filteredExpenses.length;
+    const totalGastos = filteredExpenses.reduce((sum, expense) => sum + expense.gastos.length, 0);
+    const montoTotal = filteredExpenses.reduce((sum, expense) => sum + expense.total, 0);
+    
+    document.getElementById('statTotalRegistros').textContent = totalRegistros;
+    document.getElementById('statTotalGastos').textContent = totalGastos;
+    document.getElementById('statMontoTotal').textContent = `$${montoTotal.toLocaleString('es-CO')}`;
+}
+
+function clearFilters() {
+    document.getElementById('filterFechaDesde').value = '';
+    document.getElementById('filterFechaHasta').value = '';
+    document.getElementById('filterMonth').value = '';
+    
+    console.log('🧹 Filtros limpiados - Mostrando todos los gastos');
+    
+    applyFilters();
+    
+    const notification = document.createElement('div');
+    notification.textContent = '✅ Filtros restablecidos';
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+        z-index: 10000;
+        animation: slideInRight 0.3s ease-out;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => notification.remove(), 300);
+    }, 2000);
+}
+
+function displayExpenses(expenses) {
+    const list = document.getElementById('expensesList');
+    
+    if (expenses.length === 0) {
+        list.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">📋</div>
+                <p>No hay gastos registrados en este período</p>
+            </div>
+        `;
+        return;
+    }
+
+    list.innerHTML = expenses.map(expense => `
+        <div class="expense-card">
+            <div class="expense-header">
+                <div>
+                    <div class="expense-date">${new Date(expense.fecha).toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                    <div class="expense-count">${expense.gastos.length} gasto(s) registrado(s)</div>
+                </div>
+                <div class="expense-total">$${expense.total.toLocaleString('es-CO')}</div>
+            </div>
+            <div class="expense-items">
+                ${expense.gastos.map(gasto => `
+                    <div class="expense-detail">
+                        <span class="expense-description">${gasto.descripcion}</span>
+                        <span class="expense-amount">$${gasto.monto.toLocaleString('es-CO')}</span>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="expense-actions">
+                <button class="btn-action btn-edit" onclick="editExpense('${expense._id}')">✏️ Editar</button>
+                <button class="btn-action btn-delete" onclick="deleteExpense('${expense._id}')">🗑️ Eliminar</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function editExpense(expenseId) {
+    const token = localStorage.getItem('token');
+    
+    try {
+        const response = await fetch(`${API_URL}/expenses/${expenseId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            const expense = data.data;
             
-            container.innerHTML = Array(count).fill(null).map((_, index) => `
+            document.getElementById('editExpenseId').value = expense._id;
+            document.getElementById('editFecha').value = expense.fecha.split('T')[0];
+            
+            const container = document.getElementById('editExpenseFields');
+            container.innerHTML = expense.gastos.map((gasto, index) => `
                 <div class="expense-item">
                     <div class="expense-item-header">Gasto #${index + 1}</div>
                     <div class="expense-row">
                         <div class="form-group" style="margin-bottom: 0;">
                             <input 
                                 type="text" 
-                                class="form-input" 
+                                class="form-input edit-descripcion" 
                                 placeholder="Descripción del gasto" 
                                 required 
                                 maxlength="200"
-                                onchange="updateExpenseItem(${index}, 'descripcion', this.value)"
+                                value="${gasto.descripcion}"
+                                data-index="${index}"
                             >
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
                             <input 
                                 type="number" 
-                                class="form-input" 
+                                class="form-input edit-monto" 
                                 placeholder="Monto" 
                                 required 
                                 min="0"
                                 step="0.01"
-                                onchange="updateExpenseItem(${index}, 'monto', this.value)"
+                                value="${gasto.monto}"
+                                data-index="${index}"
                             >
                         </div>
                     </div>
                 </div>
             `).join('');
 
-            btnSubmit.disabled = false;
-            document.getElementById('summaryBox').style.display = 'block';
-            updateTotal();
-        }
-
-        function updateExpenseItem(index, field, value) {
-            if (field === 'monto') {
-                expenseItems[index][field] = parseFloat(value) || 0;
-            } else {
-                expenseItems[index][field] = value;
-            }
-            updateTotal();
-        }
-
-        function updateTotal() {
-            const total = expenseItems.reduce((sum, item) => sum + item.monto, 0);
-            document.getElementById('totalAmount').textContent = `$${total.toLocaleString('es-CO')}`;
-        }
-
-        document.getElementById('expenseForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const fecha = document.getElementById('fecha').value;
+            updateEditTotal(expense.gastos);
             
-            const validItems = expenseItems.filter(item => item.descripcion.trim() && item.monto > 0);
-            
-            if (validItems.length === 0) {
-                alert('Debe completar al menos un gasto con descripción y monto válidos');
-                return;
-            }
-
-            const expenseData = {
-                fecha: fecha,
-                gastos: validItems,
-                userId: currentUser._id
-            };
-
-            const token = localStorage.getItem('token');
-
-            try {
-                const response = await fetch(`${API_URL}/expenses`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify(expenseData)
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    alert('✅ Gastos registrados exitosamente');
-                    document.getElementById('expenseForm').reset();
-                    document.getElementById('expenseFields').innerHTML = '';
-                    document.getElementById('summaryBox').style.display = 'none';
-                    document.getElementById('btnSubmit').disabled = true;
-                    document.getElementById('fecha').valueAsDate = new Date();
-                    expenseItems = [];
-                    await loadExpenses();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error al registrar los gastos');
-            }
-        });
-
-        async function loadExpenses() {
-            const token = localStorage.getItem('token');
-            const filterMonth = document.getElementById('filterMonth').value;
-
-            let url = `${API_URL}/expenses?userId=${currentUser._id}`;
-            if (filterMonth) {
-                url += `&month=${filterMonth}`;
-            }
-
-            try {
-                const response = await fetch(url, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                const data = await response.json();
-                
-                if (data.success) {
-                    displayExpenses(data.data);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-
-        function displayExpenses(expenses) {
-            const list = document.getElementById('expensesList');
-            
-            if (expenses.length === 0) {
-                list.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">📋</div>
-                        <p>No hay gastos registrados</p>
-                    </div>
-                `;
-                return;
-            }
-
-            list.innerHTML = expenses.map(expense => `
-                <div class="expense-card">
-                    <div class="expense-header">
-                        <div>
-                            <div class="expense-date">${new Date(expense.fecha).toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
-                            <div class="expense-count">${expense.gastos.length} gasto(s) registrado(s)</div>
-                        </div>
-                        <div class="expense-total">$${expense.total.toLocaleString('es-CO')}</div>
-                    </div>
-                    <div class="expense-items">
-                        ${expense.gastos.map(gasto => `
-                            <div class="expense-detail">
-                                <span class="expense-description">${gasto.descripcion}</span>
-                                <span class="expense-amount">$${gasto.monto.toLocaleString('es-CO')}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <div class="expense-actions">
-                        <button class="btn-action btn-edit" onclick="editExpense('${expense._id}')">✏️ Editar</button>
-                        <button class="btn-action btn-delete" onclick="deleteExpense('${expense._id}')">🗑️ Eliminar</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        async function editExpense(expenseId) {
-            const token = localStorage.getItem('token');try {
-                const response = await fetch(`${API_URL}/expenses/${expenseId}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                const data = await response.json();
-                
-                if (data.success) {
-                    const expense = data.data;
-                    
-                    document.getElementById('editExpenseId').value = expense._id;
-                    document.getElementById('editFecha').value = expense.fecha.split('T')[0];
-                    
-                    const container = document.getElementById('editExpenseFields');
-                    container.innerHTML = expense.gastos.map((gasto, index) => `
-                        <div class="expense-item">
-                            <div class="expense-item-header">Gasto #${index + 1}</div>
-                            <div class="expense-row">
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <input 
-                                        type="text" 
-                                        class="form-input edit-descripcion" 
-                                        placeholder="Descripción del gasto" 
-                                        required 
-                                        maxlength="200"
-                                        value="${gasto.descripcion}"
-                                        data-index="${index}"
-                                    >
-                                </div>
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <input 
-                                        type="number" 
-                                        class="form-input edit-monto" 
-                                        placeholder="Monto" 
-                                        required 
-                                        min="0"
-                                        step="0.01"
-                                        value="${gasto.monto}"
-                                        data-index="${index}"
-                                    >
-                                </div>
-                            </div>
-                        </div>
-                    `).join('');
-
-                    updateEditTotal(expense.gastos);
-                    
-                    document.querySelectorAll('.edit-descripcion, .edit-monto').forEach(input => {
-                        input.addEventListener('input', updateEditTotalFromInputs);
-                    });
-                    
-                    document.getElementById('editModal').classList.add('active');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error al cargar el gasto');
-            }
-        }
-
-        function updateEditTotalFromInputs() {
-            const descripciones = document.querySelectorAll('.edit-descripcion');
-            const montos = document.querySelectorAll('.edit-monto');
-            
-            let total = 0;
-            montos.forEach(input => {
-                total += parseFloat(input.value) || 0;
+            document.querySelectorAll('.edit-descripcion, .edit-monto').forEach(input => {
+                input.addEventListener('input', updateEditTotalFromInputs);
             });
             
-            document.getElementById('editTotalAmount').textContent = `$${total.toLocaleString('es-CO')}`;
+            document.getElementById('editModal').classList.add('active');
         }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al cargar el gasto');
+    }
+}
 
-        function updateEditTotal(gastos) {
-            const total = gastos.reduce((sum, gasto) => sum + gasto.monto, 0);
-            document.getElementById('editTotalAmount').textContent = `$${total.toLocaleString('es-CO')}`;
+function updateEditTotalFromInputs() {
+    const montos = document.querySelectorAll('.edit-monto');
+    
+    let total = 0;
+    montos.forEach(input => {
+        total += parseFloat(input.value) || 0;
+    });
+    
+    document.getElementById('editTotalAmount').textContent = `$${total.toLocaleString('es-CO')}`;
+}
+
+function updateEditTotal(gastos) {
+    const total = gastos.reduce((sum, gasto) => sum + gasto.monto, 0);
+    document.getElementById('editTotalAmount').textContent = `$${total.toLocaleString('es-CO')}`;
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').classList.remove('active');
+}
+
+document.getElementById('editForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const expenseId = document.getElementById('editExpenseId').value;
+    const fecha = document.getElementById('editFecha').value;
+    
+    const descripciones = document.querySelectorAll('.edit-descripcion');
+    const montos = document.querySelectorAll('.edit-monto');
+    
+    const gastos = [];
+    descripciones.forEach((desc, index) => {
+        const descripcion = desc.value.trim();
+        const monto = parseFloat(montos[index].value) || 0;
+        
+        if (descripcion && monto > 0) {
+            gastos.push({ descripcion, monto });
         }
+    });
 
-        function closeEditModal() {
-            document.getElementById('editModal').classList.remove('active');
-        }
+    if (gastos.length === 0) {
+        alert('Debe tener al menos un gasto válido');
+        return;
+    }
 
-        document.getElementById('editForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+    const expenseData = {
+        fecha: fecha,
+        gastos: gastos,
+        userId: currentUser._id
+    };
 
-            const expenseId = document.getElementById('editExpenseId').value;
-            const fecha = document.getElementById('editFecha').value;
-            
-            const descripciones = document.querySelectorAll('.edit-descripcion');
-            const montos = document.querySelectorAll('.edit-monto');
-            
-            const gastos = [];
-            descripciones.forEach((desc, index) => {
-                const descripcion = desc.value.trim();
-                const monto = parseFloat(montos[index].value) || 0;
-                
-                if (descripcion && monto > 0) {
-                    gastos.push({ descripcion, monto });
-                }
-            });
+    const token = localStorage.getItem('token');
 
-            if (gastos.length === 0) {
-                alert('Debe tener al menos un gasto válido');
-                return;
-            }
-
-            const expenseData = {
-                fecha: fecha,
-                gastos: gastos,
-                userId: currentUser._id
-            };
-
-            const token = localStorage.getItem('token');
-
-            try {
-                const response = await fetch(`${API_URL}/expenses/${expenseId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify(expenseData)
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    alert('✅ Gastos actualizados exitosamente');
-                    closeEditModal();
-                    await loadExpenses();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error al actualizar los gastos');
-            }
+    try {
+        const response = await fetch(`${API_URL}/expenses/${expenseId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(expenseData)
         });
 
-        async function deleteExpense(expenseId) {
-            if (!confirm('¿Está seguro de eliminar este registro de gastos?')) return;
+        const data = await response.json();
 
-            const token = localStorage.getItem('token');
-
-            try {
-                const response = await fetch(`${API_URL}/expenses/${expenseId}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    alert('✅ Gastos eliminados exitosamente');
-                    await loadExpenses();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error al eliminar los gastos');
-            }
+        if (data.success) {
+            alert('✅ Gastos actualizados exitosamente');
+            closeEditModal();
+            await loadExpenses();
+        } else {
+            alert('Error: ' + data.message);
         }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al actualizar los gastos');
+    }
+});
 
-        function toggleMenu() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-        }
+async function deleteExpense(expenseId) {
+    if (!confirm('¿Está seguro de eliminar este registro de gastos?')) return;
 
-        function logout() {
-            if (confirm('¿Cerrar sesión?')) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('usuario');
-                window.location.href = 'index.html';
-            }
+    const token = localStorage.getItem('token');
+
+    try {
+        const response = await fetch(`${API_URL}/expenses/${expenseId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert('✅ Gastos eliminados exitosamente');
+            await loadExpenses();
+        } else {
+            alert('Error: ' + data.message);
         }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al eliminar los gastos');
+    }
+}
+
+function toggleMenu() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    
+    sidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
+}
+
+function logout() {
+    if (confirm('¿Cerrar sesión?')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('usuario');
+        window.location.href = 'index.html';
+    }
+}
     </script>
 </body>
 </html>

@@ -776,6 +776,48 @@
             font-weight: 800;
             color: #667eea;
         }
+
+.btn-clear-filters {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    align-self: flex-end;
+}
+
+.btn-clear-filters:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(252, 129, 129, 0.4);
+    background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+}
+
     </style>
 </head>
 <body>
@@ -873,7 +915,7 @@
                 </div>
                 <div class="card-body">
                     <div class="period-selector">
-                        <button class="period-btn active" onclick="selectPeriod('hoy')">Hoy</button>
+                        <button class="period-btn" onclick="selectPeriod('hoy')">Hoy</button>
                         <button class="period-btn" onclick="selectPeriod('semana')">Esta Semana</button>
                         <button class="period-btn" onclick="selectPeriod('mes')">Este Mes</button>
                         <button class="period-btn" onclick="selectPeriod('custom')">Personalizado</button>
@@ -905,9 +947,10 @@
                                 <option value="">Todos los productos</option>
                             </select>
                         </div>
-                        <div class="filter-group">
-                            <button class="btn-filter" onclick="applyFilters()">Aplicar Filtros</button>
-                        </div>
+<div class="filter-group" style="display: flex; gap: 8px;">
+    <button class="btn-filter" onclick="applyFilters()" style="flex: 1;">Aplicar Filtros</button>
+    <button class="btn-clear-filters" onclick="clearFilters()" style="flex: 1;">🗑️ Limpiar</button>
+</div>
                     </div>
                 </div>
             </div>
@@ -1058,16 +1101,13 @@ if (!response.ok) {
 }
     });
 
-    function setDefaultDates() {
-        const today = new Date();
-        
-        // Establecer fecha de hoy
-        const todayStr = today.toISOString().split('T')[0];
-        document.getElementById('fechaHasta').value = todayStr;
-        document.getElementById('fechaDesde').value = todayStr;
-        
-        console.log('📅 Fechas establecidas:', todayStr);
-    }
+function setDefaultDates() {
+    // Dejar los campos de fecha vacíos por defecto
+    document.getElementById('fechaHasta').value = '';
+    document.getElementById('fechaDesde').value = '';
+    
+    console.log('📅 Filtros de fecha vacíos - Mostrando todos los pedidos');
+}
 
     function selectPeriod(period) {
         currentPeriod = period;
@@ -1106,6 +1146,60 @@ if (!response.ok) {
             applyFilters();
         }
     }
+
+    function clearFilters() {
+    // Restablecer período a "hoy"
+    currentPeriod = 'hoy';
+    
+    // Actualizar botones de período
+    document.querySelectorAll('.period-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.textContent === 'Hoy') {
+            btn.classList.add('active');
+        }
+    });
+    
+    // Restablecer fechas a hoy
+// Limpiar fechas (dejar vacías)
+document.getElementById('fechaDesde').value = '';
+document.getElementById('fechaHasta').value = '';
+    
+    // Limpiar select de estado
+    document.getElementById('filterEstado').value = '';
+    
+    // Limpiar select de producto
+    document.getElementById('filterProducto').value = '';
+    
+    console.log('🧹 Filtros limpiados - Mostrando todos los pedidos');
+    
+    // Aplicar filtros con los valores por defecto
+    applyFilters();
+    
+    // Mostrar notificación visual (opcional)
+    const notification = document.createElement('div');
+    notification.textContent = '✅ Filtros restablecidos';
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+        z-index: 10000;
+        animation: slideInRight 0.3s ease-out;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => notification.remove(), 300);
+    }, 2000);
+}
 
     async function loadProducts() {
         const token = localStorage.getItem('token');
@@ -1154,17 +1248,25 @@ if (!response.ok) {
         }
     }
 
-    function applyFilters() {
-        const fechaDesdeValue = document.getElementById('fechaDesde').value;
-        const fechaHastaValue = document.getElementById('fechaHasta').value;
-        
-        console.log('🔎 Aplicando filtros:');
-        console.log('  - Fecha desde:', fechaDesdeValue);
-        console.log('  - Fecha hasta:', fechaHastaValue);
-        
-        // Crear fechas correctamente
-        const fechaDesde = new Date(fechaDesdeValue + 'T00:00:00');
-        const fechaHasta = new Date(fechaHastaValue + 'T23:59:59.999');
+function applyFilters() {
+    const fechaDesdeValue = document.getElementById('fechaDesde').value;
+    const fechaHastaValue = document.getElementById('fechaHasta').value;
+    
+    console.log('🔎 Aplicando filtros:');
+    console.log('  - Fecha desde:', fechaDesdeValue || 'Sin filtro');
+    console.log('  - Fecha hasta:', fechaHastaValue || 'Sin filtro');
+    
+    // Crear fechas solo si existen valores
+    let fechaDesde = null;
+    let fechaHasta = null;
+    
+    if (fechaDesdeValue) {
+        fechaDesde = new Date(fechaDesdeValue + 'T00:00:00');
+    }
+    
+    if (fechaHastaValue) {
+        fechaHasta = new Date(fechaHastaValue + 'T23:59:59.999');
+    }
         
         const estado = document.getElementById('filterEstado').value;
         const producto = document.getElementById('filterProducto').value;
@@ -1174,7 +1276,19 @@ if (!response.ok) {
 
         filteredOrders = allOrders.filter(order => {
             const orderDate = new Date(order.createdAt);
-            const dateMatch = orderDate >= fechaDesde && orderDate <= fechaHasta;
+            // Si no hay fechas, mostrar todos los pedidos
+let dateMatch = true;
+
+if (fechaDesde && fechaHasta) {
+    // Si ambas fechas están definidas
+    dateMatch = orderDate >= fechaDesde && orderDate <= fechaHasta;
+} else if (fechaDesde) {
+    // Solo fecha desde
+    dateMatch = orderDate >= fechaDesde;
+} else if (fechaHasta) {
+    // Solo fecha hasta
+    dateMatch = orderDate <= fechaHasta;
+}
             const estadoMatch = !estado || order.estado === estado;
 
             let productoMatch = !producto;
