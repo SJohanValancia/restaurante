@@ -1094,7 +1094,8 @@ function updateTotal() {
 document.getElementById('expenseForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const fecha = document.getElementById('fecha').value;
+    const fechaInput = document.getElementById('fecha').value;
+const fecha = new Date(fechaInput + 'T12:00:00').toISOString();
     
     const validItems = expenseItems.filter(item => item.descripcion.trim() && item.monto > 0);
     

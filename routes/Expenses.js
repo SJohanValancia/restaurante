@@ -66,10 +66,11 @@ router.get('/:id', protect, async (req, res) => {
 // Crear un nuevo registro de gastos
 router.post('/', protect, checkPermission('crearGastos'), async (req, res) => {
   try {
-    const expenseData = {
-      ...req.body,
-      userId: req.user._id
-    };
+const expenseData = {
+  ...req.body,
+  fecha: new Date(req.body.fecha),
+  userId: req.user._id
+};
     
     const expense = await Expense.create(expenseData);
     
