@@ -33,6 +33,11 @@ const orderSchema = new mongoose.Schema({
     enum: ['pendiente', 'preparando', 'listo', 'entregado', 'cancelado'],
     default: 'pendiente'
   },
+  metodoPago: {
+    type: String,
+    enum: ['efectivo', 'transferencia'],
+    default: null
+  },
   reciboDia: {
     type: Boolean,
     default: false

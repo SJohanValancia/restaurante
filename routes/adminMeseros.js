@@ -1,4 +1,3 @@
-
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
@@ -93,7 +92,75 @@ router.post('/agregar', async (req, res) => {
   }
 });
 
-// Obtener meseros de un admin
+// NUEVA RUTA: Obtener meseros del mismo restaurante/sede
+router.get('/meseros-restaurante/:adminId', async (req, res) => {
+  try {
+    const { adminId } = req.params;
+
+    // Obtener información del admin
+    const admin = await User.findById(adminId);
+    if (!admin || admin.rol !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'No tiene permisos de administrador'
+      });
+    }
+
+    // Buscar todos los meseros/cajeros con el mismo restaurante y sede
+    const criterio = {
+      nombreRestaurante: admin.nombreRestaurante,
+      rol: { $in: ['mesero', 'cajero'] },
+      activo: true,
+      _id: { $ne: adminId } // Excluir al admin mismo
+    };
+
+    // Si el admin tiene sede, filtrar por sede también
+    if (admin.sede && admin.sede.trim() !== '') {
+      criterio.sede = admin.sede;
+    }
+
+    const meseros = await User.find(criterio)
+      .select('nombre email rol nombreRestaurante sede createdAt')
+      .sort({ createdAt: -1 });
+
+    // Obtener las relaciones existentes para marcar cuáles ya están agregados
+    const relaciones = await AdminMesero.find({ 
+      adminId,
+      activo: true 
+    }).select('meseroId');
+
+    const meserosAgregadosIds = relaciones.map(rel => rel.meseroId.toString());
+
+    const meserosConEstado = meseros.map(mesero => ({
+      _id: mesero._id,
+      nombre: mesero.nombre,
+      email: mesero.email,
+      rol: mesero.rol,
+      nombreRestaurante: mesero.nombreRestaurante,
+      sede: mesero.sede,
+      createdAt: mesero.createdAt,
+      yaAgregado: meserosAgregadosIds.includes(mesero._id.toString())
+    }));
+
+    res.json({
+      success: true,
+      count: meserosConEstado.length,
+      restaurante: admin.nombreRestaurante,
+      sede: admin.sede || 'Sin sede',
+      data: meserosConEstado
+    });
+
+  } catch (error) {
+    console.error('Error al obtener meseros del restaurante:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener meseros del restaurante',
+      error: error.message
+    });
+  }
+});
+
+// Obtener meseros agregados de un admin
 router.get('/meseros/:adminId', async (req, res) => {
   try {
     const { adminId } = req.params;

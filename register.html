@@ -634,13 +634,6 @@
             }
         });
 
-        // Verificar si ya hay sesión activa
-        window.addEventListener('load', () => {
-            const token = localStorage.getItem('token');
-            if (token) {
-                window.location.href = 'productos.html';
-            }
-        });
     </script>
 </body>
 </html>

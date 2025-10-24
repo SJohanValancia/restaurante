@@ -1231,50 +1231,49 @@ function mostrarAgotado(elemento) {
                 console.error('Error:', error);
             }
         }
+function displayOrders(orders) {
+    const list = document.getElementById('ordersList');
+    
+    if (orders.length === 0) {
+        list.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">📋</div>
+                <p>No hay pedidos registrados</p>
+            </div>
+        `;
+        return;
+    }
 
-        function displayOrders(orders) {
-            const list = document.getElementById('ordersList');
-            
-            if (orders.length === 0) {
-                list.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">📋</div>
-                        <p>No hay pedidos registrados</p>
+    list.innerHTML = orders.map(order => `
+        <div class="order-card">
+            <div class="order-header">
+                <div class="order-info">
+                    <h3>Mesa ${order.mesa}</h3>
+                    <div class="order-meta">
+                        ${new Date(order.createdAt).toLocaleString('es-CO')}
+                        ${order.metodoPago ? `<br><strong style="color: ${order.metodoPago === 'transferencia' ? '#667eea' : '#48bb78'};">💳 ${order.metodoPago === 'transferencia' ? 'Transferencia' : 'Efectivo'}</strong>` : ''}
                     </div>
-                `;
-                return;
-            }
-
-            list.innerHTML = orders.map(order => `
-                <div class="order-card">
-                    <div class="order-header">
-                        <div class="order-info">
-                            <h3>Mesa ${order.mesa}</h3>
-                            <div class="order-meta">
-                                ${new Date(order.createdAt).toLocaleString('es-CO')}
-                            </div>
-                        </div>
-                        <span class="status-badge status-${order.estado}">${order.estado}</span>
-                    </div>
-                    <div class="order-items">
-                        ${order.items.map(item => `
-                            <div class="order-item">
-                                <span class="item-name">${item.producto.nombre}</span>
-                                <span class="item-qty">x${item.cantidad}</span>
-                                <span>$${(item.precio * item.cantidad).toLocaleString('es-CO')}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                    ${order.notas ? `<p style="font-size: 12px; color: #718096; font-style: italic; margin: 8px 0;">📝 ${order.notas}</p>` : ''}
-                    <div class="order-total">
-                        <span>Total:</span>
-                        <span>$${order.total.toLocaleString('es-CO')}</span>
-                    </div>
-                    ${getOrderActions(order)}
                 </div>
-            `).join('');
-        }
-
+                <span class="status-badge status-${order.estado}">${order.estado}</span>
+            </div>
+            <div class="order-items">
+                ${order.items.map(item => `
+                    <div class="order-item">
+                        <span class="item-name">${item.producto.nombre}</span>
+                        <span class="item-qty">x${item.cantidad}</span>
+                        <span>$${(item.precio * item.cantidad).toLocaleString('es-CO')}</span>
+                    </div>
+                `).join('')}
+            </div>
+            ${order.notas ? `<p style="font-size: 12px; color: #718096; font-style: italic; margin: 8px 0;">📝 ${order.notas}</p>` : ''}
+            <div class="order-total">
+                <span>Total:</span>
+                <span>$${order.total.toLocaleString('es-CO')}</span>
+            </div>
+            ${getOrderActions(order)}
+        </div>
+    `).join('');
+}
         function getOrderActions(order) {
             if (order.estado === 'entregado' || order.estado === 'cancelado') return '';
 
@@ -1300,31 +1299,66 @@ function mostrarAgotado(elemento) {
             return actions;
         }
 
-        async function updateOrderStatus(orderId, newStatus) {
-            const token = localStorage.getItem('token');
+let currentOrderIdForPayment = null;
 
-            try {
-                const response = await fetch(`${API_URL}/orders/${orderId}/estado`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ estado: newStatus })
-                });
+async function updateOrderStatus(orderId, newStatus) {
+    // Si el nuevo estado es "entregado", mostrar modal de método de pago
+    if (newStatus === 'entregado') {
+        currentOrderIdForPayment = orderId;
+        mostrarModalMetodoPago();
+        return;
+    }
+    
+    // Para otros estados, proceder normalmente
+    await actualizarEstadoPedido(orderId, newStatus, null);
+}
 
-                const data = await response.json();
+function mostrarModalMetodoPago() {
+    const modal = document.getElementById('modalMetodoPago');
+    modal.style.display = 'flex';
+}
 
-                if (data.success) {
-                    await loadOrders();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error al actualizar el estado');
-            }
+function cerrarModalMetodoPago() {
+    const modal = document.getElementById('modalMetodoPago');
+    modal.style.display = 'none';
+    currentOrderIdForPayment = null;
+}
+
+async function confirmarMetodoPago(metodoPago) {
+    cerrarModalMetodoPago();
+    await actualizarEstadoPedido(currentOrderIdForPayment, 'entregado', metodoPago);
+}
+
+async function actualizarEstadoPedido(orderId, newStatus, metodoPago) {
+    const token = localStorage.getItem('token');
+
+    try {
+        const body = { estado: newStatus };
+        if (metodoPago) {
+            body.metodoPago = metodoPago;
         }
+
+        const response = await fetch(`${API_URL}/orders/${orderId}/estado`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(body)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            await loadOrders();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al actualizar el estado');
+    }
+}
 
         async function cancelOrder(orderId) {
             if (!confirm('¿Está seguro de cancelar este pedido?')) return;
@@ -1347,5 +1381,30 @@ function mostrarAgotado(elemento) {
             }
         }
     </script>
+
+<!-- Modal para método de pago -->
+<div id="modalMetodoPago" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 16px; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+        <h3 style="font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 1rem; text-align: center;">💳 Método de Pago</h3>
+        <p style="font-size: 14px; color: #718096; text-align: center; margin-bottom: 1.5rem;">Selecciona cómo se realizó el pago:</p>
+        
+        <div style="display: grid; gap: 1rem; margin-bottom: 1.5rem;">
+            <button onclick="confirmarMetodoPago('efectivo')" style="padding: 1rem; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <span style="font-size: 24px;">💵</span>
+                <span>Efectivo</span>
+            </button>
+            
+            <button onclick="confirmarMetodoPago('transferencia')" style="padding: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <span style="font-size: 24px;">📱</span>
+                <span>Transferencia</span>
+            </button>
+        </div>
+        
+        <button onclick="cerrarModalMetodoPago()" style="width: 100%; padding: 0.75rem; background: #e2e8f0; color: #2d3748; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">
+            Cancelar
+        </button>
+    </div>
+</div>
+
 </body>
 </html>

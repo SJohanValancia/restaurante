@@ -983,6 +983,16 @@
                     <div class="stat-value" id="ticketPromedio">$0</div>
                     <div class="stat-change" id="changeTicket">Por pedido</div>
                 </div>
+
+                <div class="stat-card">
+    <div class="stat-header">
+        <div class="stat-icon purple" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">📱</div>
+    </div>
+    <div class="stat-label">Pagos con Transferencia</div>
+    <div class="stat-value" id="totalTransferencias">$0</div>
+    <div class="stat-change" id="changeTransferencias">0 pedidos</div>
+</div>
+
             </div>
 
             <div class="card">
@@ -1343,6 +1353,18 @@ if (fechaDesde && fechaHasta) {
                 
                 <div class="order-card-body">
                     <div class="order-info-row">
+
+${order.metodoPago ? `
+    <div class="order-info-row">
+        <div>
+            <div class="order-info-label">Método de Pago</div>
+            <div class="order-info-value" style="color: ${order.metodoPago === 'transferencia' ? '#667eea' : '#48bb78'};">
+                ${order.metodoPago === 'transferencia' ? '📱 Transferencia' : '💵 Efectivo'}
+            </div>
+        </div>
+    </div>
+` : ''}
+
                         <div>
                             <div class="order-info-label">Mesa</div>
                             <div class="order-info-value">Mesa ${order.mesa || 'N/A'}</div>
@@ -1385,24 +1407,31 @@ if (fechaDesde && fechaHasta) {
         `).join('');
     }
 
-    function updateStatistics() {
-        const totalPedidos = filteredOrders.length;
-        const totalIngresos = filteredOrders
-            .filter(o => o.estado !== 'cancelado')
-            .reduce((sum, order) => sum + order.total, 0);
+function updateStatistics() {
+    const totalPedidos = filteredOrders.length;
+    const totalIngresos = filteredOrders
+        .filter(o => o.estado !== 'cancelado')
+        .reduce((sum, order) => sum + order.total, 0);
 
-        const totalProductos = filteredOrders
-            .filter(o => o.estado !== 'cancelado')
-            .reduce((sum, order) => {
-                return sum + order.items.reduce((itemSum, item) => itemSum + item.cantidad, 0);
-            }, 0);
+    const totalProductos = filteredOrders
+        .filter(o => o.estado !== 'cancelado')
+        .reduce((sum, order) => {
+            return sum + order.items.reduce((itemSum, item) => itemSum + item.cantidad, 0);
+        }, 0);
 
-        const ticketPromedio = totalPedidos > 0 ? totalIngresos / totalPedidos : 0;
+    const ticketPromedio = totalPedidos > 0 ? totalIngresos / totalPedidos : 0;
 
-        document.getElementById('totalPedidos').textContent = totalPedidos;
-        document.getElementById('totalIngresos').textContent = `$${totalIngresos.toLocaleString('es-CO')}`;
-        document.getElementById('totalProductos').textContent = totalProductos;
-        document.getElementById('ticketPromedio').textContent = `$${Math.round(ticketPromedio).toLocaleString('es-CO')}`;
+    // Calcular total de transferencias
+    const pedidosTransferencia = filteredOrders.filter(o => o.estado !== 'cancelado' && o.metodoPago === 'transferencia');
+    const totalTransferencias = pedidosTransferencia.reduce((sum, order) => sum + order.total, 0);
+
+    document.getElementById('totalPedidos').textContent = totalPedidos;
+    document.getElementById('totalIngresos').textContent = `$${totalIngresos.toLocaleString('es-CO')}`;
+    document.getElementById('totalProductos').textContent = totalProductos;
+    document.getElementById('ticketPromedio').textContent = `$${Math.round(ticketPromedio).toLocaleString('es-CO')}`;
+    document.getElementById('totalTransferencias').textContent = `$${totalTransferencias.toLocaleString('es-CO')}`;
+    document.getElementById('changeTransferencias').textContent = `${pedidosTransferencia.length} pedidos`;
+
 
         // Calcular cambios vs período anterior
         const fechaDesde = new Date(document.getElementById('fechaDesde').value + 'T00:00:00');

@@ -199,9 +199,10 @@ router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
 
 
 // Actualizar el estado de un pedido
+// Actualizar el estado de un pedido
 router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (req, res) => {
   try {
-    const { estado } = req.body;
+    const { estado, metodoPago } = req.body;
     
     const estadosValidos = ['pendiente', 'preparando', 'listo', 'entregado', 'cancelado'];
     if (!estadosValidos.includes(estado)) {
@@ -211,9 +212,16 @@ router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (re
       });
     }
 
+    const updateData = { estado };
+    
+    // Si el estado es "entregado" y se proporciona método de pago, guardarlo
+    if (estado === 'entregado' && metodoPago) {
+      updateData.metodoPago = metodoPago;
+    }
+
     const order = await Order.findByIdAndUpdate(
       req.params.id,
-      { estado },
+      updateData,
       { new: true }
     ).populate('items.producto', 'nombre categoria precio');
     

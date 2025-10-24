@@ -1012,71 +1012,79 @@ if (fechaDesde || fechaHasta) {
             document.getElementById('orderCount').textContent = total;
         }
 
-        function displayOrders() {
-            const grid = document.getElementById('ordersGrid');
-            
-            if (filteredOrders.length === 0) {
-                grid.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">🔍</div>
-                        <p>No se encontraron pedidos con los filtros seleccionados</p>
-                    </div>
-                `;
-                return;
-            }
+// Agregar las mismas funciones del modal que en pedidos.html
 
-            grid.innerHTML = filteredOrders.map(order => `
-                <div class="order-card">
-                    <div class="order-header">
-                        <div class="order-info">
-                            <h3>Mesa ${order.mesa}</h3>
-                            <div class="order-meta">
-                                <div class="meta-row">
-                                    <span class="meta-icon">📅</span>
-                                    <span>${new Date(order.createdAt).toLocaleDateString('es-CO', {
-                                        day: '2-digit',
-                                        month: 'long',
-                                        year: 'numeric'
-                                    })}</span>
-                                </div>
-                                <div class="meta-row">
-                                    <span class="meta-icon">🕐</span>
-                                    <span>${new Date(order.createdAt).toLocaleTimeString('es-CO', {
-                                        hour: '2-digit',
-                                        minute: '2-digit'
-                                    })}</span>
-                                </div>
-                                <div class="meta-row">
-                                    <span class="meta-icon">🔖</span>
-                                    <span>#${order._id.slice(-6).toUpperCase()}</span>
-                                </div>
-                            </div>
+// Actualizar displayOrders para mostrar método de pago
+function displayOrders() {
+    const grid = document.getElementById('ordersGrid');
+    
+    if (filteredOrders.length === 0) {
+        grid.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">🔍</div>
+                <p>No se encontraron pedidos con los filtros seleccionados</p>
+            </div>
+        `;
+        return;
+    }
+
+    grid.innerHTML = filteredOrders.map(order => `
+        <div class="order-card">
+            <div class="order-header">
+                <div class="order-info">
+                    <h3>Mesa ${order.mesa}</h3>
+                    <div class="order-meta">
+                        <div class="meta-row">
+                            <span class="meta-icon">📅</span>
+                            <span>${new Date(order.createdAt).toLocaleDateString('es-CO', {
+                                day: '2-digit',
+                                month: 'long',
+                                year: 'numeric'
+                            })}</span>
                         </div>
-                        <span class="status-badge status-${order.estado}">${order.estado}</span>
+                        <div class="meta-row">
+                            <span class="meta-icon">🕐</span>
+                            <span>${new Date(order.createdAt).toLocaleTimeString('es-CO', {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            })}</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-icon">📖</span>
+                            <span>#${order._id.slice(-6).toUpperCase()}</span>
+                        </div>
+                        ${order.metodoPago ? `
+                        <div class="meta-row">
+                            <span class="meta-icon">💳</span>
+                            <span style="font-weight: 600; color: ${order.metodoPago === 'transferencia' ? '#667eea' : '#48bb78'};">${order.metodoPago === 'transferencia' ? 'Transferencia' : 'Efectivo'}</span>
+                        </div>
+                        ` : ''}
                     </div>
-                    <div class="order-items">
-                        ${order.items.map(item => `
-                            <div class="order-item">
-                                <span class="item-name">${item.producto.nombre}</span>
-                                <span class="item-qty">x${item.cantidad}</span>
-                                <span>${(item.precio * item.cantidad).toLocaleString('es-CO')}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                    ${order.notas ? `
-                    <div class="order-notes">
-                        <p>📝 ${order.notas}</p>
-                    </div>
-                    ` : ''}
-                    <div class="order-total">
-                        <span>Total:</span>
-                        <span>${order.total.toLocaleString('es-CO')}</span>
-                    </div>
-                    ${getOrderActions(order)}
                 </div>
-            `).join('');
-        }
-
+                <span class="status-badge status-${order.estado}">${order.estado}</span>
+            </div>
+            <div class="order-items">
+                ${order.items.map(item => `
+                    <div class="order-item">
+                        <span class="item-name">${item.producto.nombre}</span>
+                        <span class="item-qty">x${item.cantidad}</span>
+                        <span>${(item.precio * item.cantidad).toLocaleString('es-CO')}</span>
+                    </div>
+                `).join('')}
+            </div>
+            ${order.notas ? `
+            <div class="order-notes">
+                <p>📝 ${order.notas}</p>
+            </div>
+            ` : ''}
+            <div class="order-total">
+                <span>Total:</span>
+                <span>${order.total.toLocaleString('es-CO')}</span>
+            </div>
+            ${getOrderActions(order)}
+        </div>
+    `).join('');
+}
         function getOrderActions(order) {
             let actions = '<div class="order-actions">';
             
