@@ -64,13 +64,18 @@ router.get('/:id', protect, async (req, res) => {
 });
 
 // Crear un nuevo registro de gastos
+// Crear un nuevo registro de gastos
 router.post('/', protect, checkPermission('crearGastos'), async (req, res) => {
   try {
-const expenseData = {
-  ...req.body,
-  fecha: new Date(req.body.fecha),
-  userId: req.user._id
-};
+    // Parsear la fecha correctamente sin afectar la zona horaria
+    const fechaParts = req.body.fecha.split('-');
+    const fecha = new Date(fechaParts[0], fechaParts[1] - 1, fechaParts[2], 12, 0, 0);
+    
+    const expenseData = {
+      ...req.body,
+      fecha: fecha,
+      userId: req.user._id
+    };
     
     const expense = await Expense.create(expenseData);
     
