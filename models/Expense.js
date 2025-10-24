@@ -16,6 +16,11 @@ const expenseSchema = new mongoose.Schema({
       type: Number,
       required: [true, 'El monto es obligatorio'],
       min: [0, 'El monto no puede ser negativo']
+    },
+    metodoPago: {
+      type: String,
+      enum: ['efectivo', 'transferencia'],
+      default: 'efectivo'
     }
   }],
   total: {

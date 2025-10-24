@@ -751,6 +751,54 @@
     }
 }
 
+.payment-method-selector {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.payment-method-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    background: white;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.payment-method-btn:hover {
+    border-color: #cbd5e0;
+    background: #f7fafc;
+}
+
+.payment-method-btn.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: #667eea;
+}
+
+.payment-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+}
+
     </style>
 </head>
 <body>
@@ -1041,7 +1089,7 @@ function generateExpenseFields(count) {
         return;
     }
 
-    expenseItems = Array(count).fill(null).map(() => ({ descripcion: '', monto: 0 }));
+    expenseItems = Array(count).fill(null).map(() => ({ descripcion: '', monto: 0, metodoPago: 'efectivo' }));
     
     container.innerHTML = Array(count).fill(null).map((_, index) => `
         <div class="expense-item">
@@ -1069,12 +1117,30 @@ function generateExpenseFields(count) {
                     >
                 </div>
             </div>
+            <div class="payment-method-selector">
+                <button type="button" class="payment-method-btn active" onclick="selectPaymentMethod(${index}, 'efectivo', this)">
+                    💵 Efectivo
+                </button>
+                <button type="button" class="payment-method-btn" onclick="selectPaymentMethod(${index}, 'transferencia', this)">
+                    💳 Transferencia
+                </button>
+            </div>
         </div>
     `).join('');
 
     btnSubmit.disabled = false;
     document.getElementById('summaryBox').style.display = 'block';
     updateTotal();
+}
+
+function selectPaymentMethod(index, method, button) {
+    expenseItems[index].metodoPago = method;
+    
+    const parent = button.parentElement;
+    parent.querySelectorAll('.payment-method-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    button.classList.add('active');
 }
 
 function updateExpenseItem(index, field, value) {
@@ -1288,7 +1354,10 @@ function displayExpenses(expenses) {
             <div class="expense-items">
                 ${expense.gastos.map(gasto => `
                     <div class="expense-detail">
-                        <span class="expense-description">${gasto.descripcion}</span>
+                        <div>
+                            <span class="expense-description">${gasto.descripcion}</span>
+                            ${gasto.metodoPago === 'transferencia' ? '<span class="payment-badge">💳 Transferencia</span>' : ''}
+                        </div>
                         <span class="expense-amount">$${gasto.monto.toLocaleString('es-CO')}</span>
                     </div>
                 `).join('')}
@@ -1300,6 +1369,7 @@ function displayExpenses(expenses) {
         </div>
     `).join('');
 }
+
 
 async function editExpense(expenseId) {
     const token = localStorage.getItem('token');
@@ -1346,6 +1416,14 @@ async function editExpense(expenseId) {
                             >
                         </div>
                     </div>
+                    <div class="payment-method-selector">
+                        <button type="button" class="payment-method-btn edit-payment-method ${gasto.metodoPago === 'efectivo' ? 'active' : ''}" data-index="${index}" data-method="efectivo" onclick="selectEditPaymentMethod(${index}, 'efectivo', this)">
+                            💵 Efectivo
+                        </button>
+                        <button type="button" class="payment-method-btn edit-payment-method ${gasto.metodoPago === 'transferencia' ? 'active' : ''}" data-index="${index}" data-method="transferencia" onclick="selectEditPaymentMethod(${index}, 'transferencia', this)">
+                            💳 Transferencia
+                        </button>
+                    </div>
                 </div>
             `).join('');
 
@@ -1362,6 +1440,15 @@ async function editExpense(expenseId) {
         alert('Error al cargar el gasto');
     }
 }
+
+function selectEditPaymentMethod(index, method, button) {
+    const parent = button.parentElement;
+    parent.querySelectorAll('.payment-method-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    button.classList.add('active');
+}
+
 
 function updateEditTotalFromInputs() {
     const montos = document.querySelectorAll('.edit-monto');
@@ -1391,14 +1478,16 @@ document.getElementById('editForm').addEventListener('submit', async (e) => {
     
     const descripciones = document.querySelectorAll('.edit-descripcion');
     const montos = document.querySelectorAll('.edit-monto');
+    const metodosPago = document.querySelectorAll('.edit-payment-method.active');
     
     const gastos = [];
     descripciones.forEach((desc, index) => {
         const descripcion = desc.value.trim();
         const monto = parseFloat(montos[index].value) || 0;
+        const metodoPago = metodosPago[index]?.dataset.method || 'efectivo';
         
         if (descripcion && monto > 0) {
-            gastos.push({ descripcion, monto });
+            gastos.push({ descripcion, monto, metodoPago });
         }
     });
 
@@ -1439,6 +1528,7 @@ document.getElementById('editForm').addEventListener('submit', async (e) => {
         alert('Error al actualizar los gastos');
     }
 });
+
 
 async function deleteExpense(expenseId) {
     if (!confirm('¿Está seguro de eliminar este registro de gastos?')) return;
