@@ -821,6 +821,13 @@
                     <div class="stat-label">Promedio Ingresos</div>
                     <div class="stat-value" id="promedioIngresos">$0</div>
                 </div>
+
+
+                <div class="stat-card">
+    <div class="stat-icon green" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">📱</div>
+    <div class="stat-label">Total Transferencias</div>
+    <div class="stat-value" id="totalTransferencias">$0</div>
+</div>
             </div>
 
             <div id="liquidacionesContainer">
@@ -960,16 +967,18 @@ async function cargarEstadisticas(fechaInicio = null, fechaFin = null) {
                 `$${(stats.totalIngresos || 0).toLocaleString('es-CO')}`;
             document.getElementById('totalEgresos').textContent = 
                 `$${(stats.totalEgresos || 0).toLocaleString('es-CO')}`;
+            document.getElementById('totalTransferencias').textContent = 
+                `$${(stats.totalTransferencias || 0).toLocaleString('es-CO')}`;
             document.getElementById('promedioIngresos').textContent = 
                 `$${Math.round(stats.promedioIngresosPorDia || 0).toLocaleString('es-CO')}`;
         }
     } catch (error) {
         console.error('Error al cargar estadísticas:', error);
-        // No mostrar las estadísticas si hay error
         document.getElementById('statsContainer').style.display = 'none';
     }
 }
-        function mostrarLiquidaciones() {
+
+function mostrarLiquidaciones() {
             const container = document.getElementById('liquidacionesContainer');
 
             if (liquidaciones.length === 0) {
@@ -1033,7 +1042,12 @@ async function cargarEstadisticas(fechaInicio = null, fechaFin = null) {
                             <div class="resumen-item">
                                 <span class="resumen-label">💰 Movimientos</span>
                                 <span class="resumen-value">${liquidacion.totalMovimientos >= 0 ? '+' : ''}$${liquidacion.totalMovimientos.toLocaleString('es-CO')}</span>
-                            </div>
+                            
+                            <div class="resumen-item">
+    <span class="resumen-label">📱 Transferencias</span>
+    <span class="resumen-value positive">$${(liquidacion.totalTransferencias || 0).toLocaleString('es-CO')}</span>
+</div>    </div>
+
                         </div>
                         
                         <div class="caja-final-section">
@@ -1122,6 +1136,13 @@ async function cargarEstadisticas(fechaInicio = null, fechaFin = null) {
                         <span class="caja-final-label">💵 Caja Final</span>
                         <span class="caja-final-value">$${liquidacion.cajaFinal.toLocaleString('es-CO')}</span>
                     </div>
+
+
+                    <div class="resumen-item">
+    <span class="resumen-label">Transferencias</span>
+    <span class="resumen-value positive">$${(liquidacion.totalTransferencias || 0).toLocaleString('es-CO')}</span>
+</div>
+
                 </div>
 
                 ${liquidacion.ingresos.pedidos && liquidacion.ingresos.pedidos.length > 0 ? `

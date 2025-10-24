@@ -1110,64 +1110,89 @@ if (!response.ok) {
             }
         }
 
-        async function cargarMeseros() {
-            const token = localStorage.getItem('token');
-            
-            try {
-                const response = await fetch(`${API_URL}/admin-meseros/meseros/${currentUser._id}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+async function cargarMeseros() {
+    const token = localStorage.getItem('token');
+    const container = document.getElementById('meserosList');
+    
+    // Mostrar indicador de carga inmediatamente
+    container.innerHTML = `
+        <div class="empty-state">
+            <div class="empty-icon">⏳</div>
+            <p class="empty-text">Cargando meseros...</p>
+        </div>
+    `;
+    
+    try {
+        const response = await fetch(`${API_URL}/admin-meseros/meseros/${currentUser._id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
 
-                const data = await response.json();
+        const data = await response.json();
 
-                if (data.success) {
-                    mostrarMeseros(data.data);
-                    document.getElementById('meserosCount').textContent = data.count;
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
+        if (data.success) {
+            console.log(`✅ ${data.count} meseros cargados`);
+            mostrarMeseros(data.data);
+            document.getElementById('meserosCount').textContent = data.count;
+        } else {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">❌</div>
+                    <p class="empty-text">Error al cargar meseros</p>
+                </div>
+            `;
         }
+    } catch (error) {
+        console.error('Error:', error);
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">❌</div>
+                <p class="empty-text">Error de conexión. Recarga la página.</p>
+            </div>
+        `;
+    }
+}
 
-        function mostrarMeseros(meseros) {
-            const container = document.getElementById('meserosList');
-            
-            if (meseros.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">👥</div>
-                        <p class="empty-text">No has agregado meseros aún</p>
+function mostrarMeseros(meseros) {
+    const container = document.getElementById('meserosList');
+    
+    if (meseros.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">👥</div>
+                <p class="empty-text">No has agregado meseros aún</p>
+            </div>
+        `;
+        return;
+    }
+
+    // Usar template string más eficiente
+    const html = meseros.map(item => {
+        const inicial = item.mesero.nombre.charAt(0).toUpperCase();
+        return `
+            <div class="mesero-card">
+                <div class="mesero-card-content">
+                    <div class="mesero-info-wrapper">
+                        <div class="mesero-avatar">${inicial}</div>
+                        <div class="mesero-details">
+                            <h4>${item.mesero.nombre}</h4>
+                            <p>${item.mesero.email} • ${item.mesero.rol}</p>
+                        </div>
                     </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = meseros.map(item => `
-                <div class="mesero-card">
-                    <div class="mesero-card-content">
-                        <div class="mesero-info-wrapper">
-                            <div class="mesero-avatar">
-                                ${item.mesero.nombre.charAt(0).toUpperCase()}
-                            </div>
-                            <div class="mesero-details">
-                                <h4>${item.mesero.nombre}</h4>
-                                <p>${item.mesero.email} • ${item.mesero.rol}</p>
-                            </div>
-                        </div>
-                        <div class="mesero-actions">
-   
-                            <button class="btn-icon btn-icon-permissions" onclick="editMeseroPermisos('${item.relacionId}', '${item.mesero._id}')">
-                                🔐 Permisos
-                            </button>
-                            <button class="btn-icon btn-icon-delete" onclick="deleteMesero('${item.relacionId}', '${item.mesero.nombre}')">
-                                🗑️
-                            </button>
-                        </div>
+                    <div class="mesero-actions">
+                        <button class="btn-icon btn-icon-permissions" onclick="editMeseroPermisos('${item.relacionId}', '${item.mesero._id}')">
+                            🔐 Permisos
+                        </button>
+                        <button class="btn-icon btn-icon-delete" onclick="deleteMesero('${item.relacionId}', '${item.mesero.nombre}')">
+                            🗑️
+                        </button>
                     </div>
                 </div>
-            `).join('');
-        }
-
+            </div>
+        `;
+    }).join('');
+    
+    container.innerHTML = html;
+}
         function viewMeseroDetails(relacionId) {
             showAlert('Función de inspección en desarrollo', 'info');
         }

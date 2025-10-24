@@ -1006,35 +1006,43 @@
                 </button>
             </div>
 
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon blue">💵</div>
-                    <div class="stat-label">Caja Inicial</div>
-                    <div class="stat-value" id="cajaInicial">$0</div>
-                    <div class="stat-detail">De la última liquidación</div>
-                </div>
+    <div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon blue">💵</div>
+        <div class="stat-label">Caja Inicial</div>
+        <div class="stat-value" id="cajaInicial">$0</div>
+        <div class="stat-detail">De la última liquidación</div>
+    </div>
 
-                <div class="stat-card">
-                    <div class="stat-icon green">📈</div>
-                    <div class="stat-label">Total Ingresos</div>
-                    <div class="stat-value" id="totalIngresos">$0</div>
-                    <div class="stat-detail" id="cantidadPedidos">0 pedidos</div>
-                </div>
+    <div class="stat-card">
+        <div class="stat-icon green">📈</div>
+        <div class="stat-label">Total Ingresos</div>
+        <div class="stat-value" id="totalIngresos">$0</div>
+        <div class="stat-detail" id="cantidadPedidos">0 pedidos</div>
+    </div>
 
-                <div class="stat-card">
-                    <div class="stat-icon red">📉</div>
-                    <div class="stat-label">Total Egresos</div>
-                    <div class="stat-value" id="totalEgresos">$0</div>
-                    <div class="stat-detail" id="cantidadGastos">0 gastos</div>
-                </div>
+    <div class="stat-card">
+        <div class="stat-icon red">📉</div>
+        <div class="stat-label">Total Egresos</div>
+        <div class="stat-value" id="totalEgresos">$0</div>
+        <div class="stat-detail" id="cantidadGastos">0 gastos</div>
+    </div>
 
-                <div class="stat-card">
-                    <div class="stat-icon purple">💰</div>
-                    <div class="stat-label">Movimientos de Caja</div>
-                    <div class="stat-value" id="totalMovimientos">$0</div>
-                    <div class="stat-detail" id="cantidadMovimientos">0 movimientos</div>
-                </div>
-            </div>
+    <div class="stat-card">
+        <div class="stat-icon purple">💰</div>
+        <div class="stat-label">Movimientos de Caja</div>
+        <div class="stat-value" id="totalMovimientos">$0</div>
+        <div class="stat-detail" id="cantidadMovimientos">0 movimientos</div>
+    </div>
+
+    <!-- NUEVA TARJETA PARA TRANSFERENCIAS -->
+    <div class="stat-card">
+        <div class="stat-icon green">📱</div>
+        <div class="stat-label">Pagos Transferencia</div>
+        <div class="stat-value" id="totalTransferencias">$0</div>
+        <div class="stat-detail" id="cantidadTransferencias">0 pedidos</div>
+    </div>
+</div>
 
             <div class="card">
                 <div class="card-header">
@@ -1105,6 +1113,12 @@
                     <span class="resumen-label">💵 Caja Final:</span>
                     <span class="resumen-value" id="cajaFinal">$0</span>
                 </div>
+
+                <div class="resumen-row">
+    <span class="resumen-label">📱 Transferencias:</span>
+    <span class="resumen-value" id="resumenTransferencias">$0</span>
+</div>
+
                 <button class="btn-liquidar" onclick="realizarLiquidacion()">
                     ✅ Realizar Liquidación del Día
                 </button>
@@ -1276,50 +1290,72 @@ if (currentUser.rol === 'admin') {
             }
         }
 
-        async function cargarDatosPendientes() {
-            const token = localStorage.getItem('token');
-            try {
-                const response = await fetch(
-                    `${API_URL}/liquidaciones/pendientes?userId=${currentUser._id}`,
-                    { headers: { 'Authorization': `Bearer ${token}` } }
-                );
-                const data = await response.json();
+async function cargarDatosPendientes() {
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch(
+            `${API_URL}/liquidaciones/pendientes?userId=${currentUser._id}`,
+            { headers: { 'Authorization': `Bearer ${token}` } }
+        );
+        const data = await response.json();
 
-                if (data.success) {
-                    datosPendientes = data.data;
-                    mostrarPedidos();
-                    mostrarGastos();
-                }
-            } catch (error) {
-                console.error('Error al cargar datos pendientes:', error);
-            }
-        }
-
-        function mostrarPedidos() {
-            const lista = document.getElementById('listaPedidos');
+        if (data.success) {
+            datosPendientes = data.data;
             
-            if (datosPendientes.pedidos.length === 0) {
-                lista.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">📋</div>
-                        <p>No hay pedidos pendientes de liquidar</p>
-                    </div>
-                `;
-                return;
+            // Calcular transferencias (filtra pedidos con estado diferente de cancelado)
+            const pedidosTransferencia = datosPendientes.pedidos.filter(p => 
+                p.estado !== 'cancelado' && p.metodoPago === 'transferencia'
+            );
+            const totalTransferencias = pedidosTransferencia.reduce((sum, p) => sum + p.total, 0);
+            
+            // Actualizar UI de transferencias
+            const elemTransferencias = document.getElementById('totalTransferencias');
+            const elemCantTransferencias = document.getElementById('cantidadTransferencias');
+            
+            if (elemTransferencias) {
+                elemTransferencias.textContent = `$${totalTransferencias.toLocaleString('es-CO')}`;
             }
-
-            lista.innerHTML = datosPendientes.pedidos.map(pedido => `
-                <div class="item-row">
-                    <div class="item-info">
-                        <h4>Pedido #${pedido._id.slice(-6).toUpperCase()} - Mesa ${pedido.mesa}</h4>
-                        <p>${new Date(pedido.createdAt).toLocaleString('es-CO')} | 
-                           ${pedido.items.length} producto(s)</p>
-                    </div>
-                    <div class="item-value">${pedido.total.toLocaleString('es-CO')}</div>
-                </div>
-            `).join('');
+            if (elemCantTransferencias) {
+                elemCantTransferencias.textContent = `${pedidosTransferencia.length} pedidos`;
+            }
+            
+            mostrarPedidos();
+            mostrarGastos();
         }
+    } catch (error) {
+        console.error('Error al cargar datos pendientes:', error);
+    }
+}
 
+function mostrarPedidos() {
+    const lista = document.getElementById('listaPedidos');
+    
+    if (datosPendientes.pedidos.length === 0) {
+        lista.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">📋</div>
+                <p>No hay pedidos pendientes de liquidar</p>
+            </div>
+        `;
+        return;
+    }
+
+    lista.innerHTML = datosPendientes.pedidos.map(pedido => `
+        <div class="item-row">
+            <div class="item-info">
+                <h4>
+                    Pedido #${pedido._id.slice(-6).toUpperCase()} - Mesa ${pedido.mesa}
+                    ${pedido.metodoPago === 'transferencia' ? 
+                        '<span style="display: inline-block; margin-left: 8px; padding: 4px 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 6px; font-size: 11px; font-weight: 700;">📱 TRANSFERENCIA</span>' 
+                        : ''}
+                </h4>
+                <p>${new Date(pedido.createdAt).toLocaleString('es-CO')} | 
+                   ${pedido.items.length} producto(s)${pedido.metodoPago ? ` | ${pedido.metodoPago === 'transferencia' ? '📱 Transferencia' : '💵 Efectivo'}` : ''}</p>
+            </div>
+            <div class="item-value">$${pedido.total.toLocaleString('es-CO')}</div>
+        </div>
+    `).join('');
+}
         function mostrarGastos() {
             const lista = document.getElementById('listaGastos');
             
@@ -1352,43 +1388,51 @@ if (currentUser.rol === 'admin') {
             icon.textContent = lista.classList.contains('active') ? '▼' : '▶';
         }
 
-        function actualizarResumen() {
-            const totalIngresos = datosPendientes.totalPedidos;
-            const totalEgresos = datosPendientes.totalGastos;
-            const totalMovimientos = movimientosCaja.reduce((sum, mov) => {
-                return mov.tipo === 'ingreso' ? sum + mov.monto : sum - mov.monto;
-            }, 0);
-            const cajaFinal = cajaInicialValue + totalIngresos - totalEgresos + totalMovimientos;
+function actualizarResumen() {
+    const totalIngresos = datosPendientes.totalPedidos;
+    const totalEgresos = datosPendientes.totalGastos;
+    const totalMovimientos = movimientosCaja.reduce((sum, mov) => {
+        return mov.tipo === 'ingreso' ? sum + mov.monto : sum - mov.monto;
+    }, 0);
+    
+    // Calcular transferencias
+    const pedidosTransferencia = datosPendientes.pedidos.filter(p => 
+        p.estado !== 'cancelado' && p.metodoPago === 'transferencia'
+    );
+    const totalTransferencias = pedidosTransferencia.reduce((sum, p) => sum + p.total, 0);
+    
+    const cajaFinal = cajaInicialValue + totalIngresos - totalEgresos + totalMovimientos;
 
-            // Actualizar tarjetas
-            document.getElementById('totalIngresos').textContent = 
-                `${totalIngresos.toLocaleString('es-CO')}`;
-            document.getElementById('cantidadPedidos').textContent = 
-                `${datosPendientes.pedidos.length} pedidos`;
-            
-            document.getElementById('totalEgresos').textContent = 
-                `${totalEgresos.toLocaleString('es-CO')}`;
-            document.getElementById('cantidadGastos').textContent = 
-                `${datosPendientes.gastos.length} gastos`;
-            
-            document.getElementById('totalMovimientos').textContent = 
-                `${totalMovimientos.toLocaleString('es-CO')}`;
-            document.getElementById('cantidadMovimientos').textContent = 
-                `${movimientosCaja.length} movimientos`;
+    // Actualizar tarjetas
+    document.getElementById('totalIngresos').textContent = 
+        `${totalIngresos.toLocaleString('es-CO')}`;
+    document.getElementById('cantidadPedidos').textContent = 
+        `${datosPendientes.pedidos.length} pedidos`;
+    
+    document.getElementById('totalEgresos').textContent = 
+        `${totalEgresos.toLocaleString('es-CO')}`;
+    document.getElementById('cantidadGastos').textContent = 
+        `${datosPendientes.gastos.length} gastos`;
+    
+    document.getElementById('totalMovimientos').textContent = 
+        `${totalMovimientos.toLocaleString('es-CO')}`;
+    document.getElementById('cantidadMovimientos').textContent = 
+        `${movimientosCaja.length} movimientos`;
 
-            // Actualizar resumen final
-            document.getElementById('resumenCajaInicial').textContent = 
-                `${cajaInicialValue.toLocaleString('es-CO')}`;
-            document.getElementById('resumenIngresos').textContent = 
-                `${totalIngresos.toLocaleString('es-CO')}`;
-            document.getElementById('resumenEgresos').textContent = 
-                `${totalEgresos.toLocaleString('es-CO')}`;
-            document.getElementById('resumenMovimientos').textContent = 
-                `${totalMovimientos.toLocaleString('es-CO')}`;
-            document.getElementById('cajaFinal').textContent = 
-                `${cajaFinal.toLocaleString('es-CO')}`;
-        }
-
+    // Actualizar resumen final
+    document.getElementById('resumenCajaInicial').textContent = 
+        `${cajaInicialValue.toLocaleString('es-CO')}`;
+    document.getElementById('resumenIngresos').textContent = 
+        `${totalIngresos.toLocaleString('es-CO')}`;
+    document.getElementById('resumenEgresos').textContent = 
+        `${totalEgresos.toLocaleString('es-CO')}`;
+    document.getElementById('resumenMovimientos').textContent = 
+        `${totalMovimientos.toLocaleString('es-CO')}`;
+    document.getElementById('resumenTransferencias').textContent = 
+        `${totalTransferencias.toLocaleString('es-CO')}`;
+    document.getElementById('cajaFinal').textContent = 
+        `${cajaFinal.toLocaleString('es-CO')}`;
+}
         function openControlCajaModal() {
             document.getElementById('modalControlCaja').classList.add('active');
         }
@@ -1445,6 +1489,7 @@ function mostrarMovimientos() {
         </div>
     `).join('');
 }
+
 function realizarLiquidacion() {
     // ELIMINAR LA VALIDACIÓN - permitir liquidar siempre
     document.getElementById('modalObservaciones').classList.add('active');

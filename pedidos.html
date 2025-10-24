@@ -1299,12 +1299,16 @@ function displayOrders(orders) {
             return actions;
         }
 
-let currentOrderIdForPayment = null;
+
+        let currentOrderIdForPayment = null;
 
 async function updateOrderStatus(orderId, newStatus) {
+    console.log('🔄 updateOrderStatus llamado con:', { orderId, newStatus });
+    
     // Si el nuevo estado es "entregado", mostrar modal de método de pago
     if (newStatus === 'entregado') {
         currentOrderIdForPayment = orderId;
+        console.log('💾 Guardado orderId para pago:', currentOrderIdForPayment);
         mostrarModalMetodoPago();
         return;
     }
@@ -1313,30 +1317,69 @@ async function updateOrderStatus(orderId, newStatus) {
     await actualizarEstadoPedido(orderId, newStatus, null);
 }
 
+
 function mostrarModalMetodoPago() {
+    console.log('🪟 Mostrando modal con orderId:', currentOrderIdForPayment);
     const modal = document.getElementById('modalMetodoPago');
+    if (!modal) {
+        console.error('❌ Modal no encontrado en el DOM');
+        return;
+    }
     modal.style.display = 'flex';
 }
 
 function cerrarModalMetodoPago() {
+    console.log('🚪 Cerrando modal');
     const modal = document.getElementById('modalMetodoPago');
     modal.style.display = 'none';
-    currentOrderIdForPayment = null;
+    // NO limpiar aquí - se limpiará después de actualizar
 }
 
 async function confirmarMetodoPago(metodoPago) {
-    cerrarModalMetodoPago();
-    await actualizarEstadoPedido(currentOrderIdForPayment, 'entregado', metodoPago);
+    console.log('✅ Método de pago confirmado:', metodoPago);
+    console.log('📦 Order ID actual:', currentOrderIdForPayment);
+    
+    if (!currentOrderIdForPayment) {
+        console.error('❌ No hay orderId guardado');
+        alert('Error: No se encontró el ID del pedido');
+        return;
+    }
+    
+    // Guardar el ID en una variable temporal ANTES de cerrar el modal
+    const orderIdTemp = currentOrderIdForPayment;
+    
+    // Cerrar el modal
+    const modal = document.getElementById('modalMetodoPago');
+    modal.style.display = 'none';
+    
+    // Limpiar la variable
+    currentOrderIdForPayment = null;
+    
+    // Usar la variable temporal para actualizar
+    await actualizarEstadoPedido(orderIdTemp, 'entregado', metodoPago);
 }
-
 async function actualizarEstadoPedido(orderId, newStatus, metodoPago) {
     const token = localStorage.getItem('token');
+
+    console.log('📤 Enviando petición:');
+    console.log('  - Order ID:', orderId);
+    console.log('  - Estado:', newStatus);
+    console.log('  - Método de pago:', metodoPago);
+
+    if (!orderId || orderId === 'null' || orderId === 'undefined') {
+        console.error('❌ Order ID inválido:', orderId);
+        alert('Error: ID de pedido inválido');
+        return;
+    }
 
     try {
         const body = { estado: newStatus };
         if (metodoPago) {
             body.metodoPago = metodoPago;
         }
+
+        console.log('  - Body:', JSON.stringify(body, null, 2));
+        console.log('  - URL:', `${API_URL}/orders/${orderId}/estado`);
 
         const response = await fetch(`${API_URL}/orders/${orderId}/estado`, {
             method: 'PATCH',
@@ -1347,39 +1390,119 @@ async function actualizarEstadoPedido(orderId, newStatus, metodoPago) {
             body: JSON.stringify(body)
         });
 
+        console.log('📥 Respuesta del servidor:');
+        console.log('  - Status:', response.status);
+        console.log('  - Status Text:', response.statusText);
+
         const data = await response.json();
+        console.log('  - Data:', data);
 
         if (data.success) {
+            console.log('✅ Pedido actualizado correctamente');
             await loadOrders();
         } else {
+            console.error('❌ Error del servidor:', data.message);
             alert('Error: ' + data.message);
         }
     } catch (error) {
-        console.error('Error:', error);
-        alert('Error al actualizar el estado');
+        console.error('❌ Error en la petición:', error);
+        alert('Error al actualizar el estado: ' + error.message);
     }
 }
 
-        async function cancelOrder(orderId) {
-            if (!confirm('¿Está seguro de cancelar este pedido?')) return;
-            await updateOrderStatus(orderId, 'cancelado');
-        }
+async function cancelOrder(orderId) {
+    if (!confirm('¿Está seguro de cancelar este pedido?')) return;
+    await actualizarEstadoPedido(orderId, 'cancelado', null);
+}
 
-        function toggleMenu() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
+function toggleMenu() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    
+    sidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
+}
+
+function logout() {
+    if (confirm('¿Cerrar sesión?')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('usuario');
+        window.location.href = 'index.html';
+    }
+}
+
+
+// ========================
+// SISTEMA DE TIEMPO REAL PARA PEDIDOS
+// ========================
+
+let lastOrderCountPedidos = 0;
+let isFirstLoadPedidos = true;
+let pollingIntervalPedidos = null;
+
+const notificationSoundPedidos = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGmi/7OSfTRAMUKvj8LJgGgU7k9XxxncpBSh+zPLaizsKGGS56+mjUhELTKXh8bllHAU2jdTxxnkqBSh+zPPaizsKGGS56+mjUhELTKXh8bllHAU2jdTxxnkqBSh+zPPaizsKGGS56+mjUhELTKXh8bllHAU2jdTxxnkqBSh+zPPaizsKGGS56+mjUhELTKXh8bllHAU2jdTxxnkqBSh+zPPaizsKGGS56+mjUhELTKXh8bllHAU2jdTxxnkqBQ==');
+
+function playNotificationSoundPedidos() {
+    notificationSoundPedidos.play().catch(e => console.log('No se pudo reproducir el sonido:', e));
+}
+
+async function autoRefreshOrdersPedidos() {
+    const token = localStorage.getItem('token');
+    const estado = document.getElementById('filterEstado').value;
+    
+    let url = `${API_URL}/orders?userId=${currentUser._id}`;
+    if (estado) url += `&estado=${estado}`;
+    
+    try {
+        const response = await fetch(url, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            const newOrders = data.data;
             
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-        }
-
-        function logout() {
-            if (confirm('¿Cerrar sesión?')) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('usuario');
-                window.location.href = 'index.html';
+            // Detectar cambios en los pedidos existentes
+            const currentOrdersString = JSON.stringify(newOrders.map(o => ({ id: o._id, estado: o.estado })));
+            const previousOrdersString = JSON.stringify((window.previousOrders || []).map(o => ({ id: o._id, estado: o.estado })));
+            
+            // Si hay cambios, actualizar
+            if (currentOrdersString !== previousOrdersString) {
+                displayOrders(newOrders);
+                document.getElementById('orderCount').textContent = data.count;
+                
+                // Detectar nuevo pedido
+                if (!isFirstLoadPedidos && newOrders.length > lastOrderCountPedidos) {
+                    playNotificationSoundPedidos();
+                }
             }
+            
+            window.previousOrders = newOrders;
+            lastOrderCountPedidos = newOrders.length;
+            isFirstLoadPedidos = false;
         }
+    } catch (error) {
+        console.error('Error en auto-refresh pedidos:', error);
+    }
+}
+
+// Iniciar polling cuando currentUser esté listo
+const waitForUserPedidos = setInterval(() => {
+    if (currentUser && currentUser._id) {
+        clearInterval(waitForUserPedidos);
+        pollingIntervalPedidos = setInterval(autoRefreshOrdersPedidos, 3000);
+        console.log('✅ Sistema de tiempo real activado en Pedidos');
+    }
+}, 100);
+
+window.addEventListener('beforeunload', () => {
+    if (pollingIntervalPedidos) {
+        clearInterval(pollingIntervalPedidos);
+    }
+});
+
+
     </script>
 
 <!-- Modal para método de pago -->

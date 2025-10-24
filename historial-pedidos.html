@@ -823,14 +823,15 @@
                 <div class="filters-grid">
                     <div class="filter-group">
                         <label class="filter-label">Estado</label>
-                        <select id="filterEstado" class="filter-select" onchange="applyFilters()">
-                            <option value="">Todos los estados</option>
-                            <option value="pendiente">Pendientes</option>
-                            <option value="preparando">Preparando</option>
-                            <option value="listo">Listos</option>
-                            <option value="entregado">Entregados</option>
-                            <option value="cancelado">Cancelados</option>
-                        </select>
+<select id="filterEstado" class="filter-select" onchange="applyFilters()">
+    <option value="">Todos los estados</option>
+    <option value="activos">📋 Activos (sin entregados)</option>
+    <option value="pendiente">Pendientes</option>
+    <option value="preparando">Preparando</option>
+    <option value="listo">Listos</option>
+    <option value="entregado">Entregados</option>
+    <option value="cancelado">Cancelados</option>
+</select>
                     </div>
                     <div class="filter-group">
                         <label class="filter-label">Mesa</label>
@@ -868,84 +869,237 @@
         </div>
     </div>
 
-    <script>
-        const API_URL = 'https://restaurante-co77.onrender.com/api';
-        let currentUser = null;
-        let allOrders = [];
-        let filteredOrders = [];
+<script>
 
-        window.addEventListener('DOMContentLoaded', async () => {
-            const token = localStorage.getItem('token');
-            if (!token) {
+
+// ========================
+// ACTIVACIÓN DE AUDIO PARA iOS
+// ========================
+
+let audioContextReady = false;
+let audioContext = null;
+let audioUnlocked = false;
+
+// Inicializar AudioContext
+function initAudioContext() {
+    if (!audioContextReady) {
+        try {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            audioContextReady = true;
+        } catch (e) {
+            console.error('No se pudo crear AudioContext:', e);
+        }
+    }
+}
+
+// Desbloquear audio en iOS (requiere interacción directa)
+function unlockAudioIOS() {
+    if (audioUnlocked) return;
+    
+    initAudioContext();
+    
+    if (!audioContext) return;
+    
+    // Crear y reproducir un buffer silencioso
+    const buffer = audioContext.createBuffer(1, 1, 22050);
+    const source = audioContext.createBufferSource();
+    source.buffer = buffer;
+    source.connect(audioContext.destination);
+    source.start(0);
+    
+    // Reanudar el contexto si está suspendido (Safari iOS)
+    if (audioContext.state === 'suspended') {
+        audioContext.resume();
+    }
+    
+    audioUnlocked = true;
+    console.log('🔊 Audio desbloqueado para iOS - Estado:', audioContext.state);
+    
+    // Mostrar confirmación visual
+    mostrarMensajeAudioListo();
+}
+
+function mostrarMensajeAudioListo() {
+    const mensaje = document.createElement('div');
+    mensaje.innerHTML = '🔔 Notificaciones de audio activadas';
+    mensaje.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+        z-index: 10000;
+        animation: slideInRight 0.3s ease-out;
+    `;
+    document.body.appendChild(mensaje);
+    
+    setTimeout(() => {
+        mensaje.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => mensaje.remove(), 300);
+    }, 3000);
+}
+
+// Activar con CUALQUIER interacción
+document.addEventListener('click', unlockAudioIOS, { once: false });
+document.addEventListener('touchstart', unlockAudioIOS, { once: false });
+document.addEventListener('touchend', unlockAudioIOS, { once: false });
+
+// Función mejorada para reproducir sonido "JC"
+function playNotificationSound() {
+    // Intentar desbloquear si no está listo
+    if (!audioUnlocked || !audioContext) {
+        console.warn('⚠️ Audio no desbloqueado aún');
+        unlockAudioIOS();
+        return;
+    }
+    
+    // Reanudar contexto si está suspendido
+    if (audioContext.state === 'suspended') {
+        audioContext.resume().then(() => {
+            reproducirSonidoJC();
+        });
+    } else {
+        reproducirSonidoJC();
+    }
+}
+
+function reproducirSonidoJC() {
+    try {
+        const currentTime = audioContext.currentTime;
+        
+        // Crear osciladores para simular "JC"
+        function playTone(frequency, startTime, duration, type = 'sine', volume = 0.3) {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = type;
+            
+            // Envolvente para suavizar el sonido
+            gainNode.gain.setValueAtTime(0, currentTime + startTime);
+            gainNode.gain.linearRampToValueAtTime(volume, currentTime + startTime + 0.05);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, currentTime + startTime + duration);
+            
+            oscillator.start(currentTime + startTime);
+            oscillator.stop(currentTime + startTime + duration);
+        }
+        
+        // Sonido "J" (sonido corto y agudo)
+        playTone(880, 0, 0.2, 'square', 0.4);
+        playTone(1320, 0, 0.2, 'sine', 0.3);
+        
+        // Sonido "C" (sonido más grave y resonante)
+        playTone(523, 0.25, 0.35, 'triangle', 0.4);
+        playTone(659, 0.25, 0.35, 'sine', 0.3);
+        
+        // Eco suave
+        playTone(440, 0.45, 0.25, 'sine', 0.2);
+        
+        console.log('🔊 Sonido "JC" reproducido - Estado:', audioContext.state);
+    } catch (error) {
+        console.error('❌ Error al reproducir sonido:', error);
+    }
+}
+    const API_URL = 'https://restaurante-co77.onrender.com/api';
+    let currentUser = null;
+    let allOrders = [];
+    let filteredOrders = [];
+    let currentOrderIdForPayment = null;
+
+    window.addEventListener('DOMContentLoaded', async () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = 'index.html';
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/auth/me`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.status === 401) {
+                console.warn('⚠️ Token expirado');
+                localStorage.removeItem('token');
                 window.location.href = 'index.html';
                 return;
             }
 
-            try {
-                const response = await fetch(`${API_URL}/auth/me`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+            if (!response.ok) {
+                console.error('Error al cargar usuario');
+                alert('Error al cargar datos. Intente recargar.');
+                return;
+            }
+            
+            const data = await response.json();
+            currentUser = data.data;
+            
+            if (currentUser.id && !currentUser._id) {
+                currentUser._id = currentUser.id;
+            }
 
-if (response.status === 401) {
-    console.warn('⚠️ Token expirado');
-    localStorage.removeItem('token');
-    window.location.href = 'index.html';
-    return;
-}
+            document.getElementById('sidebarUserName').textContent = currentUser.nombre;
+            document.getElementById('sidebarUserAvatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
 
-if (!response.ok) {
-    console.error('Error al cargar usuario');
-    alert('Error al cargar datos. Intente recargar.');
-    return;
-}
-                const data = await response.json();
-                currentUser = data.data;
-                
-                if (currentUser.id && !currentUser._id) {
-                    currentUser._id = currentUser.id;
-                }
+            if (currentUser.rol === 'admin') {
+                document.getElementById('adminSection').style.display = 'block';
+            }
+            
+            setDefaultDates();
+            await loadOrders();
+        } catch (error) {
+            console.error('❌ Error de red:', error);
+            alert('Error de conexión. Recargue la página.');
+        }
+    });
 
-                document.getElementById('sidebarUserName').textContent = currentUser.nombre;
-                document.getElementById('sidebarUserAvatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
-
-                // MOSTRAR SECCIÓN DE ADMIN SOLO SI ES ADMINISTRADOR
-if (currentUser.rol === 'admin') {
-    document.getElementById('adminSection').style.display = 'block';
-}
-                
-                setDefaultDates();
-                await loadOrders();
-            } catch (error) {
-    console.error('❌ Error de red:', error);
-    alert('Error de conexión. Recargue la página.');
-}
+    function setDefaultDates() {
+        document.getElementById('filterFechaHasta').value = '';
+        document.getElementById('filterFechaDesde').value = '';
+        console.log('📅 Filtros de fecha vacíos - Mostrando todos los pedidos');
+    }
+async function loadOrders() {
+    const token = localStorage.getItem('token');
+    
+    // Mostrar indicador de carga
+    const grid = document.getElementById('ordersGrid');
+    grid.innerHTML = `
+        <div class="empty-state">
+            <div class="empty-icon">⏳</div>
+            <p>Cargando pedidos...</p>
+        </div>
+    `;
+    
+    try {
+        const response = await fetch(`${API_URL}/orders?userId=${currentUser._id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
 
-function setDefaultDates() {
-    // Dejar los campos de fecha vacíos por defecto
-    document.getElementById('filterFechaHasta').value = '';
-    document.getElementById('filterFechaDesde').value = '';
-    
-    console.log('📅 Filtros de fecha vacíos - Mostrando todos los pedidos');
-}
-
-        async function loadOrders() {
-            const token = localStorage.getItem('token');
-            try {
-                const response = await fetch(`${API_URL}/orders?userId=${currentUser._id}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                const data = await response.json();
-                
-                if (data.success) {
-                    allOrders = data.data;
-                    applyFilters();
-                }
-            } catch (error) {
-                console.error('Error al cargar pedidos:', error);
-            }
+        const data = await response.json();
+        
+        if (data.success) {
+            allOrders = data.data;
+            console.log(`✅ ${allOrders.length} pedidos cargados`);
+            applyFilters();
         }
+    } catch (error) {
+        console.error('Error al cargar pedidos:', error);
+        grid.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">❌</div>
+                <p>Error al cargar pedidos. Por favor, recarga la página.</p>
+            </div>
+        `;
+    }
+}
 
 function applyFilters() {
     const estado = document.getElementById('filterEstado').value;
@@ -954,67 +1108,64 @@ function applyFilters() {
     const fechaHasta = document.getElementById('filterFechaHasta').value;
     const search = document.getElementById('filterSearch').value.toLowerCase();
 
-    console.log('🔍 Aplicando filtros:');
-    console.log('  - Estado:', estado || 'Todos');
-    console.log('  - Mesa:', mesa || 'Todas');
-    console.log('  - Fecha desde:', fechaDesde || 'Sin filtro');
-    console.log('  - Fecha hasta:', fechaHasta || 'Sin filtro');
-    console.log('  - Búsqueda:', search || 'Sin búsqueda');
+    // Filtrado optimizado
+    filteredOrders = allOrders.filter(order => {
+        // Filtro de estado especial: "activos" = todo menos entregados
+        if (estado === 'activos') {
+            if (order.estado === 'entregado') return false;
+        } else if (estado) {
+            // Filtro normal de estado
+            if (order.estado !== estado) return false;
+        }
+        
+        // Filtro de mesa
+        if (mesa && order.mesa !== parseInt(mesa)) return false;
 
-            filteredOrders = allOrders.filter(order => {
-                const estadoMatch = !estado || order.estado === estado;
-                const mesaMatch = !mesa || order.mesa === parseInt(mesa);
+        // Filtro de fecha
+        if (fechaDesde || fechaHasta) {
+            const orderDate = new Date(order.createdAt);
+            
+            if (fechaDesde) {
+                const desde = new Date(fechaDesde + 'T00:00:00');
+                if (orderDate < desde) return false;
+            }
+            
+            if (fechaHasta) {
+                const hasta = new Date(fechaHasta + 'T23:59:59.999');
+                if (orderDate > hasta) return false;
+            }
+        }
 
-// Filtro de fechas mejorado
-let fechaMatch = true;
-if (fechaDesde || fechaHasta) {
-    const orderDate = new Date(order.createdAt);
-    
-    if (fechaDesde) {
-        const desde = new Date(fechaDesde + 'T00:00:00');
-        if (orderDate < desde) fechaMatch = false;
-    }
-    
-    if (fechaHasta) {
-        const hasta = new Date(fechaHasta + 'T23:59:59.999');
-        if (orderDate > hasta) fechaMatch = false;
-    }
+        // Filtro de búsqueda
+        if (search) {
+            const notasMatch = order.notas?.toLowerCase().includes(search);
+            const productMatch = order.items.some(item => 
+                item.producto?.nombre?.toLowerCase().includes(search)
+            );
+            if (!notasMatch && !productMatch) return false;
+        }
+
+        return true;
+    });
+
+    updateStatistics();
+    displayOrders();
+}
+function updateStatistics() {
+    const total = filteredOrders.length;
+    const pendientes = filteredOrders.filter(o => o.estado === 'pendiente').length;
+    const preparando = filteredOrders.filter(o => o.estado === 'preparando').length;
+    const completados = filteredOrders.filter(o => o.estado === 'entregado').length;
+    const cancelados = filteredOrders.filter(o => o.estado === 'cancelado').length;
+
+    document.getElementById('statTotal').textContent = total;
+    document.getElementById('statPendientes').textContent = pendientes;
+    document.getElementById('statPreparando').textContent = preparando;
+    document.getElementById('statCompletados').textContent = completados;
+    document.getElementById('statCancelados').textContent = cancelados;
+    document.getElementById('orderCount').textContent = total;
 }
 
-                let searchMatch = true;
-                if (search) {
-                    const notasMatch = order.notas?.toLowerCase().includes(search);
-                    const productMatch = order.items.some(item => 
-                        item.producto?.nombre?.toLowerCase().includes(search)
-                    );
-                    searchMatch = notasMatch || productMatch;
-                }
-
-                return estadoMatch && mesaMatch && fechaMatch && searchMatch;
-            });
-
-            updateStatistics();
-            displayOrders();
-        }
-
-        function updateStatistics() {
-            const total = filteredOrders.length;
-            const pendientes = filteredOrders.filter(o => o.estado === 'pendiente').length;
-            const preparando = filteredOrders.filter(o => o.estado === 'preparando').length;
-            const completados = filteredOrders.filter(o => o.estado === 'entregado').length;
-            const cancelados = filteredOrders.filter(o => o.estado === 'cancelado').length;
-
-            document.getElementById('statTotal').textContent = total;
-            document.getElementById('statPendientes').textContent = pendientes;
-            document.getElementById('statPreparando').textContent = preparando;
-            document.getElementById('statCompletados').textContent = completados;
-            document.getElementById('statCancelados').textContent = cancelados;
-            document.getElementById('orderCount').textContent = total;
-        }
-
-// Agregar las mismas funciones del modal que en pedidos.html
-
-// Actualizar displayOrders para mostrar método de pago
 function displayOrders() {
     const grid = document.getElementById('ordersGrid');
     
@@ -1028,206 +1179,485 @@ function displayOrders() {
         return;
     }
 
-    grid.innerHTML = filteredOrders.map(order => `
-        <div class="order-card">
-            <div class="order-header">
-                <div class="order-info">
-                    <h3>Mesa ${order.mesa}</h3>
-                    <div class="order-meta">
-                        <div class="meta-row">
-                            <span class="meta-icon">📅</span>
-                            <span>${new Date(order.createdAt).toLocaleDateString('es-CO', {
-                                day: '2-digit',
-                                month: 'long',
-                                year: 'numeric'
-                            })}</span>
+    // Usar DocumentFragment para mejor rendimiento
+    const fragment = document.createDocumentFragment();
+    const tempDiv = document.createElement('div');
+    
+    tempDiv.innerHTML = filteredOrders.map(order => {
+        const fecha = new Date(order.createdAt);
+        const fechaStr = fecha.toLocaleDateString('es-CO', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        });
+        const horaStr = fecha.toLocaleTimeString('es-CO', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        return `
+            <div class="order-card">
+                <div class="order-header">
+                    <div class="order-info">
+                        <h3>Mesa ${order.mesa}</h3>
+                        <div class="order-meta">
+                            <div class="meta-row">
+                                <span class="meta-icon">📅</span>
+                                <span>${fechaStr}</span>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-icon">🕐</span>
+                                <span>${horaStr}</span>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-icon">🔖</span>
+                                <span>#${order._id.slice(-6).toUpperCase()}</span>
+                            </div>
+                            ${order.metodoPago ? `
+                            <div class="meta-row">
+                                <span class="meta-icon">💳</span>
+                                <span style="font-weight: 600; color: ${order.metodoPago === 'transferencia' ? '#667eea' : '#48bb78'};">${order.metodoPago === 'transferencia' ? 'Transferencia' : 'Efectivo'}</span>
+                            </div>
+                            ` : ''}
                         </div>
-                        <div class="meta-row">
-                            <span class="meta-icon">🕐</span>
-                            <span>${new Date(order.createdAt).toLocaleTimeString('es-CO', {
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            })}</span>
-                        </div>
-                        <div class="meta-row">
-                            <span class="meta-icon">📖</span>
-                            <span>#${order._id.slice(-6).toUpperCase()}</span>
-                        </div>
-                        ${order.metodoPago ? `
-                        <div class="meta-row">
-                            <span class="meta-icon">💳</span>
-                            <span style="font-weight: 600; color: ${order.metodoPago === 'transferencia' ? '#667eea' : '#48bb78'};">${order.metodoPago === 'transferencia' ? 'Transferencia' : 'Efectivo'}</span>
-                        </div>
-                        ` : ''}
                     </div>
+                    <span class="status-badge status-${order.estado}">${order.estado}</span>
                 </div>
-                <span class="status-badge status-${order.estado}">${order.estado}</span>
+                <div class="order-items">
+                    ${order.items.map(item => `
+                        <div class="order-item">
+                            <span class="item-name">${item.producto.nombre}</span>
+                            <span class="item-qty">x${item.cantidad}</span>
+                            <span>${(item.precio * item.cantidad).toLocaleString('es-CO')}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                ${order.notas ? `
+                <div class="order-notes">
+                    <p>📝 ${order.notas}</p>
+                </div>
+                ` : ''}
+                <div class="order-total">
+                    <span>Total:</span>
+                    <span>${order.total.toLocaleString('es-CO')}</span>
+                </div>
+                ${getOrderActions(order)}
             </div>
-            <div class="order-items">
-                ${order.items.map(item => `
-                    <div class="order-item">
-                        <span class="item-name">${item.producto.nombre}</span>
-                        <span class="item-qty">x${item.cantidad}</span>
-                        <span>${(item.precio * item.cantidad).toLocaleString('es-CO')}</span>
-                    </div>
-                `).join('')}
-            </div>
-            ${order.notas ? `
-            <div class="order-notes">
-                <p>📝 ${order.notas}</p>
-            </div>
-            ` : ''}
-            <div class="order-total">
-                <span>Total:</span>
-                <span>${order.total.toLocaleString('es-CO')}</span>
-            </div>
-            ${getOrderActions(order)}
-        </div>
-    `).join('');
+        `;
+    }).join('');
+    
+    grid.innerHTML = '';
+    grid.appendChild(tempDiv);
 }
-        function getOrderActions(order) {
-            let actions = '<div class="order-actions">';
-            
-            if (order.estado === 'pendiente') {
-                actions += `<button class="btn-action btn-preparar" onclick="updateOrderStatus('${order._id}', 'preparando')">👨‍🍳 Preparar</button>`;
-                actions += `<button class="btn-action btn-cancelar" onclick="cancelOrder('${order._id}')">❌ Cancelar</button>`;
-            }
-            
-            if (order.estado === 'preparando') {
-                actions += `<button class="btn-action btn-listo" onclick="updateOrderStatus('${order._id}', 'listo')">✅ Listo</button>`;
-                actions += `<button class="btn-action btn-cancelar" onclick="cancelOrder('${order._id}')">❌ Cancelar</button>`;
-            }
-            
-            if (order.estado === 'listo') {
-                actions += `<button class="btn-action btn-entregar" onclick="updateOrderStatus('${order._id}', 'entregado')">🍽️ Entregar</button>`;
-                actions += `<button class="btn-action btn-cancelar" onclick="cancelOrder('${order._id}')">❌ Cancelar</button>`;
-            }
-            
-            if (order.estado === 'entregado') {
-                actions += `<button class="btn-action btn-eliminar" onclick="deleteOrder('${order._id}')">🗑️ Eliminar</button>`;
-            }
-            
-            if (order.estado === 'cancelado') {
-                actions += `<button class="btn-action btn-reabrir" onclick="updateOrderStatus('${order._id}', 'pendiente')">🔄 Reabrir</button>`;
-                actions += `<button class="btn-action btn-eliminar" onclick="deleteOrder('${order._id}')">🗑️ Eliminar</button>`;
-            }
-            
-            actions += '</div>';
-            return actions;
+    function getOrderActions(order) {
+        let actions = '<div class="order-actions">';
+        
+        if (order.estado === 'pendiente') {
+            actions += `<button class="btn-action btn-preparar" onclick="updateOrderStatus('${order._id}', 'preparando')">👨‍🍳 Preparar</button>`;
+            actions += `<button class="btn-action btn-cancelar" onclick="cancelOrder('${order._id}')">❌ Cancelar</button>`;
+        }
+        
+        if (order.estado === 'preparando') {
+            actions += `<button class="btn-action btn-listo" onclick="updateOrderStatus('${order._id}', 'listo')">✅ Listo</button>`;
+            actions += `<button class="btn-action btn-cancelar" onclick="cancelOrder('${order._id}')">❌ Cancelar</button>`;
+        }
+        
+        if (order.estado === 'listo') {
+            actions += `<button class="btn-action btn-entregar" onclick="updateOrderStatus('${order._id}', 'entregado')">🍽️ Entregar</button>`;
+            actions += `<button class="btn-action btn-cancelar" onclick="cancelOrder('${order._id}')">❌ Cancelar</button>`;
+        }
+        
+        if (order.estado === 'entregado') {
+            actions += `<button class="btn-action btn-eliminar" onclick="deleteOrder('${order._id}')">🗑️ Eliminar</button>`;
+        }
+        
+        if (order.estado === 'cancelado') {
+            actions += `<button class="btn-action btn-reabrir" onclick="updateOrderStatus('${order._id}', 'pendiente')">🔄 Reabrir</button>`;
+            actions += `<button class="btn-action btn-eliminar" onclick="deleteOrder('${order._id}')">🗑️ Eliminar</button>`;
+        }
+        
+        actions += '</div>';
+        return actions;
+    }
+
+    // FUNCIONES DEL MODAL DE MÉTODO DE PAGO
+
+async function updateOrderStatus(orderId, newStatus) {
+    console.log('🔄 updateOrderStatus llamado con:', { orderId, newStatus });
+    
+    // Si el nuevo estado es "entregado", mostrar modal de método de pago
+    if (newStatus === 'entregado') {
+        currentOrderIdForPayment = orderId;
+        console.log('💾 Guardado orderId para pago:', currentOrderIdForPayment);
+        mostrarModalMetodoPago();
+        return;
+    }
+    
+    // Para otros estados, proceder normalmente SIN metodoPago
+    await actualizarEstadoPedido(orderId, newStatus, null);
+}
+
+function mostrarModalMetodoPago() {
+    console.log('🪟 Mostrando modal con orderId:', currentOrderIdForPayment);
+    const modal = document.getElementById('modalMetodoPago');
+    if (!modal) {
+        console.error('❌ Modal no encontrado en el DOM');
+        return;
+    }
+    modal.style.display = 'flex';
+}
+
+function cerrarModalMetodoPago() {
+    console.log('🚪 Cerrando modal');
+    const modal = document.getElementById('modalMetodoPago');
+    modal.style.display = 'none';
+    currentOrderIdForPayment = null;
+}
+
+async function confirmarMetodoPago(metodoPago) {
+    console.log('✅ Método de pago confirmado:', metodoPago);
+    console.log('📦 Order ID actual:', currentOrderIdForPayment);
+    
+    if (!currentOrderIdForPayment) {
+        console.error('❌ No hay orderId guardado');
+        alert('Error: No se encontró el ID del pedido');
+        return;
+    }
+    
+    // Guardar el ID en una variable temporal ANTES de cerrar el modal
+    const orderIdTemp = currentOrderIdForPayment;
+    
+    // Cerrar el modal
+    cerrarModalMetodoPago();
+    
+    // Usar la variable temporal para actualizar
+    await actualizarEstadoPedido(orderIdTemp, 'entregado', metodoPago);
+}
+
+async function actualizarEstadoPedido(orderId, newStatus, metodoPago = null) {
+    const token = localStorage.getItem('token');
+
+    console.log('📤 Enviando petición:');
+    console.log('  - Order ID:', orderId);
+    console.log('  - Estado:', newStatus);
+    console.log('  - Método de pago:', metodoPago);
+
+    if (!orderId || orderId === 'null' || orderId === 'undefined') {
+        console.error('❌ Order ID inválido:', orderId);
+        alert('Error: ID de pedido inválido');
+        return;
+    }
+
+    try {
+        const body = { estado: newStatus };
+        
+        // SOLO agregar metodoPago si existe Y el estado es 'entregado'
+        if (metodoPago && newStatus === 'entregado') {
+            body.metodoPago = metodoPago;
         }
 
-        async function updateOrderStatus(orderId, newStatus) {
-            const token = localStorage.getItem('token');
+        console.log('  - Body:', JSON.stringify(body, null, 2));
+        console.log('  - URL:', `${API_URL}/orders/${orderId}/estado`);
 
-            try {
-                const response = await fetch(`${API_URL}/orders/${orderId}/estado`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ estado: newStatus })
-                });
+        const response = await fetch(`${API_URL}/orders/${orderId}/estado`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(body)
+        });
 
-                const data = await response.json();
+        console.log('📥 Respuesta del servidor:');
+        console.log('  - Status:', response.status);
+        console.log('  - Status Text:', response.statusText);
 
-                if (data.success) {
-                    await loadOrders();
-                } else {
-                    alert('Error: ' + data.message);
+        const data = await response.json();
+        console.log('  - Data:', data);
+
+        if (data.success) {
+            console.log('✅ Pedido actualizado correctamente');
+            await loadOrders();
+        } else {
+            console.error('❌ Error del servidor:', data.message);
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('❌ Error en la petición:', error);
+        alert('Error al actualizar el estado: ' + error.message);
+    }
+}
+
+async function cancelOrder(orderId) {
+    if (!confirm('¿Está seguro de cancelar este pedido?')) return;
+    await actualizarEstadoPedido(orderId, 'cancelado', null);
+}
+    async function deleteOrder(orderId) {
+        if (!confirm('⚠️ ¿Está seguro de eliminar este pedido?\n\nEsta acción no se puede deshacer y el pedido se eliminará permanentemente del sistema.')) return;
+
+        const token = localStorage.getItem('token');
+
+        try {
+            const response = await fetch(`${API_URL}/orders/${orderId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error al actualizar el estado');
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert('✅ Pedido eliminado exitosamente');
+                await loadOrders();
+            } else {
+                alert('Error: ' + data.message);
             }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al eliminar el pedido');
         }
+    }
 
-        async function cancelOrder(orderId) {
-            if (!confirm('¿Está seguro de cancelar este pedido?')) return;
-            await updateOrderStatus(orderId, 'cancelado');
+    function clearFilters() {
+        document.getElementById('filterEstado').value = '';
+        document.getElementById('filterMesa').value = '';
+        document.getElementById('filterSearch').value = '';
+        document.getElementById('filterFechaDesde').value = '';
+        document.getElementById('filterFechaHasta').value = '';
+        
+        applyFilters();
+        
+        const notification = document.createElement('div');
+        notification.textContent = '✅ Filtros restablecidos';
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+            z-index: 10000;
+            animation: slideInRight 0.3s ease-out;
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease-out';
+            setTimeout(() => notification.remove(), 300);
+        }, 2000);
+    }
+
+    function toggleMenu() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+    }
+
+    function logout() {
+        if (confirm('¿Cerrar sesión?')) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('usuario');
+            window.location.href = 'index.html';
         }
+    }
 
-        async function deleteOrder(orderId) {
-            if (!confirm('⚠️ ¿Está seguro de eliminar este pedido?\n\nEsta acción no se puede deshacer y el pedido se eliminará permanentemente del sistema.')) return;
+    // ========================
+// SISTEMA DE TIEMPO REAL
+// ========================
 
-            const token = localStorage.getItem('token');
+let lastOrderCount = 0;
+let isFirstLoad = true;
+let pollingInterval = null;
 
-            try {
-                const response = await fetch(`${API_URL}/orders/${orderId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    alert('✅ Pedido eliminado exitosamente');
-                    await loadOrders();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error al eliminar el pedido');
-            }
+// Función para crear sonido "JC" personalizado
+// Función para crear sonido "JC" personalizado
+function playNotificationSound() {
+    // Verificar que el audio esté desbloqueado
+    if (!audioContextReady || !audioContext) {
+        console.warn('⚠️ Audio no inicializado. Haz clic en la página primero.');
+        return;
+    }
+    
+    try {
+        // Crear osciladores para simular "JC"
+        function playTone(frequency, startTime, duration, type = 'sine') {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = type;
+            
+            // Envolvente para suavizar el sonido
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime + startTime);
+            gainNode.gain.linearRampToValueAtTime(0.4, audioContext.currentTime + startTime + 0.05);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + startTime + duration);
+            
+            oscillator.start(audioContext.currentTime + startTime);
+            oscillator.stop(audioContext.currentTime + startTime + duration);
         }
-
-        function clearFilters() {
-    // Limpiar todos los filtros
-    document.getElementById('filterEstado').value = '';
-    document.getElementById('filterMesa').value = '';
-    document.getElementById('filterSearch').value = '';
-    document.getElementById('filterFechaDesde').value = '';
-    document.getElementById('filterFechaHasta').value = '';
-    
-    console.log('🧹 Filtros limpiados - Mostrando todos los pedidos');
-    
-    // Aplicar filtros con los valores por defecto
-    applyFilters();
-    
-    // Mostrar notificación visual
-    const notification = document.createElement('div');
-    notification.textContent = '✅ Filtros restablecidos';
-    notification.style.cssText = `
+        
+        // Sonido "J" (sonido corto y agudo)
+        playTone(880, 0, 0.2, 'square');      // J - principal
+        playTone(1320, 0, 0.2, 'sine');       // J - armónico
+        
+        // Sonido "C" (sonido más grave y resonante)
+        playTone(523, 0.25, 0.35, 'triangle');   // C - principal
+        playTone(659, 0.25, 0.35, 'sine');       // C - armónico
+        
+        // Eco suave para dar profundidad
+        playTone(440, 0.45, 0.25, 'sine');
+        
+        console.log('🔊 Sonido "JC" reproducido');
+    } catch (error) {
+        console.error('❌ Error al reproducir sonido:', error);
+    }
+}
+// Función para mostrar alerta de nuevo pedido
+function mostrarAlertaNuevoPedido(nuevoPedido) {
+    const alerta = document.createElement('div');
+    alerta.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 32px; animation: bounce 0.6s ease-in-out infinite;">🔔</span>
+            <div>
+                <div style="font-weight: 700; font-size: 18px; color: #1a202c;">¡Nuevo Pedido JC!</div>
+                <div style="font-size: 14px; opacity: 0.9;">Mesa ${nuevoPedido.mesa} - ${nuevoPedido.items.length} producto(s)</div>
+            </div>
+        </div>
+    `;
+    alerta.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
-        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 8px;
+        padding: 1.5rem;
+        border-radius: 12px;
         font-weight: 600;
-        font-size: 14px;
-        box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+        box-shadow: 0 8px 32px rgba(102, 126, 234, 0.6);
         z-index: 10000;
-        animation: slideInRight 0.3s ease-out;
+        animation: slideInRight 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        cursor: pointer;
     `;
     
-    document.body.appendChild(notification);
+    // Agregar animación de bounce para el icono
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    `;
+    document.head.appendChild(style);
     
+    document.body.appendChild(alerta);
+    
+    // Reproducir sonido personalizado "JC"
+    playNotificationSound();
+    
+    // Remover después de 5 segundos
     setTimeout(() => {
-        notification.style.animation = 'slideOutRight 0.3s ease-out';
-        setTimeout(() => notification.remove(), 300);
-    }, 2000);
+        alerta.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => alerta.remove(), 300);
+    }, 5000);
+    
+    // Remover al hacer clic
+    alerta.addEventListener('click', () => {
+        alerta.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => alerta.remove(), 300);
+    });
 }
 
-        function toggleMenu() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-        }
+// Función de polling automático
+async function autoRefreshOrders() {
+    const token = localStorage.getItem('token');
+    
+    try {
+        const response = await fetch(`${API_URL}/orders?userId=${currentUser._id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
 
-        function logout() {
-            if (confirm('¿Cerrar sesión?')) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('usuario');
-                window.location.href = 'index.html';
+        const data = await response.json();
+        
+        if (data.success) {
+            const newOrders = data.data;
+            
+            // Detectar nuevos pedidos
+            if (!isFirstLoad && newOrders.length > lastOrderCount) {
+                const ultimoPedido = newOrders[0]; // El más reciente
+                mostrarAlertaNuevoPedido(ultimoPedido);
             }
+            
+            // Actualizar lista si hay cambios
+            if (JSON.stringify(allOrders) !== JSON.stringify(newOrders)) {
+                allOrders = newOrders;
+                applyFilters();
+            }
+            
+            lastOrderCount = newOrders.length;
+            isFirstLoad = false;
         }
-    </script>
+    } catch (error) {
+        console.error('Error en auto-refresh:', error);
+    }
+}
+
+// Iniciar polling cuando se carga la página
+const waitForUserInterval = setInterval(() => {
+    if (currentUser && currentUser._id) {
+        clearInterval(waitForUserInterval);
+        
+        // Iniciar actualización automática cada 3 segundos
+        pollingInterval = setInterval(autoRefreshOrders, 3000);
+        
+        console.log('✅ Sistema de tiempo real activado con sonido "JC"');
+    }
+}, 100);
+
+// Limpiar interval al salir
+window.addEventListener('beforeunload', () => {
+    if (pollingInterval) {
+        clearInterval(pollingInterval);
+    }
+});
+
+</script>
+
+<!-- Modal para método de pago -->
+<div id="modalMetodoPago" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 16px; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+        <h3 style="font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 1rem; text-align: center;">💳 Método de Pago</h3>
+        <p style="font-size: 14px; color: #718096; text-align: center; margin-bottom: 1.5rem;">Selecciona cómo se realizó el pago:</p>
+        
+        <div style="display: grid; gap: 1rem; margin-bottom: 1.5rem;">
+            <button onclick="confirmarMetodoPago('efectivo')" style="padding: 1rem; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <span style="font-size: 24px;">💵</span>
+                <span>Efectivo</span>
+            </button>
+            
+            <button onclick="confirmarMetodoPago('transferencia')" style="padding: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <span style="font-size: 24px;">📱</span>
+                <span>Transferencia</span>
+            </button>
+        </div>
+        
+        <button onclick="cerrarModalMetodoPago()" style="width: 100%; padding: 0.75rem; background: #e2e8f0; color: #2d3748; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">
+            Cancelar
+        </button>
+    </div>
+</div>
+
+
+
 </body>
 </html>
