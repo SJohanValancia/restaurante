@@ -1042,6 +1042,14 @@
         <div class="stat-value" id="totalTransferencias">$0</div>
         <div class="stat-detail" id="cantidadTransferencias">0 pedidos</div>
     </div>
+
+    <div class="stat-card">
+    <div class="stat-icon red">💳</div>
+    <div class="stat-label">Gastos Transferencia</div>
+    <div class="stat-value" id="totalGastosTransferencia">$0</div>
+    <div class="stat-detail" id="cantidadGastosTransferencia">0 gastos</div>
+</div>
+
 </div>
 
             <div class="card">
@@ -1117,6 +1125,11 @@
                 <div class="resumen-row">
     <span class="resumen-label">📱 Transferencias:</span>
     <span class="resumen-value" id="resumenTransferencias">$0</span>
+</div>
+
+<div class="resumen-row">
+    <span class="resumen-label">💳 Gastos Transferencia:</span>
+    <span class="resumen-value" id="resumenGastosTransferencia">$0</span>
 </div>
 
                 <button class="btn-liquidar" onclick="realizarLiquidacion()">
@@ -1302,13 +1315,13 @@ async function cargarDatosPendientes() {
         if (data.success) {
             datosPendientes = data.data;
             
-            // Calcular transferencias (filtra pedidos con estado diferente de cancelado)
+            // Calcular transferencias de PEDIDOS
             const pedidosTransferencia = datosPendientes.pedidos.filter(p => 
                 p.estado !== 'cancelado' && p.metodoPago === 'transferencia'
             );
             const totalTransferencias = pedidosTransferencia.reduce((sum, p) => sum + p.total, 0);
             
-            // Actualizar UI de transferencias
+            // Actualizar UI de transferencias de pedidos
             const elemTransferencias = document.getElementById('totalTransferencias');
             const elemCantTransferencias = document.getElementById('cantidadTransferencias');
             
@@ -1319,6 +1332,30 @@ async function cargarDatosPendientes() {
                 elemCantTransferencias.textContent = `${pedidosTransferencia.length} pedidos`;
             }
             
+            // Calcular transferencias de GASTOS
+            let totalGastosTransferencia = 0;
+            let cantidadGastosTransferencia = 0;
+            
+            datosPendientes.gastos.forEach(registro => {
+                registro.gastos.forEach(gasto => {
+                    if (gasto.metodoPago === 'transferencia') {
+                        totalGastosTransferencia += gasto.monto;
+                        cantidadGastosTransferencia++;
+                    }
+                });
+            });
+            
+            // Actualizar UI de transferencias de gastos
+            const elemGastosTransf = document.getElementById('totalGastosTransferencia');
+            const elemCantGastosTransf = document.getElementById('cantidadGastosTransferencia');
+            
+            if (elemGastosTransf) {
+                elemGastosTransf.textContent = `$${totalGastosTransferencia.toLocaleString('es-CO')}`;
+            }
+            if (elemCantGastosTransf) {
+                elemCantGastosTransf.textContent = `${cantidadGastosTransferencia} gastos`;
+            }
+            
             mostrarPedidos();
             mostrarGastos();
         }
@@ -1326,7 +1363,6 @@ async function cargarDatosPendientes() {
         console.error('Error al cargar datos pendientes:', error);
     }
 }
-
 function mostrarPedidos() {
     const lista = document.getElementById('listaPedidos');
     
@@ -1356,30 +1392,50 @@ function mostrarPedidos() {
         </div>
     `).join('');
 }
-        function mostrarGastos() {
-            const lista = document.getElementById('listaGastos');
-            
-            if (datosPendientes.gastos.length === 0) {
-                lista.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">💸</div>
-                        <p>No hay gastos pendientes de liquidar</p>
-                    </div>
-                `;
-                return;
-            }
+function mostrarGastos() {
+    const lista = document.getElementById('listaGastos');
+    
+    if (datosPendientes.gastos.length === 0) {
+        lista.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">💸</div>
+                <p>No hay gastos pendientes de liquidar</p>
+            </div>
+        `;
+        return;
+    }
 
-            lista.innerHTML = datosPendientes.gastos.map(gasto => `
-                <div class="item-row">
-                    <div class="item-info">
-                        <h4>${new Date(gasto.fecha).toLocaleDateString('es-CO')}</h4>
-                        <p>${gasto.gastos.length} gasto(s) registrado(s)</p>
-                    </div>
-                    <div class="item-value">${gasto.total.toLocaleString('es-CO')}</div>
+    lista.innerHTML = datosPendientes.gastos.map(registro => {
+        // Contar gastos por método de pago
+        const gastosEfectivo = registro.gastos.filter(g => g.metodoPago === 'efectivo').length;
+        const gastosTransferencia = registro.gastos.filter(g => g.metodoPago === 'transferencia').length;
+        
+        return `
+        <div class="item-row">
+            <div class="item-info">
+                <h4>${new Date(registro.fecha).toLocaleDateString('es-CO')}</h4>
+                <p>${registro.gastos.length} gasto(s) registrado(s) | 
+                   ${gastosEfectivo > 0 ? `💵 ${gastosEfectivo} efectivo` : ''} 
+                   ${gastosTransferencia > 0 ? `💳 ${gastosTransferencia} transferencia` : ''}</p>
+                <div style="margin-top: 8px;">
+                    ${registro.gastos.map(gasto => `
+                        <div style="font-size: 12px; color: #4a5568; padding: 4px 0; display: flex; justify-content: space-between; align-items: center;">
+                            <span>
+                                • ${gasto.descripcion}
+                                ${gasto.metodoPago === 'transferencia' ? 
+                                    '<span style="display: inline-block; margin-left: 6px; padding: 2px 6px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 4px; font-size: 10px; font-weight: 700;">💳 TRANSF</span>' 
+                                    : ''}
+                            </span>
+                            <span style="font-weight: 600; color: #2d3748;">$${gasto.monto.toLocaleString('es-CO')}</span>
+                        </div>
+                    `).join('')}
                 </div>
-            `).join('');
-        }
-
+            </div>
+            <div class="item-value">$${registro.total.toLocaleString('es-CO')}</div>
+        </div>
+    `;
+    }).join('');
+}
         function toggleDetails(tipo) {
             const lista = document.getElementById(tipo === 'pedidos' ? 'listaPedidos' : 'listaGastos');
             const icon = document.getElementById(tipo === 'pedidos' ? 'iconPedidos' : 'iconGastos');
@@ -1395,45 +1451,58 @@ function actualizarResumen() {
         return mov.tipo === 'ingreso' ? sum + mov.monto : sum - mov.monto;
     }, 0);
     
-    // Calcular transferencias
+    // Calcular transferencias de PEDIDOS
     const pedidosTransferencia = datosPendientes.pedidos.filter(p => 
         p.estado !== 'cancelado' && p.metodoPago === 'transferencia'
     );
     const totalTransferencias = pedidosTransferencia.reduce((sum, p) => sum + p.total, 0);
     
+    // Calcular transferencias de GASTOS
+    let totalGastosTransferencia = 0;
+    datosPendientes.gastos.forEach(registro => {
+        registro.gastos.forEach(gasto => {
+            if (gasto.metodoPago === 'transferencia') {
+                totalGastosTransferencia += gasto.monto;
+            }
+        });
+    });
+    
     const cajaFinal = cajaInicialValue + totalIngresos - totalEgresos + totalMovimientos;
 
     // Actualizar tarjetas
     document.getElementById('totalIngresos').textContent = 
-        `${totalIngresos.toLocaleString('es-CO')}`;
+        `$${totalIngresos.toLocaleString('es-CO')}`;
     document.getElementById('cantidadPedidos').textContent = 
         `${datosPendientes.pedidos.length} pedidos`;
     
     document.getElementById('totalEgresos').textContent = 
-        `${totalEgresos.toLocaleString('es-CO')}`;
+        `$${totalEgresos.toLocaleString('es-CO')}`;
     document.getElementById('cantidadGastos').textContent = 
         `${datosPendientes.gastos.length} gastos`;
     
     document.getElementById('totalMovimientos').textContent = 
-        `${totalMovimientos.toLocaleString('es-CO')}`;
+        `$${totalMovimientos.toLocaleString('es-CO')}`;
     document.getElementById('cantidadMovimientos').textContent = 
         `${movimientosCaja.length} movimientos`;
 
     // Actualizar resumen final
     document.getElementById('resumenCajaInicial').textContent = 
-        `${cajaInicialValue.toLocaleString('es-CO')}`;
+        `$${cajaInicialValue.toLocaleString('es-CO')}`;
     document.getElementById('resumenIngresos').textContent = 
-        `${totalIngresos.toLocaleString('es-CO')}`;
+        `$${totalIngresos.toLocaleString('es-CO')}`;
     document.getElementById('resumenEgresos').textContent = 
-        `${totalEgresos.toLocaleString('es-CO')}`;
+        `$${totalEgresos.toLocaleString('es-CO')}`;
     document.getElementById('resumenMovimientos').textContent = 
-        `${totalMovimientos.toLocaleString('es-CO')}`;
+        `$${totalMovimientos.toLocaleString('es-CO')}`;
     document.getElementById('resumenTransferencias').textContent = 
-        `${totalTransferencias.toLocaleString('es-CO')}`;
+        `$${totalTransferencias.toLocaleString('es-CO')}`;
+    document.getElementById('resumenGastosTransferencia').textContent = 
+        `$${totalGastosTransferencia.toLocaleString('es-CO')}`;
     document.getElementById('cajaFinal').textContent = 
-        `${cajaFinal.toLocaleString('es-CO')}`;
+        `$${cajaFinal.toLocaleString('es-CO')}`;
 }
-        function openControlCajaModal() {
+
+function openControlCajaModal() {
             document.getElementById('modalControlCaja').classList.add('active');
         }
 

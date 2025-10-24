@@ -828,6 +828,18 @@
     <div class="stat-label">Total Transferencias</div>
     <div class="stat-value" id="totalTransferencias">$0</div>
 </div>
+
+<div class="stat-card">
+    <div class="stat-icon red" style="background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);">💳</div>
+    <div class="stat-label">Gastos Transferencia</div>
+    <div class="stat-value" id="totalGastosTransferencias">$0</div>
+</div>
+
+<div class="stat-card">
+    <div class="stat-icon blue">💰</div>
+    <div class="stat-label">Caja Transferencias</div>
+    <div class="stat-value" id="cajaTransferencias">$0</div>
+</div>
             </div>
 
             <div id="liquidacionesContainer">
@@ -968,7 +980,11 @@ async function cargarEstadisticas(fechaInicio = null, fechaFin = null) {
             document.getElementById('totalEgresos').textContent = 
                 `$${(stats.totalEgresos || 0).toLocaleString('es-CO')}`;
             document.getElementById('totalTransferencias').textContent = 
-                `$${(stats.totalTransferencias || 0).toLocaleString('es-CO')}`;
+                `$${(stats.totalTransferenciasIngresos || 0).toLocaleString('es-CO')}`;
+            document.getElementById('totalGastosTransferencias').textContent = 
+                `$${(stats.totalTransferenciasGastos || 0).toLocaleString('es-CO')}`;
+            document.getElementById('cajaTransferencias').textContent = 
+                `$${(stats.cajaTransferencias || 0).toLocaleString('es-CO')}`;
             document.getElementById('promedioIngresos').textContent = 
                 `$${Math.round(stats.promedioIngresosPorDia || 0).toLocaleString('es-CO')}`;
         }
@@ -977,6 +993,7 @@ async function cargarEstadisticas(fechaInicio = null, fechaFin = null) {
         document.getElementById('statsContainer').style.display = 'none';
     }
 }
+
 
 function mostrarLiquidaciones() {
             const container = document.getElementById('liquidacionesContainer');
@@ -999,80 +1016,113 @@ function mostrarLiquidaciones() {
             `;
         }
 
-        function crearTarjetaLiquidacion(liquidacion) {
-            const fecha = new Date(liquidacion.fecha);
-            const fechaFormato = fecha.toLocaleDateString('es-CO', { 
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-            const horaFormato = fecha.toLocaleTimeString('es-CO', {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+function crearTarjetaLiquidacion(liquidacion) {
+    const fecha = new Date(liquidacion.fecha);
+    const fechaFormato = fecha.toLocaleDateString('es-CO', { 
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    const horaFormato = fecha.toLocaleTimeString('es-CO', {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
 
-            return `
-                <div class="liquidacion-card">
-                    <div class="liquidacion-header">
-                        <div class="liquidacion-fecha">
-                            <span class="fecha-icon">📅</span>
-                            <div class="fecha-info">
-                                <h3>${fechaFormato}</h3>
-                                <p>${horaFormato}</p>
-                            </div>
-                        </div>
-                        <div class="liquidacion-id">
-                            #${liquidacion._id.slice(-8).toUpperCase()}
-                        </div>
-                    </div>
-                    <div class="liquidacion-body">
-                        <div class="resumen-grid">
-                            <div class="resumen-item">
-                                <span class="resumen-label">💵 Caja Inicial</span>
-                                <span class="resumen-value">$${liquidacion.cajaInicial.toLocaleString('es-CO')}</span>
-                            </div>
-                            <div class="resumen-item">
-                                <span class="resumen-label">📈 Ingresos</span>
-                                <span class="resumen-value positive">+$${liquidacion.ingresos.totalPedidos.toLocaleString('es-CO')}</span>
-                            </div>
-                            <div class="resumen-item">
-                                <span class="resumen-label">📉 Egresos</span>
-                                <span class="resumen-value negative">-$${liquidacion.egresos.totalGastos.toLocaleString('es-CO')}</span>
-                            </div>
-                            <div class="resumen-item">
-                                <span class="resumen-label">💰 Movimientos</span>
-                                <span class="resumen-value">${liquidacion.totalMovimientos >= 0 ? '+' : ''}$${liquidacion.totalMovimientos.toLocaleString('es-CO')}</span>
-                            
-                            <div class="resumen-item">
-    <span class="resumen-label">📱 Transferencias</span>
-    <span class="resumen-value positive">$${(liquidacion.totalTransferencias || 0).toLocaleString('es-CO')}</span>
-</div>    </div>
+    // Calcular transferencias de esta liquidación
+    let transferenciasPedidos = 0;
+    let transferenciasGastos = 0;
+    
+    if (liquidacion.ingresos && liquidacion.ingresos.pedidos) {
+        liquidacion.ingresos.pedidos.forEach(pedido => {
+            if (pedido && pedido.metodoPago === 'transferencia') {
+                transferenciasPedidos += pedido.total;
+            }
+        });
+    }
+    
+    if (liquidacion.egresos && liquidacion.egresos.gastos) {
+        liquidacion.egresos.gastos.forEach(registro => {
+            if (registro && registro.gastos) {
+                registro.gastos.forEach(gasto => {
+                    if (gasto.metodoPago === 'transferencia') {
+                        transferenciasGastos += gasto.monto;
+                    }
+                });
+            }
+        });
+    }
+    
+    const cajaTransferencias = transferenciasPedidos - transferenciasGastos;
 
-                        </div>
-                        
-                        <div class="caja-final-section">
-                            <span class="caja-final-label">💵 Caja Final</span>
-                            <span class="caja-final-value">$${liquidacion.cajaFinal.toLocaleString('es-CO')}</span>
-                        </div>
-
-                        ${liquidacion.observaciones ? `
-                            <div class="observaciones-section">
-                                <div class="observaciones-title">📝 Observaciones</div>
-                                <div class="observaciones-text">${liquidacion.observaciones}</div>
-                            </div>
-                        ` : ''}
-
-                        <div class="liquidacion-actions">
-                            <button class="btn-action" onclick="verDetalle('${liquidacion._id}')">
-                                <span>👁️</span>
-                                Ver Detalle Completo
-                            </button>
-
-                        </div>
+    return `
+        <div class="liquidacion-card">
+            <div class="liquidacion-header">
+                <div class="liquidacion-fecha">
+                    <span class="fecha-icon">📅</span>
+                    <div class="fecha-info">
+                        <h3>${fechaFormato}</h3>
+                        <p>${horaFormato}</p>
                     </div>
                 </div>
-            `;
-        }
+                <div class="liquidacion-id">
+                    #${liquidacion._id.slice(-8).toUpperCase()}
+                </div>
+            </div>
+            <div class="liquidacion-body">
+                <div class="resumen-grid">
+                    <div class="resumen-item">
+                        <span class="resumen-label">💵 Caja Inicial</span>
+                        <span class="resumen-value">$${liquidacion.cajaInicial.toLocaleString('es-CO')}</span>
+                    </div>
+                    <div class="resumen-item">
+                        <span class="resumen-label">📈 Ingresos</span>
+                        <span class="resumen-value positive">+$${liquidacion.ingresos.totalPedidos.toLocaleString('es-CO')}</span>
+                    </div>
+                    <div class="resumen-item">
+                        <span class="resumen-label">📉 Egresos</span>
+                        <span class="resumen-value negative">-$${liquidacion.egresos.totalGastos.toLocaleString('es-CO')}</span>
+                    </div>
+                    <div class="resumen-item">
+                        <span class="resumen-label">💰 Movimientos</span>
+                        <span class="resumen-value">${liquidacion.totalMovimientos >= 0 ? '+' : ''}$${liquidacion.totalMovimientos.toLocaleString('es-CO')}</span>
+                    </div>
+                    <div class="resumen-item">
+                        <span class="resumen-label">📱 Pagos Transferencia</span>
+                        <span class="resumen-value positive">$${transferenciasPedidos.toLocaleString('es-CO')}</span>
+                    </div>
+                    <div class="resumen-item">
+                        <span class="resumen-label">💳 Gastos Transferencia</span>
+                        <span class="resumen-value negative">$${transferenciasGastos.toLocaleString('es-CO')}</span>
+                    </div>
+                </div>
+                
+                <div class="caja-final-section">
+                    <span class="caja-final-label">💵 Caja Final</span>
+                    <span class="caja-final-value">$${liquidacion.cajaFinal.toLocaleString('es-CO')}</span>
+                </div>
+                
+                <div class="caja-final-section" style="margin-top: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <span class="caja-final-label">💰 Caja Transferencias</span>
+                    <span class="caja-final-value">$${cajaTransferencias.toLocaleString('es-CO')}</span>
+                </div>
+
+                ${liquidacion.observaciones ? `
+                    <div class="observaciones-section">
+                        <div class="observaciones-title">📝 Observaciones</div>
+                        <div class="observaciones-text">${liquidacion.observaciones}</div>
+                    </div>
+                ` : ''}
+
+                <div class="liquidacion-actions">
+                    <button class="btn-action" onclick="verDetalle('${liquidacion._id}')">
+                        <span>👁️</span>
+                        Ver Detalle Completo
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+}
 
         async function verDetalle(liquidacionId) {
             const token = localStorage.getItem('token');
@@ -1095,47 +1145,86 @@ function mostrarLiquidaciones() {
             }
         }
 
-        function mostrarModalDetalle(liquidacion) {
-            const fecha = new Date(liquidacion.fecha);
-            const fechaFormato = fecha.toLocaleDateString('es-CO', { 
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+function mostrarModalDetalle(liquidacion) {
+    const fecha = new Date(liquidacion.fecha);
+    const fechaFormato = fecha.toLocaleDateString('es-CO', { 
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
 
-            const content = `
-                <div class="detalle-section">
-                    <h3 style="font-size: 18px; color: #667eea; margin-bottom: 1rem;">
-                        📅 ${fechaFormato}
-                    </h3>
+    // Calcular transferencias
+    let transferenciasPedidos = 0;
+    let transferenciasGastos = 0;
+    
+    if (liquidacion.ingresos && liquidacion.ingresos.pedidos) {
+        liquidacion.ingresos.pedidos.forEach(pedido => {
+            if (pedido && pedido.metodoPago === 'transferencia') {
+                transferenciasPedidos += pedido.total;
+            }
+        });
+    }
+    
+    if (liquidacion.egresos && liquidacion.egresos.gastos) {
+        liquidacion.egresos.gastos.forEach(registro => {
+            if (registro && registro.gastos) {
+                registro.gastos.forEach(gasto => {
+                    if (gasto.metodoPago === 'transferencia') {
+                        transferenciasGastos += gasto.monto;
+                    }
+                });
+            }
+        });
+    }
+    
+    const cajaTransferencias = transferenciasPedidos - transferenciasGastos;
+
+    const content = `
+        <div class="detalle-section">
+            <h3 style="font-size: 18px; color: #667eea; margin-bottom: 1rem;">
+                📅 ${fechaFormato}
+            </h3>
+        </div>
+
+        <div class="detalle-section">
+            <div class="detalle-title">💵 Resumen Financiero</div>
+            <div class="resumen-grid">
+                <div class="resumen-item">
+                    <span class="resumen-label">Caja Inicial</span>
+                    <span class="resumen-value">$${liquidacion.cajaInicial.toLocaleString('es-CO')}</span>
                 </div>
-
-                <div class="detalle-section">
-                    <div class="detalle-title">💵 Resumen Financiero</div>
-                    <div class="resumen-grid">
-                        <div class="resumen-item">
-                            <span class="resumen-label">Caja Inicial</span>
-                            <span class="resumen-value">$${liquidacion.cajaInicial.toLocaleString('es-CO')}</span>
-                        </div>
-                        <div class="resumen-item">
-                            <span class="resumen-label">Total Ingresos</span>
-                            <span class="resumen-value positive">$${liquidacion.ingresos.totalPedidos.toLocaleString('es-CO')}</span>
-                        </div>
-                        <div class="resumen-item">
-                            <span class="resumen-label">Total Egresos</span>
-                            <span class="resumen-value negative">$${liquidacion.egresos.totalGastos.toLocaleString('es-CO')}</span>
-                        </div>
-                        <div class="resumen-item">
-                            <span class="resumen-label">Movimientos Caja</span>
-                            <span class="resumen-value">$${liquidacion.totalMovimientos.toLocaleString('es-CO')}</span>
-                        </div>
-                    </div>
-                    <div class="caja-final-section" style="margin-top: 1rem;">
-                        <span class="caja-final-label">💵 Caja Final</span>
-                        <span class="caja-final-value">$${liquidacion.cajaFinal.toLocaleString('es-CO')}</span>
-                    </div>
+                <div class="resumen-item">
+                    <span class="resumen-label">Total Ingresos</span>
+                    <span class="resumen-value positive">$${liquidacion.ingresos.totalPedidos.toLocaleString('es-CO')}</span>
+                </div>
+                <div class="resumen-item">
+                    <span class="resumen-label">Total Egresos</span>
+                    <span class="resumen-value negative">$${liquidacion.egresos.totalGastos.toLocaleString('es-CO')}</span>
+                </div>
+                <div class="resumen-item">
+                    <span class="resumen-label">Movimientos Caja</span>
+                    <span class="resumen-value">$${liquidacion.totalMovimientos.toLocaleString('es-CO')}</span>
+                </div>
+                <div class="resumen-item">
+                    <span class="resumen-label">📱 Pagos Transferencia</span>
+                    <span class="resumen-value positive">$${transferenciasPedidos.toLocaleString('es-CO')}</span>
+                </div>
+                <div class="resumen-item">
+                    <span class="resumen-label">💳 Gastos Transferencia</span>
+                    <span class="resumen-value negative">$${transferenciasGastos.toLocaleString('es-CO')}</span>
+                </div>
+            </div>
+            <div class="caja-final-section" style="margin-top: 1rem;">
+                <span class="caja-final-label">💵 Caja Final</span>
+                <span class="caja-final-value">$${liquidacion.cajaFinal.toLocaleString('es-CO')}</span>
+            </div>
+            <div class="caja-final-section" style="margin-top: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <span class="caja-final-label">💰 Caja Transferencias</span>
+                <span class="caja-final-value">$${cajaTransferencias.toLocaleString('es-CO')}</span>
+            </div>
+        </div>
 
 
                     <div class="resumen-item">

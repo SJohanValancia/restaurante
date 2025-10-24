@@ -79,13 +79,46 @@ router.get('/stats/resumen', protect, async (req, res) => {
       };
     }
 
-    const liquidaciones = await Liquidacion.find(query);
+    const liquidaciones = await Liquidacion.find(query)
+      .populate('ingresos.pedidos')
+      .populate('egresos.gastos');
+
+    // Calcular transferencias para cada liquidación
+    let totalTransferenciasIngresos = 0;
+    let totalTransferenciasGastos = 0;
+
+    liquidaciones.forEach(liq => {
+      // Transferencias de pedidos
+      if (liq.ingresos && liq.ingresos.pedidos) {
+        liq.ingresos.pedidos.forEach(pedido => {
+          if (pedido && pedido.metodoPago === 'transferencia') {
+            totalTransferenciasIngresos += pedido.total;
+          }
+        });
+      }
+
+      // Transferencias de gastos
+      if (liq.egresos && liq.egresos.gastos) {
+        liq.egresos.gastos.forEach(registro => {
+          if (registro && registro.gastos) {
+            registro.gastos.forEach(gasto => {
+              if (gasto.metodoPago === 'transferencia') {
+                totalTransferenciasGastos += gasto.monto;
+              }
+            });
+          }
+        });
+      }
+    });
 
     const stats = {
       totalLiquidaciones: liquidaciones.length,
       totalIngresos: liquidaciones.reduce((sum, l) => sum + (l.ingresos?.totalPedidos || 0), 0),
       totalEgresos: liquidaciones.reduce((sum, l) => sum + (l.egresos?.totalGastos || 0), 0),
       totalMovimientos: liquidaciones.reduce((sum, l) => sum + (l.totalMovimientos || 0), 0),
+      totalTransferenciasIngresos,
+      totalTransferenciasGastos,
+      cajaTransferencias: totalTransferenciasIngresos - totalTransferenciasGastos,
       promedioIngresosPorDia: liquidaciones.length > 0 
         ? liquidaciones.reduce((sum, l) => sum + (l.ingresos?.totalPedidos || 0), 0) / liquidaciones.length 
         : 0,
