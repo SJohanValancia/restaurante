@@ -1493,7 +1493,7 @@ document.getElementById('editForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const expenseId = document.getElementById('editExpenseId').value;
-    const fecha = document.getElementById('editFecha').value;
+    const fecha = document.getElementById('editFecha').value; // Ya no convertir a ISO
     
     const descripciones = document.querySelectorAll('.edit-descripcion');
     const montos = document.querySelectorAll('.edit-monto');
@@ -1547,7 +1547,6 @@ document.getElementById('editForm').addEventListener('submit', async (e) => {
         alert('Error al actualizar los gastos');
     }
 });
-
 
 async function deleteExpense(expenseId) {
     if (!confirm('¿Está seguro de eliminar este registro de gastos?')) return;

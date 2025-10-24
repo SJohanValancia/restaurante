@@ -95,11 +95,20 @@ router.post('/', protect, checkPermission('crearGastos'), async (req, res) => {
 
 
 // Actualizar un registro de gastos
+// Actualizar un registro de gastos
 router.put('/:id', protect, checkPermission('editarGastos'), async (req, res) => {
   try {
+    // Parsear la fecha correctamente sin afectar la zona horaria
+    let updateData = { ...req.body };
+    
+    if (req.body.fecha) {
+      const fechaParts = req.body.fecha.split('-');
+      updateData.fecha = new Date(fechaParts[0], fechaParts[1] - 1, fechaParts[2], 12, 0, 0);
+    }
+    
     const expense = await Expense.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      updateData,
       { new: true, runValidators: true }
     );
     
