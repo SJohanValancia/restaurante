@@ -80,29 +80,42 @@ router.get('/stats/resumen', protect, async (req, res) => {
     }
 
     const liquidaciones = await Liquidacion.find(query)
-      .populate('ingresos.pedidos')
-      .populate('egresos.gastos');
+      .populate({
+        path: 'ingresos.pedidos',
+        select: 'total metodoPago estado'
+      })
+      .populate({
+        path: 'egresos.gastos',
+        select: 'total gastos'
+      })
+      .lean();
+
+    console.log('📊 Total liquidaciones encontradas:', liquidaciones.length);
 
     // Calcular transferencias para cada liquidación
     let totalTransferenciasIngresos = 0;
     let totalTransferenciasGastos = 0;
 
-    liquidaciones.forEach(liq => {
+    liquidaciones.forEach((liq, index) => {
+      console.log(`\n🔍 Liquidación ${index + 1}:`, liq._id);
+      
       // Transferencias de pedidos
-      if (liq.ingresos && liq.ingresos.pedidos) {
+      if (liq.ingresos && Array.isArray(liq.ingresos.pedidos)) {
         liq.ingresos.pedidos.forEach(pedido => {
           if (pedido && pedido.metodoPago === 'transferencia') {
+            console.log('  📱 Pedido transferencia:', pedido.total);
             totalTransferenciasIngresos += pedido.total;
           }
         });
       }
 
       // Transferencias de gastos
-      if (liq.egresos && liq.egresos.gastos) {
+      if (liq.egresos && Array.isArray(liq.egresos.gastos)) {
         liq.egresos.gastos.forEach(registro => {
-          if (registro && registro.gastos) {
+          if (registro && Array.isArray(registro.gastos)) {
             registro.gastos.forEach(gasto => {
-              if (gasto.metodoPago === 'transferencia') {
+              if (gasto && gasto.metodoPago === 'transferencia') {
+                console.log('  💳 Gasto transferencia:', gasto.monto);
                 totalTransferenciasGastos += gasto.monto;
               }
             });
@@ -110,6 +123,11 @@ router.get('/stats/resumen', protect, async (req, res) => {
         });
       }
     });
+
+    console.log('\n💰 Totales calculados:');
+    console.log('  - Transferencias Ingresos:', totalTransferenciasIngresos);
+    console.log('  - Transferencias Gastos:', totalTransferenciasGastos);
+    console.log('  - Caja Transferencias:', totalTransferenciasIngresos - totalTransferenciasGastos);
 
     const stats = {
       totalLiquidaciones: liquidaciones.length,
@@ -132,6 +150,7 @@ router.get('/stats/resumen', protect, async (req, res) => {
       data: stats
     });
   } catch (error) {
+    console.error('❌ Error al obtener estadísticas:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener estadísticas',
@@ -217,8 +236,14 @@ router.get('/', protect, async (req, res) => {
     }
 
     const liquidaciones = await Liquidacion.find(query)
-      .populate('ingresos.pedidos', 'mesa total createdAt estado')
-      .populate('egresos.gastos', 'fecha total gastos')
+      .populate({
+        path: 'ingresos.pedidos',
+        select: 'mesa total createdAt estado metodoPago'
+      })
+      .populate({
+        path: 'egresos.gastos',
+        select: 'fecha total gastos'
+      })
       .sort({ fecha: -1 })
       .lean();
 
@@ -238,6 +263,7 @@ router.get('/', protect, async (req, res) => {
       data: liquidaciones
     });
   } catch (error) {
+    console.error('❌ Error al obtener liquidaciones:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener las liquidaciones',
@@ -245,12 +271,19 @@ router.get('/', protect, async (req, res) => {
     });
   }
 });
+
 // Obtener una liquidación por ID
 router.get('/:id', protect, async (req, res) => {
   try {
     const liquidacion = await Liquidacion.findById(req.params.id)
-      .populate('ingresos.pedidos')
-      .populate('egresos.gastos')
+      .populate({
+        path: 'ingresos.pedidos',
+        select: 'mesa total createdAt estado metodoPago items'
+      })
+      .populate({
+        path: 'egresos.gastos',
+        select: 'fecha total gastos'
+      })
       .populate('userId', 'nombre email')
       .lean();
 
@@ -275,7 +308,7 @@ router.get('/:id', protect, async (req, res) => {
       data: liquidacion
     });
   } catch (error) {
-    console.error('Error al obtener liquidación:', error);
+    console.error('❌ Error al obtener liquidación:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener la liquidación',
