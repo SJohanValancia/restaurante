@@ -800,47 +800,74 @@
                 </div>
             </div>
 
-            <div class="stats-summary" id="statsContainer" style="display: none;">
-                <div class="stat-card">
-                    <div class="stat-icon purple">📋</div>
-                    <div class="stat-label">Total Liquidaciones</div>
-                    <div class="stat-value" id="totalLiquidaciones">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon green">💵</div>
-                    <div class="stat-label">Total Ingresos</div>
-                    <div class="stat-value" id="totalIngresos">$0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon red">💸</div>
-                    <div class="stat-label">Total Egresos</div>
-                    <div class="stat-value" id="totalEgresos">$0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon blue">💰</div>
-                    <div class="stat-label">Promedio Ingresos</div>
-                    <div class="stat-value" id="promedioIngresos">$0</div>
-                </div>
+<div class="stats-summary" id="statsContainer" style="display: none;">
+    <div class="stat-card">
+        <div class="stat-icon purple">📋</div>
+        <div class="stat-label">Total Liquidaciones</div>
+        <div class="stat-value" id="totalLiquidaciones">0</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon green">💵</div>
+        <div class="stat-label">Total Ingresos</div>
+        <div class="stat-value" id="totalIngresos">$0</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon red">💸</div>
+        <div class="stat-label">Total Egresos</div>
+        <div class="stat-value" id="totalEgresos">$0</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon blue">💰</div>
+        <div class="stat-label">Promedio Ingresos</div>
+        <div class="stat-value" id="promedioIngresos">$0</div>
+    </div>
 
+    <div class="stat-card">
+        <div class="stat-icon green" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">📱</div>
+        <div class="stat-label">Pagos Transferencia</div>
+        <div class="stat-value" id="totalTransferencias">$0</div>
+    </div>
 
-                <div class="stat-card">
-    <div class="stat-icon green" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">📱</div>
-    <div class="stat-label">Total Transferencias</div>
-    <div class="stat-value" id="totalTransferencias">$0</div>
+    <div class="stat-card">
+        <div class="stat-icon red" style="background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);">💳</div>
+        <div class="stat-label">Gastos Transferencia</div>
+        <div class="stat-value" id="totalGastosTransferencias">$0</div>
+    </div>
+
+    <!-- NUEVAS TARJETAS DE MOVIMIENTOS -->
+    <div class="stat-card">
+        <div class="stat-icon green" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">💵</div>
+        <div class="stat-label">Total Aportes</div>
+        <div class="stat-value" id="totalAportes">$0</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon red" style="background: linear-gradient(135deg, #f56565 0%, #c53030 100%);">💸</div>
+        <div class="stat-label">Total Retiros</div>
+        <div class="stat-value" id="totalRetiros">$0</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon purple" style="background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);">🔄</div>
+        <div class="stat-label">Total Movimientos</div>
+        <div class="stat-value" id="totalMovimientos">$0</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon green" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">💰</div>
+        <div class="stat-label">Caja Final Total</div>
+        <div class="stat-value" id="cajaFinalTotal">$0</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon blue">💳</div>
+        <div class="stat-label">Caja Transferencias</div>
+        <div class="stat-value" id="cajaTransferencias">$0</div>
+    </div>
 </div>
-
-<div class="stat-card">
-    <div class="stat-icon red" style="background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);">💳</div>
-    <div class="stat-label">Gastos Transferencia</div>
-    <div class="stat-value" id="totalGastosTransferencias">$0</div>
-</div>
-
-<div class="stat-card">
-    <div class="stat-icon blue">💰</div>
-    <div class="stat-label">Caja Transferencias</div>
-    <div class="stat-value" id="cajaTransferencias">$0</div>
-</div>
-            </div>
 
             <div id="liquidacionesContainer">
                 <div class="loading">Cargando liquidaciones...</div>
@@ -973,28 +1000,41 @@ async function cargarEstadisticas(fechaInicio = null, fechaFin = null) {
 
         if (data.success) {
             const stats = data.data;
+            
             document.getElementById('statsContainer').style.display = 'grid';
             document.getElementById('totalLiquidaciones').textContent = stats.totalLiquidaciones || 0;
             document.getElementById('totalIngresos').textContent = 
                 `$${(stats.totalIngresos || 0).toLocaleString('es-CO')}`;
             document.getElementById('totalEgresos').textContent = 
                 `$${(stats.totalEgresos || 0).toLocaleString('es-CO')}`;
+            document.getElementById('promedioIngresos').textContent = 
+                `$${Math.round(stats.promedioIngresosPorDia || 0).toLocaleString('es-CO')}`;
+            
+            // Transferencias
             document.getElementById('totalTransferencias').textContent = 
                 `$${(stats.totalTransferenciasIngresos || 0).toLocaleString('es-CO')}`;
             document.getElementById('totalGastosTransferencias').textContent = 
                 `$${(stats.totalTransferenciasGastos || 0).toLocaleString('es-CO')}`;
             document.getElementById('cajaTransferencias').textContent = 
                 `$${(stats.cajaTransferencias || 0).toLocaleString('es-CO')}`;
-            document.getElementById('promedioIngresos').textContent = 
-                `$${Math.round(stats.promedioIngresosPorDia || 0).toLocaleString('es-CO')}`;
+            
+            // Movimientos
+            document.getElementById('totalAportes').textContent = 
+                `$${(stats.totalAportes || 0).toLocaleString('es-CO')}`;
+            document.getElementById('totalRetiros').textContent = 
+                `$${(stats.totalRetiros || 0).toLocaleString('es-CO')}`;
+            document.getElementById('totalMovimientos').textContent = 
+                `$${(stats.totalMovimientos || 0).toLocaleString('es-CO')}`;
+            
+            // Caja Final Total (ahora incluye movimientos)
+            document.getElementById('cajaFinalTotal').textContent = 
+                `$${(stats.cajaFinalTotal || 0).toLocaleString('es-CO')}`;
         }
     } catch (error) {
         console.error('Error al cargar estadísticas:', error);
         document.getElementById('statsContainer').style.display = 'none';
     }
 }
-
-
 function mostrarLiquidaciones() {
             const container = document.getElementById('liquidacionesContainer');
 

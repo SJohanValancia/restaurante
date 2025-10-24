@@ -92,9 +92,11 @@ router.get('/stats/resumen', protect, async (req, res) => {
 
     console.log('📊 Total liquidaciones encontradas:', liquidaciones.length);
 
-    // Calcular transferencias para cada liquidación
+    // Calcular transferencias y movimientos
     let totalTransferenciasIngresos = 0;
     let totalTransferenciasGastos = 0;
+    let totalAportes = 0;
+    let totalRetiros = 0;
 
     liquidaciones.forEach((liq, index) => {
       console.log(`\n🔍 Liquidación ${index + 1}:`, liq._id);
@@ -122,26 +124,50 @@ router.get('/stats/resumen', protect, async (req, res) => {
           }
         });
       }
+
+      // Movimientos de caja
+      if (liq.movimientosCaja && Array.isArray(liq.movimientosCaja)) {
+        liq.movimientosCaja.forEach(mov => {
+          if (mov.tipo === 'ingreso') {
+            console.log('  💵 Aporte:', mov.monto);
+            totalAportes += mov.monto;
+          } else if (mov.tipo === 'retiro') {
+            console.log('  💸 Retiro:', mov.monto);
+            totalRetiros += mov.monto;
+          }
+        });
+      }
     });
+
+    const totalMovimientos = totalAportes - totalRetiros;
 
     console.log('\n💰 Totales calculados:');
     console.log('  - Transferencias Ingresos:', totalTransferenciasIngresos);
     console.log('  - Transferencias Gastos:', totalTransferenciasGastos);
+    console.log('  - Total Aportes:', totalAportes);
+    console.log('  - Total Retiros:', totalRetiros);
+    console.log('  - Total Movimientos:', totalMovimientos);
     console.log('  - Caja Transferencias:', totalTransferenciasIngresos - totalTransferenciasGastos);
+
+    const totalIngresos = liquidaciones.reduce((sum, l) => sum + (l.ingresos?.totalPedidos || 0), 0);
+    const totalEgresos = liquidaciones.reduce((sum, l) => sum + (l.egresos?.totalGastos || 0), 0);
 
     const stats = {
       totalLiquidaciones: liquidaciones.length,
-      totalIngresos: liquidaciones.reduce((sum, l) => sum + (l.ingresos?.totalPedidos || 0), 0),
-      totalEgresos: liquidaciones.reduce((sum, l) => sum + (l.egresos?.totalGastos || 0), 0),
-      totalMovimientos: liquidaciones.reduce((sum, l) => sum + (l.totalMovimientos || 0), 0),
+      totalIngresos,
+      totalEgresos,
+      totalAportes,
+      totalRetiros,
+      totalMovimientos,
       totalTransferenciasIngresos,
       totalTransferenciasGastos,
       cajaTransferencias: totalTransferenciasIngresos - totalTransferenciasGastos,
+      cajaFinalTotal: totalIngresos - totalEgresos + totalMovimientos,
       promedioIngresosPorDia: liquidaciones.length > 0 
-        ? liquidaciones.reduce((sum, l) => sum + (l.ingresos?.totalPedidos || 0), 0) / liquidaciones.length 
+        ? totalIngresos / liquidaciones.length 
         : 0,
       promedioEgresosPorDia: liquidaciones.length > 0 
-        ? liquidaciones.reduce((sum, l) => sum + (l.egresos?.totalGastos || 0), 0) / liquidaciones.length 
+        ? totalEgresos / liquidaciones.length 
         : 0
     };
 
