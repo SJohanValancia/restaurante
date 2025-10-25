@@ -18,6 +18,92 @@
             color: #1a202c;
         }
 
+        /* OVERLAY PARA MÓVIL */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* BOTÓN HAMBURGUESA */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .menu-toggle:active {
+            transform: scale(0.95);
+        }
+
+        .hamburger {
+            position: relative;
+            width: 24px;
+            height: 18px;
+            margin: auto;
+        }
+
+        .hamburger span {
+            display: block;
+            position: absolute;
+            height: 3px;
+            width: 100%;
+            background: white;
+            border-radius: 3px;
+            opacity: 1;
+            left: 0;
+            transition: all 0.25s ease;
+        }
+
+        .hamburger span:nth-child(1) {
+            top: 0;
+        }
+
+        .hamburger span:nth-child(2) {
+            top: 7px;
+        }
+
+        .hamburger span:nth-child(3) {
+            top: 14px;
+        }
+
+        .menu-toggle.active .hamburger span:nth-child(1) {
+            top: 7px;
+            transform: rotate(135deg);
+        }
+
+        .menu-toggle.active .hamburger span:nth-child(2) {
+            opacity: 0;
+            left: -60px;
+        }
+
+        .menu-toggle.active .hamburger span:nth-child(3) {
+            top: 7px;
+            transform: rotate(-135deg);
+        }
+
         /* SIDEBAR */
         .sidebar {
             position: fixed;
@@ -29,6 +115,7 @@
             padding: 0;
             z-index: 1000;
             box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
         }
 
         .sidebar-header {
@@ -71,6 +158,21 @@
 
         .sidebar-nav {
             padding: 1rem 0;
+            max-height: calc(100vh - 250px);
+            overflow-y: auto;
+        }
+
+        .sidebar-nav::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
         }
 
         .nav-section-title {
@@ -189,6 +291,7 @@
         .content-wrapper {
             margin-left: 280px;
             min-height: 100vh;
+            transition: margin-left 0.3s ease;
         }
 
         .container {
@@ -604,6 +707,7 @@
             z-index: 2000;
             align-items: center;
             justify-content: center;
+            padding: 1rem;
         }
 
         .modal.active {
@@ -615,7 +719,7 @@
             border-radius: 12px;
             padding: 2rem;
             max-width: 600px;
-            width: 90%;
+            width: 100%;
             max-height: 90vh;
             overflow-y: auto;
         }
@@ -710,10 +814,14 @@
             to { transform: rotate(360deg); }
         }
 
+        /* RESPONSIVE */
         @media (max-width: 1024px) {
+            .menu-toggle {
+                display: block;
+            }
+
             .sidebar {
-                transform: translateX(-280px);
-                transition: transform 0.3s ease;
+                transform: translateX(-100%);
             }
 
             .sidebar.active {
@@ -724,14 +832,110 @@
                 margin-left: 0;
             }
 
-            .user-actions,
-            .permissions-grid {
+            .container {
+                padding: 5rem 1rem 2rem 1rem;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+
+            .page-subtitle {
+                font-size: 14px;
+            }
+
+            .search-section,
+            .result-card,
+            .meseros-section {
+                padding: 1.5rem;
+            }
+
+            .search-form {
                 flex-direction: column;
+            }
+
+            .btn-search {
+                width: 100%;
+            }
+
+            .user-card-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .user-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .mesero-card-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .mesero-actions {
+                width: 100%;
+                justify-content: stretch;
+            }
+
+            .btn-icon {
+                flex: 1;
+            }
+
+            .permissions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-buttons {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 5rem 0.75rem 1rem 0.75rem;
+            }
+
+            .search-section,
+            .result-card,
+            .meseros-section {
+                padding: 1rem;
+                border-radius: 8px;
+            }
+
+            .page-title {
+                font-size: 20px;
+            }
+
+            .user-avatar-large {
+                width: 60px;
+                height: 60px;
+                font-size: 24px;
+            }
+
+            .user-card-info h3 {
+                font-size: 18px;
+            }
+
+            .modal-content {
+                padding: 1.5rem;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Overlay para móvil -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- Botón hamburguesa -->
+    <button class="menu-toggle" id="menuToggle" onclick="toggleSidebar()">
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </button>
+
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <a href="administrador.html" class="sidebar-brand">
@@ -743,52 +947,51 @@
             </a>
         </div>
 
-<nav class="sidebar-nav">
-    <div class="nav-section-title">Principal</div>
-    <a href="productos.html" class="nav-item">
-        <span class="nav-icon">📦</span>
-        <span>Productos</span>
-    </a>
-    <a href="pedidos.html" class="nav-item">
-        <span class="nav-icon">🍽️</span>
-        <span>Pedidos</span>
-    </a>
-    <a href="gastos.html" class="nav-item">
-        <span class="nav-icon">🧾</span>
-        <span>Gastos</span>
-    </a>
-    <a href="qr-generator.html" class="nav-item">
-        <span class="nav-icon">📱</span>
-        <span>QR Generador</span>
-    </a>
-    <a href="reportes.html" class="nav-item">
-        <span class="nav-icon">📊</span>
-        <span>Reportes</span>
-    </a>
-    <a href="historial-pedidos.html" class="nav-item">
-        <span class="nav-icon">📜</span>
-        <span>Historial</span>
-    </a>
-    <a href="catalogo-productos.html" class="nav-item">
-        <span class="nav-icon">📜📦</span>
-        <span>Inventario</span>
-    </a>
-    
-    <!-- SOLO ADMINISTRADORES -->
-    <div class="nav-section-title">Administración</div>
-    <a href="administrador.html" class="nav-item active">
-        <span class="nav-icon">👥</span>
-        <span>Gestión de Meseros</span>
-    </a>
-    <a href="liquidacion.html" class="nav-item">
-        <span class="nav-icon">💵</span>
-        <span>Liquidación</span>
-    </a>
-    <a href="historial-liquidaciones.html" class="nav-item">
-        <span class="nav-icon">📋</span>
-        <span>Hist. Liquidaciones</span>
-    </a>
-</nav>
+        <nav class="sidebar-nav">
+            <div class="nav-section-title">Principal</div>
+            <a href="productos.html" class="nav-item">
+                <span class="nav-icon">📦</span>
+                <span>Productos</span>
+            </a>
+            <a href="pedidos.html" class="nav-item">
+                <span class="nav-icon">🍽️</span>
+                <span>Pedidos</span>
+            </a>
+            <a href="gastos.html" class="nav-item">
+                <span class="nav-icon">🧾</span>
+                <span>Gastos</span>
+            </a>
+            <a href="qr-generator.html" class="nav-item">
+                <span class="nav-icon">📱</span>
+                <span>QR Generador</span>
+            </a>
+            <a href="reportes.html" class="nav-item">
+                <span class="nav-icon">📊</span>
+                <span>Reportes</span>
+            </a>
+            <a href="historial-pedidos.html" class="nav-item">
+                <span class="nav-icon">📜</span>
+                <span>Historial</span>
+            </a>
+            <a href="catalogo-productos.html" class="nav-item">
+                <span class="nav-icon">📜📦</span>
+                <span>Inventario</span>
+            </a>
+            
+            <div class="nav-section-title">Administración</div>
+            <a href="administrador.html" class="nav-item active">
+                <span class="nav-icon">👥</span>
+                <span>Gestión de Meseros</span>
+            </a>
+            <a href="liquidacion.html" class="nav-item">
+                <span class="nav-icon">💵</span>
+                <span>Liquidación</span>
+            </a>
+            <a href="historial-liquidaciones.html" class="nav-item">
+                <span class="nav-icon">📋</span>
+                <span>Hist. Liquidaciones</span>
+            </a>
+        </nav>
 
         <div class="sidebar-footer">
             <div class="user-info">
@@ -876,93 +1079,117 @@
     </div>
 
     <!-- Modal de Permisos -->
-   <!-- Modal de Permisos -->
-<div class="modal" id="permissionsModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>🔐 Gestionar Permisos</h2>
+    <div class="modal" id="permissionsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔐 Gestionar Permisos</h2>
+            </div>
+            <form id="permissionsForm">
+                <div class="permissions-grid">
+                    <!-- PRODUCTOS -->
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_verProductos" class="permission-checkbox">
+                        <label for="perm_verProductos" class="permission-label">Ver Productos</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_crearProductos" class="permission-checkbox">
+                        <label for="perm_crearProductos" class="permission-label">Crear Productos</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_editarProductos" class="permission-checkbox">
+                        <label for="perm_editarProductos" class="permission-label">Editar Productos</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_eliminarProductos" class="permission-checkbox">
+                        <label for="perm_eliminarProductos" class="permission-label">Eliminar Productos</label>
+                    </div>
+                    
+                    <!-- PEDIDOS -->
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_verPedidos" class="permission-checkbox">
+                        <label for="perm_verPedidos" class="permission-label">Ver Pedidos</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_crearPedidos" class="permission-checkbox">
+                        <label for="perm_crearPedidos" class="permission-label">Crear Pedidos</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_editarPedidos" class="permission-checkbox">
+                        <label for="perm_editarPedidos" class="permission-label">Editar Pedidos</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_cancelarPedidos" class="permission-checkbox">
+                        <label for="perm_cancelarPedidos" class="permission-label">Cancelar Pedidos</label>
+                    </div>
+                    
+                    <!-- GASTOS -->
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_verGastos" class="permission-checkbox">
+                        <label for="perm_verGastos" class="permission-label">Ver Gastos</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_crearGastos" class="permission-checkbox">
+                        <label for="perm_crearGastos" class="permission-label">Crear Gastos</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_editarGastos" class="permission-checkbox">
+                        <label for="perm_editarGastos" class="permission-label">Editar Gastos</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_eliminarGastos" class="permission-checkbox">
+                        <label for="perm_eliminarGastos" class="permission-label">Eliminar Gastos</label>
+                    </div>
+                    
+                    <!-- OTROS -->
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_verReportes" class="permission-checkbox">
+                        <label for="perm_verReportes" class="permission-label">Ver Reportes</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_verLiquidaciones" class="permission-checkbox">
+                        <label for="perm_verLiquidaciones" class="permission-label">Ver Liquidaciones</label>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-modal btn-modal-secondary" onclick="closePermissionsModal()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn-modal btn-modal-primary">
+                        Guardar Permisos
+                    </button>
+                </div>
+            </form>
         </div>
-        <form id="permissionsForm">
-            <div class="permissions-grid">
-                <!-- PRODUCTOS -->
-                <div class="permission-item">
-                    <input type="checkbox" id="perm_verProductos" class="permission-checkbox">
-                    <label for="perm_verProductos" class="permission-label">Ver Productos</label>
-                </div>
-                <div class="permission-item">
-                    <input type="checkbox" id="perm_crearProductos" class="permission-checkbox">
-                    <label for="perm_crearProductos" class="permission-label">Crear Productos</label>
-                </div>
-                <div class="permission-item">
-                    <input type="checkbox" id="perm_editarProductos" class="permission-checkbox">
-                    <label for="perm_editarProductos" class="permission-label">Editar Productos</label>
-                </div>
-                <div class="permission-item">
-                    <input type="checkbox" id="perm_eliminarProductos" class="permission-checkbox">
-                    <label for="perm_eliminarProductos" class="permission-label">Eliminar Productos</label>
-                </div>
-                
-                <!-- PEDIDOS -->
-                <div class="permission-item">
-                    <input type="checkbox" id="perm_verPedidos" class="permission-checkbox">
-                    <label for="perm_verPedidos" class="permission-label">Ver Pedidos</label>
-                </div>
-                <div class="permission-item">
-                    <input type="checkbox" id="perm_crearPedidos" class="permission-checkbox">
-                    <label for="perm_crearPedidos" class="permission-label">Crear Pedidos</label>
-                </div>
-                <div class="permission-item">
-                    <input type="checkbox" id="perm_editarPedidos" class="permission-checkbox">
-                    <label for="perm_editarPedidos" class="permission-label">Editar Pedidos</label>
-                </div>
-                <div class="permission-item">
-                    <input type="checkbox" id="perm_cancelarPedidos" class="permission-checkbox">
-                    <label for="perm_cancelarPedidos" class="permission-label">Cancelar Pedidos</label>
-                </div>
-                
-<!-- GASTOS -->
-<div class="permission-item">
-    <input type="checkbox" id="perm_verGastos" class="permission-checkbox">
-    <label for="perm_verGastos" class="permission-label">Ver Gastos</label>
-</div>
-<div class="permission-item">
-    <input type="checkbox" id="perm_crearGastos" class="permission-checkbox">
-    <label for="perm_crearGastos" class="permission-label">Crear Gastos</label>
-</div>
-<div class="permission-item">
-    <input type="checkbox" id="perm_editarGastos" class="permission-checkbox">
-    <label for="perm_editarGastos" class="permission-label">Editar Gastos</label>
-</div>
-<div class="permission-item">
-    <input type="checkbox" id="perm_eliminarGastos" class="permission-checkbox">
-    <label for="perm_eliminarGastos" class="permission-label">Eliminar Gastos</label>
-</div>
-                <!-- OTROS -->
-                <div class="permission-item">
-                    <input type="checkbox" id="perm_verReportes" class="permission-checkbox">
-                    <label for="perm_verReportes" class="permission-label">Ver Reportes</label>
-                </div>
-                <div class="permission-item">
-                    <input type="checkbox" id="perm_verLiquidaciones" class="permission-checkbox">
-                    <label for="perm_verLiquidaciones" class="permission-label">Ver Liquidaciones</label>
-                </div>
-            </div>
-            <div class="modal-buttons">
-                <button type="button" class="btn-modal btn-modal-secondary" onclick="closePermissionsModal()">
-                    Cancelar
-                </button>
-                <button type="submit" class="btn-modal btn-modal-primary">
-                    Guardar Permisos
-                </button>
-            </div>
-        </form>
     </div>
-</div>
+
     <script>
         const API_URL = 'https://restaurante-co77.onrender.com/api';
         let currentUser = null;
         let currentSearchedUser = null;
         let currentRelacionId = null;
+
+        // Toggle Sidebar para móvil
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const menuToggle = document.getElementById('menuToggle');
+            
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            menuToggle.classList.toggle('active');
+        }
+
+        // Cerrar sidebar al hacer clic en un nav-item en móvil
+        document.addEventListener('DOMContentLoaded', () => {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    if (window.innerWidth <= 1024) {
+                        toggleSidebar();
+                    }
+                });
+            });
+        });
 
         window.addEventListener('DOMContentLoaded', async () => {
             const token = localStorage.getItem('token');
@@ -976,22 +1203,22 @@
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
-if (response.status === 401) {
-    console.warn('⚠️ Token expirado');
-    localStorage.removeItem('token');
-    window.location.href = 'index.html';
-    return;
-}
+                if (response.status === 401) {
+                    console.warn('⚠️ Token expirado');
+                    localStorage.removeItem('token');
+                    window.location.href = 'index.html';
+                    return;
+                }
 
-if (!response.ok) {
-    console.error('Error al cargar usuario');
-    alert('Error al cargar datos. Intente recargar.');
-    return;
-}
+                if (!response.ok) {
+                    console.error('Error al cargar usuario');
+                    alert('Error al cargar datos. Intente recargar.');
+                    return;
+                }
+
                 const data = await response.json();
                 currentUser = data.data;
 
-                // Verificar que sea admin
                 if (currentUser.rol !== 'admin') {
                     window.location.href = 'productos.html';
                     return;
@@ -1003,9 +1230,9 @@ if (!response.ok) {
 
                 await cargarMeseros();
             } catch (error) {
-    console.error('❌ Error de red:', error);
-    alert('Error de conexión. Recargue la página.');
-}
+                console.error('❌ Error de red:', error);
+                alert('Error de conexión. Recargue la página.');
+            }
         });
 
         function showAlert(message, type = 'info') {
@@ -1110,133 +1337,128 @@ if (!response.ok) {
             }
         }
 
-async function cargarMeseros() {
-    const token = localStorage.getItem('token');
-    const container = document.getElementById('meserosList');
-    
-    // Mostrar indicador de carga inmediatamente
-    container.innerHTML = `
-        <div class="empty-state">
-            <div class="empty-icon">⏳</div>
-            <p class="empty-text">Cargando meseros...</p>
-        </div>
-    `;
-    
-    try {
-        const response = await fetch(`${API_URL}/admin-meseros/meseros/${currentUser._id}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            console.log(`✅ ${data.count} meseros cargados`);
-            mostrarMeseros(data.data);
-            document.getElementById('meserosCount').textContent = data.count;
-        } else {
+        async function cargarMeseros() {
+            const token = localStorage.getItem('token');
+            const container = document.getElementById('meserosList');
+            
             container.innerHTML = `
                 <div class="empty-state">
-                    <div class="empty-icon">❌</div>
-                    <p class="empty-text">Error al cargar meseros</p>
+                    <div class="empty-icon">⏳</div>
+                    <p class="empty-text">Cargando meseros...</p>
                 </div>
             `;
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        container.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">❌</div>
-                <p class="empty-text">Error de conexión. Recarga la página.</p>
-            </div>
-        `;
-    }
-}
-
-function mostrarMeseros(meseros) {
-    const container = document.getElementById('meserosList');
-    
-    if (meseros.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">👥</div>
-                <p class="empty-text">No has agregado meseros aún</p>
-            </div>
-        `;
-        return;
-    }
-
-    // Usar template string más eficiente
-    const html = meseros.map(item => {
-        const inicial = item.mesero.nombre.charAt(0).toUpperCase();
-        return `
-            <div class="mesero-card">
-                <div class="mesero-card-content">
-                    <div class="mesero-info-wrapper">
-                        <div class="mesero-avatar">${inicial}</div>
-                        <div class="mesero-details">
-                            <h4>${item.mesero.nombre}</h4>
-                            <p>${item.mesero.email} • ${item.mesero.rol}</p>
-                        </div>
-                    </div>
-                    <div class="mesero-actions">
-                        <button class="btn-icon btn-icon-permissions" onclick="editMeseroPermisos('${item.relacionId}', '${item.mesero._id}')">
-                            🔐 Permisos
-                        </button>
-                        <button class="btn-icon btn-icon-delete" onclick="deleteMesero('${item.relacionId}', '${item.mesero.nombre}')">
-                            🗑️
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-    }).join('');
-    
-    container.innerHTML = html;
-}
-        function viewMeseroDetails(relacionId) {
-            showAlert('Función de inspección en desarrollo', 'info');
-        }
-
-async function editMeseroPermisos(relacionId, meseroId) {
-    currentRelacionId = relacionId;
-    
-    const token = localStorage.getItem('token');
-    
-    try {
-        const response = await fetch(`${API_URL}/admin-meseros/meseros/${currentUser._id}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        const data = await response.json();
-        
-        if (data.success) {
-            const mesero = data.data.find(m => m.relacionId === relacionId);
             
-            if (mesero && mesero.permisos) {
-                document.getElementById('perm_verProductos').checked = mesero.permisos.verProductos ?? true;
-                document.getElementById('perm_crearProductos').checked = mesero.permisos.crearProductos || false;
-                document.getElementById('perm_editarProductos').checked = mesero.permisos.editarProductos || false;
-                document.getElementById('perm_eliminarProductos').checked = mesero.permisos.eliminarProductos || false;
-                document.getElementById('perm_verPedidos').checked = mesero.permisos.verPedidos ?? true;
-                document.getElementById('perm_crearPedidos').checked = mesero.permisos.crearPedidos ?? true;
-                document.getElementById('perm_editarPedidos').checked = mesero.permisos.editarPedidos || false;
-                document.getElementById('perm_cancelarPedidos').checked = mesero.permisos.cancelarPedidos || false;
-                document.getElementById('perm_verGastos').checked = mesero.permisos.verGastos ?? true;
-                document.getElementById('perm_crearGastos').checked = mesero.permisos.crearGastos ?? true;
-                document.getElementById('perm_editarGastos').checked = mesero.permisos.editarGastos || false;        // NUEVO
-                document.getElementById('perm_eliminarGastos').checked = mesero.permisos.eliminarGastos || false;    // NUEVO
-                document.getElementById('perm_verReportes').checked = mesero.permisos.verReportes || false;
-                document.getElementById('perm_verLiquidaciones').checked = mesero.permisos.verLiquidaciones || false;
+            try {
+                const response = await fetch(`${API_URL}/admin-meseros/meseros/${currentUser._id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    console.log(`✅ ${data.count} meseros cargados`);
+                    mostrarMeseros(data.data);
+                    document.getElementById('meserosCount').textContent = data.count;
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">❌</div>
+                            <p class="empty-text">Error al cargar meseros</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">❌</div>
+                        <p class="empty-text">Error de conexión. Recarga la página.</p>
+                    </div>
+                `;
             }
         }
-    } catch (error) {
-        console.error('Error al cargar permisos:', error);
-    }
-    
-    document.getElementById('permissionsModal').classList.add('active');
-}
 
-function openPermissionsModal() {
+        function mostrarMeseros(meseros) {
+            const container = document.getElementById('meserosList');
+            
+            if (meseros.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">👥</div>
+                        <p class="empty-text">No has agregado meseros aún</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = meseros.map(item => {
+                const inicial = item.mesero.nombre.charAt(0).toUpperCase();
+                return `
+                    <div class="mesero-card">
+                        <div class="mesero-card-content">
+                            <div class="mesero-info-wrapper">
+                                <div class="mesero-avatar">${inicial}</div>
+                                <div class="mesero-details">
+                                    <h4>${item.mesero.nombre}</h4>
+                                    <p>${item.mesero.email} • ${item.mesero.rol}</p>
+                                </div>
+                            </div>
+                            <div class="mesero-actions">
+                                <button class="btn-icon btn-icon-permissions" onclick="editMeseroPermisos('${item.relacionId}', '${item.mesero._id}')">
+                                    🔐 Permisos
+                                </button>
+                                <button class="btn-icon btn-icon-delete" onclick="deleteMesero('${item.relacionId}', '${item.mesero.nombre}')">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        }
+
+        async function editMeseroPermisos(relacionId, meseroId) {
+            currentRelacionId = relacionId;
+            
+            const token = localStorage.getItem('token');
+            
+            try {
+                const response = await fetch(`${API_URL}/admin-meseros/meseros/${currentUser._id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    const mesero = data.data.find(m => m.relacionId === relacionId);
+                    
+                    if (mesero && mesero.permisos) {
+                        document.getElementById('perm_verProductos').checked = mesero.permisos.verProductos ?? true;
+                        document.getElementById('perm_crearProductos').checked = mesero.permisos.crearProductos || false;
+                        document.getElementById('perm_editarProductos').checked = mesero.permisos.editarProductos || false;
+                        document.getElementById('perm_eliminarProductos').checked = mesero.permisos.eliminarProductos || false;
+                        document.getElementById('perm_verPedidos').checked = mesero.permisos.verPedidos ?? true;
+                        document.getElementById('perm_crearPedidos').checked = mesero.permisos.crearPedidos ?? true;
+                        document.getElementById('perm_editarPedidos').checked = mesero.permisos.editarPedidos || false;
+                        document.getElementById('perm_cancelarPedidos').checked = mesero.permisos.cancelarPedidos || false;
+                        document.getElementById('perm_verGastos').checked = mesero.permisos.verGastos ?? true;
+                        document.getElementById('perm_crearGastos').checked = mesero.permisos.crearGastos ?? true;
+                        document.getElementById('perm_editarGastos').checked = mesero.permisos.editarGastos || false;
+                        document.getElementById('perm_eliminarGastos').checked = mesero.permisos.eliminarGastos || false;
+                        document.getElementById('perm_verReportes').checked = mesero.permisos.verReportes || false;
+                        document.getElementById('perm_verLiquidaciones').checked = mesero.permisos.verLiquidaciones || false;
+                    }
+                }
+            } catch (error) {
+                console.error('Error al cargar permisos:', error);
+            }
+            
+            document.getElementById('permissionsModal').classList.add('active');
+        }
+
+        function openPermissionsModal() {
             if (!currentSearchedUser) return;
             document.getElementById('permissionsModal').classList.add('active');
         }
@@ -1246,59 +1468,59 @@ function openPermissionsModal() {
             currentRelacionId = null;
         }
 
-document.getElementById('permissionsForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    if (!currentRelacionId) {
-        showAlert('No hay mesero seleccionado', 'error');
-        return;
-    }
+        document.getElementById('permissionsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!currentRelacionId) {
+                showAlert('No hay mesero seleccionado', 'error');
+                return;
+            }
 
-    const permisos = {
-        verProductos: document.getElementById('perm_verProductos').checked,
-        crearProductos: document.getElementById('perm_crearProductos').checked,
-        editarProductos: document.getElementById('perm_editarProductos').checked,
-        eliminarProductos: document.getElementById('perm_eliminarProductos').checked,
-        verPedidos: document.getElementById('perm_verPedidos').checked,
-        crearPedidos: document.getElementById('perm_crearPedidos').checked,
-        editarPedidos: document.getElementById('perm_editarPedidos').checked,
-        cancelarPedidos: document.getElementById('perm_cancelarPedidos').checked,
-        verGastos: document.getElementById('perm_verGastos').checked,
-        crearGastos: document.getElementById('perm_crearGastos').checked,
-        editarGastos: document.getElementById('perm_editarGastos').checked,          // NUEVO
-        eliminarGastos: document.getElementById('perm_eliminarGastos').checked,      // NUEVO
-        verReportes: document.getElementById('perm_verReportes').checked,
-        verLiquidaciones: document.getElementById('perm_verLiquidaciones').checked
-    };
+            const permisos = {
+                verProductos: document.getElementById('perm_verProductos').checked,
+                crearProductos: document.getElementById('perm_crearProductos').checked,
+                editarProductos: document.getElementById('perm_editarProductos').checked,
+                eliminarProductos: document.getElementById('perm_eliminarProductos').checked,
+                verPedidos: document.getElementById('perm_verPedidos').checked,
+                crearPedidos: document.getElementById('perm_crearPedidos').checked,
+                editarPedidos: document.getElementById('perm_editarPedidos').checked,
+                cancelarPedidos: document.getElementById('perm_cancelarPedidos').checked,
+                verGastos: document.getElementById('perm_verGastos').checked,
+                crearGastos: document.getElementById('perm_crearGastos').checked,
+                editarGastos: document.getElementById('perm_editarGastos').checked,
+                eliminarGastos: document.getElementById('perm_eliminarGastos').checked,
+                verReportes: document.getElementById('perm_verReportes').checked,
+                verLiquidaciones: document.getElementById('perm_verLiquidaciones').checked
+            };
 
-    const token = localStorage.getItem('token');
-    
-    try {
-        const response = await fetch(`${API_URL}/admin-meseros/permisos/${currentRelacionId}`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ permisos })
+            const token = localStorage.getItem('token');
+            
+            try {
+                const response = await fetch(`${API_URL}/admin-meseros/permisos/${currentRelacionId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ permisos })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('✅ Permisos actualizados exitosamente', 'success');
+                    closePermissionsModal();
+                    await cargarMeseros();
+                } else {
+                    showAlert(data.message || 'Error al actualizar permisos', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Error al actualizar permisos', 'error');
+            }
         });
 
-        const data = await response.json();
-
-        if (data.success) {
-            showAlert('✅ Permisos actualizados exitosamente', 'success');
-            closePermissionsModal();
-            await cargarMeseros();
-        } else {
-            showAlert(data.message || 'Error al actualizar permisos', 'error');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        showAlert('Error al actualizar permisos', 'error');
-    }
-});
-
-async function deleteMesero(relacionId, nombre) {
+        async function deleteMesero(relacionId, nombre) {
             if (!confirm(`¿Estás seguro de eliminar a ${nombre}?`)) {
                 return;
             }
@@ -1329,7 +1551,6 @@ async function deleteMesero(relacionId, nombre) {
             if (!currentSearchedUser) return;
             
             if (confirm(`¿Eliminar a ${currentSearchedUser.nombre}?`)) {
-                // Aquí implementarías la eliminación si es necesario
                 showAlert('Función de eliminación directa no disponible. Usa "Inspeccionar" para agregar primero.', 'info');
             }
         }

@@ -1322,90 +1322,103 @@ if (fechaDesde && fechaHasta) {
         displayOrdersCards();
     }
 
-    function displayOrdersCards() {
-        const container = document.getElementById('ordersCards');
+function displayOrdersCards() {
+    const container = document.getElementById('ordersCards');
 
-        if (filteredOrders.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-icon">📋</div>
-                    <p>No hay pedidos para mostrar en este período</p>
+    if (filteredOrders.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">📋</div>
+                <p>No hay pedidos para mostrar en este período</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = filteredOrders.map(order => `
+        <div class="order-card">
+            <div class="order-card-header">
+                <div>
+                    <div class="order-number">#${order._id.slice(-6).toUpperCase()}</div>
+                    <div class="order-time">${new Date(order.createdAt).toLocaleString('es-CO', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })}</div>
                 </div>
-            `;
-            return;
-        }
-
-        container.innerHTML = filteredOrders.map(order => `
-            <div class="order-card">
-                <div class="order-card-header">
+                <span class="status-badge status-${order.estado}">${order.estado}</span>
+            </div>
+            
+            <div class="order-card-body">
+                <div class="order-info-row">
+                    ${order.metodoPago ? `
                     <div>
-                        <div class="order-number">#${order._id.slice(-6).toUpperCase()}</div>
-                        <div class="order-time">${new Date(order.createdAt).toLocaleString('es-CO', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        })}</div>
+                        <div class="order-info-label">Método de Pago</div>
+                        <div class="order-info-value" style="color: ${order.metodoPago === 'transferencia' ? '#667eea' : '#48bb78'};">
+                            ${order.metodoPago === 'transferencia' ? '📱 Transferencia' : '💵 Efectivo'}
+                        </div>
                     </div>
-                    <span class="status-badge status-${order.estado}">${order.estado}</span>
+                    ` : ''}
+                    <div>
+                        <div class="order-info-label">Mesa</div>
+                        <div class="order-info-value">Mesa ${order.mesa || 'N/A'}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="order-info-label">Productos</div>
+                        <div class="order-info-value">${order.items ? order.items.length : 0} items</div>
+                    </div>
                 </div>
                 
-                <div class="order-card-body">
-                    <div class="order-info-row">
-
-${order.metodoPago ? `
-    <div class="order-info-row">
-        <div>
-            <div class="order-info-label">Método de Pago</div>
-            <div class="order-info-value" style="color: ${order.metodoPago === 'transferencia' ? '#667eea' : '#48bb78'};">
-                ${order.metodoPago === 'transferencia' ? '📱 Transferencia' : '💵 Efectivo'}
-            </div>
-        </div>
-    </div>
-` : ''}
-
-                        <div>
-                            <div class="order-info-label">Mesa</div>
-                            <div class="order-info-value">Mesa ${order.mesa || 'N/A'}</div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div class="order-info-label">Productos</div>
-                            <div class="order-info-value">${order.items ? order.items.length : 0} items</div>
-                        </div>
-                    </div>
-                    
-                    <div class="order-items-list">
-                        <div class="order-items-title">🍽️ Detalle del Pedido:</div>
-                        ${order.items ? order.items.map(item => `
+                <div class="order-items-list">
+                    <div class="order-items-title">🍽️ Detalle del Pedido:</div>
+                    ${order.items ? order.items.map(item => {
+                        // Manejo seguro de productos eliminados
+                        let nombre = 'Producto eliminado';
+                        let categoria = 'Sin categoría';
+                        
+                        if (item.productoInfo) {
+                            nombre = item.productoInfo.nombre;
+                            categoria = item.productoInfo.categoria;
+                        } else if (item.producto && item.producto.nombre) {
+                            nombre = item.producto.nombre;
+                            categoria = item.producto.categoria || 'Sin categoría';
+                        } else if (item.nombreProducto) {
+                            nombre = item.nombreProducto;
+                            categoria = item.categoriaProducto || 'Sin categoría';
+                        }
+                        
+                        return `
                             <div class="order-item">
                                 <div class="order-item-info">
-                                    <div class="order-item-name">${item.producto?.nombre || 'Producto'}</div>
-                                    <div class="order-item-category">${item.producto?.categoria || 'Sin categoría'}</div>
+                                    <div class="order-item-name">${nombre}</div>
+                                    <div class="order-item-category">${categoria}</div>
                                 </div>
                                 <div style="display: flex; align-items: center;">
                                     <span class="order-item-quantity">x${item.cantidad || 0}</span>
                                     <span class="order-item-price">$${((item.precio || 0) * (item.cantidad || 0)).toLocaleString('es-CO')}</span>
                                 </div>
                             </div>
-                        `).join('') : '<p>Sin items</p>'}
-                    </div>
-                    
-                    ${order.notas ? `
-                        <div style="margin-top: 1rem; padding: 0.75rem; background: #fff3cd; border-left: 3px solid #ffc107; border-radius: 4px;">
-                            <strong style="font-size: 12px; color: #856404;">📝 Notas:</strong>
-                            <p style="font-size: 13px; color: #856404; margin: 4px 0 0 0;">${order.notas}</p>
-                        </div>
-                    ` : ''}
+                        `;
+                    }).join('') : '<p>Sin items</p>'}
                 </div>
                 
-                <div class="order-card-footer">
-                    <span class="order-total-label">Total:</span>
-                    <span class="order-total-value">$${(order.total || 0).toLocaleString('es-CO')}</span>
-                </div>
+                ${order.notas ? `
+                    <div style="margin-top: 1rem; padding: 0.75rem; background: #fff3cd; border-left: 3px solid #ffc107; border-radius: 4px;">
+                        <strong style="font-size: 12px; color: #856404;">📝 Notas:</strong>
+                        <p style="font-size: 13px; color: #856404; margin: 4px 0 0 0;">${order.notas}</p>
+                    </div>
+                ` : ''}
             </div>
-        `).join('');
-    }
+            
+            <div class="order-card-footer">
+                <span class="order-total-label">Total:</span>
+                <span class="order-total-value">$${(order.total || 0).toLocaleString('es-CO')}</span>
+            </div>
+        </div>
+    `).join('');
+}
 
 function updateStatistics() {
     const totalPedidos = filteredOrders.length;
@@ -1467,58 +1480,75 @@ function updateStatistics() {
             `stat-change ${changePedidos >= 0 ? 'positive' : 'negative'}`;
     }
 
-    function updateProductsRanking() {
-        const productStats = {};
+function updateProductsRanking() {
+    const productStats = {};
 
-        filteredOrders.filter(o => o.estado !== 'cancelado').forEach(order => {
-            order.items.forEach(item => {
-                const productId = item.producto._id;
-                if (!productStats[productId]) {
-                    productStats[productId] = {
-                        nombre: item.producto.nombre,
-                        categoria: item.producto.categoria,
-                        cantidad: 0,
-                        ingresos: 0
-                    };
-                }
-                productStats[productId].cantidad += item.cantidad;
-                productStats[productId].ingresos += item.cantidad * item.precio;
-            });
+    filteredOrders.filter(o => o.estado !== 'cancelado').forEach(order => {
+        order.items.forEach(item => {
+            // Manejo seguro de productos
+            let productId, nombre, categoria;
+            
+            if (item.productoInfo) {
+                productId = item.producto || item._id;
+                nombre = item.productoInfo.nombre;
+                categoria = item.productoInfo.categoria;
+            } else if (item.producto && item.producto._id) {
+                productId = item.producto._id;
+                nombre = item.producto.nombre;
+                categoria = item.producto.categoria;
+            } else if (item.nombreProducto) {
+                productId = item.nombreProducto;
+                nombre = item.nombreProducto;
+                categoria = item.categoriaProducto || 'Sin categoría';
+            } else {
+                return; // Skip items sin información válida
+            }
+            
+            if (!productStats[productId]) {
+                productStats[productId] = {
+                    nombre: nombre,
+                    categoria: categoria,
+                    cantidad: 0,
+                    ingresos: 0
+                };
+            }
+            productStats[productId].cantidad += item.cantidad;
+            productStats[productId].ingresos += item.cantidad * item.precio;
         });
+    });
 
-        const ranking = Object.values(productStats)
-            .sort((a, b) => b.cantidad - a.cantidad)
-            .slice(0, 10);
+    const ranking = Object.values(productStats)
+        .sort((a, b) => b.cantidad - a.cantidad)
+        .slice(0, 10);
 
-        const container = document.getElementById('productsRanking');
+    const container = document.getElementById('productsRanking');
 
-        if (ranking.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-icon">📊</div>
-                    <p>No hay datos para mostrar</p>
-                </div>
-            `;
-            return;
-        }
-
-        container.innerHTML = ranking.map((product, index) => `
-            <div class="product-rank-item">
-                <div class="product-rank-info">
-                    <div class="rank-number">${index + 1}</div>
-                    <div class="product-details">
-                        <h4>${product.nombre}</h4>
-                        <p>${product.categoria}</p>
-                    </div>
-                </div>
-                <div class="product-stats">
-                    <div class="product-quantity">${product.cantidad} unidades</div>
-                    <div class="product-revenue">$${product.ingresos.toLocaleString('es-CO')}</div>
-                </div>
+    if (ranking.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">📊</div>
+                <p>No hay datos para mostrar</p>
             </div>
-        `).join('');
+        `;
+        return;
     }
 
+    container.innerHTML = ranking.map((product, index) => `
+        <div class="product-rank-item">
+            <div class="product-rank-info">
+                <div class="rank-number">${index + 1}</div>
+                <div class="product-details">
+                    <h4>${product.nombre}</h4>
+                    <p>${product.categoria}</p>
+                </div>
+            </div>
+            <div class="product-stats">
+                <div class="product-quantity">${product.cantidad} unidades</div>
+                <div class="product-revenue">$${product.ingresos.toLocaleString('es-CO')}</div>
+            </div>
+        </div>
+    `).join('');
+}
     function displayOrders() {
         const tbody = document.getElementById('ordersTableBody');
 

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Order = require('../models/order');
 const User = require('../models/User');
+const Product = require('../models/Product'); // AGREGAR ESTA LÍNEA
 const mongoose = require('mongoose');
 const { protect } = require('../middleware/auth');
 const { checkPermission } = require('../middleware/permissions');
@@ -11,7 +12,6 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
   try {
     const { estado, mesa, fecha } = req.query;
     
-    // Filtrar por todos los usuarios del mismo restaurante
     let query = { userId: { $in: req.userIdsRestaurante } };
 
     if (estado) query.estado = estado;
@@ -35,10 +35,39 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
       .populate('items.producto', 'nombre categoria precio')
       .sort({ createdAt: -1 });
 
+    // Normalizar datos para manejar productos eliminados
+    const ordersNormalizados = orders.map(order => {
+      const orderObj = order.toObject();
+      orderObj.items = orderObj.items.map(item => {
+        if (item.producto) {
+          // Producto existe
+          return {
+            ...item,
+            productoInfo: {
+              nombre: item.producto.nombre,
+              categoria: item.producto.categoria,
+              precio: item.producto.precio
+            }
+          };
+        } else {
+          // Producto fue eliminado, usar datos guardados
+          return {
+            ...item,
+            productoInfo: {
+              nombre: item.nombreProducto || 'Producto eliminado',
+              categoria: item.categoriaProducto || 'Sin categoría',
+              precio: item.precio
+            }
+          };
+        }
+      });
+      return orderObj;
+    });
+
     res.json({
       success: true,
-      count: orders.length,
-      data: orders
+      count: ordersNormalizados.length,
+      data: ordersNormalizados
     });
   } catch (error) {
     res.status(500).json({
@@ -49,7 +78,6 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
   }
 });
 
-// Obtener el pedido más reciente de una mesa específica (para seguimiento público)
 router.get('/mesa/:numeroMesa', async (req, res) => {
   try {
     const { numeroMesa } = req.params;
@@ -62,7 +90,6 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
       });
     }
 
-    // Buscar el usuario que corresponde a este restaurante y sede
     const query = { nombreRestaurante: restaurante };
     if (sede) {
       query.sede = sede;
@@ -77,22 +104,20 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
       });
     }
 
-    // Buscar el pedido más reciente de esta mesa para este usuario/restaurante
     const orderQuery = {
       mesa: parseInt(numeroMesa),
       userId: usuario._id,
       estado: { $in: ['pendiente', 'preparando', 'listo'] }
     };
 
-    const order = await Order.findOne(orderQuery)
+    let order = await Order.findOne(orderQuery)
       .populate('items.producto', 'nombre categoria precio')
       .populate('userId', 'nombre')
       .sort({ createdAt: -1 })
       .limit(1);
 
-    // Si no hay pedidos activos, buscar el último entregado
     if (!order) {
-      const lastOrder = await Order.findOne({ 
+      order = await Order.findOne({ 
         mesa: parseInt(numeroMesa),
         userId: usuario._id
       })
@@ -101,22 +126,41 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
         .sort({ createdAt: -1 })
         .limit(1);
 
-      if (!lastOrder) {
+      if (!order) {
         return res.status(404).json({
           success: false,
           message: 'No se encontraron pedidos para esta mesa'
         });
       }
-
-      return res.json({
-        success: true,
-        data: lastOrder
-      });
     }
+
+    // Normalizar datos
+    const orderObj = order.toObject();
+    orderObj.items = orderObj.items.map(item => {
+      if (item.producto) {
+        return {
+          ...item,
+          productoInfo: {
+            nombre: item.producto.nombre,
+            categoria: item.producto.categoria,
+            precio: item.producto.precio
+          }
+        };
+      } else {
+        return {
+          ...item,
+          productoInfo: {
+            nombre: item.nombreProducto || 'Producto eliminado',
+            categoria: item.categoriaProducto || 'Sin categoría',
+            precio: item.precio
+          }
+        };
+      }
+    });
 
     res.json({
       success: true,
-      data: order
+      data: orderObj
     });
   } catch (error) {
     res.status(500).json({
@@ -127,8 +171,6 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
   }
 });
 
-
-// Obtener un pedido por ID
 router.get('/:id', protect, async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
@@ -142,9 +184,33 @@ router.get('/:id', protect, async (req, res) => {
       });
     }
 
+    // Normalizar datos
+    const orderObj = order.toObject();
+    orderObj.items = orderObj.items.map(item => {
+      if (item.producto) {
+        return {
+          ...item,
+          productoInfo: {
+            nombre: item.producto.nombre,
+            categoria: item.producto.categoria,
+            precio: item.producto.precio
+          }
+        };
+      } else {
+        return {
+          ...item,
+          productoInfo: {
+            nombre: item.nombreProducto || 'Producto eliminado',
+            categoria: item.categoriaProducto || 'Sin categoría',
+            precio: item.precio
+          }
+        };
+      }
+    });
+
     res.json({
       success: true,
-      data: order
+      data: orderObj
     });
   } catch (error) {
     res.status(500).json({
@@ -155,7 +221,7 @@ router.get('/:id', protect, async (req, res) => {
   }
 });
 
-// Crear un nuevo pedido
+// MODIFICAR LA RUTA POST PARA GUARDAR NOMBRE Y CATEGORÍA
 router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
   try {
     const { mesa, items, notas } = req.body;
@@ -167,16 +233,28 @@ router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
       });
     }
 
-    const total = items.reduce((sum, item) => {
+    // Obtener información completa de los productos
+    const itemsConInfo = await Promise.all(items.map(async (item) => {
+      const producto = await Product.findById(item.producto);
+      return {
+        producto: item.producto,
+        nombreProducto: producto.nombre,
+        categoriaProducto: producto.categoria,
+        cantidad: item.cantidad,
+        precio: item.precio
+      };
+    }));
+
+    const total = itemsConInfo.reduce((sum, item) => {
       return sum + (item.precio * item.cantidad);
     }, 0);
 
     const orderData = {
       mesa,
-      items,
+      items: itemsConInfo,
       total,
       notas,
-      userId: req.user._id, // Usar el usuario actual
+      userId: req.user._id,
       estado: 'pendiente'
     };
 
@@ -197,9 +275,6 @@ router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
   }
 });
 
-
-// Actualizar el estado de un pedido
-// Actualizar el estado de un pedido
 router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (req, res) => {
   try {
     const { estado, metodoPago } = req.body;
@@ -214,7 +289,6 @@ router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (re
 
     const updateData = { estado };
     
-    // Si el estado es "entregado" y se proporciona método de pago, guardarlo
     if (estado === 'entregado' && metodoPago) {
       updateData.metodoPago = metodoPago;
     }
@@ -232,7 +306,7 @@ router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (re
       });
     }
 
-    console.log('✅ Estado actualizado:', order._id, '→', estado); // Debug
+    console.log('✅ Estado actualizado:', order._id, '→', estado);
 
     res.json({
       success: true,
@@ -248,12 +322,10 @@ router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (re
   }
 });
 
-// Actualizar un pedido completo
 router.put('/:id', protect, checkPermission('editarPedidos'), async (req, res) => {
   try {
     const { items, notas } = req.body;
 
-    // Si se actualizan los items, recalcular el total
     let updateData = { notas };
     
     if (items && items.length > 0) {
@@ -291,7 +363,6 @@ router.put('/:id', protect, checkPermission('editarPedidos'), async (req, res) =
   }
 });
 
-// Eliminar un pedido
 router.delete('/:id', protect, checkPermission('cancelarPedidos'), async (req, res) => {
   try {
     const order = await Order.findByIdAndDelete(req.params.id);
@@ -322,7 +393,6 @@ router.get('/stats/resumen', protect, async (req, res) => {
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
 
-    // Filtrar por todos los usuarios del restaurante
     const stats = await Order.aggregate([
       { 
         $match: { 

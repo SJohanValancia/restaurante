@@ -12,6 +12,15 @@ const orderSchema = new mongoose.Schema({
       ref: 'Product',
       required: true
     },
+    // AGREGAR ESTOS CAMPOS NUEVOS
+    nombreProducto: {
+      type: String,
+      required: true
+    },
+    categoriaProducto: {
+      type: String,
+      default: 'Sin categoría'
+    },
     cantidad: {
       type: Number,
       required: true,

@@ -1167,10 +1167,10 @@ function updateStatistics() {
 }
 
 function displayOrders() {
-    const grid = document.getElementById('ordersGrid');
+    const list = document.getElementById('ordersGrid');
     
     if (filteredOrders.length === 0) {
-        grid.innerHTML = `
+        list.innerHTML = `
             <div class="empty-state">
                 <div class="empty-icon">🔍</div>
                 <p>No se encontraron pedidos con los filtros seleccionados</p>
@@ -1179,7 +1179,6 @@ function displayOrders() {
         return;
     }
 
-    // Usar DocumentFragment para mejor rendimiento
     const fragment = document.createDocumentFragment();
     const tempDiv = document.createElement('div');
     
@@ -1224,13 +1223,29 @@ function displayOrders() {
                     <span class="status-badge status-${order.estado}">${order.estado}</span>
                 </div>
                 <div class="order-items">
-                    ${order.items.map(item => `
-                        <div class="order-item">
-                            <span class="item-name">${item.producto.nombre}</span>
-                            <span class="item-qty">x${item.cantidad}</span>
-                            <span>${(item.precio * item.cantidad).toLocaleString('es-CO')}</span>
-                        </div>
-                    `).join('')}
+                    ${order.items.map(item => {
+                        // Manejo seguro de productos eliminados
+                        let nombre = 'Producto eliminado';
+                        
+                        if (item.productoInfo) {
+                            // Backend normalizado
+                            nombre = item.productoInfo.nombre;
+                        } else if (item.producto && item.producto.nombre) {
+                            // Producto existe
+                            nombre = item.producto.nombre;
+                        } else if (item.nombreProducto) {
+                            // Nombre guardado en el pedido
+                            nombre = item.nombreProducto;
+                        }
+                        
+                        return `
+                            <div class="order-item">
+                                <span class="item-name">${nombre}</span>
+                                <span class="item-qty">x${item.cantidad}</span>
+                                <span>$${(item.precio * item.cantidad).toLocaleString('es-CO')}</span>
+                            </div>
+                        `;
+                    }).join('')}
                 </div>
                 ${order.notas ? `
                 <div class="order-notes">
@@ -1239,17 +1254,18 @@ function displayOrders() {
                 ` : ''}
                 <div class="order-total">
                     <span>Total:</span>
-                    <span>${order.total.toLocaleString('es-CO')}</span>
+                    <span>$${order.total.toLocaleString('es-CO')}</span>
                 </div>
                 ${getOrderActions(order)}
             </div>
         `;
     }).join('');
     
-    grid.innerHTML = '';
-    grid.appendChild(tempDiv);
+    list.innerHTML = '';
+    list.appendChild(tempDiv);
 }
-    function getOrderActions(order) {
+
+function getOrderActions(order) {
         let actions = '<div class="order-actions">';
         
         if (order.estado === 'pendiente') {

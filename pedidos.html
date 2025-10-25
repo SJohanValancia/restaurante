@@ -1231,7 +1231,8 @@ function mostrarAgotado(elemento) {
                 console.error('Error:', error);
             }
         }
-function displayOrders(orders) {
+
+        function displayOrders(orders) {
     const list = document.getElementById('ordersList');
     
     if (orders.length === 0) {
@@ -1257,13 +1258,18 @@ function displayOrders(orders) {
                 <span class="status-badge status-${order.estado}">${order.estado}</span>
             </div>
             <div class="order-items">
-                ${order.items.map(item => `
-                    <div class="order-item">
-                        <span class="item-name">${item.producto.nombre}</span>
-                        <span class="item-qty">x${item.cantidad}</span>
-                        <span>$${(item.precio * item.cantidad).toLocaleString('es-CO')}</span>
-                    </div>
-                `).join('')}
+                ${order.items.map(item => {
+                    // Usar productoInfo si existe, sino usar producto directamente
+                    const nombre = item.productoInfo ? item.productoInfo.nombre : (item.producto ? item.producto.nombre : item.nombreProducto || 'Producto eliminado');
+                    
+                    return `
+                        <div class="order-item">
+                            <span class="item-name">${nombre}</span>
+                            <span class="item-qty">x${item.cantidad}</span>
+                            <span>$${(item.precio * item.cantidad).toLocaleString('es-CO')}</span>
+                        </div>
+                    `;
+                }).join('')}
             </div>
             ${order.notas ? `<p style="font-size: 12px; color: #718096; font-style: italic; margin: 8px 0;">📝 ${order.notas}</p>` : ''}
             <div class="order-total">
@@ -1274,7 +1280,8 @@ function displayOrders(orders) {
         </div>
     `).join('');
 }
-        function getOrderActions(order) {
+
+function getOrderActions(order) {
             if (order.estado === 'entregado' || order.estado === 'cancelado') return '';
 
             let actions = '<div class="order-actions">';
