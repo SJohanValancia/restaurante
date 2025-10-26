@@ -2,111 +2,12 @@ const express = require('express');
 const router = express.Router();
 const Order = require('../models/order');
 const User = require('../models/User');
-const Product = require('../models/Product');
+const Product = require('../models/Product'); // AGREGAR ESTA LÍNEA
 const mongoose = require('mongoose');
 const { protect } = require('../middleware/auth');
 const { checkPermission } = require('../middleware/permissions');
 
-// RUTA PÚBLICA para seguimiento de pedidos (DEBE IR PRIMERO)
-router.get('/mesa/:numeroMesa', async (req, res) => {
-  try {
-    const { numeroMesa } = req.params;
-    const { restaurante, sede } = req.query;
 
-    console.log('🔍 Buscando pedido para:', { numeroMesa, restaurante, sede });
-
-    if (!restaurante) {
-      return res.status(400).json({
-        success: false,
-        message: 'El nombre del restaurante es obligatorio'
-      });
-    }
-
-    // Buscar pedido directamente por nombre de restaurante y mesa
-    const orderQuery = {
-      numeroMesa: parseInt(numeroMesa),
-      nombreRestaurante: restaurante,
-      estado: { $in: ['pendiente', 'preparando', 'listo'] }
-    };
-
-    if (sede) {
-      orderQuery.sede = sede;
-    }
-
-    console.log('🔍 Query de búsqueda:', orderQuery);
-
-    let order = await Order.findOne(orderQuery)
-      .populate('items.producto', 'nombre categoria precio')
-      .sort({ createdAt: -1 });
-
-    // Si no hay pedido activo, buscar el más reciente
-    if (!order) {
-      console.log('⚠️ No hay pedidos activos, buscando el más reciente...');
-      const recentQuery = {
-        numeroMesa: parseInt(numeroMesa),
-        nombreRestaurante: restaurante
-      };
-      if (sede) recentQuery.sede = sede;
-
-      order = await Order.findOne(recentQuery)
-        .populate('items.producto', 'nombre categoria precio')
-        .sort({ createdAt: -1 });
-
-      if (!order) {
-        console.log('❌ No se encontraron pedidos para la mesa', numeroMesa);
-        return res.status(404).json({
-          success: false,
-          message: 'No se encontraron pedidos para esta mesa'
-        });
-      }
-    }
-
-    console.log('✅ Pedido encontrado:', order._id, 'Estado:', order.estado);
-
-    // Normalizar datos para manejar productos eliminados
-    const orderObj = order.toObject();
-    orderObj.items = orderObj.items.map(item => {
-      if (item.producto) {
-        return {
-          cantidad: item.cantidad,
-          precio: item.precio,
-          producto: {
-            _id: item.producto._id,
-            nombre: item.producto.nombre,
-            categoria: item.producto.categoria,
-            precio: item.producto.precio
-          },
-          _id: item._id
-        };
-      } else {
-        return {
-          cantidad: item.cantidad,
-          precio: item.precio,
-          producto: {
-            nombre: item.nombreProducto || 'Producto eliminado',
-            categoria: item.categoriaProducto || 'Sin categoría',
-            precio: item.precio
-          },
-          _id: item._id
-        };
-      }
-    });
-
-    res.json({
-      success: true,
-      data: orderObj
-    });
-  } catch (error) {
-    console.error('❌ Error al obtener el pedido:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al obtener el pedido',
-      error: error.message
-    });
-  }
-});
-
-// Rutas protegidas (CON autenticación)
 router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
   try {
     const { estado, mesa, fecha } = req.query;
@@ -114,7 +15,7 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
     let query = { userId: { $in: req.userIdsRestaurante } };
 
     if (estado) query.estado = estado;
-    if (mesa) query.numeroMesa = parseInt(mesa);
+    if (mesa) query.mesa = parseInt(mesa);
     
     if (fecha === 'hoy') {
       const hoy = new Date();
@@ -134,23 +35,25 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
       .populate('items.producto', 'nombre categoria precio')
       .sort({ createdAt: -1 });
 
+    // Normalizar datos para manejar productos eliminados
     const ordersNormalizados = orders.map(order => {
       const orderObj = order.toObject();
       orderObj.items = orderObj.items.map(item => {
         if (item.producto) {
+          // Producto existe
           return {
             ...item,
-            producto: {
-              _id: item.producto._id,
+            productoInfo: {
               nombre: item.producto.nombre,
               categoria: item.producto.categoria,
               precio: item.producto.precio
             }
           };
         } else {
+          // Producto fue eliminado, usar datos guardados
           return {
             ...item,
-            producto: {
+            productoInfo: {
               nombre: item.nombreProducto || 'Producto eliminado',
               categoria: item.categoriaProducto || 'Sin categoría',
               precio: item.precio
@@ -175,26 +78,69 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
   }
 });
 
-router.get('/:id', protect, async (req, res) => {
+router.get('/mesa/:numeroMesa', async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id)
-      .populate('items.producto', 'nombre categoria precio')
-      .populate('userId', 'nombre email');
+    const { numeroMesa } = req.params;
+    const { restaurante, sede } = req.query;
 
-    if (!order) {
-      return res.status(404).json({
+    if (!restaurante) {
+      return res.status(400).json({
         success: false,
-        message: 'Pedido no encontrado'
+        message: 'El nombre del restaurante es obligatorio'
       });
     }
 
+    const query = { nombreRestaurante: restaurante };
+    if (sede) {
+      query.sede = sede;
+    }
+
+    const usuario = await User.findOne(query);
+
+    if (!usuario) {
+      return res.status(404).json({
+        success: false,
+        message: 'Restaurante no encontrado'
+      });
+    }
+
+    const orderQuery = {
+      mesa: parseInt(numeroMesa),
+      userId: usuario._id,
+      estado: { $in: ['pendiente', 'preparando', 'listo'] }
+    };
+
+    let order = await Order.findOne(orderQuery)
+      .populate('items.producto', 'nombre categoria precio')
+      .populate('userId', 'nombre')
+      .sort({ createdAt: -1 })
+      .limit(1);
+
+    if (!order) {
+      order = await Order.findOne({ 
+        mesa: parseInt(numeroMesa),
+        userId: usuario._id
+      })
+        .populate('items.producto', 'nombre categoria precio')
+        .populate('userId', 'nombre')
+        .sort({ createdAt: -1 })
+        .limit(1);
+
+      if (!order) {
+        return res.status(404).json({
+          success: false,
+          message: 'No se encontraron pedidos para esta mesa'
+        });
+      }
+    }
+
+    // Normalizar datos
     const orderObj = order.toObject();
     orderObj.items = orderObj.items.map(item => {
       if (item.producto) {
         return {
           ...item,
-          producto: {
-            _id: item.producto._id,
+          productoInfo: {
             nombre: item.producto.nombre,
             categoria: item.producto.categoria,
             precio: item.producto.precio
@@ -203,7 +149,7 @@ router.get('/:id', protect, async (req, res) => {
       } else {
         return {
           ...item,
-          producto: {
+          productoInfo: {
             nombre: item.nombreProducto || 'Producto eliminado',
             categoria: item.categoriaProducto || 'Sin categoría',
             precio: item.precio
@@ -225,9 +171,60 @@ router.get('/:id', protect, async (req, res) => {
   }
 });
 
+router.get('/:id', protect, async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id)
+      .populate('items.producto', 'nombre categoria precio')
+      .populate('userId', 'nombre email');
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Pedido no encontrado'
+      });
+    }
+
+    // Normalizar datos
+    const orderObj = order.toObject();
+    orderObj.items = orderObj.items.map(item => {
+      if (item.producto) {
+        return {
+          ...item,
+          productoInfo: {
+            nombre: item.producto.nombre,
+            categoria: item.producto.categoria,
+            precio: item.producto.precio
+          }
+        };
+      } else {
+        return {
+          ...item,
+          productoInfo: {
+            nombre: item.nombreProducto || 'Producto eliminado',
+            categoria: item.categoriaProducto || 'Sin categoría',
+            precio: item.precio
+          }
+        };
+      }
+    });
+
+    res.json({
+      success: true,
+      data: orderObj
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener el pedido',
+      error: error.message
+    });
+  }
+});
+
+// MODIFICAR LA RUTA POST PARA GUARDAR NOMBRE Y CATEGORÍA
 router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
   try {
-    const { numeroMesa, items, notas } = req.body;
+    const { mesa, items, notas } = req.body;
 
     if (!items || items.length === 0) {
       return res.status(400).json({
@@ -239,9 +236,6 @@ router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
     // Obtener información completa de los productos
     const itemsConInfo = await Promise.all(items.map(async (item) => {
       const producto = await Product.findById(item.producto);
-      if (!producto) {
-        throw new Error(`Producto ${item.producto} no encontrado`);
-      }
       return {
         producto: item.producto,
         nombreProducto: producto.nombre,
@@ -256,13 +250,11 @@ router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
     }, 0);
 
     const orderData = {
-      numeroMesa,
+      mesa,
       items: itemsConInfo,
       total,
       notas,
       userId: req.user._id,
-      nombreRestaurante: req.user.nombreRestaurante,
-      sede: req.user.sede || null,
       estado: 'pendiente'
     };
 

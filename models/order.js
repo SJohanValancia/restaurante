@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
-  numeroMesa: {  // ← CAMBIAR DE "mesa" A "numeroMesa"
+  mesa: {
     type: Number,
     required: [true, 'El número de mesa es obligatorio'],
     min: [1, 'El número de mesa debe ser mayor a 0']
@@ -12,6 +12,7 @@ const orderSchema = new mongoose.Schema({
       ref: 'Product',
       required: true
     },
+    // AGREGAR ESTOS CAMPOS NUEVOS
     nombreProducto: {
       type: String,
       required: true
@@ -60,15 +61,6 @@ const orderSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  // AGREGAR ESTOS CAMPOS NUEVOS para el seguimiento público
-  nombreRestaurante: {
-    type: String,
-    required: true
-  },
-  sede: {
-    type: String,
-    default: null
-  },
   mesero: {
     type: String,
     default: function() {
@@ -80,13 +72,11 @@ const orderSchema = new mongoose.Schema({
   versionKey: false
 });
 
-// Índices
-orderSchema.index({ numeroMesa: 1 });  // ← CAMBIAR
+orderSchema.index({ mesa: 1 });
 orderSchema.index({ estado: 1 });
 orderSchema.index({ userId: 1 });
 orderSchema.index({ createdAt: -1 });
 orderSchema.index({ reciboDia: 1 });
-orderSchema.index({ nombreRestaurante: 1, numeroMesa: 1 });  // ← NUEVO índice compuesto
 
 orderSchema.pre('save', function(next) {
   if (this.items && this.items.length > 0) {
