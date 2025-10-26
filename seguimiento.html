@@ -42,7 +42,6 @@
             opacity: 0.9;
         }
 
-        /* Indicador de actualización en tiempo real */
         .live-indicator {
             position: fixed;
             top: 20px;
@@ -462,6 +461,18 @@
             margin-bottom: 1.5rem;
         }
 
+        .error-details {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 12px;
+            color: #718096;
+            text-align: left;
+            max-width: 100%;
+            overflow-x: auto;
+        }
+
         .btn-refresh {
             padding: 12px 24px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -479,7 +490,6 @@
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
 
-        /* Notificación de cambio */
         .change-notification {
             position: fixed;
             top: 80px;
@@ -556,7 +566,6 @@
     </style>
 </head>
 <body>
-    <!-- Indicador de conexión en tiempo real -->
     <div class="live-indicator">
         <div class="live-dot"></div>
         <span>Actualización en tiempo real</span>
@@ -582,7 +591,6 @@
         let previousStatus = null;
         let pollingInterval = null;
 
-        // Obtener parámetros de la URL
         const urlParams = new URLSearchParams(window.location.search);
         const restaurante = urlParams.get('restaurante');
         const mesa = urlParams.get('mesa');
@@ -594,14 +602,10 @@
                 return;
             }
 
-            // Cargar pedido inicial
             loadOrder();
-            
-            // Configurar polling cada 3 segundos para actualizaciones en tiempo real
             pollingInterval = setInterval(checkForUpdates, 3000);
         });
 
-        // Limpiar intervalo al salir de la página
         window.addEventListener('beforeunload', () => {
             if (pollingInterval) {
                 clearInterval(pollingInterval);
@@ -610,56 +614,123 @@
 
         async function loadOrder() {
             try {
-                const response = await fetch(`${API_URL}/orders/mesa/${mesa}?restaurante=${encodeURIComponent(restaurante)}${sede ? '&sede=' + encodeURIComponent(sede) : ''}`);
+                // Intenta primero con el endpoint específico de mesa
+                let url = `${API_URL}/orders/mesa/${mesa}`;
+                const params = new URLSearchParams({
+                    restaurante: restaurante
+                });
+                if (sede) params.append('sede', sede);
                 
+                let response = await fetch(`${url}?${params.toString()}`);
+                
+                // Si falla, intenta obtener todos los pedidos y filtrar
                 if (!response.ok) {
-                    throw new Error('No se pudo obtener el pedido');
-                }
+                    console.log('Endpoint /mesa no disponible, intentando con /orders');
+                    response = await fetch(`${API_URL}/orders`);
+                    
+                    if (!response.ok) {
+                        throw new Error(`Error ${response.status}: ${response.statusText}`);
+                    }
 
-                const data = await response.json();
+                    const data = await response.json();
+                    
+                    if (data.success && data.data && Array.isArray(data.data)) {
+                        // Filtrar el pedido que coincida con la mesa y restaurante
+                        const filteredOrders = data.data.filter(order => {
+                            const matchMesa = order.numeroMesa == mesa;
+                            const matchRestaurante = order.nombreRestaurante === restaurante;
+                            const matchSede = !sede || order.sede === sede;
+                            const notFinished = order.estado !== 'entregado' && order.estado !== 'cancelado';
+                            
+                            return matchMesa && matchRestaurante && matchSede && notFinished;
+                        });
 
-                if (data.success && data.data) {
-                    orderData = data.data;
-                    previousStatus = data.data.estado;
-                    displayOrder(false);
+                        if (filteredOrders.length > 0) {
+                            // Tomar el pedido más reciente
+                            const latestOrder = filteredOrders.sort((a, b) => 
+                                new Date(b.createdAt) - new Date(a.createdAt)
+                            )[0];
+                            
+                            orderData = latestOrder;
+                            previousStatus = latestOrder.estado;
+                            displayOrder(false);
+                        } else {
+                            showError('Sin pedidos activos', 'No hay pedidos activos para esta mesa en este momento.');
+                        }
+                    } else {
+                        throw new Error('Respuesta inválida del servidor');
+                    }
                 } else {
-                    showError('Sin pedidos', 'No hay pedidos activos para esta mesa en este momento.');
+                    const data = await response.json();
+                    
+                    if (data.success && data.data) {
+                        orderData = data.data;
+                        previousStatus = data.data.estado;
+                        displayOrder(false);
+                    } else {
+                        showError('Sin pedidos', 'No hay pedidos activos para esta mesa en este momento.');
+                    }
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showError('Error de conexión', 'No se pudo cargar la información del pedido. Por favor, intente nuevamente.');
+                showError(
+                    'Error de conexión', 
+                    'No se pudo cargar la información del pedido.',
+                    `Detalles: ${error.message}\nRestaurante: ${restaurante}\nMesa: ${mesa}${sede ? '\nSede: ' + sede : ''}`
+                );
             }
         }
 
         async function checkForUpdates() {
             try {
-                const response = await fetch(`${API_URL}/orders/mesa/${mesa}?restaurante=${encodeURIComponent(restaurante)}${sede ? '&sede=' + encodeURIComponent(sede) : ''}`);
+                let url = `${API_URL}/orders/mesa/${mesa}`;
+                const params = new URLSearchParams({ restaurante: restaurante });
+                if (sede) params.append('sede', sede);
                 
-                if (!response.ok) return;
+                let response = await fetch(`${url}?${params.toString()}`);
+                
+                if (!response.ok) {
+                    response = await fetch(`${API_URL}/orders`);
+                    if (!response.ok) return;
 
-                const data = await response.json();
+                    const data = await response.json();
+                    if (!data.success || !Array.isArray(data.data)) return;
 
-                if (data.success && data.data) {
-                    const newOrder = data.data;
-                    
-                    // Verificar si hay cambios en el estado
+                    const filteredOrders = data.data.filter(order => {
+                        return order.numeroMesa == mesa && 
+                               order.nombreRestaurante === restaurante &&
+                               (!sede || order.sede === sede) &&
+                               order.estado !== 'entregado' && 
+                               order.estado !== 'cancelado';
+                    });
+
+                    if (filteredOrders.length === 0) return;
+
+                    const newOrder = filteredOrders.sort((a, b) => 
+                        new Date(b.createdAt) - new Date(a.createdAt)
+                    )[0];
+
                     if (orderData && newOrder.estado !== orderData.estado) {
-                        console.log('🔔 Cambio detectado:', orderData.estado, '→', newOrder.estado);
-                        
-                        // Mostrar notificación de cambio
                         showChangeNotification(orderData.estado, newOrder.estado);
-                        
-                        // Actualizar datos
                         previousStatus = orderData.estado;
                         orderData = newOrder;
-                        
-                        // Actualizar vista con animación
                         displayOrder(true);
-                    } else if (!orderData) {
-                        // Primera carga
-                        orderData = newOrder;
-                        previousStatus = newOrder.estado;
-                        displayOrder(false);
+                    }
+                } else {
+                    const data = await response.json();
+                    if (data.success && data.data) {
+                        const newOrder = data.data;
+                        
+                        if (orderData && newOrder.estado !== orderData.estado) {
+                            showChangeNotification(orderData.estado, newOrder.estado);
+                            previousStatus = orderData.estado;
+                            orderData = newOrder;
+                            displayOrder(true);
+                        } else if (!orderData) {
+                            orderData = newOrder;
+                            previousStatus = newOrder.estado;
+                            displayOrder(false);
+                        }
                     }
                 }
             } catch (error) {
@@ -670,7 +741,6 @@
         function showChangeNotification(oldStatus, newStatus) {
             const statusInfo = getStatusInfo(newStatus);
             
-            // Crear notificación
             const notification = document.createElement('div');
             notification.className = 'change-notification';
             notification.innerHTML = `
@@ -682,11 +752,8 @@
             `;
             
             document.body.appendChild(notification);
-            
-            // Reproducir sonido (opcional)
             playNotificationSound();
             
-            // Eliminar después de 4 segundos
             setTimeout(() => {
                 notification.style.animation = 'slideInNotification 0.3s ease reverse';
                 setTimeout(() => notification.remove(), 300);
@@ -694,7 +761,6 @@
         }
 
         function playNotificationSound() {
-            // Crear un sonido simple con Web Audio API
             try {
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 const oscillator = audioContext.createOscillator();
@@ -724,7 +790,6 @@
             const timeline = getTimeline(order.estado, isUpdate ? previousStatus : null);
 
             content.innerHTML = `
-                <!-- Información del establecimiento -->
                 <div class="info-card ${isUpdate ? 'updating' : ''}">
                     <h2>🏪 Información</h2>
                     <div class="info-row">
@@ -747,7 +812,6 @@
                     </div>
                 </div>
 
-                <!-- Tarjeta del pedido -->
                 <div class="order-card ${isUpdate ? 'updating' : ''}">
                     <div class="order-header">
                         <div class="order-info">
@@ -759,7 +823,6 @@
                         <span class="status-badge status-${order.estado} ${isUpdate ? 'changed' : ''}">${order.estado}</span>
                     </div>
 
-                    <!-- Timeline del estado -->
                     <div class="status-timeline">
                         <div class="timeline-title">Progreso del Pedido</div>
                         ${timeline.map(item => `
@@ -776,7 +839,6 @@
                         `).join('')}
                     </div>
 
-                    <!-- Items del pedido -->
                     <div class="order-items">
                         <div class="items-title">🍽️ Productos</div>
                         ${order.items.map(item => `
@@ -791,14 +853,12 @@
                         `).join('')}
                     </div>
 
-                    <!-- Notas -->
                     ${order.notas ? `
                     <div class="order-notes">
                         <p>📝 ${order.notas}</p>
                     </div>
                     ` : ''}
 
-                    <!-- Total -->
                     <div class="order-total">
                         <span class="total-label">Total del Pedido:</span>
                         <span class="total-amount">$${order.total.toLocaleString('es-CO')}</span>
@@ -851,7 +911,6 @@
             const currentIndex = statusOrder.indexOf(currentStatus);
             const previousIndex = previousStatus ? statusOrder.indexOf(previousStatus) : -1;
 
-            // Si está cancelado, marcar solo el primero como activo
             if (currentStatus === 'cancelado') {
                 return allStatuses.map((status, index) => ({
                     ...status,
@@ -873,18 +932,18 @@
             });
         }
 
-        function showError(title, message) {
+        function showError(title, message, details = null) {
             const content = document.getElementById('content');
             content.innerHTML = `
                 <div class="error-card">
                     <div class="error-icon">😕</div>
                     <h2 class="error-title">${title}</h2>
                     <p class="error-message">${message}</p>
+                    ${details ? `<div class="error-details"><pre>${details}</pre></div>` : ''}
                     <button class="btn-refresh" onclick="location.reload()">
                         🔄 Intentar Nuevamente
                     </button>
-                </div>
-            `;
+                </div>`;
         }
     </script>
 </body>
