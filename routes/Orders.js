@@ -7,7 +7,106 @@ const mongoose = require('mongoose');
 const { protect } = require('../middleware/auth');
 const { checkPermission } = require('../middleware/permissions');
 
-// Rutas protegidas
+// RUTA PÚBLICA para seguimiento de pedidos (DEBE IR PRIMERO)
+router.get('/mesa/:numeroMesa', async (req, res) => {
+  try {
+    const { numeroMesa } = req.params;
+    const { restaurante, sede } = req.query;
+
+    console.log('🔍 Buscando pedido para:', { numeroMesa, restaurante, sede });
+
+    if (!restaurante) {
+      return res.status(400).json({
+        success: false,
+        message: 'El nombre del restaurante es obligatorio'
+      });
+    }
+
+    // Buscar pedido directamente por nombre de restaurante y mesa
+    const orderQuery = {
+      numeroMesa: parseInt(numeroMesa),
+      nombreRestaurante: restaurante,
+      estado: { $in: ['pendiente', 'preparando', 'listo'] }
+    };
+
+    if (sede) {
+      orderQuery.sede = sede;
+    }
+
+    console.log('🔍 Query de búsqueda:', orderQuery);
+
+    let order = await Order.findOne(orderQuery)
+      .populate('items.producto', 'nombre categoria precio')
+      .sort({ createdAt: -1 });
+
+    // Si no hay pedido activo, buscar el más reciente
+    if (!order) {
+      console.log('⚠️ No hay pedidos activos, buscando el más reciente...');
+      const recentQuery = {
+        numeroMesa: parseInt(numeroMesa),
+        nombreRestaurante: restaurante
+      };
+      if (sede) recentQuery.sede = sede;
+
+      order = await Order.findOne(recentQuery)
+        .populate('items.producto', 'nombre categoria precio')
+        .sort({ createdAt: -1 });
+
+      if (!order) {
+        console.log('❌ No se encontraron pedidos para la mesa', numeroMesa);
+        return res.status(404).json({
+          success: false,
+          message: 'No se encontraron pedidos para esta mesa'
+        });
+      }
+    }
+
+    console.log('✅ Pedido encontrado:', order._id, 'Estado:', order.estado);
+
+    // Normalizar datos para manejar productos eliminados
+    const orderObj = order.toObject();
+    orderObj.items = orderObj.items.map(item => {
+      if (item.producto) {
+        return {
+          cantidad: item.cantidad,
+          precio: item.precio,
+          producto: {
+            _id: item.producto._id,
+            nombre: item.producto.nombre,
+            categoria: item.producto.categoria,
+            precio: item.producto.precio
+          },
+          _id: item._id
+        };
+      } else {
+        return {
+          cantidad: item.cantidad,
+          precio: item.precio,
+          producto: {
+            nombre: item.nombreProducto || 'Producto eliminado',
+            categoria: item.categoriaProducto || 'Sin categoría',
+            precio: item.precio
+          },
+          _id: item._id
+        };
+      }
+    });
+
+    res.json({
+      success: true,
+      data: orderObj
+    });
+  } catch (error) {
+    console.error('❌ Error al obtener el pedido:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener el pedido',
+      error: error.message
+    });
+  }
+});
+
+// Rutas protegidas (CON autenticación)
 router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
   try {
     const { estado, mesa, fecha } = req.query;
@@ -71,122 +170,6 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error al obtener los pedidos',
-      error: error.message
-    });
-  }
-});
-
-// RUTA PÚBLICA para seguimiento de pedidos (sin autenticación)
-router.get('/mesa/:numeroMesa', async (req, res) => {
-  try {
-    const { numeroMesa } = req.params;
-    const { restaurante, sede } = req.query;
-
-    console.log('🔍 Buscando pedido para:', { numeroMesa, restaurante, sede });
-
-    if (!restaurante) {
-      return res.status(400).json({
-        success: false,
-        message: 'El nombre del restaurante es obligatorio'
-      });
-    }
-
-    // Buscar el usuario del restaurante
-    const query = { nombreRestaurante: restaurante };
-    if (sede) {
-      query.sede = sede;
-    }
-
-    const usuario = await User.findOne(query);
-
-    if (!usuario) {
-      console.log('❌ Restaurante no encontrado:', restaurante);
-      return res.status(404).json({
-        success: false,
-        message: 'Restaurante no encontrado'
-      });
-    }
-
-    console.log('✅ Restaurante encontrado:', usuario.nombreRestaurante);
-
-    // Buscar pedido activo primero
-    const orderQuery = {
-      numeroMesa: parseInt(numeroMesa),
-      userId: usuario._id,
-      estado: { $in: ['pendiente', 'preparando', 'listo'] }
-    };
-
-    console.log('🔍 Query de búsqueda:', orderQuery);
-
-    let order = await Order.findOne(orderQuery)
-      .populate('items.producto', 'nombre categoria precio')
-      .sort({ createdAt: -1 });
-
-    // Si no hay pedido activo, buscar el más reciente
-    if (!order) {
-      console.log('⚠️ No hay pedidos activos, buscando el más reciente...');
-      order = await Order.findOne({ 
-        numeroMesa: parseInt(numeroMesa),
-        userId: usuario._id
-      })
-        .populate('items.producto', 'nombre categoria precio')
-        .sort({ createdAt: -1 });
-
-      if (!order) {
-        console.log('❌ No se encontraron pedidos para la mesa', numeroMesa);
-        return res.status(404).json({
-          success: false,
-          message: 'No se encontraron pedidos para esta mesa'
-        });
-      }
-    }
-
-    console.log('✅ Pedido encontrado:', order._id, 'Estado:', order.estado);
-
-    // Normalizar datos para manejar productos eliminados
-    const orderObj = order.toObject();
-    orderObj.items = orderObj.items.map(item => {
-      if (item.producto) {
-        return {
-          cantidad: item.cantidad,
-          precio: item.precio,
-          producto: {
-            _id: item.producto._id,
-            nombre: item.producto.nombre,
-            categoria: item.producto.categoria,
-            precio: item.producto.precio
-          },
-          _id: item._id
-        };
-      } else {
-        return {
-          cantidad: item.cantidad,
-          precio: item.precio,
-          producto: {
-            nombre: item.nombreProducto || 'Producto eliminado',
-            categoria: item.categoriaProducto || 'Sin categoría',
-            precio: item.precio
-          },
-          _id: item._id
-        };
-      }
-    });
-
-    // Agregar información del restaurante al response
-    orderObj.nombreRestaurante = usuario.nombreRestaurante;
-    if (usuario.sede) {
-      orderObj.sede = usuario.sede;
-    }
-
-    res.json({
-      success: true,
-      data: orderObj
-    });
-  } catch (error) {
-    console.error('❌ Error al obtener el pedido:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al obtener el pedido',
       error: error.message
     });
   }
