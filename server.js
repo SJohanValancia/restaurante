@@ -22,16 +22,15 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Conectado a MongoDB Atlas'))
   .catch((err) => console.error('❌ Error de conexión a MongoDB:', err.message));
 
+// ⭐ IMPORTANTE: Rutas públicas de orders DEBEN IR PRIMERO
+// Esta ruta NO tiene el middleware protect
+app.use('/api/orders', ordersRoutes);
+
 // Rutas públicas (sin autenticación)
 app.use('/api/auth', require('./routes/auth'));
 
-// ⭐ RUTA PÚBLICA DE ORDERS - SIN PROTECCIÓN
-// Esta debe ir ANTES de las rutas protegidas
-app.get('/api/orders/mesa/:numeroMesa', ordersRoutes);
-
 // Rutas protegidas (requieren autenticación)
 app.use('/api/products', protect, require('./routes/Products'));
-app.use('/api/orders', protect, ordersRoutes); // Ahora el resto de orders sí están protegidas
 app.use('/api/expenses', protect, expensesRoutes);
 app.use('/api/liquidaciones', protect, liquidacionesRoutes);
 app.use('/api/admin-meseros', protect, adminMeserosRoutes);

@@ -2,86 +2,18 @@ const express = require('express');
 const router = express.Router();
 const Order = require('../models/order');
 const User = require('../models/User');
-const Product = require('../models/Product'); // AGREGAR ESTA LÍNEA
+const Product = require('../models/Product');
 const mongoose = require('mongoose');
 const { protect } = require('../middleware/auth');
 const { checkPermission } = require('../middleware/permissions');
 
-
-router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
-  try {
-    const { estado, mesa, fecha } = req.query;
-    
-    let query = { userId: { $in: req.userIdsRestaurante } };
-
-    if (estado) query.estado = estado;
-    if (mesa) query.mesa = parseInt(mesa);
-    
-    if (fecha === 'hoy') {
-      const hoy = new Date();
-      hoy.setHours(0, 0, 0, 0);
-      query.createdAt = { $gte: hoy };
-    } else if (fecha === 'semana') {
-      const semana = new Date();
-      semana.setDate(semana.getDate() - 7);
-      query.createdAt = { $gte: semana };
-    } else if (fecha === 'mes') {
-      const mes = new Date();
-      mes.setMonth(mes.getMonth() - 1);
-      query.createdAt = { $gte: mes };
-    }
-
-    const orders = await Order.find(query)
-      .populate('items.producto', 'nombre categoria precio')
-      .sort({ createdAt: -1 });
-
-    // Normalizar datos para manejar productos eliminados
-    const ordersNormalizados = orders.map(order => {
-      const orderObj = order.toObject();
-      orderObj.items = orderObj.items.map(item => {
-        if (item.producto) {
-          // Producto existe
-          return {
-            ...item,
-            productoInfo: {
-              nombre: item.producto.nombre,
-              categoria: item.producto.categoria,
-              precio: item.producto.precio
-            }
-          };
-        } else {
-          // Producto fue eliminado, usar datos guardados
-          return {
-            ...item,
-            productoInfo: {
-              nombre: item.nombreProducto || 'Producto eliminado',
-              categoria: item.categoriaProducto || 'Sin categoría',
-              precio: item.precio
-            }
-          };
-        }
-      });
-      return orderObj;
-    });
-
-    res.json({
-      success: true,
-      count: ordersNormalizados.length,
-      data: ordersNormalizados
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error al obtener los pedidos',
-      error: error.message
-    });
-  }
-});
-
+// ⭐ RUTA PÚBLICA - Sin protect
 router.get('/mesa/:numeroMesa', async (req, res) => {
   try {
     const { numeroMesa } = req.params;
     const { restaurante, sede } = req.query;
+
+    console.log('📍 Solicitud recibida - Mesa:', numeroMesa, 'Restaurante:', restaurante, 'Sede:', sede);
 
     if (!restaurante) {
       return res.status(400).json({
@@ -158,14 +90,139 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
       }
     });
 
+    console.log('✅ Pedido encontrado y enviado');
+
     res.json({
       success: true,
       data: orderObj
     });
   } catch (error) {
+    console.error('❌ Error en /mesa:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener el pedido',
+      error: error.message
+    });
+  }
+});
+
+// ⭐ RUTAS PROTEGIDAS - Con protect
+router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
+  try {
+    const { estado, mesa, fecha } = req.query;
+    
+    let query = { userId: { $in: req.userIdsRestaurante } };
+
+    if (estado) query.estado = estado;
+    if (mesa) query.mesa = parseInt(mesa);
+    
+    if (fecha === 'hoy') {
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+      query.createdAt = { $gte: hoy };
+    } else if (fecha === 'semana') {
+      const semana = new Date();
+      semana.setDate(semana.getDate() - 7);
+      query.createdAt = { $gte: semana };
+    } else if (fecha === 'mes') {
+      const mes = new Date();
+      mes.setMonth(mes.getMonth() - 1);
+      query.createdAt = { $gte: mes };
+    }
+
+    const orders = await Order.find(query)
+      .populate('items.producto', 'nombre categoria precio')
+      .sort({ createdAt: -1 });
+
+    const ordersNormalizados = orders.map(order => {
+      const orderObj = order.toObject();
+      orderObj.items = orderObj.items.map(item => {
+        if (item.producto) {
+          return {
+            ...item,
+            productoInfo: {
+              nombre: item.producto.nombre,
+              categoria: item.producto.categoria,
+              precio: item.producto.precio
+            }
+          };
+        } else {
+          return {
+            ...item,
+            productoInfo: {
+              nombre: item.nombreProducto || 'Producto eliminado',
+              categoria: item.categoriaProducto || 'Sin categoría',
+              precio: item.precio
+            }
+          };
+        }
+      });
+      return orderObj;
+    });
+
+    res.json({
+      success: true,
+      count: ordersNormalizados.length,
+      data: ordersNormalizados
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener los pedidos',
+      error: error.message
+    });
+  }
+});
+
+router.get('/stats/resumen', protect, async (req, res) => {
+  try {
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    const stats = await Order.aggregate([
+      { 
+        $match: { 
+          userId: { $in: req.userIdsRestaurante.map(id => mongoose.Types.ObjectId(id)) },
+          createdAt: { $gte: hoy } 
+        } 
+      },
+      {
+        $group: {
+          _id: '$estado',
+          count: { $sum: 1 },
+          total: { $sum: '$total' }
+        }
+      }
+    ]);
+
+    const totalPedidos = await Order.countDocuments({ 
+      userId: { $in: req.userIdsRestaurante }, 
+      createdAt: { $gte: hoy } 
+    });
+    
+    const totalVentas = await Order.aggregate([
+      { 
+        $match: { 
+          userId: { $in: req.userIdsRestaurante.map(id => mongoose.Types.ObjectId(id)) },
+          createdAt: { $gte: hoy }, 
+          estado: { $ne: 'cancelado' } 
+        } 
+      },
+      { $group: { _id: null, total: { $sum: '$total' } } }
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        pedidosHoy: totalPedidos,
+        ventasHoy: totalVentas[0]?.total || 0,
+        porEstado: stats
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener estadísticas',
       error: error.message
     });
   }
@@ -184,7 +241,6 @@ router.get('/:id', protect, async (req, res) => {
       });
     }
 
-    // Normalizar datos
     const orderObj = order.toObject();
     orderObj.items = orderObj.items.map(item => {
       if (item.producto) {
@@ -221,7 +277,6 @@ router.get('/:id', protect, async (req, res) => {
   }
 });
 
-// MODIFICAR LA RUTA POST PARA GUARDAR NOMBRE Y CATEGORÍA
 router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
   try {
     const { mesa, items, notas } = req.body;
@@ -233,7 +288,6 @@ router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
       });
     }
 
-    // Obtener información completa de los productos
     const itemsConInfo = await Promise.all(items.map(async (item) => {
       const producto = await Product.findById(item.producto);
       return {
@@ -383,60 +437,6 @@ router.delete('/:id', protect, checkPermission('cancelarPedidos'), async (req, r
     res.status(500).json({
       success: false,
       message: 'Error al eliminar el pedido',
-      error: error.message
-    });
-  }
-});
-
-router.get('/stats/resumen', protect, async (req, res) => {
-  try {
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
-
-    const stats = await Order.aggregate([
-      { 
-        $match: { 
-          userId: { $in: req.userIdsRestaurante.map(id => mongoose.Types.ObjectId(id)) },
-          createdAt: { $gte: hoy } 
-        } 
-      },
-      {
-        $group: {
-          _id: '$estado',
-          count: { $sum: 1 },
-          total: { $sum: '$total' }
-        }
-      }
-    ]);
-
-    const totalPedidos = await Order.countDocuments({ 
-      userId: { $in: req.userIdsRestaurante }, 
-      createdAt: { $gte: hoy } 
-    });
-    
-    const totalVentas = await Order.aggregate([
-      { 
-        $match: { 
-          userId: { $in: req.userIdsRestaurante.map(id => mongoose.Types.ObjectId(id)) },
-          createdAt: { $gte: hoy }, 
-          estado: { $ne: 'cancelado' } 
-        } 
-      },
-      { $group: { _id: null, total: { $sum: '$total' } } }
-    ]);
-
-    res.json({
-      success: true,
-      data: {
-        pedidosHoy: totalPedidos,
-        ventasHoy: totalVentas[0]?.total || 0,
-        porEstado: stats
-      }
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error al obtener estadísticas',
       error: error.message
     });
   }
