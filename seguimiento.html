@@ -42,7 +42,6 @@
             opacity: 0.9;
         }
 
-        /* Indicador de actualización en tiempo real */
         .live-indicator {
             position: fixed;
             top: 20px;
@@ -479,7 +478,6 @@
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
 
-        /* Notificación de cambio */
         .change-notification {
             position: fixed;
             top: 80px;
@@ -556,7 +554,6 @@
     </style>
 </head>
 <body>
-    <!-- Indicador de conexión en tiempo real -->
     <div class="live-indicator">
         <div class="live-dot"></div>
         <span>Actualización en tiempo real</span>
@@ -582,7 +579,6 @@
         let previousStatus = null;
         let pollingInterval = null;
 
-        // Obtener parámetros de la URL
         const urlParams = new URLSearchParams(window.location.search);
         const restaurante = urlParams.get('restaurante');
         const mesa = urlParams.get('mesa');
@@ -594,14 +590,10 @@
                 return;
             }
 
-            // Cargar pedido inicial
             loadOrder();
-            
-            // Configurar polling cada 3 segundos para actualizaciones en tiempo real
             pollingInterval = setInterval(checkForUpdates, 3000);
         });
 
-        // Limpiar intervalo al salir de la página
         window.addEventListener('beforeunload', () => {
             if (pollingInterval) {
                 clearInterval(pollingInterval);
@@ -610,13 +602,22 @@
 
         async function loadOrder() {
             try {
-                const response = await fetch(`${API_URL}/orders/mesa/${mesa}?restaurante=${encodeURIComponent(restaurante)}${sede ? '&sede=' + encodeURIComponent(sede) : ''}`);
+                console.log('🔍 Cargando pedido...');
+                const url = `${API_URL}/orders/mesa/${mesa}?restaurante=${encodeURIComponent(restaurante)}${sede ? '&sede=' + encodeURIComponent(sede) : ''}`;
+                console.log('URL:', url);
+                
+                const response = await fetch(url);
+                
+                console.log('Status:', response.status);
                 
                 if (!response.ok) {
-                    throw new Error('No se pudo obtener el pedido');
+                    const errorData = await response.json().catch(() => ({}));
+                    console.error('Error del servidor:', errorData);
+                    throw new Error(errorData.message || 'No se pudo obtener el pedido');
                 }
 
                 const data = await response.json();
+                console.log('✅ Datos recibidos:', data);
 
                 if (data.success && data.data) {
                     orderData = data.data;
@@ -626,14 +627,15 @@
                     showError('Sin pedidos', 'No hay pedidos activos para esta mesa en este momento.');
                 }
             } catch (error) {
-                console.error('Error:', error);
-                showError('Error de conexión', 'No se pudo cargar la información del pedido. Por favor, intente nuevamente.');
+                console.error('❌ Error completo:', error);
+                showError('Error de conexión', `No se pudo cargar la información del pedido: ${error.message}`);
             }
         }
 
         async function checkForUpdates() {
             try {
-                const response = await fetch(`${API_URL}/orders/mesa/${mesa}?restaurante=${encodeURIComponent(restaurante)}${sede ? '&sede=' + encodeURIComponent(sede) : ''}`);
+                const url = `${API_URL}/orders/mesa/${mesa}?restaurante=${encodeURIComponent(restaurante)}${sede ? '&sede=' + encodeURIComponent(sede) : ''}`;
+                const response = await fetch(url);
                 
                 if (!response.ok) return;
 
@@ -642,21 +644,13 @@
                 if (data.success && data.data) {
                     const newOrder = data.data;
                     
-                    // Verificar si hay cambios en el estado
                     if (orderData && newOrder.estado !== orderData.estado) {
                         console.log('🔔 Cambio detectado:', orderData.estado, '→', newOrder.estado);
-                        
-                        // Mostrar notificación de cambio
                         showChangeNotification(orderData.estado, newOrder.estado);
-                        
-                        // Actualizar datos
                         previousStatus = orderData.estado;
                         orderData = newOrder;
-                        
-                        // Actualizar vista con animación
                         displayOrder(true);
                     } else if (!orderData) {
-                        // Primera carga
                         orderData = newOrder;
                         previousStatus = newOrder.estado;
                         displayOrder(false);
@@ -670,7 +664,6 @@
         function showChangeNotification(oldStatus, newStatus) {
             const statusInfo = getStatusInfo(newStatus);
             
-            // Crear notificación
             const notification = document.createElement('div');
             notification.className = 'change-notification';
             notification.innerHTML = `
@@ -682,11 +675,8 @@
             `;
             
             document.body.appendChild(notification);
-            
-            // Reproducir sonido (opcional)
             playNotificationSound();
             
-            // Eliminar después de 4 segundos
             setTimeout(() => {
                 notification.style.animation = 'slideInNotification 0.3s ease reverse';
                 setTimeout(() => notification.remove(), 300);
@@ -694,7 +684,6 @@
         }
 
         function playNotificationSound() {
-            // Crear un sonido simple con Web Audio API
             try {
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 const oscillator = audioContext.createOscillator();
@@ -723,8 +712,22 @@
             const statusInfo = getStatusInfo(order.estado);
             const timeline = getTimeline(order.estado, isUpdate ? previousStatus : null);
 
+            // CAMBIO IMPORTANTE: Usar productoInfo en lugar de producto
+            const itemsHTML = order.items.map(item => {
+                const info = item.productoInfo || item.producto || {};
+                return `
+                    <div class="order-item">
+                        <div class="item-details">
+                            <div class="item-name">${info.nombre || 'Producto'}</div>
+                            <div class="item-category">${info.categoria || 'Sin categoría'}</div>
+                        </div>
+                        <span class="item-qty">x${item.cantidad}</span>
+                        <span class="item-price">$${(item.precio * item.cantidad).toLocaleString('es-CO')}</span>
+                    </div>
+                `;
+            }).join('');
+
             content.innerHTML = `
-                <!-- Información del establecimiento -->
                 <div class="info-card ${isUpdate ? 'updating' : ''}">
                     <h2>🏪 Información</h2>
                     <div class="info-row">
@@ -747,7 +750,6 @@
                     </div>
                 </div>
 
-                <!-- Tarjeta del pedido -->
                 <div class="order-card ${isUpdate ? 'updating' : ''}">
                     <div class="order-header">
                         <div class="order-info">
@@ -759,7 +761,6 @@
                         <span class="status-badge status-${order.estado} ${isUpdate ? 'changed' : ''}">${order.estado}</span>
                     </div>
 
-                    <!-- Timeline del estado -->
                     <div class="status-timeline">
                         <div class="timeline-title">Progreso del Pedido</div>
                         ${timeline.map(item => `
@@ -776,29 +777,17 @@
                         `).join('')}
                     </div>
 
-                    <!-- Items del pedido -->
                     <div class="order-items">
                         <div class="items-title">🍽️ Productos</div>
-                        ${order.items.map(item => `
-                            <div class="order-item">
-                                <div class="item-details">
-                                    <div class="item-name">${item.producto.nombre}</div>
-                                    <div class="item-category">${item.producto.categoria}</div>
-                                </div>
-                                <span class="item-qty">x${item.cantidad}</span>
-                                <span class="item-price">$${(item.precio * item.cantidad).toLocaleString('es-CO')}</span>
-                            </div>
-                        `).join('')}
+                        ${itemsHTML}
                     </div>
 
-                    <!-- Notas -->
                     ${order.notas ? `
                     <div class="order-notes">
                         <p>📝 ${order.notas}</p>
                     </div>
                     ` : ''}
 
-                    <!-- Total -->
                     <div class="order-total">
                         <span class="total-label">Total del Pedido:</span>
                         <span class="total-amount">$${order.total.toLocaleString('es-CO')}</span>
@@ -851,7 +840,6 @@
             const currentIndex = statusOrder.indexOf(currentStatus);
             const previousIndex = previousStatus ? statusOrder.indexOf(previousStatus) : -1;
 
-            // Si está cancelado, marcar solo el primero como activo
             if (currentStatus === 'cancelado') {
                 return allStatuses.map((status, index) => ({
                     ...status,

@@ -5,7 +5,8 @@ const path = require('path');
 const expensesRoutes = require('./routes/Expenses');
 const liquidacionesRoutes = require('./routes/liquidaciones');
 const adminMeserosRoutes = require('./routes/adminMeseros');
-const { protect } = require('./middleware/auth'); // IMPORTAR MIDDLEWARE
+const ordersRoutes = require('./routes/Orders'); // IMPORTAR EXPLÍCITAMENTE
+const { protect } = require('./middleware/auth');
 require('dotenv').config();
 
 const app = express();
@@ -24,9 +25,13 @@ mongoose.connect(process.env.MONGO_URI)
 // Rutas públicas (sin autenticación)
 app.use('/api/auth', require('./routes/auth'));
 
+// ⭐ RUTA PÚBLICA DE ORDERS - SIN PROTECCIÓN
+// Esta debe ir ANTES de las rutas protegidas
+app.get('/api/orders/mesa/:numeroMesa', ordersRoutes);
+
 // Rutas protegidas (requieren autenticación)
 app.use('/api/products', protect, require('./routes/Products'));
-app.use('/api/orders', protect, require('./routes/Orders'));
+app.use('/api/orders', protect, ordersRoutes); // Ahora el resto de orders sí están protegidas
 app.use('/api/expenses', protect, expensesRoutes);
 app.use('/api/liquidaciones', protect, liquidacionesRoutes);
 app.use('/api/admin-meseros', protect, adminMeserosRoutes);
