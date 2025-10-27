@@ -705,96 +705,110 @@
             }
         }
 
-        function displayOrder(isUpdate = false) {
-            const content = document.getElementById('content');
-            const order = orderData;
+  function displayOrder(isUpdate = false) {
+    const content = document.getElementById('content');
+    const order = orderData;
 
-            const statusInfo = getStatusInfo(order.estado);
-            const timeline = getTimeline(order.estado, isUpdate ? previousStatus : null);
+    const statusInfo = getStatusInfo(order.estado);
+    const timeline = getTimeline(order.estado, isUpdate ? previousStatus : null);
 
-            // CAMBIO IMPORTANTE: Usar productoInfo en lugar de producto
-            const itemsHTML = order.items.map(item => {
-                const info = item.productoInfo || item.producto || {};
-                return `
-                    <div class="order-item">
-                        <div class="item-details">
-                            <div class="item-name">${info.nombre || 'Producto'}</div>
-                            <div class="item-category">${info.categoria || 'Sin categoría'}</div>
-                        </div>
-                        <span class="item-qty">x${item.cantidad}</span>
-                        <span class="item-price">$${(item.precio * item.cantidad).toLocaleString('es-CO')}</span>
-                    </div>
-                `;
-            }).join('');
+    // NUEVO: Items con estados individuales agrupados
+    const itemsHTML = order.items.map(item => {
+        const info = item.productoInfo || item.producto || {};
+        const grupos = item.estadosIndividuales || [{cantidad: item.cantidad, estado: 'pendiente'}];
+        
+        return grupos.map(grupo => `
+            <div class="order-item" style="border-left: 4px solid ${getColorEstado(grupo.estado)};">
+                <div class="item-details">
+                    <div class="item-name">${info.nombre || 'Producto'}</div>
+                    <div class="item-category">${info.categoria || 'Sin categoría'} · <span class="status-badge status-${grupo.estado}" style="font-size: 10px; padding: 2px 8px; margin-left: 4px;">${grupo.estado}</span></div>
+                </div>
+                <span class="item-qty">x${grupo.cantidad}</span>
+                <span class="item-price">$${(item.precio * grupo.cantidad).toLocaleString('es-CO')}</span>
+            </div>
+        `).join('');
+    }).join('');
 
-            content.innerHTML = `
-                <div class="info-card ${isUpdate ? 'updating' : ''}">
-                    <h2>🏪 Información</h2>
-                    <div class="info-row">
-                        <span class="info-label">Restaurante:</span>
-                        <span class="info-value">${restaurante}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Mesa:</span>
-                        <span class="info-value">#${mesa}</span>
-                    </div>
-                    ${sede ? `
-                    <div class="info-row">
-                        <span class="info-label">Sede:</span>
-                        <span class="info-value">${sede}</span>
-                    </div>
-                    ` : ''}
-                    <div class="info-row">
-                        <span class="info-label">Hora del pedido:</span>
-                        <span class="info-value">${new Date(order.createdAt).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}</span>
+    content.innerHTML = `
+        <div class="info-card ${isUpdate ? 'updating' : ''}">
+            <h2>🪑 Información</h2>
+            <div class="info-row">
+                <span class="info-label">Restaurante:</span>
+                <span class="info-value">${restaurante}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Mesa:</span>
+                <span class="info-value">#${mesa}</span>
+            </div>
+            ${sede ? `
+            <div class="info-row">
+                <span class="info-label">Sede:</span>
+                <span class="info-value">${sede}</span>
+            </div>
+            ` : ''}
+            <div class="info-row">
+                <span class="info-label">Hora del pedido:</span>
+                <span class="info-value">${new Date(order.createdAt).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}</span>
+            </div>
+        </div>
+
+        <div class="order-card ${isUpdate ? 'updating' : ''}">
+            <div class="order-header">
+                <div class="order-info">
+                    <h3>${statusInfo.emoji} ${statusInfo.title}</h3>
+                    <div class="order-meta">
+                        ${statusInfo.message}
                     </div>
                 </div>
+                <span class="status-badge status-${order.estado} ${isUpdate ? 'changed' : ''}">${order.estado}</span>
+            </div>
 
-                <div class="order-card ${isUpdate ? 'updating' : ''}">
-                    <div class="order-header">
-                        <div class="order-info">
-                            <h3>${statusInfo.emoji} ${statusInfo.title}</h3>
-                            <div class="order-meta">
-                                ${statusInfo.message}
+            <div class="status-timeline">
+                <div class="timeline-title">Progreso del Pedido</div>
+                ${timeline.map(item => `
+                    <div class="timeline-item">
+                        <div class="timeline-icon ${item.active ? 'active' : 'inactive'} ${item.justActivated ? 'just-activated' : ''}">
+                            ${item.icon}
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-label ${item.active ? '' : 'inactive'}">
+                                ${item.label}
                             </div>
                         </div>
-                        <span class="status-badge status-${order.estado} ${isUpdate ? 'changed' : ''}">${order.estado}</span>
                     </div>
+                `).join('')}
+            </div>
 
-                    <div class="status-timeline">
-                        <div class="timeline-title">Progreso del Pedido</div>
-                        ${timeline.map(item => `
-                            <div class="timeline-item">
-                                <div class="timeline-icon ${item.active ? 'active' : 'inactive'} ${item.justActivated ? 'just-activated' : ''}">
-                                    ${item.icon}
-                                </div>
-                                <div class="timeline-content">
-                                    <div class="timeline-label ${item.active ? '' : 'inactive'}">
-                                        ${item.label}
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
+            <div class="order-items">
+                <div class="items-title">🍽️ Productos</div>
+                ${itemsHTML}
+            </div>
 
-                    <div class="order-items">
-                        <div class="items-title">🍽️ Productos</div>
-                        ${itemsHTML}
-                    </div>
+            ${order.notas ? `
+            <div class="order-notes">
+                <p>📝 ${order.notas}</p>
+            </div>
+            ` : ''}
 
-                    ${order.notas ? `
-                    <div class="order-notes">
-                        <p>📝 ${order.notas}</p>
-                    </div>
-                    ` : ''}
+            <div class="order-total">
+                <span class="total-label">Total del Pedido:</span>
+                <span class="total-amount">$${order.total.toLocaleString('es-CO')}</span>
+            </div>
+        </div>
+    `;
+}
 
-                    <div class="order-total">
-                        <span class="total-label">Total del Pedido:</span>
-                        <span class="total-amount">$${order.total.toLocaleString('es-CO')}</span>
-                    </div>
-                </div>
-            `;
-        }
+function getColorEstado(estado) {
+    const colores = {
+        'pendiente': '#f6ad55',
+        'preparando': '#4299e1',
+        'listo': '#48bb78',
+        'entregado': '#9f7aea',
+        'cancelado': '#fc8181'
+    };
+    return colores[estado] || '#e2e8f0';
+}
+
 
         function getStatusInfo(estado) {
             const statusMap = {

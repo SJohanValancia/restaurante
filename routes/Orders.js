@@ -376,6 +376,87 @@ router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (re
   }
 });
 
+// ✅ NUEVA RUTA: Actualizar estado individual de un producto
+router.patch('/:id/item/:itemIndex/estado', protect, checkPermission('editarPedidos'), async (req, res) => {
+  try {
+    const { itemIndex } = req.params;
+    const { cantidadCambiar, nuevoEstado } = req.body;
+    
+    const order = await Order.findById(req.params.id);
+    
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Pedido no encontrado'
+      });
+    }
+
+    const item = order.items[itemIndex];
+    
+    if (!item) {
+      return res.status(404).json({
+        success: false,
+        message: 'Producto no encontrado'
+      });
+    }
+
+    // Buscar si ya existe un grupo con el estado actual
+    const grupoExistente = item.estadosIndividuales.find(e => e.estado === nuevoEstado);
+    
+    if (grupoExistente) {
+      // Agregar al grupo existente
+      grupoExistente.cantidad += cantidadCambiar;
+    } else {
+      // Crear nuevo grupo
+      item.estadosIndividuales.push({
+        cantidad: cantidadCambiar,
+        estado: nuevoEstado
+      });
+    }
+
+    // Reducir del grupo "pendiente" u otro estado actual
+    const grupoActual = item.estadosIndividuales.find(e => e.estado !== nuevoEstado);
+    if (grupoActual) {
+      grupoActual.cantidad -= cantidadCambiar;
+      
+      // Eliminar si llega a 0
+      if (grupoActual.cantidad <= 0) {
+        item.estadosIndividuales = item.estadosIndividuales.filter(e => e.cantidad > 0);
+      }
+    }
+
+    // Verificar si todos los items están entregados
+    const todosEntregados = order.items.every(item => 
+      item.estadosIndividuales.every(grupo => grupo.estado === 'entregado')
+    );
+
+    if (todosEntregados && order.estado !== 'entregado') {
+      // No cambiar automáticamente, solo notificar
+      await order.save();
+      return res.json({
+        success: true,
+        message: 'Estado del producto actualizado',
+        data: order,
+        todosEntregados: true
+      });
+    }
+
+    await order.save();
+    
+    res.json({
+      success: true,
+      message: 'Estado del producto actualizado',
+      data: order
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: 'Error al actualizar el estado del producto',
+      error: error.message
+    });
+  }
+});
+
 router.put('/:id', protect, checkPermission('editarPedidos'), async (req, res) => {
   try {
     const { items, notas } = req.body;

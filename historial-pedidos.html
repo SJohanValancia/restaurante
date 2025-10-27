@@ -1194,16 +1194,15 @@ function displayOrders() {
         return;
     }
 
-    // ORDENAR: Separar entregados de no entregados
-    const noEntregados = filteredOrders.filter(o => o.estado !== 'entregado');
+    const activos = filteredOrders.filter(o => !['entregado', 'cancelado'].includes(o.estado));
+    const cancelados = filteredOrders.filter(o => o.estado === 'cancelado');
     const entregados = filteredOrders.filter(o => o.estado === 'entregado');
     
-    // Ordenar por fecha ASCENDENTE (más antiguo primero = orden de llegada)
-    noEntregados.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    activos.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    cancelados.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
     entregados.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
     
-    // Combinar: no entregados arriba, entregados abajo
-    const orderedOrders = [...noEntregados, ...entregados];
+    const orderedOrders = [...activos, ...cancelados, ...entregados];
 
     const fragment = document.createDocumentFragment();
     const tempDiv = document.createElement('div');
@@ -1235,7 +1234,7 @@ function displayOrders() {
                                 <span>${horaStr}</span>
                             </div>
                             <div class="meta-row">
-                                <span class="meta-icon">🔖</span>
+                                <span class="meta-icon">📖</span>
                                 <span>#${order._id.slice(-6).toUpperCase()}</span>
                             </div>
                             ${order.metodoPago ? `
@@ -1249,7 +1248,7 @@ function displayOrders() {
                     <span class="status-badge status-${order.estado}">${order.estado}</span>
                 </div>
                 <div class="order-items">
-                    ${order.items.map(item => {
+                    ${order.items.map((item, itemIndex) => {
                         let nombre = 'Producto eliminado';
                         
                         if (item.productoInfo) {
@@ -1260,13 +1259,29 @@ function displayOrders() {
                             nombre = item.nombreProducto;
                         }
                         
-                        return `
-                            <div class="order-item">
-                                <span class="item-name">${nombre}</span>
-                                <span class="item-qty">x${item.cantidad}</span>
-                                <span>$${(item.precio * item.cantidad).toLocaleString('es-CO')}</span>
+                        // Agrupar por estado
+                        const grupos = item.estadosIndividuales || [{cantidad: item.cantidad, estado: 'pendiente'}];
+                        
+                        return grupos.map(grupo => `
+                            <div class="order-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #f7fafc; border-radius: 8px; margin-bottom: 8px;">
+                                <div style="flex: 1;">
+                                    <span class="item-name" style="font-weight: 600; color: #2d3748;">${nombre}</span>
+                                    <span class="item-qty" style="margin-left: 8px; color: #667eea; font-weight: 700;">x${grupo.cantidad}</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 14px; font-weight: 700; color: #1a202c;">$${(item.precio * grupo.cantidad).toLocaleString('es-CO')}</span>
+                                    ${order.estado !== 'entregado' && order.estado !== 'cancelado' ? `
+                                        <span class="status-badge status-${grupo.estado}" style="font-size: 10px; padding: 4px 8px;">${grupo.estado}</span>
+                                        <button onclick="cambiarEstadoProducto('${order._id}', ${itemIndex}, ${grupo.cantidad}, '${grupo.estado}')" 
+                                                style="padding: 4px 8px; background: #4299e1; color: white; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 600;">
+                                            ▶️
+                                        </button>
+                                    ` : `
+                                        <span class="status-badge status-${grupo.estado}" style="font-size: 10px; padding: 4px 8px;">${grupo.estado}</span>
+                                    `}
+                                </div>
                             </div>
-                        `;
+                        `).join('');
                     }).join('')}
                 </div>
                 ${order.notas ? `
@@ -1286,7 +1301,6 @@ function displayOrders() {
     list.innerHTML = '';
     list.appendChild(tempDiv);
 }
-
 
 
 function getOrderActions(order) {
@@ -1670,6 +1684,201 @@ window.addEventListener('beforeunload', () => {
         clearInterval(pollingInterval);
     }
 });
+
+// ============================================
+// SISTEMA DE ESTADOS INDIVIDUALES POR PRODUCTO
+// ============================================
+
+let modalEstadoProductoData = null;
+
+function cambiarEstadoProducto(orderId, itemIndex, cantidadTotal, estadoActual) {
+    modalEstadoProductoData = { orderId, itemIndex, cantidadTotal, estadoActual };
+    
+    // Determinar siguiente estado
+    const siguienteEstado = obtenerSiguienteEstado(estadoActual);
+    
+    if (cantidadTotal === 1) {
+        // Si es solo 1, cambiar directamente
+        actualizarEstadoProducto(orderId, itemIndex, 1, siguienteEstado);
+    } else {
+        // Mostrar modal para seleccionar cantidad
+        mostrarModalCantidadProducto(cantidadTotal, siguienteEstado);
+    }
+}
+
+function obtenerSiguienteEstado(estadoActual) {
+    const flujo = ['pendiente', 'preparando', 'listo', 'entregado'];
+    const index = flujo.indexOf(estadoActual);
+    return flujo[index + 1] || 'entregado';
+}
+
+function mostrarModalCantidadProducto(cantidadTotal, siguienteEstado) {
+    const modal = document.createElement('div');
+    modal.id = 'modalCantidadProducto';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.7);
+        z-index: 10001;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.2s ease;
+    `;
+    
+    const emojiEstado = {
+        'preparando': '👨‍🍳',
+        'listo': '✅',
+        'entregado': '🎉'
+    }[siguienteEstado];
+    
+    modal.innerHTML = `
+        <div style="background: white; border-radius: 16px; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: slideUp 0.3s ease;">
+            <h3 style="font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 1rem; text-align: center;">
+                ${emojiEstado} Cambiar a ${siguienteEstado}
+            </h3>
+            <p style="font-size: 14px; color: #718096; text-align: center; margin-bottom: 1.5rem;">
+                ¿Cuántas unidades quieres marcar como <strong>${siguienteEstado}</strong>?
+            </p>
+            
+            <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1.5rem;">
+                <button onclick="ajustarCantidadModal(-1)" style="width: 50px; height: 50px; background: #e2e8f0; border: none; border-radius: 10px; font-size: 24px; cursor: pointer; font-weight: 700; color: #2d3748;">
+                    -
+                </button>
+                <div style="min-width: 80px; text-align: center;">
+                    <div id="cantidadSeleccionada" style="font-size: 32px; font-weight: 800; color: #667eea;">1</div>
+                    <div style="font-size: 12px; color: #718096;">de ${cantidadTotal}</div>
+                </div>
+                <button onclick="ajustarCantidadModal(1)" style="width: 50px; height: 50px; background: #667eea; border: none; border-radius: 10px; font-size: 24px; cursor: pointer; font-weight: 700; color: white;">
+                    +
+                </button>
+            </div>
+            
+            <div style="display: grid; gap: 0.75rem;">
+                <button onclick="confirmarCambioEstadoProducto('${siguienteEstado}')" style="padding: 1rem; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer;">
+                    ✅ Confirmar
+                </button>
+                <button onclick="cerrarModalCantidadProducto()" style="padding: 0.75rem; background: #e2e8f0; color: #2d3748; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+function ajustarCantidadModal(delta) {
+    const display = document.getElementById('cantidadSeleccionada');
+    let cantidad = parseInt(display.textContent);
+    cantidad = Math.max(1, Math.min(modalEstadoProductoData.cantidadTotal, cantidad + delta));
+    display.textContent = cantidad;
+}
+
+function cerrarModalCantidadProducto() {
+    const modal = document.getElementById('modalCantidadProducto');
+    if (modal) {
+        modal.style.animation = 'fadeOut 0.2s ease';
+        setTimeout(() => modal.remove(), 200);
+    }
+    modalEstadoProductoData = null;
+}
+
+async function confirmarCambioEstadoProducto(nuevoEstado) {
+    const cantidad = parseInt(document.getElementById('cantidadSeleccionada').textContent);
+    cerrarModalCantidadProducto();
+    
+    await actualizarEstadoProducto(
+        modalEstadoProductoData.orderId,
+        modalEstadoProductoData.itemIndex,
+        cantidad,
+        nuevoEstado
+    );
+}
+
+async function actualizarEstadoProducto(orderId, itemIndex, cantidadCambiar, nuevoEstado) {
+    const token = localStorage.getItem('token');
+    
+    try {
+        const response = await fetch(`${API_URL}/orders/${orderId}/item/${itemIndex}/estado`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                cantidadCambiar,
+                nuevoEstado
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            // Si todos los productos están entregados, preguntar método de pago
+            if (data.todosEntregados) {
+                currentOrderIdForPayment = orderId;
+                mostrarModalMetodoPago();
+            } else {
+                await loadOrders();
+            }
+            
+            // Animación de éxito
+            mostrarNotificacionExito(`Producto marcado como ${nuevoEstado}`);
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al actualizar el estado del producto');
+    }
+}
+
+function mostrarNotificacionExito(mensaje) {
+    const notif = document.createElement('div');
+    notif.textContent = mensaje;
+    notif.style.cssText = `
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+        z-index: 10000;
+        animation: slideInRight 0.3s ease-out;
+    `;
+    document.body.appendChild(notif);
+    
+    setTimeout(() => {
+        notif.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => notif.remove(), 300);
+    }, 2500);
+}
+
+// Agregar estilos de animación
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+    @keyframes slideUp {
+        from { transform: translateY(30px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+`;
+document.head.appendChild(style);
 
 </script>
 

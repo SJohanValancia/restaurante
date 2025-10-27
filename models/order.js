@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
   mesa: {
-    type: String,  // ✅ CAMBIADO A STRING
+    type: String,
     required: [true, 'El número de mesa es obligatorio'],
     trim: true,
     maxlength: [20, 'El nombre de mesa no puede exceder 20 caracteres']
@@ -30,7 +30,20 @@ const orderSchema = new mongoose.Schema({
       type: Number,
       required: true,
       min: [0, 'El precio no puede ser negativo']
-    }
+    },
+    // ✅ NUEVOS CAMPOS PARA ESTADOS INDIVIDUALES
+    estadosIndividuales: [{
+      cantidad: {
+        type: Number,
+        required: true,
+        min: 1
+      },
+      estado: {
+        type: String,
+        enum: ['pendiente', 'preparando', 'listo', 'entregado'],
+        default: 'pendiente'
+      }
+    }]
   }],
   total: {
     type: Number,
@@ -78,12 +91,25 @@ orderSchema.index({ userId: 1 });
 orderSchema.index({ createdAt: -1 });
 orderSchema.index({ reciboDia: 1 });
 
+// ✅ MIDDLEWARE PARA INICIALIZAR ESTADOS INDIVIDUALES
 orderSchema.pre('save', function(next) {
+  // Inicializar estadosIndividuales si no existen
+  this.items.forEach(item => {
+    if (!item.estadosIndividuales || item.estadosIndividuales.length === 0) {
+      item.estadosIndividuales = [{
+        cantidad: item.cantidad,
+        estado: 'pendiente'
+      }];
+    }
+  });
+  
+  // Calcular total
   if (this.items && this.items.length > 0) {
     this.total = this.items.reduce((sum, item) => {
       return sum + (item.precio * item.cantidad);
     }, 0);
   }
+  
   next();
 });
 
