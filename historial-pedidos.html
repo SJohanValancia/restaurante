@@ -848,10 +848,10 @@
     <option value="cancelado">Cancelados</option>
 </select>
                     </div>
-                    <div class="filter-group">
-                        <label class="filter-label">Mesa</label>
-                        <input type="number" id="filterMesa" class="filter-input" placeholder="Número de mesa" min="1" onchange="applyFilters()">
-                    </div>
+<div class="filter-group">
+    <label class="filter-label">Mesa</label>
+    <input type="text" id="filterMesa" class="filter-input" placeholder="Nombre/Número de mesa" maxlength="20" onchange="applyFilters()">
+</div>
                     <div class="filter-group">
                         <label class="filter-label">Desde</label>
                         <input type="date" id="filterFechaDesde" class="filter-input" onchange="applyFilters()">
@@ -1118,7 +1118,7 @@ async function loadOrders() {
 
 function applyFilters() {
     const estado = document.getElementById('filterEstado').value;
-    const mesa = document.getElementById('filterMesa').value;
+    const mesa = document.getElementById('filterMesa').value.trim(); 
     const fechaDesde = document.getElementById('filterFechaDesde').value;
     const fechaHasta = document.getElementById('filterFechaHasta').value;
     const search = document.getElementById('filterSearch').value.toLowerCase();
@@ -1194,10 +1194,21 @@ function displayOrders() {
         return;
     }
 
+    // ORDENAR: Separar entregados de no entregados
+    const noEntregados = filteredOrders.filter(o => o.estado !== 'entregado');
+    const entregados = filteredOrders.filter(o => o.estado === 'entregado');
+    
+    // Ordenar por fecha ASCENDENTE (más antiguo primero = orden de llegada)
+    noEntregados.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    entregados.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    
+    // Combinar: no entregados arriba, entregados abajo
+    const orderedOrders = [...noEntregados, ...entregados];
+
     const fragment = document.createDocumentFragment();
     const tempDiv = document.createElement('div');
     
-    tempDiv.innerHTML = filteredOrders.map(order => {
+    tempDiv.innerHTML = orderedOrders.map(order => {
         const fecha = new Date(order.createdAt);
         const fechaStr = fecha.toLocaleDateString('es-CO', {
             day: '2-digit',
@@ -1220,7 +1231,7 @@ function displayOrders() {
                                 <span>${fechaStr}</span>
                             </div>
                             <div class="meta-row">
-                                <span class="meta-icon">🕐</span>
+                                <span class="meta-icon">🕒</span>
                                 <span>${horaStr}</span>
                             </div>
                             <div class="meta-row">
@@ -1239,17 +1250,13 @@ function displayOrders() {
                 </div>
                 <div class="order-items">
                     ${order.items.map(item => {
-                        // Manejo seguro de productos eliminados
                         let nombre = 'Producto eliminado';
                         
                         if (item.productoInfo) {
-                            // Backend normalizado
                             nombre = item.productoInfo.nombre;
                         } else if (item.producto && item.producto.nombre) {
-                            // Producto existe
                             nombre = item.producto.nombre;
                         } else if (item.nombreProducto) {
-                            // Nombre guardado en el pedido
                             nombre = item.nombreProducto;
                         }
                         
@@ -1279,6 +1286,8 @@ function displayOrders() {
     list.innerHTML = '';
     list.appendChild(tempDiv);
 }
+
+
 
 function getOrderActions(order) {
         let actions = '<div class="order-actions">';

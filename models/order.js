@@ -2,9 +2,10 @@ const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
   mesa: {
-    type: Number,
+    type: String,  // ✅ CAMBIADO A STRING
     required: [true, 'El número de mesa es obligatorio'],
-    min: [1, 'El número de mesa debe ser mayor a 0']
+    trim: true,
+    maxlength: [20, 'El nombre de mesa no puede exceder 20 caracteres']
   },
   items: [{
     producto: {
@@ -12,7 +13,6 @@ const orderSchema = new mongoose.Schema({
       ref: 'Product',
       required: true
     },
-    // AGREGAR ESTOS CAMPOS NUEVOS
     nombreProducto: {
       type: String,
       required: true

@@ -37,7 +37,7 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
     }
 
     const orderQuery = {
-      mesa: parseInt(numeroMesa),
+      mesa: (numeroMesa),
       userId: usuario._id,
       estado: { $in: ['pendiente', 'preparando', 'listo'] }
     };
@@ -50,7 +50,7 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
 
     if (!order) {
       order = await Order.findOne({ 
-        mesa: parseInt(numeroMesa),
+        mesa: (numeroMesa),
         userId: usuario._id
       })
         .populate('items.producto', 'nombre categoria precio')
@@ -114,7 +114,7 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
     let query = { userId: { $in: req.userIdsRestaurante } };
 
     if (estado) query.estado = estado;
-    if (mesa) query.mesa = parseInt(mesa);
+    if (mesa) query.mesa = (mesa);
     
     if (fecha === 'hoy') {
       const hoy = new Date();

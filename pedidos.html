@@ -874,7 +874,7 @@
                     <div class="card-body">
                         <form id="orderForm">
                             <div class="form-group">
-                                <label class="form-label" for="mesa">Número de Mesa *</label>
+                                <label class="form-label" for="mesa">Número/nombre de mesa</label>
                                 <input type="number" id="mesa" class="form-input" required min="1" placeholder="Ej: 5">
                             </div>
 
@@ -1170,7 +1170,7 @@ function mostrarAgotado(elemento) {
             }
 
             const orderData = {
-                mesa: parseInt(mesa),
+                mesa: (mesa),
                 items: selectedItems.map(item => ({
                     producto: item.producto._id,
                     cantidad: item.cantidad,
@@ -1232,7 +1232,7 @@ function mostrarAgotado(elemento) {
             }
         }
 
-        function displayOrders(orders) {
+function displayOrders(orders) {
     const list = document.getElementById('ordersList');
     
     if (orders.length === 0) {
@@ -1245,7 +1245,18 @@ function mostrarAgotado(elemento) {
         return;
     }
 
-    list.innerHTML = orders.map(order => `
+    // ORDENAR: Separar entregados de no entregados
+    const noEntregados = orders.filter(o => o.estado !== 'entregado');
+    const entregados = orders.filter(o => o.estado === 'entregado');
+    
+    // Ordenar por fecha ASCENDENTE (más antiguo primero = orden de llegada)
+    noEntregados.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    entregados.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    
+    // Combinar
+    const orderedOrders = [...noEntregados, ...entregados];
+
+    list.innerHTML = orderedOrders.map(order => `
         <div class="order-card">
             <div class="order-header">
                 <div class="order-info">
@@ -1259,7 +1270,6 @@ function mostrarAgotado(elemento) {
             </div>
             <div class="order-items">
                 ${order.items.map(item => {
-                    // Usar productoInfo si existe, sino usar producto directamente
                     const nombre = item.productoInfo ? item.productoInfo.nombre : (item.producto ? item.producto.nombre : item.nombreProducto || 'Producto eliminado');
                     
                     return `
@@ -1280,6 +1290,8 @@ function mostrarAgotado(elemento) {
         </div>
     `).join('');
 }
+
+
 
 function getOrderActions(order) {
             if (order.estado === 'entregado' || order.estado === 'cancelado') return '';
