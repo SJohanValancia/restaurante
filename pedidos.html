@@ -618,10 +618,10 @@
             color: #22543d;
         }
 
-        .status-entregado {
-            background: #e2e8f0;
-            color: #2d3748;
-        }
+.status-entregado {
+    background: #c6f6d5;
+    color: #22543d;
+}
 
         .status-cancelado {
             background: #fed7d7;
@@ -961,7 +961,7 @@
                                     <option value="pendiente">Pendientes</option>
                                     <option value="preparando">Preparando</option>
                                     <option value="listo">Listos</option>
-                                    <option value="entregado">Entregados</option>
+                                    <option value="entregado">Pagados</option>
                                     <option value="cancelado">Cancelados</option>
                                 </select>
                             </div>
@@ -985,6 +985,12 @@
         let currentUser = null;
         let availableProducts = [];
         let selectedItems = [];
+        let allProducts = [];
+        let allProductsCache = [];
+        // DEBE ESTAR después de:
+
+// AGREGAR ESTA LÍNEA:
+let currentOrderIdForPayment = null;
 
         // CARGA INICIAL
         window.addEventListener('DOMContentLoaded', async () => {
@@ -1042,7 +1048,6 @@ if (currentUser.rol === 'admin') {
 async function loadProducts() {
     const token = localStorage.getItem('token');
     try {
-        // CAMBIAR ESTA LÍNEA - Quitar el filtro de disponible=true
         const response = await fetch(`${API_URL}/products?userId=${currentUser._id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -1050,13 +1055,16 @@ async function loadProducts() {
         
         if (data.success) {
             availableProducts = data.data;
+            allProductsCache = data.data; // ✅ ACTUALIZAR CACHE TAMBIÉN
             displayProducts(availableProducts);
         }
     } catch (error) {
         console.error('Error al cargar productos:', error);
     }
 }
-  function displayProducts(products) {
+
+
+function displayProducts(products) {
     const list = document.getElementById('productsList');
     
     if (products.length === 0) {
@@ -1142,45 +1150,53 @@ function mostrarAgotado(elemento) {
             updateSelectedProducts();
         }
 
-        function updateSelectedProducts() {
-            const container = document.getElementById('selectedProducts');
-            const summary = document.getElementById('orderSummary');
-            const btnSubmit = document.getElementById('btnSubmit');
+function updateSelectedProducts() {
+    const container = document.getElementById('selectedProducts');
+    const summary = document.getElementById('orderSummary');
+    const btnSubmit = document.getElementById('btnSubmit');
 
-            if (selectedItems.length === 0) {
-                container.innerHTML = '';
-                summary.style.display = 'none';
-                btnSubmit.disabled = true;
-                return;
-            }
+    if (selectedItems.length === 0) {
+        container.innerHTML = '';
+        summary.style.display = 'none';
+        btnSubmit.disabled = true;
+        return;
+    }
 
-            summary.style.display = 'block';
-            btnSubmit.disabled = false;
+    summary.style.display = 'block';
+    btnSubmit.disabled = false;
 
-            container.innerHTML = `
-                <label class="form-label">Productos Seleccionados</label>
-                ${selectedItems.map((item, index) => `
-                    <div class="selected-item">
-                        <div class="selected-item-info">
-                            <h4>${item.producto.nombre}</h4>
-                            <div class="quantity-controls">
-                                <button type="button" class="qty-btn" onclick="changeQuantity(${index}, -1)">-</button>
-                                <span class="qty-display">${item.cantidad}</span>
-                                <button type="button" class="qty-btn" onclick="changeQuantity(${index}, 1)">+</button>
-                                <span class="item-price">$${(item.producto.precio * item.cantidad).toLocaleString('es-CO')}</span>
-                            </div>
-                        </div>
-                        <button type="button" class="btn-remove" onclick="removeItem(${index})">Eliminar</button>
+    container.innerHTML = `
+        <label class="form-label">Productos Seleccionados</label>
+        ${selectedItems.map((item, index) => `
+            <div class="selected-item">
+                <div class="selected-item-info">
+                    <h4>${item.producto.nombre}</h4>
+                    <div class="quantity-controls">
+                        <button type="button" class="qty-btn" onclick="changeQuantity(${index}, -1)">-</button>
+                        <input 
+                            type="number" 
+                            min="1" 
+                            max="999" 
+                            value="${item.cantidad}" 
+                            onchange="setQuantity(${index}, this.value)"
+                            onclick="this.select()"
+                            style="width: 60px; text-align: center; font-weight: 600; font-size: 14px; border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px;"
+                        >
+                        <button type="button" class="qty-btn" onclick="changeQuantity(${index}, 1)">+</button>
+                        <span class="item-price">$${(item.producto.precio * item.cantidad).toLocaleString('es-CO')}</span>
                     </div>
-                `).join('')}
-            `;
+                </div>
+                <button type="button" class="btn-remove" onclick="removeItem(${index})">Eliminar</button>
+            </div>
+        `).join('')}
+    `;
 
-            const totalItems = selectedItems.reduce((sum, item) => sum + item.cantidad, 0);
-            const totalPrice = selectedItems.reduce((sum, item) => sum + (item.producto.precio * item.cantidad), 0);
+    const totalItems = selectedItems.reduce((sum, item) => sum + item.cantidad, 0);
+    const totalPrice = selectedItems.reduce((sum, item) => sum + (item.producto.precio * item.cantidad), 0);
 
-            document.getElementById('summaryItems').textContent = totalItems;
-            document.getElementById('summaryTotal').textContent = `$${totalPrice.toLocaleString('es-CO')}`;
-        }
+    document.getElementById('summaryItems').textContent = totalItems;
+    document.getElementById('summaryTotal').textContent = `$${totalPrice.toLocaleString('es-CO')}`;
+}
 
         function changeQuantity(index, delta) {
             selectedItems[index].cantidad += delta;
@@ -1189,6 +1205,23 @@ function mostrarAgotado(elemento) {
             }
             updateSelectedProducts();
         }
+
+        function setQuantity(index, value) {
+    let cantidad = parseInt(value);
+    
+    // Validar que sea un número válido
+    if (isNaN(cantidad) || cantidad < 1) {
+        cantidad = 1;
+    }
+    
+    // Límite máximo opcional
+    if (cantidad > 999) {
+        cantidad = 999;
+    }
+    
+    selectedItems[index].cantidad = cantidad;
+    updateSelectedProducts();
+}
 
         function removeItem(index) {
             selectedItems.splice(index, 1);
@@ -1314,7 +1347,7 @@ function displayOrders(orders) {
                     </div>
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span style="font-size: 14px; font-weight: 700; color: #1a202c;">$${(item.precio * grupo.cantidad).toLocaleString('es-CO')}</span>
-                        ${order.estado !== 'entregado' && order.estado !== 'cancelado' ? `
+                        ${order.estado !== 'Pagado' && order.estado !== 'cancelado' ? `
                             <span class="status-badge status-${grupo.estado}" style="font-size: 10px; padding: 4px 8px;">${grupo.estado}</span>
                             <button onclick="cambiarEstadoProducto('${order._id}', ${itemIndex}, ${grupo.cantidad}, '${grupo.estado}')" 
                                     style="padding: 4px 8px; background: #4299e1; color: white; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 600;">
@@ -1339,8 +1372,9 @@ function displayOrders(orders) {
                         </div>
                     </div>
                     <div style="display: flex; gap: 8px; align-items: center;">
-                        <span class="status-badge status-${order.estado}">${order.estado}</span>
-                        ${order.estado !== 'entregado' && order.estado !== 'cancelado' ? `
+                        <span class="status-badge status-${order.estado}">${order.estado === 'entregado' ? 'pagado' : order.estado}</span>
+
+                        ${order.estado !== 'Pagado' && order.estado !== 'cancelado' ? `
                             <button onclick="abrirModalEditar('${order._id}')" style="padding: 6px 12px; background: #805ad5; color: white; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 4px;">
                                 ✏️ Editar
                             </button>
@@ -1364,6 +1398,7 @@ function displayOrders(orders) {
 function getOrderActions(order) {
             if (order.estado === 'entregado' || order.estado === 'cancelado') return '';
 
+
             let actions = '<div class="order-actions">';
             
             if (order.estado === 'pendiente') {
@@ -1374,21 +1409,21 @@ function getOrderActions(order) {
                 actions += `<button class="btn-action btn-listo" onclick="updateOrderStatus('${order._id}', 'listo')">✅ Listo</button>`;
             }
             
-            if (order.estado === 'listo') {
-                actions += `<button class="btn-action btn-entregar" onclick="updateOrderStatus('${order._id}', 'entregado')">🍽️ Entregar</button>`;
-            }
-            
-            if (order.estado !== 'cancelado') {
-                actions += `<button class="btn-action btn-cancelar" onclick="cancelOrder('${order._id}')">❌ Cancelar</button>`;
-            }
+if (order.estado === 'listo') {
+    actions += `<button class="btn-action btn-entregar" onclick="updateOrderStatus('${order._id}', 'entregado')">💳 Pagar</button>`;
+}
+
+if (order.estado !== 'entregado' && order.estado !== 'cancelado') {
+    actions += `<button class="btn-action btn-cancelar" onclick="cancelOrder('${order._id}')">❌ Cancelar</button>`;
+}
             
             actions += '</div>';
             return actions;
         }
 
 
-        let currentOrderIdForPayment = null;
 
+// Debe estar ASÍ:
 async function updateOrderStatus(orderId, newStatus) {
     console.log('🔄 updateOrderStatus llamado con:', { orderId, newStatus });
     
@@ -1400,11 +1435,12 @@ async function updateOrderStatus(orderId, newStatus) {
         return;
     }
     
-    // Para otros estados, proceder normalmente
+    // Para otros estados, proceder normalmente SIN metodoPago
     await actualizarEstadoPedido(orderId, newStatus, null);
 }
 
 
+// Debe estar ASÍ:
 function mostrarModalMetodoPago() {
     console.log('🪟 Mostrando modal con orderId:', currentOrderIdForPayment);
     const modal = document.getElementById('modalMetodoPago');
@@ -1422,6 +1458,7 @@ function cerrarModalMetodoPago() {
     // NO limpiar aquí - se limpiará después de actualizar
 }
 
+// Debe estar ASÍ:
 async function confirmarMetodoPago(metodoPago) {
     console.log('✅ Método de pago confirmado:', metodoPago);
     console.log('📦 Order ID actual:', currentOrderIdForPayment);
@@ -1445,6 +1482,8 @@ async function confirmarMetodoPago(metodoPago) {
     // Usar la variable temporal para actualizar
     await actualizarEstadoPedido(orderIdTemp, 'entregado', metodoPago);
 }
+
+// Debe estar ASÍ:
 async function actualizarEstadoPedido(orderId, newStatus, metodoPago) {
     const token = localStorage.getItem('token');
 
@@ -1496,7 +1535,6 @@ async function actualizarEstadoPedido(orderId, newStatus, metodoPago) {
         alert('Error al actualizar el estado: ' + error.message);
     }
 }
-
 async function cancelOrder(orderId) {
     if (!confirm('¿Está seguro de cancelar este pedido?')) return;
     await actualizarEstadoPedido(orderId, 'cancelado', null);
@@ -1534,16 +1572,44 @@ function playNotificationSoundPedidos() {
 }
 
 async function autoRefreshOrdersPedidos() {
+    // Si no hay usuario, no hacer refresh
+    if (!currentUser || !currentUser._id) {
+        return;
+    }
+    
     const token = localStorage.getItem('token');
-    const estado = document.getElementById('filterEstado').value;
+    if (!token) {
+        console.warn('⚠️ No hay token, deteniendo auto-refresh');
+        if (pollingIntervalPedidos) {
+            clearInterval(pollingIntervalPedidos);
+        }
+        return;
+    }
+    
+    const estado = document.getElementById('filterEstado')?.value || '';
     
     let url = `${API_URL}/orders?userId=${currentUser._id}`;
     if (estado) url += `&estado=${estado}`;
     
     try {
         const response = await fetch(url, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Cache-Control': 'no-cache'
+            },
+            signal: AbortSignal.timeout(5000) // Timeout de 5 segundos
         });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                console.warn('⚠️ Token expirado en auto-refresh');
+                if (pollingIntervalPedidos) {
+                    clearInterval(pollingIntervalPedidos);
+                }
+                return;
+            }
+            throw new Error(`HTTP ${response.status}`);
+        }
 
         const data = await response.json();
         
@@ -1551,8 +1617,19 @@ async function autoRefreshOrdersPedidos() {
             const newOrders = data.data;
             
             // Detectar cambios en los pedidos existentes
-            const currentOrdersString = JSON.stringify(newOrders.map(o => ({ id: o._id, estado: o.estado })));
-            const previousOrdersString = JSON.stringify((window.previousOrders || []).map(o => ({ id: o._id, estado: o.estado })));
+            const currentOrdersString = JSON.stringify(newOrders.map(o => ({ 
+                id: o._id, 
+                estado: o.estado,
+                itemsCount: o.items.length,
+                total: o.total
+            })));
+            
+            const previousOrdersString = JSON.stringify((window.previousOrders || []).map(o => ({ 
+                id: o._id, 
+                estado: o.estado,
+                itemsCount: o.items.length,
+                total: o.total
+            })));
             
             // Si hay cambios, actualizar
             if (currentOrdersString !== previousOrdersString) {
@@ -1562,6 +1639,7 @@ async function autoRefreshOrdersPedidos() {
                 // Detectar nuevo pedido
                 if (!isFirstLoadPedidos && newOrders.length > lastOrderCountPedidos) {
                     playNotificationSoundPedidos();
+                    mostrarNotificacionExito('🔔 Nuevo pedido recibido');
                 }
             }
             
@@ -1570,10 +1648,13 @@ async function autoRefreshOrdersPedidos() {
             isFirstLoadPedidos = false;
         }
     } catch (error) {
-        console.error('Error en auto-refresh pedidos:', error);
+        // Solo mostrar error si no es timeout o network error común
+        if (error.name !== 'TimeoutError' && error.name !== 'AbortError') {
+            console.warn('⚠️ Error en auto-refresh (se reintentará):', error.message);
+        }
+        // No hacer nada, simplemente esperar al siguiente ciclo
     }
 }
-
 // Iniciar polling cuando currentUser esté listo
 const waitForUserPedidos = setInterval(() => {
     if (currentUser && currentUser._id) {
@@ -1612,9 +1693,9 @@ function cambiarEstadoProducto(orderId, itemIndex, cantidadTotal, estadoActual) 
 }
 
 function obtenerSiguienteEstado(estadoActual) {
-    const flujo = ['pendiente', 'preparando', 'listo', 'entregado'];
+    const flujo = ['pendiente', 'preparando', 'listo', 'pagado'];
     const index = flujo.indexOf(estadoActual);
-    return flujo[index + 1] || 'entregado';
+    return flujo[index + 1] || 'pagado';
 }
 
 function mostrarModalCantidadProducto(cantidadTotal, siguienteEstado) {
@@ -1637,7 +1718,7 @@ function mostrarModalCantidadProducto(cantidadTotal, siguienteEstado) {
     const emojiEstado = {
         'preparando': '👨‍🍳',
         'listo': '✅',
-        'entregado': '🎉'
+        'pagado': '🎉'
     }[siguienteEstado];
     
     modal.innerHTML = `
@@ -1798,9 +1879,14 @@ document.head.appendChild(style);
 let currentEditOrderId = null;
 let currentEditOrder = null;
 let editSelectedItems = [];
+let editAvailableProductsList = []; // ✅ GUARDAR LISTA GLOBAL
 
 async function abrirModalEditar(orderId) {
     currentEditOrderId = orderId;
+    
+    // ✅ MOSTRAR MODAL INMEDIATAMENTE con loading
+    document.getElementById('modalEditarPedido').style.display = 'flex';
+    document.getElementById('editProductsList').innerHTML = '<p style="text-align: center; color: #667eea; padding: 2rem;">⏳ Cargando...</p>';
     
     // Obtener los datos completos del pedido
     const token = localStorage.getItem('token');
@@ -1830,24 +1916,34 @@ async function abrirModalEditar(orderId) {
             
             actualizarListaProductosEdicion();
             
-            // Cargar productos disponibles para agregar
-            await cargarProductosParaEdicion();
-            
-            document.getElementById('modalEditarPedido').style.display = 'flex';
+            // ✅ USAR CACHE si ya existe, si no cargar
+            if (allProductsCache.length > 0) {
+                mostrarProductosDisponiblesEdicion(allProductsCache);
+            } else {
+                await cargarProductosParaEdicion();
+            }
         }
     } catch (error) {
         console.error('Error al cargar pedido:', error);
         alert('Error al cargar los datos del pedido');
+        cerrarModalEditar();
     }
 }
 
+
 function cerrarModalEditar() {
     document.getElementById('modalEditarPedido').style.display = 'none';
-    document.getElementById('editSearchProduct').value = '';
-    document.getElementById('editAvailableProducts').style.display = 'none';
+    const searchInput = document.getElementById('editSearchProduct');
+    if (searchInput) searchInput.value = '';
+    const container = document.getElementById('editAvailableProducts');
+    if (container) {
+        container.style.display = 'none';
+        container.innerHTML = '';
+    }
     currentEditOrderId = null;
     currentEditOrder = null;
     editSelectedItems = [];
+    editAvailableProductsList = [];
 }
 
 function actualizarListaProductosEdicion() {
@@ -1867,7 +1963,15 @@ function actualizarListaProductosEdicion() {
             </div>
             <div style="display: flex; align-items: center; gap: 8px;">
                 <button onclick="cambiarCantidadEdicion(${index}, -1)" style="width: 28px; height: 28px; border: 1px solid #e2e8f0; background: white; border-radius: 6px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;">-</button>
-                <span style="min-width: 40px; text-align: center; font-weight: 600; font-size: 14px;">${item.cantidad}</span>
+                <input 
+                    type="number" 
+                    min="1" 
+                    max="999" 
+                    value="${item.cantidad}" 
+                    onchange="setCantidadEdicion(${index}, this.value)"
+                    onclick="this.select()"
+                    style="width: 60px; text-align: center; font-weight: 600; font-size: 14px; border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px;"
+                >
                 <button onclick="cambiarCantidadEdicion(${index}, 1)" style="width: 28px; height: 28px; border: 1px solid #e2e8f0; background: white; border-radius: 6px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;">+</button>
                 <span style="font-size: 14px; font-weight: 700; color: #2d3748; min-width: 80px; text-align: right;">$${(item.producto.precio * item.cantidad).toLocaleString('es-CO')}</span>
                 <button onclick="eliminarProductoEdicion(${index})" style="background: #fc8181; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">🗑️</button>
@@ -1875,7 +1979,6 @@ function actualizarListaProductosEdicion() {
         </div>
     `).join('');
     
-    // Actualizar total
     const total = editSelectedItems.reduce((sum, item) => sum + (item.producto.precio * item.cantidad), 0);
     document.getElementById('editTotalDisplay').textContent = `$${total.toLocaleString('es-CO')}`;
 }
@@ -1888,6 +1991,23 @@ function cambiarCantidadEdicion(index, delta) {
     actualizarListaProductosEdicion();
 }
 
+function setCantidadEdicion(index, value) {
+    let cantidad = parseInt(value);
+    
+    // Validar que sea un número válido
+    if (isNaN(cantidad) || cantidad < 1) {
+        cantidad = 1;
+    }
+    
+    // Límite máximo opcional
+    if (cantidad > 999) {
+        cantidad = 999;
+    }
+    
+    editSelectedItems[index].cantidad = cantidad;
+    actualizarListaProductosEdicion();
+}
+
 function eliminarProductoEdicion(index) {
     if (confirm('¿Eliminar este producto del pedido?')) {
         editSelectedItems.splice(index, 1);
@@ -1896,6 +2016,12 @@ function eliminarProductoEdicion(index) {
 }
 
 async function cargarProductosParaEdicion() {
+    // ✅ Si ya tenemos productos en cache, no recargar
+    if (allProductsCache.length > 0) {
+        mostrarProductosDisponiblesEdicion(allProductsCache);
+        return;
+    }
+    
     const token = localStorage.getItem('token');
     try {
         const response = await fetch(`${API_URL}/products?userId=${currentUser._id}`, {
@@ -1904,10 +2030,13 @@ async function cargarProductosParaEdicion() {
         const data = await response.json();
         
         if (data.success) {
-            mostrarProductosDisponiblesEdicion(data.data.filter(p => p.disponible));
+            allProductsCache = data.data; // ✅ GUARDAR EN CACHE
+            console.log('📦 Productos cargados y cacheados:', allProductsCache.length);
+            mostrarProductosDisponiblesEdicion(allProductsCache);
         }
     } catch (error) {
         console.error('Error al cargar productos:', error);
+        alert('Error al cargar productos');
     }
 }
 
@@ -1915,61 +2044,194 @@ function mostrarProductosDisponiblesEdicion(products) {
     const container = document.getElementById('editAvailableProducts');
     const searchInput = document.getElementById('editSearchProduct');
     
-    // REMOVER LISTENERS ANTERIORES - Clonar el input para eliminar listeners
+    // Limpiar el input
+    searchInput.value = '';
+    
+    // MOSTRAR TODOS LOS PRODUCTOS AL INICIO
+    container.style.display = 'block';
+    renderizarProductosEdicion(products, container);
+    
+    // REMOVER LISTENERS ANTERIORES
     const newSearchInput = searchInput.cloneNode(true);
     searchInput.parentNode.replaceChild(newSearchInput, searchInput);
     
-    // Agregar el event listener al nuevo input
-    newSearchInput.addEventListener('input', (e) => {
-        const search = e.target.value.toLowerCase();
-        const filtered = products.filter(p => 
+    // Referenciar el nuevo input
+    const finalSearchInput = document.getElementById('editSearchProduct');
+    
+    // Agregar el event listener para búsqueda
+    finalSearchInput.addEventListener('input', (e) => {
+        const search = e.target.value.toLowerCase().trim();
+        
+        if (search.length > 0) {
+            const filtered = products.filter(p => 
+                p.nombre.toLowerCase().includes(search) || 
+                p.categoria.toLowerCase().includes(search)
+            );
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #a0aec0; padding: 1rem;">No se encontraron productos</p>';
+            } else {
+                renderizarProductosEdicion(filtered, container);
+            }
+        } else {
+            // Si borra la búsqueda, mostrar todos de nuevo
+            renderizarProductosEdicion(products, container);
+        }
+    });
+}
+
+function renderizarProductosEdicion(products, container) {
+    if (products.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #a0aec0; padding: 1rem;">No hay productos</p>';
+        return;
+    }
+    
+    container.innerHTML = products.map(p => {
+        const isAgotado = !p.disponible;
+        const nombreEscapado = p.nombre.replace(/'/g, "\\'").replace(/"/g, '\\"');
+        const categoriaEscapada = p.categoria.replace(/'/g, "\\'").replace(/"/g, '\\"');
+        
+        return `
+            <div onclick="${isAgotado ? 'mostrarAgotadoEdicion(this)' : `agregarProductoEdicion('${p._id}', '${nombreEscapado}', ${p.precio}, '${categoriaEscapada}')`}" 
+                 class="${isAgotado ? 'product-agotado-edit' : ''}"
+                 style="padding: 12px; border-bottom: 1px solid #e2e8f0; cursor: ${isAgotado ? 'not-allowed' : 'pointer'}; transition: background 0.2s; display: flex; justify-content: space-between; align-items: center; ${isAgotado ? 'opacity: 0.6; background: #f7fafc;' : ''}" 
+                 onmouseover="if(!this.classList.contains('product-agotado-edit')) this.style.background='white'" 
+                 onmouseout="if(!this.classList.contains('product-agotado-edit')) this.style.background='transparent'">
+                <div style="flex: 1;">
+                    <div style="font-size: 14px; font-weight: 600; color: #2d3748;">
+                        ${p.nombre} 
+                        ${isAgotado ? '<span style="color: #e53e3e; font-size: 11px; font-weight: 700; margin-left: 6px;">● AGOTADO</span>' : ''}
+                    </div>
+                    <div style="font-size: 12px; color: #718096;">${p.categoria}</div>
+                </div>
+                <div style="font-size: 15px; font-weight: 700; color: ${isAgotado ? '#a0aec0' : '#48bb78'}; ${isAgotado ? 'text-decoration: line-through;' : ''}">
+                    $${p.precio.toLocaleString('es-CO')}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function mostrarAgotadoEdicion(elemento) {
+    // Efecto de shake
+    elemento.style.animation = 'shake 0.5s';
+    
+    // Mostrar mensaje temporal
+    const mensaje = document.createElement('div');
+    mensaje.textContent = '❌ Producto agotado';
+    mensaje.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 16px;
+        box-shadow: 0 8px 24px rgba(229, 62, 62, 0.4);
+        z-index: 10001;
+        animation: fadeInOut 2s ease-in-out;
+    `;
+    document.body.appendChild(mensaje);
+    
+    // Remover mensaje después de 2 segundos
+    setTimeout(() => {
+        mensaje.remove();
+    }, 2000);
+    
+    // Resetear animación
+    setTimeout(() => {
+        elemento.style.animation = '';
+    }, 500);
+}
+
+
+function configurarBuscadorProductos() {
+    const searchInput = document.getElementById('editSearchProduct');
+    const container = document.getElementById('editAvailableProducts');
+    
+    // Limpiar
+    searchInput.value = '';
+    container.innerHTML = '';
+    container.style.display = 'none';
+    
+    // Remover listeners previos
+    const newInput = searchInput.cloneNode(true);
+    searchInput.parentNode.replaceChild(newInput, searchInput);
+    
+    // Agregar nuevo listener
+    document.getElementById('editSearchProduct').addEventListener('input', function(e) {
+        const search = e.target.value.toLowerCase().trim();
+        const container = document.getElementById('editAvailableProducts');
+        
+        if (search.length === 0) {
+            container.style.display = 'none';
+            container.innerHTML = '';
+            return;
+        }
+        
+        const filtered = editAvailableProductsList.filter(p => 
             p.nombre.toLowerCase().includes(search) || 
             p.categoria.toLowerCase().includes(search)
         );
         
-        if (search.length > 0) {
-            container.style.display = 'block';
-            if (filtered.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #a0aec0; padding: 1rem;">No se encontraron productos</p>';
-            } else {
-                container.innerHTML = filtered.map(p => `
-                    <div onclick="agregarProductoEdicion('${p._id}', \`${p.nombre}\`, ${p.precio}, \`${p.categoria}\`)" style="padding: 12px; border-bottom: 1px solid #e2e8f0; cursor: pointer; transition: background 0.2s; display: flex; justify-content: space-between; align-items: center;" onmouseover="this.style.background='white'" onmouseout="this.style.background='transparent'">
+        container.style.display = 'block';
+        
+        if (filtered.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: #a0aec0; padding: 1rem;">No se encontraron productos</p>';
+        } else {
+            container.innerHTML = filtered.map(p => {
+                const id = p._id;
+                const nombre = p.nombre.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+                const categoria = p.categoria.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+                const precio = p.precio;
+                
+                return `
+                    <div onclick="agregarProductoEdicion('${id}', '${nombre}', ${precio}, '${categoria}')" 
+                         style="padding: 12px; border-bottom: 1px solid #e2e8f0; cursor: pointer; transition: background 0.2s; display: flex; justify-content: space-between; align-items: center;" 
+                         onmouseover="this.style.background='white'" 
+                         onmouseout="this.style.background='transparent'">
                         <div>
                             <div style="font-size: 14px; font-weight: 600; color: #2d3748;">${p.nombre}</div>
                             <div style="font-size: 12px; color: #718096;">${p.categoria}</div>
                         </div>
                         <div style="font-size: 15px; font-weight: 700; color: #48bb78;">$${p.precio.toLocaleString('es-CO')}</div>
                     </div>
-                `).join('');
-            }
-        } else {
-            container.style.display = 'none';
+                `;
+            }).join('');
         }
     });
+    
+    console.log('✅ Buscador configurado con', editAvailableProductsList.length, 'productos');
 }
 
 function agregarProductoEdicion(id, nombre, precio, categoria) {
+    // Desescapar los datos que vienen del HTML
+    const nombreLimpio = nombre.replace(/\\'/g, "'").replace(/\\"/g, '"');
+    const categoriaLimpia = categoria.replace(/\\'/g, "'").replace(/\\"/g, '"');
+    
     const existing = editSelectedItems.find(item => item.producto._id === id);
     
     if (existing) {
         existing.cantidad++;
+        mostrarNotificacionExito(`➕ ${nombreLimpio} (x${existing.cantidad})`);
     } else {
         editSelectedItems.push({
             producto: {
                 _id: id,
-                nombre: nombre,
+                nombre: nombreLimpio,
                 precio: precio,
-                categoria: categoria
+                categoria: categoriaLimpia
             },
             cantidad: 1
         });
+        mostrarNotificacionExito(`✅ ${nombreLimpio} agregado`);
     }
     
     actualizarListaProductosEdicion();
-    document.getElementById('editSearchProduct').value = '';
-    document.getElementById('editAvailableProducts').style.display = 'none';
 }
-
 async function guardarEdicionPedido() {
     const mesa = document.getElementById('editMesa').value.trim();
     const notas = document.getElementById('editNotas').value.trim();
@@ -2072,9 +2334,9 @@ async function guardarEdicionPedido() {
                 <input type="text" id="editSearchProduct" style="width: 100%; padding: 10px 14px 10px 38px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;" placeholder="Buscar producto...">
                 <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #a0aec0;">🔍</span>
             </div>
-            <div id="editAvailableProducts" style="max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; background: #f7fafc; display: none;">
-                <!-- Se llenará dinámicamente -->
-            </div>
+<div id="editAvailableProducts" style="max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; background: #f7fafc;">
+    <!-- Los productos aparecerán aquí automáticamente -->
+</div>
         </div>
 
         <div style="margin-bottom: 1.5rem;">

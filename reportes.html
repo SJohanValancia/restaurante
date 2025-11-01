@@ -476,10 +476,10 @@
             color: #22543d;
         }
 
-        .status-entregado {
-            background: #e2e8f0;
-            color: #2d3748;
-        }
+.status-entregado {
+    background: #c6f6d5;
+    color: #22543d;
+}
 
         .status-cancelado {
             background: #fed7d7;
@@ -1189,7 +1189,7 @@
                                 <option value="pendiente">Pendiente</option>
                                 <option value="preparando">Preparando</option>
                                 <option value="listo">Listo</option>
-                                <option value="entregado">Entregado</option>
+                                <option value="entregado">Pagados</option>
                                 <option value="cancelado">Cancelado</option>
                             </select>
                         </div>
@@ -1600,7 +1600,8 @@ function displayOrdersCards() {
                         minute: '2-digit'
                     })}</div>
                 </div>
-                <span class="status-badge status-${order.estado}">${order.estado}</span>
+                <span class="status-badge status-${order.estado}">${order.estado === 'entregado' ? 'pagado' : order.estado}</span>
+
             </div>
             
             <div class="order-card-body">

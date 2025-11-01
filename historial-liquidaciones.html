@@ -877,6 +877,13 @@
         <div class="stat-value" id="cajaFinalTotal">$0</div>
     </div>
 
+
+    <div class="stat-card">
+    <div class="stat-icon green" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">💵</div>
+    <div class="stat-label">Caja Efectivo</div>
+    <div class="stat-value" id="cajaEfectivo">$0</div>
+</div>
+
     <div class="stat-card">
         <div class="stat-icon blue">💳</div>
         <div class="stat-label">Caja Transferencias</div>
@@ -1032,6 +1039,12 @@ async function cargarEstadisticas(fechaInicio = null, fechaFin = null) {
                 `$${(stats.totalTransferenciasGastos || 0).toLocaleString('es-CO')}`;
             document.getElementById('cajaTransferencias').textContent = 
                 `$${(stats.cajaTransferencias || 0).toLocaleString('es-CO')}`;
+
+                const cajaEfectivo = (stats.totalIngresos || 0) - (stats.totalTransferenciasIngresos || 0) - 
+                     ((stats.totalEgresos || 0) - (stats.totalTransferenciasGastos || 0));
+
+document.getElementById('cajaEfectivo').textContent = 
+    `$${cajaEfectivo.toLocaleString('es-CO')}`;
             
             // Movimientos
             document.getElementById('totalAportes').textContent = 
@@ -1108,6 +1121,9 @@ function crearTarjetaLiquidacion(liquidacion) {
     }
     
     const cajaTransferencias = transferenciasPedidos - transferenciasGastos;
+    const ingresosEfectivo = liquidacion.ingresos.totalPedidos - transferenciasPedidos;
+const gastosEfectivo = liquidacion.egresos.totalGastos - transferenciasGastos;
+const cajaEfectivoLiq = ingresosEfectivo - gastosEfectivo;
 
     return `
         <div class="liquidacion-card">
@@ -1155,6 +1171,14 @@ function crearTarjetaLiquidacion(liquidacion) {
                     <span class="caja-final-label">💵 Caja Final</span>
                     <span class="caja-final-value">$${liquidacion.cajaFinal.toLocaleString('es-CO')}</span>
                 </div>
+
+                
+
+
+<div class="caja-final-section" style="margin-top: 1rem; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white;">
+    <span class="caja-final-label">💵 Caja Efectivo</span>
+    <span class="caja-final-value">$${cajaEfectivoLiq.toLocaleString('es-CO')}</span>
+</div>
                 
                 <div class="caja-final-section" style="margin-top: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
                     <span class="caja-final-label">💰 Caja Transferencias</span>
@@ -1235,6 +1259,9 @@ function mostrarModalDetalle(liquidacion) {
     }
     
     const cajaTransferencias = transferenciasPedidos - transferenciasGastos;
+    const ingresosEfectivoModal = liquidacion.ingresos.totalPedidos - transferenciasPedidos;
+const gastosEfectivoModal = liquidacion.egresos.totalGastos - transferenciasGastos;
+const cajaEfectivoModal = ingresosEfectivoModal - gastosEfectivoModal;
 
     const content = `
         <div class="detalle-section">
@@ -1275,6 +1302,13 @@ function mostrarModalDetalle(liquidacion) {
                 <span class="caja-final-label">💵 Caja Final</span>
                 <span class="caja-final-value">$${liquidacion.cajaFinal.toLocaleString('es-CO')}</span>
             </div>
+
+            <div class="caja-final-section" style="margin-top: 1rem; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white;">
+    <span class="caja-final-label">💵 Caja Efectivo</span>
+    <span class="caja-final-value">$${cajaEfectivoModal.toLocaleString('es-CO')}</span>
+</div>
+
+
             <div class="caja-final-section" style="margin-top: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
                 <span class="caja-final-label">💰 Caja Transferencias</span>
                 <span class="caja-final-value">$${cajaTransferencias.toLocaleString('es-CO')}</span>

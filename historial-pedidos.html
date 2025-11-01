@@ -504,11 +504,10 @@
             background: #c6f6d5;
             color: #22543d;
         }
-
-        .status-entregado {
-            background: #e2e8f0;
-            color: #2d3748;
-        }
+.status-entregado {
+    background: #c6f6d5;
+    color: #22543d;
+}
 
         .status-cancelado {
             background: #fed7d7;
@@ -817,7 +816,7 @@
                     <div class="stat-header">
                         <div class="stat-icon green">✅</div>
                     </div>
-                    <div class="stat-label">Completados</div>
+                    <div class="stat-label">Pagados</div>
                     <div class="stat-value" id="statCompletados">0</div>
                 </div>
                 <div class="stat-card">
@@ -844,7 +843,7 @@
     <option value="pendiente">Pendientes</option>
     <option value="preparando">Preparando</option>
     <option value="listo">Listos</option>
-    <option value="entregado">Entregados</option>
+    <option value="entregado">Pagado</option>
     <option value="cancelado">Cancelados</option>
 </select>
                     </div>
@@ -1245,7 +1244,8 @@ function displayOrders() {
                             ` : ''}
                         </div>
                     </div>
-                    <span class="status-badge status-${order.estado}">${order.estado}</span>
+                    <span class="status-badge status-${order.estado}">${order.estado === 'entregado' ? 'pagado' : order.estado}</span>
+
                 </div>
                 <div class="order-items">
                     ${order.items.map((item, itemIndex) => {
@@ -1317,7 +1317,7 @@ function getOrderActions(order) {
         }
         
         if (order.estado === 'listo') {
-            actions += `<button class="btn-action btn-entregar" onclick="updateOrderStatus('${order._id}', 'entregado')">🍽️ Entregar</button>`;
+            actions += `<button class="btn-action btn-entregar" onclick="updateOrderStatus('${order._id}', 'entregado')">🍽️ Pagar</button>`;
             actions += `<button class="btn-action btn-cancelar" onclick="cancelOrder('${order._id}')">❌ Cancelar</button>`;
         }
         
