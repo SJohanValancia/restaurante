@@ -806,6 +806,251 @@
     to { transform: translateY(0); opacity: 1; }
 }
 
+/* RESPONSIVE MÓVIL MEJORADO */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .page-title {
+        font-size: 24px;
+    }
+
+    .page-subtitle {
+        font-size: 14px;
+    }
+
+    .layout {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    /* Formulario de pedido más compacto */
+    .card-header {
+        padding: 1rem;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .card-header h2 {
+        font-size: 16px;
+    }
+
+    .card-header p {
+        font-size: 12px;
+    }
+
+    /* Productos seleccionados en columna */
+    .selected-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .selected-item-info {
+        width: 100%;
+    }
+
+    .quantity-controls {
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    /* Lista de productos más compacta */
+    .products-list {
+        max-height: 250px;
+    }
+
+    .product-item {
+        padding: 10px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .product-price {
+        font-size: 16px;
+        align-self: flex-end;
+    }
+
+    /* Tarjetas de pedidos */
+    .order-card {
+        padding: 1rem;
+    }
+
+    .order-header {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: flex-start;
+    }
+
+    .order-info h3 {
+        font-size: 16px;
+    }
+
+    .order-meta {
+        font-size: 11px;
+    }
+
+    /* Botones de acción en columna en móvil */
+    .order-actions {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .btn-action {
+        width: 100%;
+        padding: 12px;
+        font-size: 13px;
+    }
+
+    /* Header de pedidos */
+    .orders-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .filters {
+        width: 100%;
+    }
+
+    .filter-select {
+        width: 100%;
+    }
+
+    /* Items de pedido en columna */
+    .order-item {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 0.5rem;
+        padding: 8px !important;
+    }
+
+    .order-item > div:first-child {
+        width: 100%;
+    }
+
+    .order-item > div:last-child {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    /* Total del pedido */
+    .order-total {
+        font-size: 16px;
+    }
+
+    /* Resumen del pedido */
+    .order-summary {
+        padding: 0.75rem;
+    }
+
+    .summary-row {
+        font-size: 13px;
+    }
+
+    .summary-row.total {
+        font-size: 16px;
+    }
+
+    /* Formulario */
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+        font-size: 16px; /* Evita zoom en iOS */
+    }
+
+    /* Botón submit */
+    .btn-submit {
+        padding: 12px;
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0.5rem;
+    }
+
+    .page-header {
+        margin-bottom: 1rem;
+    }
+
+    .page-title {
+        font-size: 20px;
+    }
+
+    .card {
+        border-radius: 8px;
+    }
+
+    .order-card {
+        padding: 0.75rem;
+    }
+
+    /* Hacer más pequeños los badges */
+    .status-badge {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+
+    /* Cantidad y precio más compactos */
+    .item-qty {
+        font-size: 11px;
+    }
+
+    /* Botones de cantidad */
+    .qty-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 18px;
+    }
+
+    /* Empty state */
+    .empty-icon {
+        font-size: 36px;
+    }
+
+    .empty-state p {
+        font-size: 13px;
+    }
+}
+
+/* Mejoras para pantallas táctiles */
+@media (hover: none) and (pointer: coarse) {
+    /* Hacer botones más grandes para dedos */
+    .btn-action,
+    .btn-submit,
+    .btn-remove,
+    .qty-btn {
+        min-height: 44px; /* Tamaño mínimo recomendado por Apple */
+    }
+
+    /* Mejorar espaciado entre elementos táctiles */
+    .order-actions {
+        gap: 0.75rem;
+    }
+
+    .quantity-controls {
+        gap: 12px;
+    }
+
+    /* Hacer más fácil seleccionar productos */
+    .product-item {
+        min-height: 60px;
+        padding: 12px;
+    }
+}
+
     </style>
 </head>
 <body>

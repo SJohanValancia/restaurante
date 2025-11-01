@@ -1646,10 +1646,25 @@ async function autoRefreshOrders() {
         if (data.success) {
             const newOrders = data.data;
             
-            // Detectar nuevos pedidos
-            if (!isFirstLoad && newOrders.length > lastOrderCount) {
-                const ultimoPedido = newOrders[0]; // El más reciente
-                mostrarAlertaNuevoPedido(ultimoPedido);
+            if (!isFirstLoad) {
+                // Detectar nuevo pedido
+                if (newOrders.length > lastOrderCount) {
+                    const ultimoPedido = newOrders[0];
+                    mostrarAlertaNuevoPedido(ultimoPedido);
+                }
+                
+                // Detectar pedidos editados
+                if (allOrders && allOrders.length > 0) {
+                    newOrders.forEach(newOrder => {
+                        const oldOrder = allOrders.find(o => o._id === newOrder._id);
+                        if (oldOrder) {
+                            const cambios = detectarCambiosPedido(oldOrder, newOrder);
+                            if (cambios.length > 0) {
+                                mostrarAlertaPedidoEditado(newOrder, cambios);
+                            }
+                        }
+                    });
+                }
             }
             
             // Actualizar lista si hay cambios
@@ -1664,6 +1679,132 @@ async function autoRefreshOrders() {
     } catch (error) {
         console.error('Error en auto-refresh:', error);
     }
+}
+
+function detectarCambiosPedido(oldOrder, newOrder) {
+    const cambios = [];
+    
+    // Detectar cambio de mesa
+    if (oldOrder.mesa !== newOrder.mesa) {
+        cambios.push(`Mesa: ${oldOrder.mesa} → ${newOrder.mesa}`);
+    }
+    
+    // Detectar cambio de notas
+    if ((oldOrder.notas || '') !== (newOrder.notas || '')) {
+        if (!oldOrder.notas && newOrder.notas) {
+            cambios.push(`Se agregaron notas: "${newOrder.notas}"`);
+        } else if (oldOrder.notas && !newOrder.notas) {
+            cambios.push(`Se eliminaron las notas`);
+        } else {
+            cambios.push(`Notas modificadas`);
+        }
+    }
+    
+    // Detectar cambios en productos
+    const oldItemsMap = new Map();
+    oldOrder.items.forEach(item => {
+        const nombre = item.productoInfo?.nombre || item.nombreProducto || 'Producto';
+        oldItemsMap.set(nombre, item.cantidad);
+    });
+    
+    const newItemsMap = new Map();
+    newOrder.items.forEach(item => {
+        const nombre = item.productoInfo?.nombre || item.nombreProducto || 'Producto';
+        newItemsMap.set(nombre, item.cantidad);
+    });
+    
+    // Productos agregados
+    newItemsMap.forEach((cantidad, nombre) => {
+        if (!oldItemsMap.has(nombre)) {
+            cambios.push(`➕ ${nombre} (x${cantidad})`);
+        } else if (oldItemsMap.get(nombre) !== cantidad) {
+            const diff = cantidad - oldItemsMap.get(nombre);
+            if (diff > 0) {
+                cambios.push(`📈 ${nombre}: ${oldItemsMap.get(nombre)} → ${cantidad}`);
+            } else {
+                cambios.push(`📉 ${nombre}: ${oldItemsMap.get(nombre)} → ${cantidad}`);
+            }
+        }
+    });
+    
+    // Productos eliminados
+    oldItemsMap.forEach((cantidad, nombre) => {
+        if (!newItemsMap.has(nombre)) {
+            cambios.push(`➖ ${nombre} eliminado`);
+        }
+    });
+    
+    // Detectar cambio de total
+    if (oldOrder.total !== newOrder.total) {
+        cambios.push(`Total: $${oldOrder.total.toLocaleString('es-CO')} → $${newOrder.total.toLocaleString('es-CO')}`);
+    }
+    
+    return cambios;
+}
+
+function mostrarAlertaPedidoEditado(pedido, cambios) {
+    const alerta = document.createElement('div');
+    
+    const cambiosHTML = cambios.slice(0, 4).map(c => 
+        `<div style="font-size: 12px; opacity: 0.95; margin-top: 4px;">• ${c}</div>`
+    ).join('');
+    
+    const masCambios = cambios.length > 4 ? 
+        `<div style="font-size: 11px; opacity: 0.8; margin-top: 6px; font-style: italic;">+${cambios.length - 4} cambio(s) más</div>` 
+        : '';
+    
+    alerta.innerHTML = `
+        <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <span style="font-size: 32px; animation: bounce 0.6s ease-in-out infinite;">✏️</span>
+            <div style="flex: 1;">
+                <div style="font-weight: 700; font-size: 16px; color: #1a202c; margin-bottom: 6px;">Pedido Editado - Mesa ${pedido.mesa}</div>
+                <div style="background: rgba(255,255,255,0.2); padding: 8px; border-radius: 6px; margin-top: 6px;">
+                    ${cambiosHTML}
+                    ${masCambios}
+                </div>
+            </div>
+        </div>
+    `;
+    alerta.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        box-shadow: 0 8px 32px rgba(237, 137, 54, 0.6);
+        z-index: 10000;
+        animation: slideInRight 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        cursor: pointer;
+        max-width: 400px;
+    `;
+    
+    document.body.appendChild(alerta);
+    
+    // Reproducir sonido de edición
+    if (audioContext && audioUnlocked) {
+        if (audioContext.state === 'suspended') {
+            audioContext.resume().then(() => {
+                reproducirSonidoEdicion();
+            });
+        } else {
+            reproducirSonidoEdicion();
+        }
+    }
+    
+    // Remover después de 7 segundos
+    setTimeout(() => {
+        alerta.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => alerta.remove(), 300);
+    }, 7000);
+    
+    // Remover al hacer clic
+    alerta.addEventListener('click', () => {
+        alerta.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => alerta.remove(), 300);
+    });
 }
 
 // Iniciar polling cuando se carga la página
@@ -1883,6 +2024,39 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+function reproducirSonidoEdicion() {
+    try {
+        const currentTime = audioContext.currentTime;
+        
+        function playTone(frequency, startTime, duration, type = 'sine', volume = 0.3) {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = type;
+            
+            gainNode.gain.setValueAtTime(0, currentTime + startTime);
+            gainNode.gain.linearRampToValueAtTime(volume, currentTime + startTime + 0.05);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, currentTime + startTime + duration);
+            
+            oscillator.start(currentTime + startTime);
+            oscillator.stop(currentTime + startTime + duration);
+        }
+        
+        // Sonido de edición - tono ascendente suave
+        playTone(440, 0, 0.15, 'sine', 0.3);      // La
+        playTone(554, 0.15, 0.15, 'sine', 0.3);   // Do#
+        playTone(659, 0.3, 0.25, 'triangle', 0.4); // Mi
+        
+        console.log('🔊 Sonido de edición reproducido');
+    } catch (error) {
+        console.error('❌ Error al reproducir sonido:', error);
+    }
+}
 
 </script>
 

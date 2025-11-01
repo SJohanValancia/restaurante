@@ -7,13 +7,13 @@ const mongoose = require('mongoose');
 const { protect } = require('../middleware/auth');
 const { checkPermission } = require('../middleware/permissions');
 
-// ⭐ RUTA PÚBLICA - Sin protect
+// â­ RUTA PÃšBLICA - Sin protect
 router.get('/mesa/:numeroMesa', async (req, res) => {
   try {
     const { numeroMesa } = req.params;
     const { restaurante, sede } = req.query;
 
-    console.log('📍 Solicitud recibida - Mesa:', numeroMesa, 'Restaurante:', restaurante, 'Sede:', sede);
+    console.log('ðŸ“ Solicitud recibida - Mesa:', numeroMesa, 'Restaurante:', restaurante, 'Sede:', sede);
 
     if (!restaurante) {
       return res.status(400).json({
@@ -83,21 +83,21 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
           ...item,
           productoInfo: {
             nombre: item.nombreProducto || 'Producto eliminado',
-            categoria: item.categoriaProducto || 'Sin categoría',
+            categoria: item.categoriaProducto || 'Sin categorÃ­a',
             precio: item.precio
           }
         };
       }
     });
 
-    console.log('✅ Pedido encontrado y enviado');
+    console.log('âœ… Pedido encontrado y enviado');
 
     res.json({
       success: true,
       data: orderObj
     });
   } catch (error) {
-    console.error('❌ Error en /mesa:', error);
+    console.error('âŒ Error en /mesa:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener el pedido',
@@ -106,7 +106,7 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
   }
 });
 
-// ⭐ RUTAS PROTEGIDAS - Con protect
+// â­ RUTAS PROTEGIDAS - Con protect
 router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
   try {
     const { estado, mesa, fecha } = req.query;
@@ -151,7 +151,7 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
             ...item,
             productoInfo: {
               nombre: item.nombreProducto || 'Producto eliminado',
-              categoria: item.categoriaProducto || 'Sin categoría',
+              categoria: item.categoriaProducto || 'Sin categorÃ­a',
               precio: item.precio
             }
           };
@@ -222,7 +222,7 @@ router.get('/stats/resumen', protect, async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error al obtener estadísticas',
+      message: 'Error al obtener estadÃ­sticas',
       error: error.message
     });
   }
@@ -257,7 +257,7 @@ router.get('/:id', protect, async (req, res) => {
           ...item,
           productoInfo: {
             nombre: item.nombreProducto || 'Producto eliminado',
-            categoria: item.categoriaProducto || 'Sin categoría',
+            categoria: item.categoriaProducto || 'Sin categorÃ­a',
             precio: item.precio
           }
         };
@@ -337,7 +337,7 @@ router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (re
     if (!estadosValidos.includes(estado)) {
       return res.status(400).json({
         success: false,
-        message: 'Estado no válido'
+        message: 'Estado no vÃ¡lido'
       });
     }
 
@@ -360,7 +360,7 @@ router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (re
       });
     }
 
-    console.log('✅ Estado actualizado:', order._id, '→', estado);
+    console.log('âœ… Estado actualizado:', order._id, 'â†’', estado);
 
     res.json({
       success: true,
@@ -376,7 +376,7 @@ router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (re
   }
 });
 
-// ✅ NUEVA RUTA: Actualizar estado individual de un producto
+// âœ… NUEVA RUTA: Actualizar estado individual de un producto
 router.patch('/:id/item/:itemIndex/estado', protect, checkPermission('editarPedidos'), async (req, res) => {
   try {
     const { itemIndex } = req.params;
@@ -425,13 +425,13 @@ router.patch('/:id/item/:itemIndex/estado', protect, checkPermission('editarPedi
       }
     }
 
-    // Verificar si todos los items están entregados
+    // Verificar si todos los items estÃ¡n entregados
     const todosEntregados = order.items.every(item => 
       item.estadosIndividuales.every(grupo => grupo.estado === 'entregado')
     );
 
     if (todosEntregados && order.estado !== 'entregado') {
-      // No cambiar automáticamente, solo notificar
+      // No cambiar automÃ¡ticamente, solo notificar
       await order.save();
       return res.json({
         success: true,
@@ -471,7 +471,7 @@ router.put('/:id', protect, checkPermission('editarPedidos'), async (req, res) =
       });
     }
 
-    // Actualizar campos básicos
+    // Actualizar campos bÃ¡sicos
     order.mesa = mesa;
     order.notas = notas;
     
@@ -483,7 +483,7 @@ router.put('/:id', protect, checkPermission('editarPedidos'), async (req, res) =
         categoriaProducto: item.categoriaProducto,
         cantidad: item.cantidad,
         precio: item.precio,
-        // ✅ INICIALIZAR ESTADOS INDIVIDUALES CORRECTAMENTE
+        // âœ… INICIALIZAR ESTADOS INDIVIDUALES CORRECTAMENTE
         estadosIndividuales: [{
           cantidad: item.cantidad,
           estado: 'pendiente'
@@ -519,7 +519,7 @@ router.put('/:id', protect, checkPermission('editarPedidos'), async (req, res) =
           ...item,
           productoInfo: {
             nombre: item.nombreProducto || 'Producto eliminado',
-            categoria: item.categoriaProducto || 'Sin categoría',
+            categoria: item.categoriaProducto || 'Sin categorÃ­a',
             precio: item.precio
           }
         };
