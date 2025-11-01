@@ -769,6 +769,43 @@
     100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
 }
 
+@keyframes slideInRight {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
     </style>
 </head>
 <body>
@@ -1232,114 +1269,88 @@ function mostrarAgotado(elemento) {
             }
         }
 
-function displayOrders() {
-    const list = document.getElementById('ordersGrid');
+
+function displayOrders(orders) {
+    const list = document.getElementById('ordersList');
     
-    if (filteredOrders.length === 0) {
+    if (orders.length === 0) {
         list.innerHTML = `
             <div class="empty-state">
-                <div class="empty-icon">🔍</div>
-                <p>No se encontraron pedidos con los filtros seleccionados</p>
+                <div class="empty-icon">📋</div>
+                <p>No hay pedidos registrados</p>
             </div>
         `;
         return;
     }
 
-    const activos = filteredOrders.filter(o => !['entregado', 'cancelado'].includes(o.estado));
-    const cancelados = filteredOrders.filter(o => o.estado === 'cancelado');
-    const entregados = filteredOrders.filter(o => o.estado === 'entregado');
+    // ORDENAR: Separar en tres grupos
+    const activos = orders.filter(o => !['entregado', 'cancelado'].includes(o.estado));
+    const cancelados = orders.filter(o => o.estado === 'cancelado');
+    const entregados = orders.filter(o => o.estado === 'entregado');
     
+    // Ordenar por fecha ASCENDENTE (más antiguo primero = orden de llegada)
     activos.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
     cancelados.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
     entregados.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
     
+    // Combinar: activos arriba, cancelados en medio, entregados abajo
     const orderedOrders = [...activos, ...cancelados, ...entregados];
 
-    const fragment = document.createDocumentFragment();
-    const tempDiv = document.createElement('div');
-    
-    tempDiv.innerHTML = orderedOrders.map(order => {
-        const fecha = new Date(order.createdAt);
-        const fechaStr = fecha.toLocaleDateString('es-CO', {
-            day: '2-digit',
-            month: 'long',
-            year: 'numeric'
-        });
-        const horaStr = fecha.toLocaleTimeString('es-CO', {
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-        
+    list.innerHTML = orderedOrders.map(order => {
+        // Generar HTML para items con estados individuales
+        const itemsHTML = order.items.map((item, itemIndex) => {
+            const nombre = item.productoInfo ? item.productoInfo.nombre : 
+                          (item.producto && item.producto.nombre ? item.producto.nombre : 
+                          (item.nombreProducto || 'Producto eliminado'));
+            
+            // Agrupar por estado
+            const grupos = item.estadosIndividuales || [{cantidad: item.cantidad, estado: 'pendiente'}];
+            
+            return grupos.map(grupo => `
+                <div class="order-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #f7fafc; border-radius: 8px; margin-bottom: 8px;">
+                    <div style="flex: 1;">
+                        <span class="item-name" style="font-weight: 600; color: #2d3748;">${nombre}</span>
+                        <span class="item-qty" style="margin-left: 8px; color: #667eea; font-weight: 700;">x${grupo.cantidad}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 14px; font-weight: 700; color: #1a202c;">$${(item.precio * grupo.cantidad).toLocaleString('es-CO')}</span>
+                        ${order.estado !== 'entregado' && order.estado !== 'cancelado' ? `
+                            <span class="status-badge status-${grupo.estado}" style="font-size: 10px; padding: 4px 8px;">${grupo.estado}</span>
+                            <button onclick="cambiarEstadoProducto('${order._id}', ${itemIndex}, ${grupo.cantidad}, '${grupo.estado}')" 
+                                    style="padding: 4px 8px; background: #4299e1; color: white; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 600;">
+                                ▶️
+                            </button>
+                        ` : `
+                            <span class="status-badge status-${grupo.estado}" style="font-size: 10px; padding: 4px 8px;">${grupo.estado}</span>
+                        `}
+                    </div>
+                </div>
+            `).join('');
+        }).join('');
+
         return `
-            <div class="order-card">
+            <div class="order-card" id="order-card-${order._id}">
                 <div class="order-header">
                     <div class="order-info">
                         <h3>Mesa ${order.mesa}</h3>
                         <div class="order-meta">
-                            <div class="meta-row">
-                                <span class="meta-icon">📅</span>
-                                <span>${fechaStr}</span>
-                            </div>
-                            <div class="meta-row">
-                                <span class="meta-icon">🕒</span>
-                                <span>${horaStr}</span>
-                            </div>
-                            <div class="meta-row">
-                                <span class="meta-icon">📖</span>
-                                <span>#${order._id.slice(-6).toUpperCase()}</span>
-                            </div>
-                            ${order.metodoPago ? `
-                            <div class="meta-row">
-                                <span class="meta-icon">💳</span>
-                                <span style="font-weight: 600; color: ${order.metodoPago === 'transferencia' ? '#667eea' : '#48bb78'};">${order.metodoPago === 'transferencia' ? 'Transferencia' : 'Efectivo'}</span>
-                            </div>
-                            ` : ''}
+                            ${new Date(order.createdAt).toLocaleString('es-CO')}
+                            ${order.metodoPago ? `<br><strong style="color: ${order.metodoPago === 'transferencia' ? '#667eea' : '#48bb78'};">💳 ${order.metodoPago === 'transferencia' ? 'Transferencia' : 'Efectivo'}</strong>` : ''}
                         </div>
                     </div>
-                    <span class="status-badge status-${order.estado}">${order.estado}</span>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <span class="status-badge status-${order.estado}">${order.estado}</span>
+                        ${order.estado !== 'entregado' && order.estado !== 'cancelado' ? `
+                            <button onclick="abrirModalEditar('${order._id}')" style="padding: 6px 12px; background: #805ad5; color: white; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                                ✏️ Editar
+                            </button>
+                        ` : ''}
+                    </div>
                 </div>
                 <div class="order-items">
-                    ${order.items.map((item, itemIndex) => {
-                        let nombre = 'Producto eliminado';
-                        
-                        if (item.productoInfo) {
-                            nombre = item.productoInfo.nombre;
-                        } else if (item.producto && item.producto.nombre) {
-                            nombre = item.producto.nombre;
-                        } else if (item.nombreProducto) {
-                            nombre = item.nombreProducto;
-                        }
-                        
-                        // Agrupar por estado
-                        const grupos = item.estadosIndividuales || [{cantidad: item.cantidad, estado: 'pendiente'}];
-                        
-                        return grupos.map(grupo => `
-                            <div class="order-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #f7fafc; border-radius: 8px; margin-bottom: 8px;">
-                                <div style="flex: 1;">
-                                    <span class="item-name" style="font-weight: 600; color: #2d3748;">${nombre}</span>
-                                    <span class="item-qty" style="margin-left: 8px; color: #667eea; font-weight: 700;">x${grupo.cantidad}</span>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <span style="font-size: 14px; font-weight: 700; color: #1a202c;">$${(item.precio * grupo.cantidad).toLocaleString('es-CO')}</span>
-                                    ${order.estado !== 'entregado' && order.estado !== 'cancelado' ? `
-                                        <span class="status-badge status-${grupo.estado}" style="font-size: 10px; padding: 4px 8px;">${grupo.estado}</span>
-                                        <button onclick="cambiarEstadoProducto('${order._id}', ${itemIndex}, ${grupo.cantidad}, '${grupo.estado}')" 
-                                                style="padding: 4px 8px; background: #4299e1; color: white; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 600;">
-                                            ▶️
-                                        </button>
-                                    ` : `
-                                        <span class="status-badge status-${grupo.estado}" style="font-size: 10px; padding: 4px 8px;">${grupo.estado}</span>
-                                    `}
-                                </div>
-                            </div>
-                        `).join('');
-                    }).join('')}
+                    ${itemsHTML}
                 </div>
-                ${order.notas ? `
-                <div class="order-notes">
-                    <p>📝 ${order.notas}</p>
-                </div>
-                ` : ''}
+                ${order.notas ? `<p style="font-size: 12px; color: #718096; font-style: italic; margin: 8px 0;">📝 ${order.notas}</p>` : ''}
                 <div class="order-total">
                     <span>Total:</span>
                     <span>$${order.total.toLocaleString('es-CO')}</span>
@@ -1348,9 +1359,6 @@ function displayOrders() {
             </div>
         `;
     }).join('');
-    
-    list.innerHTML = '';
-    list.appendChild(tempDiv);
 }
 
 function getOrderActions(order) {
@@ -1686,15 +1694,20 @@ function cerrarModalCantidadProducto() {
 
 async function confirmarCambioEstadoProducto(nuevoEstado) {
     const cantidad = parseInt(document.getElementById('cantidadSeleccionada').textContent);
+    
+    // Guardar los datos ANTES de cerrar el modal
+    const { orderId, itemIndex } = modalEstadoProductoData;
+    
     cerrarModalCantidadProducto();
     
     await actualizarEstadoProducto(
-        modalEstadoProductoData.orderId,
-        modalEstadoProductoData.itemIndex,
+        orderId,
+        itemIndex,
         cantidad,
         nuevoEstado
     );
 }
+
 
 async function actualizarEstadoProducto(orderId, itemIndex, cantidadCambiar, nuevoEstado) {
     const token = localStorage.getItem('token');
@@ -1777,6 +1790,239 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
+
+// ========================
+// SISTEMA DE EDICIÓN DE PEDIDOS
+// ========================
+
+let currentEditOrderId = null;
+let currentEditOrder = null;
+let editSelectedItems = [];
+
+async function abrirModalEditar(orderId) {
+    currentEditOrderId = orderId;
+    
+    // Obtener los datos completos del pedido
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch(`${API_URL}/orders/${orderId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            currentEditOrder = data.data;
+            
+            // Llenar el formulario
+            document.getElementById('editMesa').value = currentEditOrder.mesa;
+            document.getElementById('editNotas').value = currentEditOrder.notas || '';
+            
+            // Convertir items del pedido a formato de edición
+            editSelectedItems = currentEditOrder.items.map(item => ({
+                producto: {
+                    _id: item.producto ? (item.producto._id || item.producto) : item.producto,
+                    nombre: item.productoInfo ? item.productoInfo.nombre : item.nombreProducto,
+                    precio: item.precio,
+                    categoria: item.productoInfo ? item.productoInfo.categoria : item.categoriaProducto
+                },
+                cantidad: item.cantidad
+            }));
+            
+            actualizarListaProductosEdicion();
+            
+            // Cargar productos disponibles para agregar
+            await cargarProductosParaEdicion();
+            
+            document.getElementById('modalEditarPedido').style.display = 'flex';
+        }
+    } catch (error) {
+        console.error('Error al cargar pedido:', error);
+        alert('Error al cargar los datos del pedido');
+    }
+}
+
+function cerrarModalEditar() {
+    document.getElementById('modalEditarPedido').style.display = 'none';
+    document.getElementById('editSearchProduct').value = '';
+    document.getElementById('editAvailableProducts').style.display = 'none';
+    currentEditOrderId = null;
+    currentEditOrder = null;
+    editSelectedItems = [];
+}
+
+function actualizarListaProductosEdicion() {
+    const container = document.getElementById('editProductsList');
+    
+    if (editSelectedItems.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #a0aec0; padding: 1rem;">No hay productos en el pedido</p>';
+        document.getElementById('editTotalDisplay').textContent = '$0';
+        return;
+    }
+    
+    container.innerHTML = editSelectedItems.map((item, index) => `
+        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="flex: 1;">
+                <div style="font-weight: 600; color: #2d3748; font-size: 14px;">${item.producto.nombre}</div>
+                <div style="font-size: 12px; color: #718096;">${item.producto.categoria}</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <button onclick="cambiarCantidadEdicion(${index}, -1)" style="width: 28px; height: 28px; border: 1px solid #e2e8f0; background: white; border-radius: 6px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;">-</button>
+                <span style="min-width: 40px; text-align: center; font-weight: 600; font-size: 14px;">${item.cantidad}</span>
+                <button onclick="cambiarCantidadEdicion(${index}, 1)" style="width: 28px; height: 28px; border: 1px solid #e2e8f0; background: white; border-radius: 6px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;">+</button>
+                <span style="font-size: 14px; font-weight: 700; color: #2d3748; min-width: 80px; text-align: right;">$${(item.producto.precio * item.cantidad).toLocaleString('es-CO')}</span>
+                <button onclick="eliminarProductoEdicion(${index})" style="background: #fc8181; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">🗑️</button>
+            </div>
+        </div>
+    `).join('');
+    
+    // Actualizar total
+    const total = editSelectedItems.reduce((sum, item) => sum + (item.producto.precio * item.cantidad), 0);
+    document.getElementById('editTotalDisplay').textContent = `$${total.toLocaleString('es-CO')}`;
+}
+
+function cambiarCantidadEdicion(index, delta) {
+    editSelectedItems[index].cantidad += delta;
+    if (editSelectedItems[index].cantidad <= 0) {
+        editSelectedItems.splice(index, 1);
+    }
+    actualizarListaProductosEdicion();
+}
+
+function eliminarProductoEdicion(index) {
+    if (confirm('¿Eliminar este producto del pedido?')) {
+        editSelectedItems.splice(index, 1);
+        actualizarListaProductosEdicion();
+    }
+}
+
+async function cargarProductosParaEdicion() {
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch(`${API_URL}/products?userId=${currentUser._id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            mostrarProductosDisponiblesEdicion(data.data.filter(p => p.disponible));
+        }
+    } catch (error) {
+        console.error('Error al cargar productos:', error);
+    }
+}
+
+function mostrarProductosDisponiblesEdicion(products) {
+    const container = document.getElementById('editAvailableProducts');
+    const searchInput = document.getElementById('editSearchProduct');
+    
+    // REMOVER LISTENERS ANTERIORES - Clonar el input para eliminar listeners
+    const newSearchInput = searchInput.cloneNode(true);
+    searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+    
+    // Agregar el event listener al nuevo input
+    newSearchInput.addEventListener('input', (e) => {
+        const search = e.target.value.toLowerCase();
+        const filtered = products.filter(p => 
+            p.nombre.toLowerCase().includes(search) || 
+            p.categoria.toLowerCase().includes(search)
+        );
+        
+        if (search.length > 0) {
+            container.style.display = 'block';
+            if (filtered.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #a0aec0; padding: 1rem;">No se encontraron productos</p>';
+            } else {
+                container.innerHTML = filtered.map(p => `
+                    <div onclick="agregarProductoEdicion('${p._id}', \`${p.nombre}\`, ${p.precio}, \`${p.categoria}\`)" style="padding: 12px; border-bottom: 1px solid #e2e8f0; cursor: pointer; transition: background 0.2s; display: flex; justify-content: space-between; align-items: center;" onmouseover="this.style.background='white'" onmouseout="this.style.background='transparent'">
+                        <div>
+                            <div style="font-size: 14px; font-weight: 600; color: #2d3748;">${p.nombre}</div>
+                            <div style="font-size: 12px; color: #718096;">${p.categoria}</div>
+                        </div>
+                        <div style="font-size: 15px; font-weight: 700; color: #48bb78;">$${p.precio.toLocaleString('es-CO')}</div>
+                    </div>
+                `).join('');
+            }
+        } else {
+            container.style.display = 'none';
+        }
+    });
+}
+
+function agregarProductoEdicion(id, nombre, precio, categoria) {
+    const existing = editSelectedItems.find(item => item.producto._id === id);
+    
+    if (existing) {
+        existing.cantidad++;
+    } else {
+        editSelectedItems.push({
+            producto: {
+                _id: id,
+                nombre: nombre,
+                precio: precio,
+                categoria: categoria
+            },
+            cantidad: 1
+        });
+    }
+    
+    actualizarListaProductosEdicion();
+    document.getElementById('editSearchProduct').value = '';
+    document.getElementById('editAvailableProducts').style.display = 'none';
+}
+
+async function guardarEdicionPedido() {
+    const mesa = document.getElementById('editMesa').value.trim();
+    const notas = document.getElementById('editNotas').value.trim();
+    
+    if (!mesa) {
+        alert('El número de mesa es obligatorio');
+        return;
+    }
+    
+    if (editSelectedItems.length === 0) {
+        alert('Debe haber al menos un producto en el pedido');
+        return;
+    }
+    
+    const updateData = {
+        mesa: mesa,
+        items: editSelectedItems.map(item => ({
+            producto: item.producto._id,
+            nombreProducto: item.producto.nombre,
+            categoriaProducto: item.producto.categoria,
+            cantidad: item.cantidad,
+            precio: item.producto.precio
+        })),
+        notas: notas
+    };
+    
+    const token = localStorage.getItem('token');
+    
+    try {
+        const response = await fetch(`${API_URL}/orders/${currentEditOrderId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(updateData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            mostrarNotificacionExito('✅ Pedido actualizado correctamente');
+            cerrarModalEditar();
+            await loadOrders();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al actualizar el pedido');
+    }
+}
+
     </script>
 
 <!-- Modal para método de pago -->
@@ -1800,6 +2046,57 @@ document.head.appendChild(style);
         <button onclick="cerrarModalMetodoPago()" style="width: 100%; padding: 0.75rem; background: #e2e8f0; color: #2d3748; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">
             Cancelar
         </button>
+    </div>
+</div>
+
+<!-- Modal para editar pedido -->
+<div id="modalEditarPedido" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center; overflow-y: auto; padding: 20px;">
+    <div style="background: white; border-radius: 16px; padding: 2rem; max-width: 500px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); margin: auto;">
+        <h3 style="font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 1rem;">✏️ Editar Pedido</h3>
+        
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px;">Nombre/Número de Mesa</label>
+            <input type="text" id="editMesa" style="width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;" maxlength="20">
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px;">Productos del Pedido</label>
+            <div id="editProductsList" style="max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; background: #f7fafc;">
+                <!-- Se llenará dinámicamente -->
+            </div>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px;">Agregar más productos (opcional)</label>
+            <div style="position: relative; margin-bottom: 10px;">
+                <input type="text" id="editSearchProduct" style="width: 100%; padding: 10px 14px 10px 38px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;" placeholder="Buscar producto...">
+                <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #a0aec0;">🔍</span>
+            </div>
+            <div id="editAvailableProducts" style="max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; background: #f7fafc; display: none;">
+                <!-- Se llenará dinámicamente -->
+            </div>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px;">Notas</label>
+            <textarea id="editNotas" style="width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; resize: vertical; min-height: 80px;" maxlength="500"></textarea>
+        </div>
+
+        <div style="background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: 700; color: #48bb78;">
+                <span>Total:</span>
+                <span id="editTotalDisplay">$0</span>
+            </div>
+        </div>
+
+        <div style="display: grid; gap: 0.75rem;">
+            <button onclick="guardarEdicionPedido()" style="padding: 1rem; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer;">
+                ✅ Guardar Cambios
+            </button>
+            <button onclick="cerrarModalEditar()" style="padding: 0.75rem; background: #e2e8f0; color: #2d3748; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                Cancelar
+            </button>
+        </div>
     </div>
 </div>
 

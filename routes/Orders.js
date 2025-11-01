@@ -459,23 +459,10 @@ router.patch('/:id/item/:itemIndex/estado', protect, checkPermission('editarPedi
 
 router.put('/:id', protect, checkPermission('editarPedidos'), async (req, res) => {
   try {
-    const { items, notas } = req.body;
-
-    let updateData = { notas };
+    const { mesa, items, notas } = req.body;
     
-    if (items && items.length > 0) {
-      const total = items.reduce((sum, item) => {
-        return sum + (item.precio * item.cantidad);
-      }, 0);
-      updateData.items = items;
-      updateData.total = total;
-    }
-
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      updateData,
-      { new: true, runValidators: true }
-    ).populate('items.producto', 'nombre categoria precio');
+    // Obtener el pedido actual
+    const order = await Order.findById(req.params.id);
     
     if (!order) {
       return res.status(404).json({
@@ -484,12 +471,68 @@ router.put('/:id', protect, checkPermission('editarPedidos'), async (req, res) =
       });
     }
 
+    // Actualizar campos básicos
+    order.mesa = mesa;
+    order.notas = notas;
+    
+    // Si hay items, actualizarlos con estadosIndividuales inicializados
+    if (items && items.length > 0) {
+      order.items = items.map(item => ({
+        producto: item.producto,
+        nombreProducto: item.nombreProducto,
+        categoriaProducto: item.categoriaProducto,
+        cantidad: item.cantidad,
+        precio: item.precio,
+        // ✅ INICIALIZAR ESTADOS INDIVIDUALES CORRECTAMENTE
+        estadosIndividuales: [{
+          cantidad: item.cantidad,
+          estado: 'pendiente'
+        }]
+      }));
+      
+      // Recalcular total
+      order.total = items.reduce((sum, item) => {
+        return sum + (item.precio * item.cantidad);
+      }, 0);
+    }
+
+    // Guardar con el middleware pre-save
+    await order.save();
+    
+    // Populate para la respuesta
+    await order.populate('items.producto', 'nombre categoria precio');
+    
+    // Normalizar la respuesta
+    const orderObj = order.toObject();
+    orderObj.items = orderObj.items.map(item => {
+      if (item.producto) {
+        return {
+          ...item,
+          productoInfo: {
+            nombre: item.producto.nombre,
+            categoria: item.producto.categoria,
+            precio: item.producto.precio
+          }
+        };
+      } else {
+        return {
+          ...item,
+          productoInfo: {
+            nombre: item.nombreProducto || 'Producto eliminado',
+            categoria: item.categoriaProducto || 'Sin categoría',
+            precio: item.precio
+          }
+        };
+      }
+    });
+
     res.json({
       success: true,
       message: 'Pedido actualizado exitosamente',
-      data: order
+      data: orderObj
     });
   } catch (error) {
+    console.error('Error al actualizar pedido:', error);
     res.status(400).json({
       success: false,
       message: 'Error al actualizar el pedido',

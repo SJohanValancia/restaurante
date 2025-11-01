@@ -171,11 +171,45 @@
             font-weight: 800;
             color: #1a202c;
             margin-bottom: 6px;
+            transition: all 0.4s ease;
+        }
+
+        .order-info h3.updating {
+            animation: titleChange 0.6s ease;
+        }
+
+        @keyframes titleChange {
+            0% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            50% {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         .order-meta {
             font-size: 13px;
             color: #718096;
+            transition: all 0.4s ease;
+        }
+
+        .order-meta.updating {
+            animation: fadeInOut 0.6s ease;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
         }
 
         .status-badge {
@@ -197,10 +231,10 @@
                 transform: scale(1);
             }
             25% {
-                transform: scale(1.15);
+                transform: scale(1.15) rotate(5deg);
             }
             50% {
-                transform: scale(0.95);
+                transform: scale(0.95) rotate(-5deg);
             }
             75% {
                 transform: scale(1.05);
@@ -254,7 +288,7 @@
             gap: 12px;
             padding: 10px 0;
             position: relative;
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
         }
 
         .timeline-item::before {
@@ -265,6 +299,11 @@
             bottom: -10px;
             width: 2px;
             background: #e2e8f0;
+            transition: all 0.4s ease;
+        }
+
+        .timeline-item.line-active::before {
+            background: linear-gradient(180deg, #48bb78 0%, #e2e8f0 100%);
         }
 
         .timeline-item:last-child::before {
@@ -282,13 +321,14 @@
             flex-shrink: 0;
             z-index: 1;
             border: 2px solid;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         .timeline-icon.active {
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             border-color: #48bb78;
             color: white;
+            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
         }
 
         .timeline-icon.inactive {
@@ -298,19 +338,19 @@
         }
 
         .timeline-icon.just-activated {
-            animation: iconActivate 0.6s ease;
+            animation: iconActivate 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         @keyframes iconActivate {
             0% {
-                transform: scale(0.8);
+                transform: scale(0.5) rotate(-180deg);
                 opacity: 0;
             }
             50% {
-                transform: scale(1.2);
+                transform: scale(1.3) rotate(10deg);
             }
             100% {
-                transform: scale(1);
+                transform: scale(1) rotate(0deg);
                 opacity: 1;
             }
         }
@@ -328,6 +368,20 @@
 
         .timeline-label.inactive {
             color: #a0aec0;
+        }
+
+        .timeline-label.just-activated {
+            animation: labelGlow 0.8s ease;
+        }
+
+        @keyframes labelGlow {
+            0%, 100% {
+                color: #2d3748;
+            }
+            50% {
+                color: #48bb78;
+                transform: translateX(5px);
+            }
         }
 
         .order-items {
@@ -351,6 +405,34 @@
             background: #f7fafc;
             border-radius: 8px;
             margin-bottom: 8px;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .order-item.item-updated {
+            animation: itemUpdate 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes itemUpdate {
+            0% {
+                transform: translateX(0) scale(1);
+                box-shadow: 0 0 0 rgba(72, 187, 120, 0);
+            }
+            25% {
+                transform: translateX(-10px) scale(1.05);
+                box-shadow: 0 4px 20px rgba(72, 187, 120, 0.4);
+            }
+            50% {
+                transform: translateX(10px) scale(1.05);
+                box-shadow: 0 4px 20px rgba(72, 187, 120, 0.6);
+            }
+            75% {
+                transform: translateX(-5px) scale(1.02);
+                box-shadow: 0 4px 20px rgba(72, 187, 120, 0.4);
+            }
+            100% {
+                transform: translateX(0) scale(1);
+                box-shadow: 0 0 0 rgba(72, 187, 120, 0);
+            }
         }
 
         .item-details {
@@ -490,23 +572,33 @@
             align-items: center;
             gap: 12px;
             z-index: 1001;
-            animation: slideInNotification 0.3s ease;
+            animation: slideInNotification 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             border-left: 4px solid #48bb78;
         }
 
         @keyframes slideInNotification {
             from {
-                transform: translateX(400px);
+                transform: translateX(400px) rotate(10deg);
                 opacity: 0;
             }
             to {
-                transform: translateX(0);
+                transform: translateX(0) rotate(0deg);
                 opacity: 1;
             }
         }
 
         .notification-icon {
             font-size: 24px;
+            animation: bounce 0.6s ease-in-out 3;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
         }
 
         .notification-content h4 {
@@ -577,6 +669,7 @@
         const API_URL = 'https://restaurante-co77.onrender.com/api';
         let orderData = null;
         let previousStatus = null;
+        let previousItems = null;
         let pollingInterval = null;
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -621,7 +714,8 @@
 
                 if (data.success && data.data) {
                     orderData = data.data;
-                    previousStatus = data.data.estado;
+                    previousStatus = calculateOverallStatus(data.data);
+                    previousItems = JSON.stringify(data.data.items);
                     displayOrder(false);
                 } else {
                     showError('Sin pedidos', 'No hay pedidos activos para esta mesa en este momento.');
@@ -643,22 +737,86 @@
 
                 if (data.success && data.data) {
                     const newOrder = data.data;
+                    const newOverallStatus = calculateOverallStatus(newOrder);
+                    const newItemsString = JSON.stringify(newOrder.items);
                     
-                    if (orderData && newOrder.estado !== orderData.estado) {
-                        console.log('🔔 Cambio detectado:', orderData.estado, '→', newOrder.estado);
-                        showChangeNotification(orderData.estado, newOrder.estado);
-                        previousStatus = orderData.estado;
+                    // Detectar cambios en items individuales
+                    const itemsChanged = previousItems !== newItemsString;
+                    
+                    // Detectar cambios en el estado general
+                    const statusChanged = previousStatus !== newOverallStatus;
+                    
+                    if (itemsChanged || statusChanged) {
+                        console.log('🔔 Cambios detectados');
+                        
+                        if (statusChanged) {
+                            console.log('📊 Estado general cambió:', previousStatus, '→', newOverallStatus);
+                            showChangeNotification(previousStatus, newOverallStatus);
+                        } else if (itemsChanged) {
+                            console.log('🍽️ Estados de productos cambiaron');
+                            showItemChangeNotification();
+                        }
+                        
+                        previousStatus = newOverallStatus;
+                        previousItems = newItemsString;
                         orderData = newOrder;
-                        displayOrder(true);
+                        displayOrder(true, itemsChanged);
                     } else if (!orderData) {
                         orderData = newOrder;
-                        previousStatus = newOrder.estado;
+                        previousStatus = newOverallStatus;
+                        previousItems = newItemsString;
                         displayOrder(false);
                     }
                 }
             } catch (error) {
                 console.error('Error al verificar actualizaciones:', error);
             }
+        }
+
+        // Calcular el estado general basado en los estados individuales de productos
+        function calculateOverallStatus(order) {
+            if (!order.items || order.items.length === 0) return 'pendiente';
+            
+            const allGroups = [];
+            order.items.forEach(item => {
+                const grupos = item.estadosIndividuales || [{cantidad: item.cantidad, estado: 'pendiente'}];
+                allGroups.push(...grupos.map(g => g.estado));
+            });
+            
+            // Si todos están entregados
+            if (allGroups.every(e => e === 'entregado')) return 'entregado';
+            
+            // Si al menos uno está listo y ninguno pendiente/preparando
+            if (allGroups.some(e => e === 'listo') && !allGroups.some(e => e === 'pendiente' || e === 'preparando')) return 'listo';
+            
+            // Si al menos uno está listo o preparando
+            if (allGroups.some(e => e === 'listo')) return 'listo';
+            
+            // Si al menos uno está preparando
+            if (allGroups.some(e => e === 'preparando')) return 'preparando';
+            
+            // Por defecto, pendiente
+            return 'pendiente';
+        }
+
+        function showItemChangeNotification() {
+            const notification = document.createElement('div');
+            notification.className = 'change-notification';
+            notification.innerHTML = `
+                <div class="notification-icon">🍽️</div>
+                <div class="notification-content">
+                    <h4>¡Producto actualizado!</h4>
+                    <p>El estado de un producto cambió</p>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            playNotificationSound();
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideInNotification 0.3s ease reverse';
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
         }
 
         function showChangeNotification(oldStatus, newStatus) {
@@ -686,129 +844,145 @@
         function playNotificationSound() {
             try {
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
                 
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
+                // Sonido "JC" mejorado
+                function playTone(frequency, startTime, duration, type = 'sine', volume = 0.3) {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = frequency;
+                    oscillator.type = type;
+                    
+                    gainNode.gain.setValueAtTime(0, audioContext.currentTime + startTime);
+                    gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + startTime + 0.05);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + startTime + duration);
+                    
+                    oscillator.start(audioContext.currentTime + startTime);
+                    oscillator.stop(audioContext.currentTime + startTime + duration);
+                }
                 
-                oscillator.frequency.value = 800;
-                oscillator.type = 'sine';
+                // Sonido "J"
+                playTone(880, 0, 0.2, 'square', 0.4);
+                playTone(1320, 0, 0.2, 'sine', 0.3);
                 
-                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                // Sonido "C"
+                playTone(523, 0.25, 0.35, 'triangle', 0.4);
+                playTone(659, 0.25, 0.35, 'sine', 0.3);
                 
-                oscillator.start(audioContext.currentTime);
-                oscillator.stop(audioContext.currentTime + 0.3);
+                // Echo
+                playTone(440, 0.45, 0.25, 'sine', 0.2);
+                
             } catch (error) {
                 console.log('No se pudo reproducir sonido de notificación');
             }
         }
 
-  function displayOrder(isUpdate = false) {
-    const content = document.getElementById('content');
-    const order = orderData;
+        function displayOrder(isUpdate = false, itemsChanged = false) {
+            const content = document.getElementById('content');
+            const order = orderData;
+            
+            const overallStatus = calculateOverallStatus(order);
+            const statusInfo = getStatusInfo(overallStatus);
+            const timeline = getTimeline(overallStatus, isUpdate ? previousStatus : null);
 
-    const statusInfo = getStatusInfo(order.estado);
-    const timeline = getTimeline(order.estado, isUpdate ? previousStatus : null);
+            // Items con animación si cambiaron
+            const itemsHTML = order.items.map(item => {
+                const info = item.productoInfo || item.producto || {};
+                const grupos = item.estadosIndividuales || [{cantidad: item.cantidad, estado: 'pendiente'}];
+                
+                return grupos.map(grupo => `
+                    <div class="order-item ${itemsChanged ? 'item-updated' : ''}" style="border-left: 4px solid ${getColorEstado(grupo.estado)};">
+                        <div class="item-details">
+                            <div class="item-name">${info.nombre || 'Producto'}</div>
+                            <div class="item-category">${info.categoria || 'Sin categoría'} · <span class="status-badge status-${grupo.estado}" style="font-size: 10px; padding: 2px 8px; margin-left: 4px;">${grupo.estado}</span></div>
+                        </div>
+                        <span class="item-qty">x${grupo.cantidad}</span>
+                        <span class="item-price">$${(item.precio * grupo.cantidad).toLocaleString('es-CO')}</span>
+                    </div>
+                `).join('');
+            }).join('');
 
-    // NUEVO: Items con estados individuales agrupados
-    const itemsHTML = order.items.map(item => {
-        const info = item.productoInfo || item.producto || {};
-        const grupos = item.estadosIndividuales || [{cantidad: item.cantidad, estado: 'pendiente'}];
-        
-        return grupos.map(grupo => `
-            <div class="order-item" style="border-left: 4px solid ${getColorEstado(grupo.estado)};">
-                <div class="item-details">
-                    <div class="item-name">${info.nombre || 'Producto'}</div>
-                    <div class="item-category">${info.categoria || 'Sin categoría'} · <span class="status-badge status-${grupo.estado}" style="font-size: 10px; padding: 2px 8px; margin-left: 4px;">${grupo.estado}</span></div>
-                </div>
-                <span class="item-qty">x${grupo.cantidad}</span>
-                <span class="item-price">$${(item.precio * grupo.cantidad).toLocaleString('es-CO')}</span>
-            </div>
-        `).join('');
-    }).join('');
-
-    content.innerHTML = `
-        <div class="info-card ${isUpdate ? 'updating' : ''}">
-            <h2>🪑 Información</h2>
-            <div class="info-row">
-                <span class="info-label">Restaurante:</span>
-                <span class="info-value">${restaurante}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Mesa:</span>
-                <span class="info-value">#${mesa}</span>
-            </div>
-            ${sede ? `
-            <div class="info-row">
-                <span class="info-label">Sede:</span>
-                <span class="info-value">${sede}</span>
-            </div>
-            ` : ''}
-            <div class="info-row">
-                <span class="info-label">Hora del pedido:</span>
-                <span class="info-value">${new Date(order.createdAt).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}</span>
-            </div>
-        </div>
-
-        <div class="order-card ${isUpdate ? 'updating' : ''}">
-            <div class="order-header">
-                <div class="order-info">
-                    <h3>${statusInfo.emoji} ${statusInfo.title}</h3>
-                    <div class="order-meta">
-                        ${statusInfo.message}
+            content.innerHTML = `
+                <div class="info-card ${isUpdate ? 'updating' : ''}">
+                    <h2>🪑 Información</h2>
+                    <div class="info-row">
+                        <span class="info-label">Restaurante:</span>
+                        <span class="info-value">${restaurante}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Mesa:</span>
+                        <span class="info-value">#${mesa}</span>
+                    </div>
+                    ${sede ? `
+                    <div class="info-row">
+                        <span class="info-label">Sede:</span>
+                        <span class="info-value">${sede}</span>
+                    </div>
+                    ` : ''}
+                    <div class="info-row">
+                        <span class="info-label">Hora del pedido:</span>
+                        <span class="info-value">${new Date(order.createdAt).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
                 </div>
-                <span class="status-badge status-${order.estado} ${isUpdate ? 'changed' : ''}">${order.estado}</span>
-            </div>
 
-            <div class="status-timeline">
-                <div class="timeline-title">Progreso del Pedido</div>
-                ${timeline.map(item => `
-                    <div class="timeline-item">
-                        <div class="timeline-icon ${item.active ? 'active' : 'inactive'} ${item.justActivated ? 'just-activated' : ''}">
-                            ${item.icon}
-                        </div>
-                        <div class="timeline-content">
-                            <div class="timeline-label ${item.active ? '' : 'inactive'}">
-                                ${item.label}
+                <div class="order-card ${isUpdate ? 'updating' : ''}">
+                    <div class="order-header">
+                        <div class="order-info">
+                            <h3 class="${isUpdate ? 'updating' : ''}">${statusInfo.emoji} ${statusInfo.title}</h3>
+                            <div class="order-meta ${isUpdate ? 'updating' : ''}">
+                                ${statusInfo.message}
                             </div>
                         </div>
+                        <span class="status-badge status-${overallStatus} ${isUpdate ? 'changed' : ''}">${overallStatus}</span>
                     </div>
-                `).join('')}
-            </div>
 
-            <div class="order-items">
-                <div class="items-title">🍽️ Productos</div>
-                ${itemsHTML}
-            </div>
+                    <div class="status-timeline">
+                        <div class="timeline-title">Progreso del Pedido</div>${timeline.map(item => `
+                            <div class="timeline-item ${item.active ? 'line-active' : ''}">
+                                <div class="timeline-icon ${item.active ? 'active' : 'inactive'} ${item.justActivated ? 'just-activated' : ''}">
+                                    ${item.icon}
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-label ${item.active ? '' : 'inactive'} ${item.justActivated ? 'just-activated' : ''}">
+                                        ${item.label}
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
 
-            ${order.notas ? `
-            <div class="order-notes">
-                <p>📝 ${order.notas}</p>
-            </div>
-            ` : ''}
+                    <div class="order-items">
+                        <div class="items-title">🍽️ Productos</div>
+                        ${itemsHTML}
+                    </div>
 
-            <div class="order-total">
-                <span class="total-label">Total del Pedido:</span>
-                <span class="total-amount">$${order.total.toLocaleString('es-CO')}</span>
-            </div>
-        </div>
-    `;
-}
+                    ${order.notas ? `
+                    <div class="order-notes">
+                        <p>📝 ${order.notas}</p>
+                    </div>
+                    ` : ''}
 
-function getColorEstado(estado) {
-    const colores = {
-        'pendiente': '#f6ad55',
-        'preparando': '#4299e1',
-        'listo': '#48bb78',
-        'entregado': '#9f7aea',
-        'cancelado': '#fc8181'
-    };
-    return colores[estado] || '#e2e8f0';
-}
+                    <div class="order-total">
+                        <span class="total-label">Total del Pedido:</span>
+                        <span class="total-amount">$${order.total.toLocaleString('es-CO')}</span>
+                    </div>
+                </div>
+            `;
+        }
 
+        function getColorEstado(estado) {
+            const colores = {
+                'pendiente': '#f6ad55',
+                'preparando': '#4299e1',
+                'listo': '#48bb78',
+                'entregado': '#9f7aea',
+                'cancelado': '#fc8181'
+            };
+            return colores[estado] || '#e2e8f0';
+        }
 
         function getStatusInfo(estado) {
             const statusMap = {

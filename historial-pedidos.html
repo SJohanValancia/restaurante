@@ -1789,11 +1789,15 @@ function cerrarModalCantidadProducto() {
 
 async function confirmarCambioEstadoProducto(nuevoEstado) {
     const cantidad = parseInt(document.getElementById('cantidadSeleccionada').textContent);
+    
+    // Guardar los datos ANTES de cerrar el modal
+    const { orderId, itemIndex } = modalEstadoProductoData;
+    
     cerrarModalCantidadProducto();
     
     await actualizarEstadoProducto(
-        modalEstadoProductoData.orderId,
-        modalEstadoProductoData.itemIndex,
+        orderId,
+        itemIndex,
         cantidad,
         nuevoEstado
     );
