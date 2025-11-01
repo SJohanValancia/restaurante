@@ -7,13 +7,13 @@ const mongoose = require('mongoose');
 const { protect } = require('../middleware/auth');
 const { checkPermission } = require('../middleware/permissions');
 
-// â­ RUTA PÃšBLICA - Sin protect
+// ⭐ RUTA PÚBLICA - Sin protect
 router.get('/mesa/:numeroMesa', async (req, res) => {
   try {
     const { numeroMesa } = req.params;
     const { restaurante, sede } = req.query;
 
-    console.log('ðŸ“ Solicitud recibida - Mesa:', numeroMesa, 'Restaurante:', restaurante, 'Sede:', sede);
+    console.log('🔍 Solicitud recibida - Mesa:', numeroMesa, 'Restaurante:', restaurante, 'Sede:', sede);
 
     if (!restaurante) {
       return res.status(400).json({
@@ -22,6 +22,7 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
       });
     }
 
+    // Buscar usuario del restaurante
     const query = { nombreRestaurante: restaurante };
     if (sede) {
       query.sede = sede;
@@ -30,17 +31,23 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
     const usuario = await User.findOne(query);
 
     if (!usuario) {
+      console.log('❌ Restaurante no encontrado:', restaurante);
       return res.status(404).json({
         success: false,
         message: 'Restaurante no encontrado'
       });
     }
 
+    console.log('✅ Usuario encontrado:', usuario._id);
+
+    // Buscar pedido activo primero (estados activos)
     const orderQuery = {
-      mesa: (numeroMesa),
+      mesa: numeroMesa.trim(), // ✅ QUITAR String()
       userId: usuario._id,
       estado: { $in: ['pendiente', 'preparando', 'listo'] }
     };
+
+    console.log('🔍 Buscando con query:', JSON.stringify(orderQuery));
 
     let order = await Order.findOne(orderQuery)
       .populate('items.producto', 'nombre categoria precio')
@@ -48,9 +55,13 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(1);
 
+    console.log('🔍 Pedido activo encontrado:', order ? 'Sí' : 'No');
+
+    // Si no hay pedido activo, buscar el último pedido (cualquier estado)
     if (!order) {
+      console.log('🔍 Buscando último pedido de la mesa...');
       order = await Order.findOne({ 
-        mesa: (numeroMesa),
+        mesa: numeroMesa.trim(),
         userId: usuario._id
       })
         .populate('items.producto', 'nombre categoria precio')
@@ -58,12 +69,15 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
         .sort({ createdAt: -1 })
         .limit(1);
 
-      if (!order) {
-        return res.status(404).json({
-          success: false,
-          message: 'No se encontraron pedidos para esta mesa'
-        });
-      }
+      console.log('🔍 Último pedido encontrado:', order ? 'Sí' : 'No');
+    }
+
+    if (!order) {
+      console.log('❌ No se encontró ningún pedido para mesa:', numeroMesa);
+      return res.status(404).json({
+        success: false,
+        message: 'No se encontraron pedidos para esta mesa'
+      });
     }
 
     // Normalizar datos
@@ -83,21 +97,21 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
           ...item,
           productoInfo: {
             nombre: item.nombreProducto || 'Producto eliminado',
-            categoria: item.categoriaProducto || 'Sin categorÃ­a',
+            categoria: item.categoriaProducto || 'Sin categoría',
             precio: item.precio
           }
         };
       }
     });
 
-    console.log('âœ… Pedido encontrado y enviado');
+    console.log('✅ Pedido encontrado y enviado');
 
     res.json({
       success: true,
       data: orderObj
     });
   } catch (error) {
-    console.error('âŒ Error en /mesa:', error);
+    console.error('❌ Error en /mesa:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener el pedido',
