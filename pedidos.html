@@ -1729,7 +1729,7 @@ async function confirmarMetodoPago(metodoPago) {
 }
 
 // Debe estar ASÍ:
-async function actualizarEstadoPedido(orderId, newStatus, metodoPago) {
+async function actualizarEstadoPedido(orderId, newStatus, metodoPago = null) {
     const token = localStorage.getItem('token');
 
     console.log('📤 Enviando petición:');
@@ -1744,7 +1744,11 @@ async function actualizarEstadoPedido(orderId, newStatus, metodoPago) {
     }
 
     try {
-        const body = { estado: newStatus };
+        const body = { 
+            estado: newStatus,
+            actualizarTodosLosProductos: true  // ✅ NUEVO: Flag para actualizar todos los productos
+        };
+        
         if (metodoPago) {
             body.metodoPago = metodoPago;
         }
@@ -1780,6 +1784,7 @@ async function actualizarEstadoPedido(orderId, newStatus, metodoPago) {
         alert('Error al actualizar el estado: ' + error.message);
     }
 }
+
 async function cancelOrder(orderId) {
     if (!confirm('¿Está seguro de cancelar este pedido?')) return;
     await actualizarEstadoPedido(orderId, 'cancelado', null);

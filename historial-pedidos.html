@@ -900,6 +900,7 @@ function initAudioContext() {
         try {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
             audioContextReady = true;
+            console.log('🎵 AudioContext creado - Estado:', audioContext.state);
         } catch (e) {
             console.error('No se pudo crear AudioContext:', e);
         }
@@ -907,30 +908,35 @@ function initAudioContext() {
 }
 
 // Desbloquear audio en iOS (requiere interacción directa)
-function unlockAudioIOS() {
+async function unlockAudioIOS() {
     if (audioUnlocked) return;
     
     initAudioContext();
     
     if (!audioContext) return;
     
-    // Crear y reproducir un buffer silencioso
-    const buffer = audioContext.createBuffer(1, 1, 22050);
-    const source = audioContext.createBufferSource();
-    source.buffer = buffer;
-    source.connect(audioContext.destination);
-    source.start(0);
-    
-    // Reanudar el contexto si está suspendido (Safari iOS)
-    if (audioContext.state === 'suspended') {
-        audioContext.resume();
+    try {
+        // CRÍTICO: Reanudar el contexto PRIMERO
+        if (audioContext.state === 'suspended') {
+            await audioContext.resume();
+            console.log('▶️ AudioContext reanudado - Estado:', audioContext.state);
+        }
+        
+        // Crear y reproducir un buffer silencioso
+        const buffer = audioContext.createBuffer(1, 1, 22050);
+        const source = audioContext.createBufferSource();
+        source.buffer = buffer;
+        source.connect(audioContext.destination);
+        source.start(0);
+        
+        audioUnlocked = true;
+        console.log('🔊 Audio desbloqueado para iOS - Estado:', audioContext.state);
+        
+        // Mostrar confirmación visual
+        mostrarMensajeAudioListo();
+    } catch (error) {
+        console.error('Error al desbloquear audio:', error);
     }
-    
-    audioUnlocked = true;
-    console.log('🔊 Audio desbloqueado para iOS - Estado:', audioContext.state);
-    
-    // Mostrar confirmación visual
-    mostrarMensajeAudioListo();
 }
 
 function mostrarMensajeAudioListo() {
@@ -958,28 +964,39 @@ function mostrarMensajeAudioListo() {
     }, 3000);
 }
 
-// Activar con CUALQUIER interacción
-document.addEventListener('click', unlockAudioIOS, { once: false });
-document.addEventListener('touchstart', unlockAudioIOS, { once: false });
-document.addEventListener('touchend', unlockAudioIOS, { once: false });
+// Activar con CUALQUIER interacción (múltiples eventos para asegurar)
+document.addEventListener('click', unlockAudioIOS);
+document.addEventListener('touchstart', unlockAudioIOS);
+document.addEventListener('touchend', unlockAudioIOS);
+document.addEventListener('keydown', unlockAudioIOS);
+
+// IMPORTANTE: También intentar reanudar antes de cada sonido
+async function ensureAudioReady() {
+    if (!audioContext) {
+        initAudioContext();
+    }
+    
+    if (audioContext && audioContext.state === 'suspended') {
+        try {
+            await audioContext.resume();
+            console.log('🔄 AudioContext reanudado automáticamente');
+        } catch (error) {
+            console.error('Error al reanudar:', error);
+        }
+    }
+}
 
 // Función mejorada para reproducir sonido "JC"
-function playNotificationSound() {
-    // Intentar desbloquear si no está listo
-    if (!audioUnlocked || !audioContext) {
-        console.warn('⚠️ Audio no desbloqueado aún');
-        unlockAudioIOS();
+async function playNotificationSound() {
+    // Asegurar que el audio esté listo
+    await ensureAudioReady();
+    
+    if (!audioContext || audioContext.state !== 'running') {
+        console.warn('⚠️ AudioContext no está listo. Estado:', audioContext?.state);
         return;
     }
     
-    // Reanudar contexto si está suspendido
-    if (audioContext.state === 'suspended') {
-        audioContext.resume().then(() => {
-            reproducirSonidoJC();
-        });
-    } else {
-        reproducirSonidoJC();
-    }
+    reproducirSonidoJC();
 }
 
 function reproducirSonidoJC() {
@@ -1022,7 +1039,49 @@ function reproducirSonidoJC() {
         console.error('❌ Error al reproducir sonido:', error);
     }
 }
-    const API_URL = 'https://restaurante-co77.onrender.com/api';
+
+// Función para sonido de edición
+async function reproducirSonidoEdicion() {
+    await ensureAudioReady();
+    
+    if (!audioContext || audioContext.state !== 'running') {
+        console.warn('⚠️ AudioContext no está listo para edición');
+        return;
+    }
+    
+    try {
+        const currentTime = audioContext.currentTime;
+        
+        function playTone(frequency, startTime, duration, type = 'sine', volume = 0.3) {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = type;
+            
+            gainNode.gain.setValueAtTime(0, currentTime + startTime);
+            gainNode.gain.linearRampToValueAtTime(volume, currentTime + startTime + 0.05);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, currentTime + startTime + duration);
+            
+            oscillator.start(currentTime + startTime);
+            oscillator.stop(currentTime + startTime + duration);
+        }
+        
+        // Sonido de edición - tono ascendente suave
+        playTone(440, 0, 0.15, 'sine', 0.3);      // La
+        playTone(554, 0.15, 0.15, 'sine', 0.3);   // Do#
+        playTone(659, 0.3, 0.25, 'triangle', 0.4); // Mi
+        
+        console.log('🔊 Sonido de edición reproducido');
+    } catch (error) {
+        console.error('❌ Error al reproducir sonido de edición:', error);
+    }
+}
+
+const API_URL = 'https://restaurante-co77.onrender.com/api';
     let currentUser = null;
     let allOrders = [];
     let filteredOrders = [];
@@ -1403,7 +1462,10 @@ async function actualizarEstadoPedido(orderId, newStatus, metodoPago = null) {
     }
 
     try {
-        const body = { estado: newStatus };
+        const body = { 
+            estado: newStatus,
+            actualizarTodosLosProductos: true  // ✅ NUEVO: Flag para actualizar todos los productos
+        };
         
         // SOLO agregar metodoPago si existe Y el estado es 'entregado'
         if (metodoPago && newStatus === 'entregado') {
@@ -1441,7 +1503,6 @@ async function actualizarEstadoPedido(orderId, newStatus, metodoPago = null) {
         alert('Error al actualizar el estado: ' + error.message);
     }
 }
-
 async function cancelOrder(orderId) {
     if (!confirm('¿Está seguro de cancelar este pedido?')) return;
     await actualizarEstadoPedido(orderId, 'cancelado', null);

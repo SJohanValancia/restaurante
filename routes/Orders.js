@@ -331,27 +331,17 @@ router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
 
 router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (req, res) => {
   try {
-    const { estado, metodoPago } = req.body;
+    const { estado, metodoPago, actualizarTodosLosProductos } = req.body;
     
     const estadosValidos = ['pendiente', 'preparando', 'listo', 'entregado', 'cancelado'];
     if (!estadosValidos.includes(estado)) {
       return res.status(400).json({
         success: false,
-        message: 'Estado no vÃ¡lido'
+        message: 'Estado no válido'
       });
     }
 
-    const updateData = { estado };
-    
-    if (estado === 'entregado' && metodoPago) {
-      updateData.metodoPago = metodoPago;
-    }
-
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      updateData,
-      { new: true }
-    ).populate('items.producto', 'nombre categoria precio');
+    const order = await Order.findById(req.params.id);
     
     if (!order) {
       return res.status(404).json({
@@ -360,7 +350,31 @@ router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (re
       });
     }
 
-    console.log('âœ… Estado actualizado:', order._id, 'â†’', estado);
+    // ✅ SI SE SOLICITA ACTUALIZAR TODOS LOS PRODUCTOS
+    if (actualizarTodosLosProductos) {
+      order.items.forEach(item => {
+        item.estadosIndividuales = [{
+          cantidad: item.cantidad,
+          estado: estado
+        }];
+      });
+    }
+
+    // Actualizar el estado general del pedido
+    order.estado = estado;
+    
+    // Si es entregado y hay método de pago, guardarlo
+    if (estado === 'entregado' && metodoPago) {
+      order.metodoPago = metodoPago;
+    }
+
+    await order.save();
+    await order.populate('items.producto', 'nombre categoria precio');
+    
+    console.log('✅ Estado actualizado:', order._id, '→', estado);
+    if (actualizarTodosLosProductos) {
+      console.log('✅ Todos los productos actualizados a:', estado);
+    }
 
     res.json({
       success: true,
