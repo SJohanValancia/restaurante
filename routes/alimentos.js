@@ -5,20 +5,39 @@ const Product = require('../models/Product');
 const { protect } = require('../middleware/auth');
 
 // Obtener todos los alimentos del restaurante
+// Obtener todos los alimentos del restaurante
 router.get('/', protect, async (req, res) => {
   try {
+    console.log('📥 Obteniendo alimentos para usuario:', req.user._id);
+    console.log('📥 IDs de restaurante:', req.userIdsRestaurante);
+
     const alimentos = await Alimento.find({ 
       userId: { $in: req.userIdsRestaurante } 
     })
-    .populate('productoId', 'nombre categoria')
+    .populate('productoId', 'nombre categoria precio')
     .sort({ nombre: 1 });
+
+    console.log('✅ Alimentos encontrados:', alimentos.length);
+
+    // Validar y limpiar datos antes de enviar
+    const alimentosLimpios = alimentos.map(alimento => {
+      const obj = alimento.toObject();
+      
+      // Asegurar que todos los campos numéricos existan
+      obj.stock = obj.stock || 0;
+      obj.valor = obj.valor || 0;
+      obj.cantidadRequerida = obj.cantidadRequerida || 0;
+      
+      return obj;
+    });
 
     res.json({
       success: true,
-      count: alimentos.length,
-      data: alimentos
+      count: alimentosLimpios.length,
+      data: alimentosLimpios
     });
   } catch (error) {
+    console.error('❌ Error al obtener alimentos:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener los alimentos',
