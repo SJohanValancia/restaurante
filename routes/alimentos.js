@@ -54,29 +54,58 @@ router.get('/:id', protect, async (req, res) => {
 });
 
 // Crear un nuevo alimento
+// Crear un nuevo alimento
 router.post('/', protect, async (req, res) => {
   try {
     const { nombre, stock, valor, productoId, cantidadRequerida } = req.body;
+
+    // Log para debug
+    console.log('📥 Datos recibidos:', req.body);
+    console.log('👤 Usuario actual:', req.user);
+
+    // Validar campos obligatorios
+    if (!nombre || stock === undefined || valor === undefined || !productoId || !cantidadRequerida) {
+      return res.status(400).json({
+        success: false,
+        message: 'Faltan campos obligatorios',
+        recibido: { nombre, stock, valor, productoId, cantidadRequerida }
+      });
+    }
 
     // Validar que el producto existe
     const producto = await Product.findById(productoId);
     if (!producto) {
       return res.status(404).json({
         success: false,
-        message: 'Producto no encontrado'
+        message: 'Producto no encontrado con ID: ' + productoId
+      });
+    }
+
+    console.log('✅ Producto encontrado:', producto.nombre);
+
+    // Validar que req.user._id existe
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({
+        success: false,
+        message: 'Usuario no autenticado correctamente'
       });
     }
 
     const alimentoData = {
-      nombre,
-      stock,
-      valor,
-      productoId,
-      cantidadRequerida,
+      nombre: nombre.trim(),
+      stock: Number(stock),
+      valor: Number(valor),
+      productoId: productoId,
+      cantidadRequerida: Number(cantidadRequerida),
       userId: req.user._id
     };
 
+    console.log('💾 Guardando alimento con datos:', alimentoData);
+
     const alimento = await Alimento.create(alimentoData);
+    
+    console.log('✅ Alimento creado con ID:', alimento._id);
+
     const alimentoCompleto = await Alimento.findById(alimento._id)
       .populate('productoId', 'nombre categoria');
 
@@ -86,10 +115,14 @@ router.post('/', protect, async (req, res) => {
       data: alimentoCompleto
     });
   } catch (error) {
-    res.status(400).json({
+    console.error('❌ Error completo al crear alimento:', error);
+    console.error('Stack trace:', error.stack);
+    
+    res.status(500).json({
       success: false,
       message: 'Error al crear el alimento',
-      error: error.message
+      error: error.message,
+      tipo: error.name
     });
   }
 });
