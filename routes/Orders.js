@@ -7,6 +7,56 @@ const mongoose = require('mongoose');
 const { protect } = require('../middleware/auth');
 const { checkPermission } = require('../middleware/permissions');
 
+// ✅ FUNCIÓN PARA DESCONTAR STOCK DE ALIMENTOS
+async function descontarStockAlimentos(items, userId) {
+  const Alimento = require('../models/Alimento');
+  
+  try {
+    // Por cada item del pedido
+    for (const item of items) {
+      const productoId = item.producto;
+      const cantidadPedida = item.cantidad;
+      
+      // Buscar todos los alimentos que usan este producto
+      const alimentos = await Alimento.find({
+        'productos.productoId': productoId,
+        userId: userId
+      });
+      
+      // Descontar stock de cada alimento
+      for (const alimento of alimentos) {
+        // Encontrar la configuración del producto en este alimento
+        const productoConfig = alimento.productos.find(
+          p => p.productoId.toString() === productoId.toString()
+        );
+        
+        if (productoConfig) {
+          const cantidadADescontar = productoConfig.cantidadRequerida * cantidadPedida;
+          
+          // Validar que haya stock suficiente
+          if (alimento.stock < cantidadADescontar) {
+            throw new Error(
+              `Stock insuficiente de "${alimento.nombre}". ` +
+              `Disponible: ${alimento.stock}, Requerido: ${cantidadADescontar}`
+            );
+          }
+          
+          // Descontar stock
+          alimento.stock -= cantidadADescontar;
+          await alimento.save();
+          
+          console.log(`✅ Descontado ${cantidadADescontar} unidades de "${alimento.nombre}". Stock restante: ${alimento.stock}`);
+        }
+      }
+    }
+    
+    return { success: true };
+  } catch (error) {
+    console.error('❌ Error al descontar stock:', error);
+    throw error;
+  }
+}
+
 // ⭐ RUTA PÚBLICA - Sin protect
 router.get('/mesa/:numeroMesa', async (req, res) => {
   try {
@@ -299,6 +349,16 @@ router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'El pedido debe tener al menos un producto'
+      });
+    }
+
+    // ✅ VALIDAR Y DESCONTAR STOCK ANTES DE CREAR EL PEDIDO
+    try {
+      await descontarStockAlimentos(items, req.user._id);
+    } catch (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.message
       });
     }
 

@@ -821,10 +821,14 @@
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label class="form-label" for="cantidadRequerida">Cantidad Requerida por Plato *</label>
-                                <input type="number" id="cantidadRequerida" class="form-input" min="1" placeholder="Cantidad necesaria" required>
-                            </div>
+<div class="form-group">
+    <label class="form-label">Productos (Platos) donde se usa *</label>
+    <div class="select-search-wrapper">
+        <input type="text" class="form-input" id="productoSearch" placeholder="🔍 Buscar producto para agregar...">
+        <div class="producto-list" id="productoList"></div>
+        <div id="selectedProducto" style="margin-top: 12px;"></div>
+    </div>
+</div>
 
                             <button type="submit" class="btn-primary">💾 Guardar Alimento</button>
                             <button type="button" class="btn-secondary" id="btnCancelar" style="display: none;">✖ Cancelar</button>
@@ -850,254 +854,297 @@
     </div>
 
     <script>
-        const API_URL = 'https://restaurante-co77.onrender.com/api';
-        let currentUser = null;
-        let productos = [];
+    const API_URL = 'https://restaurante-co77.onrender.com/api';
+let currentUser = null;
+let productos = [];
+let productosSeleccionados = []; // ✅ NUEVO: Array de productos seleccionados
 
-        // CARGA INICIAL
-        window.addEventListener('DOMContentLoaded', async () => {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                window.location.href = 'index.html';
-                return;
-            }
+// CARGA INICIAL
+window.addEventListener('DOMContentLoaded', async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = 'index.html';
+        return;
+    }
 
-            try {
-                const response = await fetch(`${API_URL}/auth/me`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (response.status === 401) {
-                    console.warn('⚠️ Token expirado');
-                    localStorage.removeItem('token');
-                    window.location.href = 'index.html';
-                    return;
-                }
-
-                if (!response.ok) {
-                    console.error('Error al cargar usuario');
-                    alert('Error al cargar datos. Intente recargar.');
-                    return;
-                }
-
-                const data = await response.json();
-                currentUser = data.data;
-                
-                // Normalizar el ID
-                if (currentUser.id && !currentUser._id) {
-                    currentUser._id = currentUser.id;
-                }
-                
-                if (!currentUser || !currentUser._id) {
-                    console.error('Error: currentUser no tiene _id:', currentUser);
-                    throw new Error('Datos de usuario incompletos');
-                }
-                
-                console.log('✅ Usuario cargado:', currentUser);
-                
-                // Actualizar sidebar
-                document.getElementById('sidebarUserName').textContent = currentUser.nombre;
-                document.getElementById('sidebarUserAvatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
-                document.getElementById('sidebarUserRole').textContent = currentUser.rol === 'admin' ? 'Administrador' : 'Usuario';
-                
-                // Mostrar sección admin si corresponde
-                if (currentUser.rol === 'admin') {
-                    document.getElementById('adminSection').style.display = 'block';
-                }
-                
-                await cargarProductos();
-                await cargarAlimentos();
-            } catch (error) {
-                console.error('❌ Error de red:', error);
-                alert('Error de conexión. Recargue la página.');
-            }
+    try {
+        const response = await fetch(`${API_URL}/auth/me`, {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
 
-        // CARGAR PRODUCTOS
-        async function cargarProductos() {
-            const token = localStorage.getItem('token');
-            try {
-                const response = await fetch(`${API_URL}/products`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                const result = await response.json();
-                if (result.success) {
-                    productos = result.data;
-                    console.log('✅ Productos cargados:', productos.length);
-                }
-            } catch (error) {
-                console.error('Error al cargar productos:', error);
-            }
+        if (response.status === 401) {
+            console.warn('⚠️ Token expirado');
+            localStorage.removeItem('token');
+            window.location.href = 'index.html';
+            return;
         }
 
-        // MOSTRAR PRODUCTOS EN SELECT
-        function mostrarProductos(productosAMostrar) {
-            const productoList = document.getElementById('productoList');
-            productoList.innerHTML = '';
-
-            if (productosAMostrar.length === 0) {
-                productoList.innerHTML = '<div class="producto-option" style="color: #718096;">No se encontraron productos</div>';
-                return;
-            }
-
-            productosAMostrar.forEach(producto => {
-                const div = document.createElement('div');
-                div.className = 'producto-option';
-                div.innerHTML = `
-                    <strong style="color: #1a202c;">${producto.nombre}</strong><br>
-                    <small style="color: #718096;">${producto.categoria} - $${producto.precio.toLocaleString('es-CO')}</small>
-                `;
-div.addEventListener('click', () => seleccionarProducto(producto));
-productoList.appendChild(div);
-            });
+        if (!response.ok) {
+            console.error('Error al cargar usuario');
+            alert('Error al cargar datos. Intente recargar.');
+            return;
         }
 
-        // SELECCIONAR PRODUCTO
-// SELECCIONAR PRODUCTO
-function seleccionarProducto(producto) {
-    console.log('✅ Producto seleccionado:', producto); // Para debug
-    
-    document.getElementById('productoId').value = producto._id;
-    document.getElementById('productoSearch').value = '';
-    document.getElementById('selectedProducto').innerHTML = `
-        <span class="selected-producto-badge">
-            ✓ ${producto.nombre} - ${producto.categoria}
-        </span>
-    `;
-    document.getElementById('productoList').classList.remove('show');
+        const data = await response.json();
+        currentUser = data.data;
+        
+        if (currentUser.id && !currentUser._id) {
+            currentUser._id = currentUser.id;
+        }
+        
+        if (!currentUser || !currentUser._id) {
+            throw new Error('Datos de usuario incompletos');
+        }
+        
+        console.log('✅ Usuario cargado:', currentUser);
+        
+        document.getElementById('sidebarUserName').textContent = currentUser.nombre;
+        document.getElementById('sidebarUserAvatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
+        document.getElementById('sidebarUserRole').textContent = currentUser.rol === 'admin' ? 'Administrador' : 'Usuario';
+        
+        if (currentUser.rol === 'admin') {
+            document.getElementById('adminSection').style.display = 'block';
+        }
+        
+        await cargarProductos();
+        await cargarAlimentos();
+    } catch (error) {
+        console.error('❌ Error de red:', error);
+        alert('Error de conexión. Recargue la página.');
+    }
+});
+
+// CARGAR PRODUCTOS
+async function cargarProductos() {
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch(`${API_URL}/products`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            productos = result.data;
+            console.log('✅ Productos cargados:', productos.length);
+        }
+    } catch (error) {
+        console.error('Error al cargar productos:', error);
+    }
 }
 
-        // BUSCAR PRODUCTOS
-        document.getElementById('productoSearch').addEventListener('input', (e) => {
-            const busqueda = e.target.value.toLowerCase();
-            const productosFiltrados = productos.filter(p => 
-                p.nombre.toLowerCase().includes(busqueda) ||
-                p.categoria.toLowerCase().includes(busqueda)
-            );
-            mostrarProductos(productosFiltrados);
-            document.getElementById('productoList').classList.add('show');
-        });
+// ✅ MOSTRAR PRODUCTOS EN SELECT
+function mostrarProductos(productosAMostrar) {
+    const productoList = document.getElementById('productoList');
+    productoList.innerHTML = '';
 
-        // MOSTRAR/OCULTAR LISTA
-        document.getElementById('productoSearch').addEventListener('focus', () => {
-            document.getElementById('productoList').classList.add('show');
-            mostrarProductos(productos);
-        });
+    if (productosAMostrar.length === 0) {
+        productoList.innerHTML = '<div class="producto-option" style="color: #718096;">No se encontraron productos</div>';
+        return;
+    }
 
-        // OCULTAR LISTA AL HACER CLIC FUERA
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.select-search-wrapper')) {
-                document.getElementById('productoList').classList.remove('show');
-            }
-        });
+    productosAMostrar.forEach(producto => {
+        const div = document.createElement('div');
+        div.className = 'producto-option';
+        div.innerHTML = `
+            <strong style="color: #1a202c;">${producto.nombre}</strong><br>
+            <small style="color: #718096;">${producto.categoria} - $${producto.precio.toLocaleString('es-CO')}</small>
+        `;
+        div.addEventListener('click', () => agregarProductoSeleccionado(producto));
+        productoList.appendChild(div);
+    });
+}
 
-        // CARGAR ALIMENTOS
-        async function cargarAlimentos() {
-            const token = localStorage.getItem('token');
-            try {
-                const response = await fetch(`${API_URL}/alimentos`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+// ✅ AGREGAR PRODUCTO A LA LISTA SELECCIONADA
+function agregarProductoSeleccionado(producto) {
+    // Verificar si ya está agregado
+    const yaExiste = productosSeleccionados.find(p => p.productoId === producto._id);
+    if (yaExiste) {
+        alert('Este producto ya está en la lista');
+        return;
+    }
 
-                const result = await response.json();
-                if (result.success) {
-                    mostrarAlimentos(result.data);
-                }
-            } catch (error) {
-                console.error('Error al cargar alimentos:', error);
-                document.getElementById('alimentosGrid').innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">⚠️</div>
-                        <p style="font-size: 1.2rem; font-weight: 600;">Error al cargar alimentos</p>
-                        <p>Por favor, recargue la página</p>
-                    </div>
-                `;
-            }
-        }
+    // Agregar producto con cantidad requerida por defecto en 1
+    productosSeleccionados.push({
+        productoId: producto._id,
+        nombre: producto.nombre,
+        categoria: producto.categoria,
+        cantidadRequerida: 1
+    });
 
-        // MOSTRAR ALIMENTOS
-        function mostrarAlimentos(alimentos) {
-            const grid = document.getElementById('alimentosGrid');
-            
-            if (alimentos.length === 0) {
-                grid.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">🥘</div>
-                        <p style="font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem;">No hay alimentos registrados</p>
-                        <p>Comienza agregando tu primer alimento</p>
-                    </div>
-                `;
-                return;
-            }
+    document.getElementById('productoSearch').value = '';
+    document.getElementById('productoList').classList.remove('show');
+    
+    actualizarListaProductosSeleccionados();
+}
 
-            grid.innerHTML = alimentos.map(alimento => `
-                <div class="alimento-card">
-                    <div class="alimento-header">
-                        <h3 class="alimento-title">${alimento.nombre}</h3>
-                        <span class="alimento-badge">🥘</span>
-                    </div>
+// ✅ ACTUALIZAR VISTA DE PRODUCTOS SELECCIONADOS
+function actualizarListaProductosSeleccionados() {
+    const container = document.getElementById('selectedProducto');
+    
+    if (productosSeleccionados.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
 
-                    <div class="alimento-info">
-                        <div class="info-item">
-                            <div class="info-label">Stock Disponible</div>
-                            <div class="info-value">${alimento.stock} unidades</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Valor</div>
-                            <div class="info-value">$${alimento.valor.toLocaleString('es-CO')}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Cantidad Requerida</div>
-                            <div class="info-value">${alimento.cantidadRequerida} unid.</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Costo por Plato</div>
-                            <div class="info-value">$${(alimento.valor * alimento.cantidadRequerida).toLocaleString('es-CO')}</div>
-                        </div>
-                    </div>
-
-                    <div class="alimento-producto">
-                        <div class="alimento-producto-title">🍽️ Usado en:</div>
-                        <div class="alimento-producto-name">
-                            ${alimento.productoId ? alimento.productoId.nombre : 'Producto no disponible'}
-                            ${alimento.productoId ? `<br><small style="color: #4299e1;">${alimento.productoId.categoria}</small>` : ''}
-                        </div>
-                    </div>
-
-                    <div class="alimento-actions">
-                        <button class="btn-edit" onclick="editarAlimento('${alimento._id}')">
-                            ✏️ Editar
-                        </button>
-                        <button class="btn-delete" onclick="eliminarAlimento('${alimento._id}', '${alimento.nombre}')">
-                            🗑️ Eliminar
-                        </button>
-                    </div>
+    container.innerHTML = productosSeleccionados.map((prod, index) => `
+        <div class="selected-producto-badge" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px;">
+            <div style="flex: 1;">
+                <strong>${prod.nombre}</strong><br>
+                <small>${prod.categoria}</small>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 5px;">
+                    <button onclick="cambiarCantidad(${index}, -1)" style="width: 25px; height: 25px; background: rgba(255,255,255,0.3); border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold;">-</button>
+                    <span style="min-width: 30px; text-align: center; font-weight: bold;">${prod.cantidadRequerida}</span>
+                    <button onclick="cambiarCantidad(${index}, 1)" style="width: 25px; height: 25px; background: rgba(255,255,255,0.3); border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold;">+</button>
                 </div>
-            `).join('');
-        }
+                <button onclick="eliminarProductoSeleccionado(${index})" style="background: rgba(239, 68, 68, 0.8); color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px;">✖</button>
+            </div>
+        </div>
+    `).join('');
+}
 
-        // ENVIAR FORMULARIO
+// ✅ CAMBIAR CANTIDAD REQUERIDA
+function cambiarCantidad(index, delta) {
+    productosSeleccionados[index].cantidadRequerida += delta;
+    
+    if (productosSeleccionados[index].cantidadRequerida < 1) {
+        productosSeleccionados[index].cantidadRequerida = 1;
+    }
+    
+    actualizarListaProductosSeleccionados();
+}
+
+// ✅ ELIMINAR PRODUCTO SELECCIONADO
+function eliminarProductoSeleccionado(index) {
+    productosSeleccionados.splice(index, 1);
+    actualizarListaProductosSeleccionados();
+}
+
+// BUSCAR PRODUCTOS
+document.getElementById('productoSearch').addEventListener('input', (e) => {
+    const busqueda = e.target.value.toLowerCase();
+    const productosFiltrados = productos.filter(p => 
+        p.nombre.toLowerCase().includes(busqueda) ||
+        p.categoria.toLowerCase().includes(busqueda)
+    );
+    mostrarProductos(productosFiltrados);
+    document.getElementById('productoList').classList.add('show');
+});
+
+// MOSTRAR/OCULTAR LISTA
+document.getElementById('productoSearch').addEventListener('focus', () => {
+    document.getElementById('productoList').classList.add('show');
+    mostrarProductos(productos);
+});
+
+// OCULTAR LISTA AL HACER CLIC FUERA
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.select-search-wrapper')) {
+        document.getElementById('productoList').classList.remove('show');
+    }
+});
+
+// CARGAR ALIMENTOS
+async function cargarAlimentos() {
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch(`${API_URL}/alimentos`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            mostrarAlimentos(result.data);
+        }
+    } catch (error) {
+        console.error('Error al cargar alimentos:', error);
+        document.getElementById('alimentosGrid').innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">⚠️</div>
+                <p style="font-size: 1.2rem; font-weight: 600;">Error al cargar alimentos</p>
+                <p>Por favor, recargue la página</p>
+            </div>
+        `;
+    }
+}
+
+// MOSTRAR ALIMENTOS
+function mostrarAlimentos(alimentos) {
+    const grid = document.getElementById('alimentosGrid');
+    
+    if (alimentos.length === 0) {
+        grid.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">🥘</div>
+                <p style="font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem;">No hay alimentos registrados</p>
+                <p>Comienza agregando tu primer alimento</p>
+            </div>
+        `;
+        return;
+    }
+
+    grid.innerHTML = alimentos.map(alimento => `
+        <div class="alimento-card">
+            <div class="alimento-header">
+                <h3 class="alimento-title">${alimento.nombre}</h3>
+                <span class="alimento-badge">🥘</span>
+            </div>
+
+            <div class="alimento-info">
+                <div class="info-item">
+                    <div class="info-label">Stock Disponible</div>
+                    <div class="info-value">${alimento.stock} unidades</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Valor</div>
+                    <div class="info-value">$${alimento.valor.toLocaleString('es-CO')}</div>
+                </div>
+            </div>
+
+            <div class="alimento-producto">
+                <div class="alimento-producto-title">🍽️ Usado en:</div>
+                ${alimento.productos && alimento.productos.length > 0 ? alimento.productos.map(prod => `
+                    <div style="margin-top: 8px; padding: 8px; background: white; border-radius: 6px; border-left: 3px solid #4299e1;">
+                        <div class="alimento-producto-name">
+                            ${prod.productoId ? prod.productoId.nombre : 'Producto no disponible'}
+                            ${prod.productoId ? `<br><small style="color: #4299e1;">${prod.productoId.categoria}</small>` : ''}
+                        </div>
+                        <div style="font-size: 12px; color: #718096; margin-top: 4px;">
+                            Cantidad requerida: <strong>${prod.cantidadRequerida}</strong> unid.
+                        </div>
+                    </div>
+                `).join('') : '<p style="color: #a0aec0; font-size: 14px; margin-top: 8px;">No vinculado a productos</p>'}
+            </div>
+
+            <div class="alimento-actions">
+                <button class="btn-edit" onclick="editarAlimento('${alimento._id}')">
+                    ✏️ Editar
+                </button>
+                <button class="btn-delete" onclick="eliminarAlimento('${alimento._id}', '${alimento.nombre}')">
+                    🗑️ Eliminar
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
 // ENVIAR FORMULARIO
 document.getElementById('alimentoForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const productoId = document.getElementById('productoId').value;
-    
-    // VALIDACIÓN MEJORADA
-    if (!productoId || productoId.trim() === '') {
-        alert('⚠️ Por favor seleccione un producto de la lista');
+    // ✅ VALIDAR QUE HAYA AL MENOS UN PRODUCTO SELECCIONADO
+    if (productosSeleccionados.length === 0) {
+        alert('⚠️ Debe seleccionar al menos un producto');
         document.getElementById('productoSearch').focus();
         return;
     }
 
-    // Validar todos los campos
     const nombre = document.getElementById('nombre').value.trim();
     const stock = document.getElementById('stock').value;
     const valor = document.getElementById('valor').value;
-    const cantidadRequerida = document.getElementById('cantidadRequerida').value;
 
-    if (!nombre || !stock || !valor || !cantidadRequerida) {
+    if (!nombre || !stock || !valor) {
         alert('⚠️ Por favor complete todos los campos obligatorios');
         return;
     }
@@ -1106,11 +1153,10 @@ document.getElementById('alimentoForm').addEventListener('submit', async (e) => 
         nombre: nombre,
         stock: parseInt(stock),
         valor: parseFloat(valor),
-        productoId: productoId,
-        cantidadRequerida: parseInt(cantidadRequerida)
+        productos: productosSeleccionados // ✅ ENVIAR ARRAY DE PRODUCTOS
     };
 
-    console.log('📤 Enviando datos:', alimentoData); // Para debug
+    console.log('📤 Enviando datos:', alimentoData);
 
     const alimentoId = document.getElementById('alimentoId').value;
     const url = alimentoId ? `${API_URL}/alimentos/${alimentoId}` : `${API_URL}/alimentos`;
@@ -1128,7 +1174,7 @@ document.getElementById('alimentoForm').addEventListener('submit', async (e) => 
 
         const result = await response.json();
         
-        console.log('📥 Respuesta del servidor:', result); // Para debug
+        console.log('📥 Respuesta del servidor:', result);
 
         if (result.success) {
             alert('✅ ' + result.message);
@@ -1142,111 +1188,115 @@ document.getElementById('alimentoForm').addEventListener('submit', async (e) => 
         alert('❌ Error de conexión al guardar el alimento');
     }
 });
-        // EDITAR ALIMENTO
-        async function editarAlimento(id) {
-            const token = localStorage.getItem('token');
 
-            try {
-                const response = await fetch(`${API_URL}/alimentos/${id}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+// EDITAR ALIMENTO
+async function editarAlimento(id) {
+    const token = localStorage.getItem('token');
 
-                const result = await response.json();
-                if (result.success) {
-                    const alimento = result.data;
-                    document.getElementById('alimentoId').value = alimento._id;
-                    document.getElementById('nombre').value = alimento.nombre;
-                    document.getElementById('stock').value = alimento.stock;
-                    document.getElementById('valor').value = alimento.valor;
-                    document.getElementById('productoId').value = alimento.productoId._id;
-                    document.getElementById('cantidadRequerida').value = alimento.cantidadRequerida;
-                    
-                    document.getElementById('selectedProducto').innerHTML = `
-                        <span class="selected-producto-badge">
-                            ✓ ${alimento.productoId.nombre} - ${alimento.productoId.categoria}
-                        </span>
-                    `;
-
-                    document.getElementById('formTitle').textContent = '✏️ Editar Alimento';
-                    document.getElementById('btnCancelar').style.display = 'block';
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('❌ Error al cargar el alimento');
-            }
-        }
-
-        // ELIMINAR ALIMENTO
-        async function eliminarAlimento(id, nombre) {
-            if (!confirm(`¿Eliminar "${nombre}"?\n\nEsta acción no se puede deshacer.`)) {
-                return;
-            }
-
-            const token = localStorage.getItem('token');
-
-            try {
-                const response = await fetch(`${API_URL}/alimentos/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                const result = await response.json();
-                if (result.success) {
-                    alert('✅ ' + result.message);
-                    await cargarAlimentos();
-                } else {
-                    alert('❌ ' + (result.message || 'Error al eliminar el alimento'));
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('❌ Error al eliminar el alimento');
-            }
-        }
-
-        // LIMPIAR FORMULARIO
-        function limpiarFormulario() {
-            document.getElementById('alimentoForm').reset();
-            document.getElementById('alimentoId').value = '';
-            document.getElementById('productoId').value = '';
-            document.getElementById('selectedProducto').innerHTML = '';
-            document.getElementById('formTitle').textContent = '➕ Agregar Alimento';
-            document.getElementById('btnCancelar').style.display = 'none';
-        }
-
-        // BOTÓN CANCELAR
-        document.getElementById('btnCancelar').addEventListener('click', limpiarFormulario);
-
-        // MENU TOGGLE
-        function toggleMenu() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            const contentWrapper = document.getElementById('contentWrapper');
-            
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-            
-            if (window.innerWidth > 1024) {
-                sidebar.classList.toggle('collapsed');
-                contentWrapper.classList.toggle('expanded');
-            }
-        }
-
-        // LOGOUT
-        function logout() {
-            if (confirm('¿Cerrar sesión?')) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('usuario');
-                window.location.href = 'index.html';
-            }
-        }
-
-        // Cerrar menú móvil al cambiar tamaño
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 1024) {
-                document.getElementById('sidebarOverlay').classList.remove('active');
-            }
+    try {
+        const response = await fetch(`${API_URL}/alimentos/${id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
+
+        const result = await response.json();
+        if (result.success) {
+            const alimento = result.data;
+            
+            document.getElementById('alimentoId').value = alimento._id;
+            document.getElementById('nombre').value = alimento.nombre;
+            document.getElementById('stock').value = alimento.stock;
+            document.getElementById('valor').value = alimento.valor;
+            
+            // ✅ CARGAR PRODUCTOS SELECCIONADOS
+            productosSeleccionados = alimento.productos.map(prod => ({
+                productoId: prod.productoId._id,
+                nombre: prod.productoId.nombre,
+                categoria: prod.productoId.categoria,
+                cantidadRequerida: prod.cantidadRequerida
+            }));
+            
+            actualizarListaProductosSeleccionados();
+
+            document.getElementById('formTitle').textContent = '✏️ Editar Alimento';
+            document.getElementById('btnCancelar').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al cargar el alimento');
+    }
+}
+
+// ELIMINAR ALIMENTO
+async function eliminarAlimento(id, nombre) {
+    if (!confirm(`¿Eliminar "${nombre}"?\n\nEsta acción no se puede deshacer.`)) {
+        return;
+    }
+
+    const token = localStorage.getItem('token');
+
+    try {
+        const response = await fetch(`${API_URL}/alimentos/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            alert('✅ ' + result.message);
+            await cargarAlimentos();
+        } else {
+            alert('❌ ' + (result.message || 'Error al eliminar el alimento'));
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al eliminar el alimento');
+    }
+}
+
+// LIMPIAR FORMULARIO
+function limpiarFormulario() {
+    document.getElementById('alimentoForm').reset();
+    document.getElementById('alimentoId').value = '';
+    productosSeleccionados = []; // ✅ LIMPIAR PRODUCTOS SELECCIONADOS
+    actualizarListaProductosSeleccionados();
+    document.getElementById('formTitle').textContent = '➕ Agregar Alimento';
+    document.getElementById('btnCancelar').style.display = 'none';
+}
+
+// BOTÓN CANCELAR
+document.getElementById('btnCancelar').addEventListener('click', limpiarFormulario);
+
+// MENU TOGGLE
+function toggleMenu() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const contentWrapper = document.getElementById('contentWrapper');
+    
+    sidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
+    
+    if (window.innerWidth > 1024) {
+        sidebar.classList.toggle('collapsed');
+        contentWrapper.classList.toggle('expanded');
+    }
+}
+
+// LOGOUT
+function logout() {
+    if (confirm('¿Cerrar sesión?')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('usuario');
+        window.location.href = 'index.html';
+    }
+}
+
+// Cerrar menú móvil al cambiar tamaño
+window.addEventListener('resize', () => {
+    if (window.innerWidth > 1024) {
+        document.getElementById('sidebarOverlay').classList.remove('active');
+    }
+});
     </script>
 </body>
 </html>

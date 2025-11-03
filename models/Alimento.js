@@ -18,16 +18,19 @@ const alimentoSchema = new mongoose.Schema({
     required: [true, 'El valor es obligatorio'],
     min: [0, 'El valor no puede ser negativo']
   },
-  productoId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product',
-    required: [true, 'El producto es obligatorio']
-  },
-  cantidadRequerida: {
-    type: Number,
-    required: [true, 'La cantidad requerida es obligatoria'],
-    min: [1, 'La cantidad debe ser al menos 1']
-  },
+  // ✅ CAMBIO: Ahora es un array de productos
+  productos: [{
+    productoId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product',
+      required: true
+    },
+    cantidadRequerida: {
+      type: Number,
+      required: [true, 'La cantidad requerida es obligatoria'],
+      min: [1, 'La cantidad debe ser al menos 1']
+    }
+  }],
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -40,7 +43,7 @@ const alimentoSchema = new mongoose.Schema({
 
 // Índices
 alimentoSchema.index({ nombre: 1 });
-alimentoSchema.index({ productoId: 1 });
+alimentoSchema.index({ 'productos.productoId': 1 });
 alimentoSchema.index({ userId: 1 });
 
 module.exports = mongoose.model('Alimento', alimentoSchema);
