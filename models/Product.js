@@ -12,7 +12,7 @@ const productSchema = new mongoose.Schema({
     required: [true, 'El precio es obligatorio'],
     min: [0, 'El precio no puede ser negativo']
   },
-categoria: {
+  categoria: {
     type: String,
     required: [true, 'La categoría es obligatoria'],
     trim: true,
@@ -51,11 +51,16 @@ productSchema.index({ categoria: 1 });
 productSchema.index({ disponible: 1 });
 productSchema.index({ userId: 1 });
 
+// ✅ VIRTUAL CORREGIDO - Validar que precio exista
 productSchema.virtual('precioFormateado').get(function() {
+  if (this.precio === undefined || this.precio === null) {
+    return '$0';
+  }
   return `$${this.precio.toLocaleString('es-CO')}`;
 });
 
-productSchema.set('toJSON', { virtuals: true });
-productSchema.set('toObject', { virtuals: true });
+// ✅ DESACTIVAR virtuals en conversiones automáticas
+productSchema.set('toJSON', { virtuals: false });
+productSchema.set('toObject', { virtuals: false });
 
 module.exports = mongoose.model('Product', productSchema);

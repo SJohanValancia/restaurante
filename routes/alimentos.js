@@ -15,14 +15,9 @@ router.get('/', protect, async (req, res) => {
 
     const alimentosLimpios = alimentos.map(alimento => {
       const obj = alimento.toObject();
+      // ✅ ASEGURAR que stock y valor siempre existan
       obj.stock = typeof obj.stock === 'number' ? obj.stock : 0;
       obj.valor = typeof obj.valor === 'number' ? obj.valor : 0;
-      
-      // ✅ LIMPIAR productos que no tienen productoId válido
-      if (obj.productos) {
-        obj.productos = obj.productos.filter(p => p.productoId != null);
-      }
-      
       return obj;
     });
 
@@ -54,14 +49,10 @@ router.get('/:id', protect, async (req, res) => {
       });
     }
 
+    // ✅ ASEGURAR que stock y valor existan
     const alimentoObj = alimento.toObject();
     alimentoObj.stock = typeof alimentoObj.stock === 'number' ? alimentoObj.stock : 0;
     alimentoObj.valor = typeof alimentoObj.valor === 'number' ? alimentoObj.valor : 0;
-    
-    // ✅ LIMPIAR productos que no tienen productoId válido
-    if (alimentoObj.productos) {
-      alimentoObj.productos = alimentoObj.productos.filter(p => p.productoId != null);
-    }
 
     res.json({
       success: true,
@@ -120,8 +111,8 @@ router.post('/', protect, async (req, res) => {
 
     const alimentoData = {
       nombre: nombre.trim(),
-      stock: stockNumero,
-      valor: valorNumero,
+      stock: stockNumero,  // ✅ Usar el número validado
+      valor: valorNumero,   // ✅ Usar el número validado
       productos: productos.map(p => ({
         productoId: p.productoId,
         cantidadRequerida: Number(p.cantidadRequerida)
@@ -133,21 +124,8 @@ router.post('/', protect, async (req, res) => {
 
     const alimento = await Alimento.create(alimentoData);
     
-    // ✅ POPULATE con manejo de errores
-    let alimentoCompleto;
-    try {
-      alimentoCompleto = await Alimento.findById(alimento._id)
-        .populate('productos.productoId', 'nombre categoria precio');
-      
-      // ✅ Verificar que el populate funcionó
-      if (!alimentoCompleto) {
-        throw new Error('No se pudo cargar el alimento creado');
-      }
-    } catch (populateError) {
-      console.error('⚠️ Error en populate, retornando datos básicos:', populateError);
-      // Si falla el populate, retornar el alimento sin populate
-      alimentoCompleto = alimento;
-    }
+    const alimentoCompleto = await Alimento.findById(alimento._id)
+      .populate('productos.productoId', 'nombre categoria');
 
     res.status(201).json({
       success: true,
@@ -169,6 +147,7 @@ router.put('/:id', protect, async (req, res) => {
   try {
     const { nombre, stock, valor, productos } = req.body;
 
+    // ✅ VALIDAR números si vienen en el body
     const updateData = {
       nombre: nombre ? nombre.trim() : undefined,
       stock: stock !== undefined ? Number(stock) : undefined,
@@ -190,7 +169,7 @@ router.put('/:id', protect, async (req, res) => {
       req.params.id,
       updateData,
       { new: true, runValidators: true }
-    );
+    ).populate('productos.productoId', 'nombre categoria');
 
     if (!alimento) {
       return res.status(404).json({
@@ -199,19 +178,10 @@ router.put('/:id', protect, async (req, res) => {
       });
     }
 
-    // ✅ POPULATE con manejo de errores
-    let alimentoCompleto;
-    try {
-      alimentoCompleto = await alimento.populate('productos.productoId', 'nombre categoria precio');
-    } catch (populateError) {
-      console.error('⚠️ Error en populate:', populateError);
-      alimentoCompleto = alimento;
-    }
-
     res.json({
       success: true,
       message: 'Alimento actualizado exitosamente',
-      data: alimentoCompleto
+      data: alimento
     });
   } catch (error) {
     console.error('❌ Error al actualizar:', error);
