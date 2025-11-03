@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Alimentos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .card {
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border: none;
+            margin-bottom: 20px;
+        }
+        .table-hover tbody tr:hover {
+            background-color: #f1f3f5;
+        }
+        .btn-action {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        .search-select {
+            position: relative;
+        }
+        .search-input {
+            margin-bottom: 10px;
+        }
+        .producto-option {
+            padding: 8px;
+            cursor: pointer;
+        }
+        .producto-option:hover {
+            background-color: #f8f9fa;
+        }
+        .select-search-wrapper {
+            position: relative;
+        }
+        .producto-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            display: none;
+            position: absolute;
+            background: white;
+            width: 100%;
+            z-index: 1000;
+        }
+        .producto-list.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-utensils"></i> Sistema de Restaurante
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="productos.html">Productos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="alimentos.html">Alimentos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="cerrarSesion">Cerrar Sesión</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-plus-circle"></i>
+                            <span id="formTitle">Agregar Alimento</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="alimentoForm">
+                            <input type="hidden" id="alimentoId">
+                            
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label">Nombre del Alimento *</label>
+                                <input type="text" class="form-control" id="nombre" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="stock" class="form-label">Stock *</label>
+                                <input type="number" class="form-control" id="stock" min="0" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="valor" class="form-label">Valor *</label>
+                                <input type="number" class="form-control" id="valor" min="0" step="0.01" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Producto (Plato) *</label>
+                                <div class="select-search-wrapper">
+                                    <input type="text" class="form-control search-input" id="productoSearch" placeholder="Buscar producto...">
+                                    <div class="producto-list" id="productoList"></div>
+                                    <input type="hidden" id="productoId" required>
+                                    <div id="selectedProducto" class="alert alert-info mt-2" style="display: none;"></div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="cantidadRequerida" class="form-label">Cantidad Requerida *</label>
+                                <input type="number" class="form-control" id="cantidadRequerida" min="1" required>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary" id="btnSubmit">
+                                    <i class="fas fa-save"></i> Guardar
+                                </button>
+                                <button type="button" class="btn btn-secondary" id="btnCancelar" style="display: none;">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list"></i> Lista de Alimentos
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Stock</th>
+                                        <th>Valor</th>
+                                        <th>Producto</th>
+                                        <th>Cantidad Req.</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="alimentosTableBody">
+                                    <tr>
+                                        <td colspan="6" class="text-center">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Cargando...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        let token = localStorage.getItem('token');
+        let productos = [];
+        let alimentoEditando = null;
+
+        // Verificar autenticación
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        // Cerrar sesión
+        document.getElementById('cerrarSesion').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        });
+
+        // Cargar productos para el select
+        async function cargarProductos() {
+            try {
+                const response = await fetch(`${API_URL}/products`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    productos = result.data;
+                    mostrarProductos(productos);
+                }
+            } catch (error) {
+                console.error('Error al cargar productos:', error);
+            }
+        }
+
+        // Mostrar productos en la lista
+        function mostrarProductos(productosAMostrar) {
+            const productoList = document.getElementById('productoList');
+            productoList.innerHTML = '';
+
+            if (productosAMostrar.length === 0) {
+                productoList.innerHTML = '<div class="producto-option text-muted">No se encontraron productos</div>';
+                return;
+            }
+
+            productosAMostrar.forEach(producto => {
+                const div = document.createElement('div');
+                div.className = 'producto-option';
+                div.innerHTML = `
+                    <strong>${producto.nombre}</strong><br>
+                    <small class="text-muted">${producto.categoria}</small>
+                `;
+                div.addEventListener('click', () => seleccionarProducto(producto));
+                productoList.appendChild(div);
+            });
+        }
+
+        // Seleccionar producto
+        function seleccionarProducto(producto) {
+            document.getElementById('productoId').value = producto._id;
+            document.getElementById('productoSearch').value = '';
+            document.getElementById('selectedProducto').style.display = 'block';
+            document.getElementById('selectedProducto').innerHTML = `
+                <strong>Producto seleccionado:</strong><br>
+                ${producto.nombre} - ${producto.categoria}
+            `;
+            document.getElementById('productoList').classList.remove('show');
+        }
+
+        // Buscar productos
+        document.getElementById('productoSearch').addEventListener('input', (e) => {
+            const busqueda = e.target.value.toLowerCase();
+            const productosFiltrados = productos.filter(p => 
+                p.nombre.toLowerCase().includes(busqueda) ||
+                p.categoria.toLowerCase().includes(busqueda)
+            );
+            mostrarProductos(productosFiltrados);
+            document.getElementById('productoList').classList.add('show');
+        });
+
+        // Mostrar/ocultar lista de productos
+        document.getElementById('productoSearch').addEventListener('focus', () => {
+            document.getElementById('productoList').classList.add('show');
+            mostrarProductos(productos);
+        });
+
+        // Ocultar lista al hacer clic fuera
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.select-search-wrapper')) {
+                document.getElementById('productoList').classList.remove('show');
+            }
+        });
+
+        // Cargar alimentos
+        async function cargarAlimentos() {
+            try {
+                const response = await fetch(`${API_URL}/alimentos`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    mostrarAlimentos(result.data);
+                }
+            } catch (error) {
+                console.error('Error al cargar alimentos:', error);
+                document.getElementById('alimentosTableBody').innerHTML = 
+                    '<tr><td colspan="6" class="text-center text-danger">Error al cargar los alimentos</td></tr>';
+            }
+        }
+
+        // Mostrar alimentos en la tabla
+        function mostrarAlimentos(alimentos) {
+            const tbody = document.getElementById('alimentosTableBody');
+            
+            if (alimentos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center">No hay alimentos registrados</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = alimentos.map(alimento => `
+                <tr>
+                    <td>${alimento.nombre}</td>
+                    <td>${alimento.stock}</td>
+                    <td>$${alimento.valor.toLocaleString('es-CO')}</td>
+                    <td>${alimento.productoId ? alimento.productoId.nombre : 'N/A'}</td>
+                    <td>${alimento.cantidadRequerida}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning btn-action" onclick="editarAlimento('${alimento._id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger btn-action" onclick="eliminarAlimento('${alimento._id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Enviar formulario
+        document.getElementById('alimentoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const productoId = document.getElementById('productoId').value;
+            if (!productoId) {
+                alert('Por favor seleccione un producto');
+                return;
+            }
+
+            const alimentoData = {
+                nombre: document.getElementById('nombre').value,
+                stock: parseInt(document.getElementById('stock').value),
+                valor: parseFloat(document.getElementById('valor').value),
+                productoId: productoId,
+                cantidadRequerida: parseInt(document.getElementById('cantidadRequerida').value)
+            };
+
+            const alimentoId = document.getElementById('alimentoId').value;
+            const url = alimentoId ? `${API_URL}/alimentos/${alimentoId}` : `${API_URL}/alimentos`;
+            const method = alimentoId ? 'PUT' : 'POST';
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(alimentoData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert(result.message);
+                    limpiarFormulario();
+                    cargarAlimentos();
+                } else {
+                    alert(result.message || 'Error al guardar el alimento');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al guardar el alimento');
+            }
+        });
+
+        // Editar alimento
+        async function editarAlimento(id) {
+            try {
+                const response = await fetch(`${API_URL}/alimentos/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    const alimento = result.data;
+                    document.getElementById('alimentoId').value = alimento._id;
+                    document.getElementById('nombre').value = alimento.nombre;
+                    document.getElementById('stock').value = alimento.stock;
+                    document.getElementById('valor').value = alimento.valor;
+                    document.getElementById('productoId').value = alimento.productoId._id;
+                    document.getElementById('cantidadRequerida').value = alimento.cantidadRequerida;
+                    
+                    document.getElementById('selectedProducto').style.display = 'block';
+                    document.getElementById('selectedProducto').innerHTML = `
+                        <strong>Producto seleccionado:</strong><br>
+                        ${alimento.productoId.nombre} - ${alimento.productoId.categoria}
+                    `;
+
+                    document.getElementById('formTitle').textContent = 'Editar Alimento';
+                    document.getElementById('btnCancelar').style.display = 'block';
+                    window.scrollTo(0, 0);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar el alimento');
+            }
+        }
+
+        // Eliminar alimento
+        async function eliminarAlimento(id) {
+            if (!confirm('¿Está seguro de eliminar este alimento?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/alimentos/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert(result.message);
+                    cargarAlimentos();
+                } else {
+                    alert(result.message || 'Error al eliminar el alimento');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al eliminar el alimento');
+            }
+        }
+
+        // Limpiar formulario
+        function limpiarFormulario() {
+            document.getElementById('alimentoForm').reset();
+            document.getElementById('alimentoId').value = '';
+            document.getElementById('productoId').value = '';
+            document.getElementById('selectedProducto').style.display = 'none';
+            document.getElementById('formTitle').textContent = 'Agregar Alimento';
+            document.getElementById('btnCancelar').style.display = 'none';
+        }
+
+        // Botón cancelar
+        document.getElementById('btnCancelar').addEventListener('click', limpiarFormulario);
+
+        // Cargar datos al iniciar
+        cargarProductos();
+        cargarAlimentos();
+    </script>
+</body>
+</html>

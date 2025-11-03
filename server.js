@@ -6,6 +6,7 @@ const expensesRoutes = require('./routes/Expenses');
 const liquidacionesRoutes = require('./routes/liquidaciones');
 const adminMeserosRoutes = require('./routes/adminMeseros');
 const ordersRoutes = require('./routes/Orders'); // IMPORTAR EXPLÍCITAMENTE
+const alimentosRoutes = require('./routes/alimentos');
 const { protect } = require('./middleware/auth');
 require('dotenv').config();
 
@@ -34,6 +35,7 @@ app.use('/api/products', protect, require('./routes/Products'));
 app.use('/api/expenses', protect, expensesRoutes);
 app.use('/api/liquidaciones', protect, liquidacionesRoutes);
 app.use('/api/admin-meseros', protect, adminMeserosRoutes);
+app.use('/api/alimentos', alimentosRoutes);
 
 // Ruta principal (sirve index.html)
 app.get('/', (req, res) => {
