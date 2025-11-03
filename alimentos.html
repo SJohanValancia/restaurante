@@ -793,46 +793,39 @@
                         <h2 id="formTitle">➕ Agregar Alimento</h2>
                     </div>
                     <div class="card-body">
-                        <form id="alimentoForm">
-                            <input type="hidden" id="alimentoId">
-                            
-                            <div class="form-group">
-                                <label class="form-label" for="nombre">Nombre del Alimento *</label>
-                                <input type="text" id="nombre" class="form-input" placeholder="Ej: Carne molida" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="stock">Stock Disponible *</label>
-                                <input type="number" id="stock" class="form-input" min="0" placeholder="Cantidad en stock" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="valor">Valor (COP) *</label>
-                                <input type="number" id="valor" class="form-input" min="0" step="0.01" placeholder="Precio del alimento" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Producto (Plato) *</label>
-                                <div class="select-search-wrapper">
-                                    <input type="text" class="form-input" id="productoSearch" placeholder="🔍 Buscar producto...">
-                                    <div class="producto-list" id="productoList"></div>
-                                    <input type="hidden" id="productoId" required>
-                                    <div id="selectedProducto"></div>
-                                </div>
-                            </div>
-
-<div class="form-group">
-    <label class="form-label">Productos (Platos) donde se usa *</label>
-    <div class="select-search-wrapper">
-        <input type="text" class="form-input" id="productoSearch" placeholder="🔍 Buscar producto para agregar...">
-        <div class="producto-list" id="productoList"></div>
-        <div id="selectedProducto" style="margin-top: 12px;"></div>
+                       <form id="alimentoForm">
+    <input type="hidden" id="alimentoId">
+    
+    <div class="form-group">
+        <label class="form-label" for="nombre">Nombre del Alimento *</label>
+        <input type="text" id="nombre" class="form-input" placeholder="Ej: Carne molida, Patacón, Arroz" required>
     </div>
-</div>
 
-                            <button type="submit" class="btn-primary">💾 Guardar Alimento</button>
-                            <button type="button" class="btn-secondary" id="btnCancelar" style="display: none;">✖ Cancelar</button>
-                        </form>
+    <div class="form-group">
+        <label class="form-label" for="stock">Stock Disponible *</label>
+        <input type="number" id="stock" class="form-input" min="0" placeholder="Cantidad en inventario" required>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label" for="valor">Valor Unitario (COP) *</label>
+        <input type="number" id="valor" class="form-input" min="0" step="0.01" placeholder="Precio por unidad" required>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">Productos donde se usa *</label>
+        <p style="font-size: 13px; color: #718096; margin-bottom: 10px;">
+            Busca y selecciona los platos que usan este alimento. Ajusta la cantidad necesaria para cada uno.
+        </p>
+        <div class="select-search-wrapper">
+            <input type="text" class="form-input" id="productoSearch" placeholder="🔍 Buscar producto para agregar...">
+            <div class="producto-list" id="productoList"></div>
+            <div id="selectedProducto" style="margin-top: 12px;"></div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn-primary">💾 Guardar Alimento</button>
+    <button type="button" class="btn-secondary" id="btnCancelar" style="display: none;">✖ Cancelar</button>
+</form>
                     </div>
                 </div>
 
@@ -854,10 +847,10 @@
     </div>
 
     <script>
-    const API_URL = 'https://restaurante-co77.onrender.com/api';
+   const API_URL = 'https://restaurante-co77.onrender.com/api';
 let currentUser = null;
 let productos = [];
-let productosSeleccionados = []; // ✅ NUEVO: Array de productos seleccionados
+let productosSeleccionados = [];
 
 // CARGA INICIAL
 window.addEventListener('DOMContentLoaded', async () => {
@@ -932,13 +925,13 @@ async function cargarProductos() {
     }
 }
 
-// ✅ MOSTRAR PRODUCTOS EN SELECT
+// MOSTRAR PRODUCTOS EN LISTA DE BÚSQUEDA
 function mostrarProductos(productosAMostrar) {
     const productoList = document.getElementById('productoList');
     productoList.innerHTML = '';
 
     if (productosAMostrar.length === 0) {
-        productoList.innerHTML = '<div class="producto-option" style="color: #718096;">No se encontraron productos</div>';
+        productoList.innerHTML = '<div class="producto-option" style="color: #718096; text-align: center; padding: 1rem;">No se encontraron productos</div>';
         return;
     }
 
@@ -954,16 +947,14 @@ function mostrarProductos(productosAMostrar) {
     });
 }
 
-// ✅ AGREGAR PRODUCTO A LA LISTA SELECCIONADA
+// AGREGAR PRODUCTO A LA LISTA SELECCIONADA
 function agregarProductoSeleccionado(producto) {
-    // Verificar si ya está agregado
     const yaExiste = productosSeleccionados.find(p => p.productoId === producto._id);
     if (yaExiste) {
-        alert('Este producto ya está en la lista');
+        alert('⚠️ Este producto ya está en la lista');
         return;
     }
 
-    // Agregar producto con cantidad requerida por defecto en 1
     productosSeleccionados.push({
         productoId: producto._id,
         nombre: producto.nombre,
@@ -977,34 +968,49 @@ function agregarProductoSeleccionado(producto) {
     actualizarListaProductosSeleccionados();
 }
 
-// ✅ ACTUALIZAR VISTA DE PRODUCTOS SELECCIONADOS
+// ACTUALIZAR VISTA DE PRODUCTOS SELECCIONADOS
 function actualizarListaProductosSeleccionados() {
     const container = document.getElementById('selectedProducto');
     
     if (productosSeleccionados.length === 0) {
-        container.innerHTML = '';
+        container.innerHTML = '<p style="color: #a0aec0; font-size: 14px; text-align: center; padding: 1rem; background: #f7fafc; border-radius: 8px; border: 1px dashed #cbd5e0;">No hay productos seleccionados</p>';
         return;
     }
 
     container.innerHTML = productosSeleccionados.map((prod, index) => `
-        <div class="selected-producto-badge" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3); transition: all 0.2s;">
             <div style="flex: 1;">
-                <strong>${prod.nombre}</strong><br>
-                <small>${prod.categoria}</small>
+                <div style="font-weight: 700; font-size: 15px; margin-bottom: 2px;">${prod.nombre}</div>
+                <div style="font-size: 12px; opacity: 0.9;">${prod.categoria}</div>
             </div>
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="display: flex; align-items: center; gap: 5px;">
-                    <button onclick="cambiarCantidad(${index}, -1)" style="width: 25px; height: 25px; background: rgba(255,255,255,0.3); border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold;">-</button>
-                    <span style="min-width: 30px; text-align: center; font-weight: bold;">${prod.cantidadRequerida}</span>
-                    <button onclick="cambiarCantidad(${index}, 1)" style="width: 25px; height: 25px; background: rgba(255,255,255,0.3); border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold;">+</button>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.2); padding: 6px 10px; border-radius: 8px;">
+                    <button onclick="cambiarCantidad(${index}, -1)" 
+                            style="width: 28px; height: 28px; background: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.5); border-radius: 6px; color: white; cursor: pointer; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;"
+                            onmouseover="this.style.background='rgba(255,255,255,0.4)'"
+                            onmouseout="this.style.background='rgba(255,255,255,0.3)'">
+                        −
+                    </button>
+                    <span style="min-width: 35px; text-align: center; font-weight: 800; font-size: 16px;">${prod.cantidadRequerida}</span>
+                    <button onclick="cambiarCantidad(${index}, 1)" 
+                            style="width: 28px; height: 28px; background: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.5); border-radius: 6px; color: white; cursor: pointer; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;"
+                            onmouseover="this.style.background='rgba(255,255,255,0.4)'"
+                            onmouseout="this.style.background='rgba(255,255,255,0.3)'">
+                        +
+                    </button>
                 </div>
-                <button onclick="eliminarProductoSeleccionado(${index})" style="background: rgba(239, 68, 68, 0.8); color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px;">✖</button>
+                <button onclick="eliminarProductoSeleccionado(${index})" 
+                        style="background: rgba(239, 68, 68, 0.9); color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s;"
+                        onmouseover="this.style.background='#ef4444'"
+                        onmouseout="this.style.background='rgba(239, 68, 68, 0.9)'">
+                    🗑️
+                </button>
             </div>
         </div>
     `).join('');
 }
 
-// ✅ CAMBIAR CANTIDAD REQUERIDA
+// CAMBIAR CANTIDAD REQUERIDA
 function cambiarCantidad(index, delta) {
     productosSeleccionados[index].cantidadRequerida += delta;
     
@@ -1015,10 +1021,12 @@ function cambiarCantidad(index, delta) {
     actualizarListaProductosSeleccionados();
 }
 
-// ✅ ELIMINAR PRODUCTO SELECCIONADO
+// ELIMINAR PRODUCTO SELECCIONADO
 function eliminarProductoSeleccionado(index) {
-    productosSeleccionados.splice(index, 1);
-    actualizarListaProductosSeleccionados();
+    if (confirm('¿Quitar este producto de la lista?')) {
+        productosSeleccionados.splice(index, 1);
+        actualizarListaProductosSeleccionados();
+    }
 }
 
 // BUSCAR PRODUCTOS
@@ -1084,7 +1092,13 @@ function mostrarAlimentos(alimentos) {
         return;
     }
 
-    grid.innerHTML = alimentos.map(alimento => `
+    grid.innerHTML = alimentos.map(alimento => {
+        const totalProductos = alimento.productos?.length || 0;
+        const costoTotalPorPlato = alimento.productos?.reduce((sum, prod) => {
+            return sum + (alimento.valor * prod.cantidadRequerida);
+        }, 0) || 0;
+
+        return `
         <div class="alimento-card">
             <div class="alimento-header">
                 <h3 class="alimento-title">${alimento.nombre}</h3>
@@ -1097,24 +1111,41 @@ function mostrarAlimentos(alimentos) {
                     <div class="info-value">${alimento.stock} unidades</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Valor</div>
+                    <div class="info-label">Valor Unitario</div>
                     <div class="info-value">$${alimento.valor.toLocaleString('es-CO')}</div>
                 </div>
             </div>
 
+            ${totalProductos > 0 ? `
+                <div style="background: #f0f4ff; padding: 10px; border-radius: 8px; margin-bottom: 1rem; border-left: 3px solid #667eea;">
+                    <div style="font-size: 12px; color: #4a5568; margin-bottom: 4px;">📊 Resumen</div>
+                    <div style="font-size: 14px; color: #2d3748;">
+                        Usado en <strong>${totalProductos}</strong> ${totalProductos === 1 ? 'plato' : 'platos'}
+                    </div>
+                </div>
+            ` : ''}
+
             <div class="alimento-producto">
                 <div class="alimento-producto-title">🍽️ Usado en:</div>
-                ${alimento.productos && alimento.productos.length > 0 ? alimento.productos.map(prod => `
-                    <div style="margin-top: 8px; padding: 8px; background: white; border-radius: 6px; border-left: 3px solid #4299e1;">
-                        <div class="alimento-producto-name">
-                            ${prod.productoId ? prod.productoId.nombre : 'Producto no disponible'}
-                            ${prod.productoId ? `<br><small style="color: #4299e1;">${prod.productoId.categoria}</small>` : ''}
+                ${alimento.productos && alimento.productos.length > 0 ? alimento.productos.map(prod => {
+                    const costoPlato = alimento.valor * prod.cantidadRequerida;
+                    return `
+                    <div style="margin-top: 8px; padding: 10px; background: white; border-radius: 8px; border-left: 3px solid #4299e1; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 6px;">
+                            <div class="alimento-producto-name" style="flex: 1;">
+                                ${prod.productoId ? prod.productoId.nombre : 'Producto no disponible'}
+                                ${prod.productoId ? `<br><small style="color: #4299e1; font-size: 11px;">${prod.productoId.categoria}</small>` : ''}
+                            </div>
+                            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; white-space: nowrap;">
+                                x${prod.cantidadRequerida}
+                            </div>
                         </div>
-                        <div style="font-size: 12px; color: #718096; margin-top: 4px;">
-                            Cantidad requerida: <strong>${prod.cantidadRequerida}</strong> unid.
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #718096; margin-top: 6px; padding-top: 6px; border-top: 1px solid #e2e8f0;">
+                            <span>Costo por plato:</span>
+                            <strong style="color: #2d3748;">$${costoPlato.toLocaleString('es-CO')}</strong>
                         </div>
                     </div>
-                `).join('') : '<p style="color: #a0aec0; font-size: 14px; margin-top: 8px;">No vinculado a productos</p>'}
+                `}).join('') : '<p style="color: #a0aec0; font-size: 14px; margin-top: 8px; text-align: center; padding: 1rem; background: #f7fafc; border-radius: 6px;">No vinculado a productos</p>'}
             </div>
 
             <div class="alimento-actions">
@@ -1126,16 +1157,15 @@ function mostrarAlimentos(alimentos) {
                 </button>
             </div>
         </div>
-    `).join('');
+    `}).join('');
 }
 
 // ENVIAR FORMULARIO
 document.getElementById('alimentoForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    // ✅ VALIDAR QUE HAYA AL MENOS UN PRODUCTO SELECCIONADO
     if (productosSeleccionados.length === 0) {
-        alert('⚠️ Debe seleccionar al menos un producto');
+        alert('⚠️ Debe seleccionar al menos un producto donde se usa este alimento');
         document.getElementById('productoSearch').focus();
         return;
     }
@@ -1153,7 +1183,10 @@ document.getElementById('alimentoForm').addEventListener('submit', async (e) => 
         nombre: nombre,
         stock: parseInt(stock),
         valor: parseFloat(valor),
-        productos: productosSeleccionados // ✅ ENVIAR ARRAY DE PRODUCTOS
+        productos: productosSeleccionados.map(p => ({
+            productoId: p.productoId,
+            cantidadRequerida: p.cantidadRequerida
+        }))
     };
 
     console.log('📤 Enviando datos:', alimentoData);
@@ -1207,7 +1240,6 @@ async function editarAlimento(id) {
             document.getElementById('stock').value = alimento.stock;
             document.getElementById('valor').value = alimento.valor;
             
-            // ✅ CARGAR PRODUCTOS SELECCIONADOS
             productosSeleccionados = alimento.productos.map(prod => ({
                 productoId: prod.productoId._id,
                 nombre: prod.productoId.nombre,
@@ -1258,7 +1290,7 @@ async function eliminarAlimento(id, nombre) {
 function limpiarFormulario() {
     document.getElementById('alimentoForm').reset();
     document.getElementById('alimentoId').value = '';
-    productosSeleccionados = []; // ✅ LIMPIAR PRODUCTOS SELECCIONADOS
+    productosSeleccionados = [];
     actualizarListaProductosSeleccionados();
     document.getElementById('formTitle').textContent = '➕ Agregar Alimento';
     document.getElementById('btnCancelar').style.display = 'none';
