@@ -1078,6 +1078,7 @@ async function cargarAlimentos() {
 }
 
 // MOSTRAR ALIMENTOS
+// MOSTRAR ALIMENTOS
 function mostrarAlimentos(alimentos) {
     const grid = document.getElementById('alimentosGrid');
     
@@ -1108,11 +1109,11 @@ function mostrarAlimentos(alimentos) {
             <div class="alimento-info">
                 <div class="info-item">
                     <div class="info-label">Stock Disponible</div>
-                    <div class="info-value">${alimento.stock} unidades</div>
+                    <div class="info-value">${alimento.stock || 0} unidades</div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">Valor Unitario</div>
-                    <div class="info-value">$${alimento.valor.toLocaleString('es-CO')}</div>
+                    <div class="info-value">$${(alimento.valor || 0).toLocaleString('es-CO')}</div>
                 </div>
             </div>
 
@@ -1128,13 +1129,17 @@ function mostrarAlimentos(alimentos) {
             <div class="alimento-producto">
                 <div class="alimento-producto-title">🍽️ Usado en:</div>
                 ${alimento.productos && alimento.productos.length > 0 ? alimento.productos.map(prod => {
+                    // ✅ VALIDAR que productoId exista antes de usarlo
+                    const productoNombre = prod.productoId?.nombre || 'Producto no disponible';
+                    const productoCategoria = prod.productoId?.categoria || '';
                     const costoPlato = alimento.valor * prod.cantidadRequerida;
+                    
                     return `
                     <div style="margin-top: 8px; padding: 10px; background: white; border-radius: 8px; border-left: 3px solid #4299e1; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
                         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 6px;">
                             <div class="alimento-producto-name" style="flex: 1;">
-                                ${prod.productoId ? prod.productoId.nombre : 'Producto no disponible'}
-                                ${prod.productoId ? `<br><small style="color: #4299e1; font-size: 11px;">${prod.productoId.categoria}</small>` : ''}
+                                ${productoNombre}
+                                ${productoCategoria ? `<br><small style="color: #4299e1; font-size: 11px;">${productoCategoria}</small>` : ''}
                             </div>
                             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; white-space: nowrap;">
                                 x${prod.cantidadRequerida}
@@ -1223,6 +1228,7 @@ document.getElementById('alimentoForm').addEventListener('submit', async (e) => 
 });
 
 // EDITAR ALIMENTO
+// EDITAR ALIMENTO
 async function editarAlimento(id) {
     const token = localStorage.getItem('token');
 
@@ -1240,12 +1246,28 @@ async function editarAlimento(id) {
             document.getElementById('stock').value = alimento.stock;
             document.getElementById('valor').value = alimento.valor;
             
-            productosSeleccionados = alimento.productos.map(prod => ({
-                productoId: prod.productoId._id,
-                nombre: prod.productoId.nombre,
-                categoria: prod.productoId.categoria,
-                cantidadRequerida: prod.cantidadRequerida
-            }));
+            // ✅ CORREGIDO: Extraer solo el ID del producto
+            productosSeleccionados = alimento.productos.map(prod => {
+                // Manejar tanto si productoId es objeto o string
+                const prodId = typeof prod.productoId === 'object' 
+                    ? prod.productoId._id 
+                    : prod.productoId;
+                
+                const prodNombre = typeof prod.productoId === 'object' 
+                    ? prod.productoId.nombre 
+                    : 'Producto';
+                
+                const prodCategoria = typeof prod.productoId === 'object' 
+                    ? prod.productoId.categoria 
+                    : '';
+                
+                return {
+                    productoId: prodId,
+                    nombre: prodNombre,
+                    categoria: prodCategoria,
+                    cantidadRequerida: prod.cantidadRequerida
+                };
+            });
             
             actualizarListaProductosSeleccionados();
 
