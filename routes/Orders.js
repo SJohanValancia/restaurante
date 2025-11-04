@@ -559,7 +559,53 @@ router.put('/:id', protect, checkPermission('editarPedidos'), async (req, res) =
       });
     }
 
-    // Actualizar campos bÃ¡sicos
+    // ✅ CALCULAR DIFERENCIA DE PRODUCTOS PARA DESCONTAR STOCK
+    if (items && items.length > 0) {
+      // Crear un mapa de productos originales con sus cantidades
+      const productosOriginales = new Map();
+      order.items.forEach(item => {
+        const prodId = item.producto.toString();
+        productosOriginales.set(prodId, item.cantidad);
+      });
+
+      // Crear un mapa de productos nuevos con sus cantidades
+      const productosNuevos = new Map();
+      items.forEach(item => {
+        const prodId = item.producto.toString();
+        productosNuevos.set(prodId, item.cantidad);
+      });
+
+      // Calcular diferencias (solo productos agregados o aumentados)
+      const productosParaDescontar = [];
+      
+      productosNuevos.forEach((cantidadNueva, prodId) => {
+        const cantidadOriginal = productosOriginales.get(prodId) || 0;
+        const diferencia = cantidadNueva - cantidadOriginal;
+        
+        // Si la diferencia es positiva, significa que se agregaron más unidades
+        if (diferencia > 0) {
+          productosParaDescontar.push({
+            producto: prodId,
+            cantidad: diferencia
+          });
+        }
+      });
+
+      // ✅ DESCONTAR STOCK SOLO DE LOS PRODUCTOS NUEVOS O AUMENTADOS
+      if (productosParaDescontar.length > 0) {
+        try {
+          await descontarStockAlimentos(productosParaDescontar, req.user._id);
+          console.log('✅ Stock descontado por edición de pedido:', productosParaDescontar);
+        } catch (error) {
+          return res.status(400).json({
+            success: false,
+            message: error.message
+          });
+        }
+      }
+    }
+
+    // Actualizar campos básicos
     order.mesa = mesa;
     order.notas = notas;
     
@@ -571,7 +617,7 @@ router.put('/:id', protect, checkPermission('editarPedidos'), async (req, res) =
         categoriaProducto: item.categoriaProducto,
         cantidad: item.cantidad,
         precio: item.precio,
-        // âœ… INICIALIZAR ESTADOS INDIVIDUALES CORRECTAMENTE
+        // ✅ INICIALIZAR ESTADOS INDIVIDUALES CORRECTAMENTE
         estadosIndividuales: [{
           cantidad: item.cantidad,
           estado: 'pendiente'
@@ -607,7 +653,7 @@ router.put('/:id', protect, checkPermission('editarPedidos'), async (req, res) =
           ...item,
           productoInfo: {
             nombre: item.nombreProducto || 'Producto eliminado',
-            categoria: item.categoriaProducto || 'Sin categorÃ­a',
+            categoria: item.categoriaProducto || 'Sin categoría',
             precio: item.precio
           }
         };

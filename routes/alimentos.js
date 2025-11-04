@@ -84,12 +84,12 @@ router.post('/', protect, async (req, res) => {
     }
 
     // Validar campos obligatorios
-    if (!nombre || !productos || productos.length === 0) {
-      return res.status(400).json({
+if (!nombre || productos === undefined || productos.length === 0) {
+    return res.status(400).json({
         success: false,
         message: 'Faltan campos obligatorios. Debe incluir al menos un producto.'
-      });
-    }
+    });
+}
 
     // Validar que todos los productos existan
     for (const prod of productos) {
@@ -109,16 +109,16 @@ router.post('/', protect, async (req, res) => {
       });
     }
 
-    const alimentoData = {
-      nombre: nombre.trim(),
-      stock: stockNumero,  // ✅ Usar el número validado
-      valor: valorNumero,   // ✅ Usar el número validado
-      productos: productos.map(p => ({
+const alimentoData = {
+    nombre: nombre.trim(),
+    stock: stockNumero,
+    valor: valorNumero || 0,  // ✅ Valor por defecto 0 si no se proporciona
+    productos: productos.map(p => ({
         productoId: p.productoId,
         cantidadRequerida: Number(p.cantidadRequerida)
-      })),
-      userId: req.user._id
-    };
+    })),
+    userId: req.user._id
+};
 
     console.log('✅ Datos a guardar:', alimentoData);
 

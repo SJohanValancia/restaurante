@@ -292,15 +292,7 @@
             align-items: start;
         }
 
-        .card {
-            background: white;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            overflow: hidden;
-            animation: fadeIn 0.5s ease;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
-        }
+
 
         .card:hover {
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -321,6 +313,7 @@
 
         .card-body {
             padding: 1.5rem;
+            height: -300px;
         }
 
         .form-group {
@@ -361,37 +354,74 @@
             position: relative;
         }
 
-        .producto-list {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            display: none;
-            position: absolute;
-            background: white;
-            width: 100%;
-            z-index: 1000;
-            margin-top: 4px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            animation: fadeIn 0.2s ease;
-        }
+      /* SELECT CON BÚSQUEDA */
+.select-search-wrapper {
+    position: relative;
+}
 
-        .producto-list.show {
-            display: block;
-        }
+.producto-list {
+    max-height: 350px; /* ✅ Aumentado de 200px a 350px */
+    overflow-y: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    display: none;
+    position: absolute;
+    background: white;
+    width: 100%;
+    z-index: 1000;
+    margin-top: 4px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15); /* ✅ Sombra más pronunciada */
+    animation: fadeIn 0.2s ease;
+}
 
-        .producto-list::-webkit-scrollbar {
-            width: 8px;
-        }
+.producto-list.show {
+    display: block;
+}
 
-        .producto-list::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
+.producto-list::-webkit-scrollbar {
+    width: 10px; /* ✅ Aumentado de 8px a 10px */
+}
 
-        .producto-list::-webkit-scrollbar-thumb {
-            background: #667eea;
-            border-radius: 4px;
-        }
+.producto-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 5px;
+}
+
+.producto-list::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 5px;
+}
+
+.producto-list::-webkit-scrollbar-thumb:hover {
+    background: #5568d3;
+}
+
+.producto-option {
+    padding: 16px; /* ✅ Aumentado de 12px a 16px */
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 1px solid #f7fafc;
+}
+
+.producto-option:last-child {
+    border-bottom: none;
+}
+
+.producto-option:hover {
+    background: #f7fafc;
+    transform: translateX(4px);
+}
+
+.selected-producto-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    margin-top: 8px;
+    font-size: 14px;
+    animation: fadeIn 0.3s ease;
+}
 
         .producto-option {
             padding: 12px;
@@ -687,6 +717,76 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* SELECT CON BÚSQUEDA */
+.select-search-wrapper {
+    position: relative;
+}
+
+.producto-list {
+    max-height: 500px; /* ✅ */
+    overflow-y: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    display: none;
+    position: absolute;
+    background: white;
+    width: 100%;
+    z-index: 1000;
+    margin-top: 4px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    animation: fadeIn 0.2s ease;
+}
+
+.producto-list.show {
+    display: block;
+}
+
+.producto-list::-webkit-scrollbar {
+    width: 10px;
+}
+
+.producto-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 5px;
+}
+
+.producto-list::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 5px;
+}
+
+.producto-list::-webkit-scrollbar-thumb:hover {
+    background: #5568d3;
+}
+
+.producto-option {
+    padding: 16px; /* ✅ */
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 1px solid #f7fafc;
+}
+
+.producto-option:last-child {
+    border-bottom: none;
+}
+
+.producto-option:hover {
+    background: #f7fafc;
+    transform: translateX(4px);
+}
+
+.selected-producto-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    margin-top: 8px;
+    font-size: 14px;
+    animation: fadeIn 0.3s ease;
+}
+
     </style>
 </head>
 <body>
@@ -708,7 +808,7 @@
             </a>
         </div>
 
-        <nav class="sidebar-nav">
+       <nav class="sidebar-nav">
             <div class="nav-section">
                 <div class="nav-section-title">Principal</div>
                 <a href="productos.html" class="nav-item">
@@ -739,9 +839,13 @@
                     <span class="nav-icon">📜📦</span>
                     <span>Inventario</span>
                 </a>
-                <a href="alimentos.html" class="nav-item active">
+                <a href="alimentos.html" class="nav-item">
                     <span class="nav-icon">🥘</span>
                     <span>Alimentos</span>
+                </a>
+                <a href="inventario-alimentos.html" class="nav-item active">
+                    <span class="nav-icon">📋</span>
+                    <span>Inventario Alimentos</span>
                 </a>
             </div>
 
@@ -801,15 +905,16 @@
         <input type="text" id="nombre" class="form-input" placeholder="Ej: Carne molida, Patacón, Arroz" required>
     </div>
 
+    <div style="display: none;" class="form-group">
+    <label class="form-label" for="valor">Valor Unitario (COP) <small style="color: #a0aec0;">(Opcional)</small></label>
+    <input type="number" id="valor" class="form-input" min="0" step="0.01" placeholder="Precio por unidad">
+</div>
+
     <div class="form-group">
         <label class="form-label" for="stock">Stock Disponible *</label>
         <input type="number" id="stock" class="form-input" min="0" placeholder="Cantidad en inventario" required>
     </div>
 
-    <div class="form-group">
-        <label class="form-label" for="valor">Valor Unitario (COP) *</label>
-        <input type="number" id="valor" class="form-input" min="0" step="0.01" placeholder="Precio por unidad" required>
-    </div>
 
     <div class="form-group">
         <label class="form-label">Productos donde se usa *</label>
@@ -946,6 +1051,8 @@ function mostrarProductos(productosAMostrar) {
         productoList.appendChild(div);
     });
 }
+
+
 
 // AGREGAR PRODUCTO A LA LISTA SELECCIONADA
 function agregarProductoSeleccionado(producto) {
@@ -1111,10 +1218,7 @@ function mostrarAlimentos(alimentos) {
                     <div class="info-label">Stock Disponible</div>
                     <div class="info-value">${alimento.stock || 0} unidades</div>
                 </div>
-                <div class="info-item">
-                    <div class="info-label">Valor Unitario</div>
-                    <div class="info-value">$${(alimento.valor || 0).toLocaleString('es-CO')}</div>
-                </div>
+
             </div>
 
             ${totalProductos > 0 ? `
@@ -1179,20 +1283,20 @@ document.getElementById('alimentoForm').addEventListener('submit', async (e) => 
     const stock = document.getElementById('stock').value;
     const valor = document.getElementById('valor').value;
 
-    if (!nombre || !stock || !valor) {
-        alert('⚠️ Por favor complete todos los campos obligatorios');
-        return;
-    }
+if (!nombre || stock === '') {
+    alert('⚠️ Por favor complete todos los campos obligatorios');
+    return;
+}
 
-    const alimentoData = {
-        nombre: nombre,
-        stock: parseInt(stock),
-        valor: parseFloat(valor),
-        productos: productosSeleccionados.map(p => ({
-            productoId: p.productoId,
-            cantidadRequerida: p.cantidadRequerida
-        }))
-    };
+const alimentoData = {
+    nombre: nombre,
+    stock: parseInt(stock),
+    valor: valor ? parseFloat(valor) : 0,
+    productos: productosSeleccionados.map(p => ({
+        productoId: p.productoId,
+        cantidadRequerida: p.cantidadRequerida
+    }))
+};
 
     console.log('📤 Enviando datos:', alimentoData);
 

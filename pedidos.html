@@ -1072,38 +1072,46 @@
             </a>
         </div>
 
-       <nav class="sidebar-nav">
-    <div class="nav-section">
-        <div class="nav-section-title">Principal</div>
-        <a href="productos.html" class="nav-item">
-            <span class="nav-icon">📦</span>
-            <span>Productos</span>
-        </a>
-        <a href="pedidos.html" class="nav-item active">
-            <span class="nav-icon">🍽️</span>
-            <span>Pedidos</span>
-        </a>
-        <a href="gastos.html" class="nav-item">
-            <span class="nav-icon">🧾</span>
-            <span>Gastos</span>
-        </a>
-        <a href="qr-generator.html" class="nav-item">
-            <span class="nav-icon">📱</span>
-            <span>QR Generador</span>
-        </a>
-        <a href="reportes.html" class="nav-item">
-            <span class="nav-icon">📊</span>
-            <span>Reportes</span>
-        </a>
-        <a href="historial-pedidos.html" class="nav-item">
-            <span class="nav-icon">📜</span>
-            <span>Historial</span>
-        </a>
-        <a href="catalogo-productos.html" class="nav-item">
-            <span class="nav-icon">📜📦</span>
-            <span>Inventario</span>
-        </a>
-    </div>
+     <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Principal</div>
+                <a href="productos.html" class="nav-item">
+                    <span class="nav-icon">📦</span>
+                    <span>Productos</span>
+                </a>
+                <a href="pedidos.html" class="nav-item">
+                    <span class="nav-icon">🍽️</span>
+                    <span>Pedidos</span>
+                </a>
+                <a href="gastos.html" class="nav-item">
+                    <span class="nav-icon">🧾</span>
+                    <span>Gastos</span>
+                </a>
+                <a href="qr-generator.html" class="nav-item">
+                    <span class="nav-icon">📱</span>
+                    <span>QR Generador</span>
+                </a>
+                <a href="reportes.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>Reportes</span>
+                </a>
+                <a href="historial-pedidos.html" class="nav-item">
+                    <span class="nav-icon">📜</span>
+                    <span>Historial</span>
+                </a>
+                <a href="catalogo-productos.html" class="nav-item">
+                    <span class="nav-icon">📜📦</span>
+                    <span>Inventario</span>
+                </a>
+                <a href="alimentos.html" class="nav-item">
+                    <span class="nav-icon">🥘</span>
+                    <span>Alimentos</span>
+                </a>
+                <a href="inventario-alimentos.html" class="nav-item active">
+                    <span class="nav-icon">📋</span>
+                    <span>Inventario Alimentos</span>
+                </a>
+            </div>
 
     <!-- SOLO PARA ADMINISTRADORES -->
     <div class="nav-section" id="adminSection" style="display: none;">
@@ -1419,11 +1427,11 @@ function updateSelectedProducts() {
                     <div class="quantity-controls">
                         <button type="button" class="qty-btn" onclick="changeQuantity(${index}, -1)">-</button>
                         <input 
-                            type="number" 
-                            min="1" 
-                            max="999" 
-                            value="${item.cantidad}" 
-                            onchange="setQuantity(${index}, this.value)"
+<input 
+    type="number" 
+    min="1"
+    value="${item.cantidad}" 
+    onchange="setQuantity(${index}, this.value)"
                             onclick="this.select()"
                             style="width: 60px; text-align: center; font-weight: 600; font-size: 14px; border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px;"
                         >
@@ -1451,22 +1459,17 @@ function updateSelectedProducts() {
             updateSelectedProducts();
         }
 
-        function setQuantity(index, value) {
+function setQuantity(index, value) {
     let cantidad = parseInt(value);
     
-    // Validar que sea un número válido
     if (isNaN(cantidad) || cantidad < 1) {
         cantidad = 1;
-    }
-    
-    // Límite máximo opcional
-    if (cantidad > 999) {
-        cantidad = 999;
     }
     
     selectedItems[index].cantidad = cantidad;
     updateSelectedProducts();
 }
+
 
         function removeItem(index) {
             selectedItems.splice(index, 1);
@@ -2214,11 +2217,11 @@ function actualizarListaProductosEdicion() {
             <div style="display: flex; align-items: center; gap: 8px;">
                 <button onclick="cambiarCantidadEdicion(${index}, -1)" style="width: 28px; height: 28px; border: 1px solid #e2e8f0; background: white; border-radius: 6px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;">-</button>
                 <input 
-                    type="number" 
-                    min="1" 
-                    max="999" 
-                    value="${item.cantidad}" 
-                    onchange="setCantidadEdicion(${index}, this.value)"
+<input 
+    type="number" 
+    min="1"
+    value="${item.cantidad}" 
+    onchange="setCantidadEdicion(${index}, this.value)"
                     onclick="this.select()"
                     style="width: 60px; text-align: center; font-weight: 600; font-size: 14px; border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px;"
                 >
@@ -2244,20 +2247,13 @@ function cambiarCantidadEdicion(index, delta) {
 function setCantidadEdicion(index, value) {
     let cantidad = parseInt(value);
     
-    // Validar que sea un número válido
     if (isNaN(cantidad) || cantidad < 1) {
         cantidad = 1;
-    }
-    
-    // Límite máximo opcional
-    if (cantidad > 999) {
-        cantidad = 999;
     }
     
     editSelectedItems[index].cantidad = cantidad;
     actualizarListaProductosEdicion();
 }
-
 function eliminarProductoEdicion(index) {
     if (confirm('¿Eliminar este producto del pedido?')) {
         editSelectedItems.splice(index, 1);
