@@ -8,7 +8,7 @@ const { protect } = require('../middleware/auth');
 const { checkPermission } = require('../middleware/permissions');
 
 // ✅ FUNCIÓN PARA DESCONTAR STOCK DE ALIMENTOS
-async function descontarStockAlimentos(items, userId) {
+async function descontarStockAlimentos(items, userId, ignorarStock = false) {
   const Alimento = require('../models/Alimento');
   
   try {
@@ -33,19 +33,31 @@ async function descontarStockAlimentos(items, userId) {
         if (productoConfig) {
           const cantidadADescontar = productoConfig.cantidadRequerida * cantidadPedida;
           
-          // Validar que haya stock suficiente
-          if (alimento.stock < cantidadADescontar) {
-            throw new Error(
-              `Stock insuficiente de "${alimento.nombre}". ` +
-              `Disponible: ${alimento.stock}, Requerido: ${cantidadADescontar}`
-            );
+          // ✅ Si ignorarStock es true, solo descontar lo que hay disponible
+          if (ignorarStock) {
+            if (alimento.stock > 0) {
+              const descontado = Math.min(alimento.stock, cantidadADescontar);
+              alimento.stock -= descontado;
+              await alimento.save();
+              console.log(`⚠️ Descontado parcialmente ${descontado} unidades de "${alimento.nombre}". Stock restante: ${alimento.stock}`);
+            } else {
+              console.log(`⚠️ "${alimento.nombre}" sin stock, pedido creado sin descontar`);
+            }
+          } else {
+            // Validar que haya stock suficiente (comportamiento original)
+            if (alimento.stock < cantidadADescontar) {
+              throw new Error(
+                `Stock insuficiente de "${alimento.nombre}". ` +
+                `Disponible: ${alimento.stock}, Requerido: ${cantidadADescontar}`
+              );
+            }
+            
+            // Descontar stock
+            alimento.stock -= cantidadADescontar;
+            await alimento.save();
+            
+            console.log(`✅ Descontado ${cantidadADescontar} unidades de "${alimento.nombre}". Stock restante: ${alimento.stock}`);
           }
-          
-          // Descontar stock
-          alimento.stock -= cantidadADescontar;
-          await alimento.save();
-          
-          console.log(`✅ Descontado ${cantidadADescontar} unidades de "${alimento.nombre}". Stock restante: ${alimento.stock}`);
         }
       }
     }
@@ -343,7 +355,7 @@ router.get('/:id', protect, async (req, res) => {
 
 router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
   try {
-    const { mesa, items, notas } = req.body;
+    const { mesa, items, notas, ignorarStockAlimentos } = req.body;
 
     if (!items || items.length === 0) {
       return res.status(400).json({
@@ -354,12 +366,15 @@ router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
 
     // ✅ VALIDAR Y DESCONTAR STOCK ANTES DE CREAR EL PEDIDO
     try {
-      await descontarStockAlimentos(items, req.user._id);
+      await descontarStockAlimentos(items, req.user._id, ignorarStockAlimentos);
     } catch (error) {
-      return res.status(400).json({
-        success: false,
-        message: error.message
-      });
+      // Solo retornar error si NO se debe ignorar el stock
+      if (!ignorarStockAlimentos) {
+        return res.status(400).json({
+          success: false,
+          message: error.message
+        });
+      }
     }
 
     const itemsConInfo = await Promise.all(items.map(async (item) => {

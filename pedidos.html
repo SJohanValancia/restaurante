@@ -1301,14 +1301,45 @@ if (currentUser.rol === 'admin') {
 async function loadProducts() {
     const token = localStorage.getItem('token');
     try {
+        // Cargar productos
         const response = await fetch(`${API_URL}/products?userId=${currentUser._id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await response.json();
         
         if (data.success) {
-            availableProducts = data.data;
-            allProductsCache = data.data; // ✅ ACTUALIZAR CACHE TAMBIÉN
+            // Cargar alimentos para verificar stock
+            const alimentosResponse = await fetch(`${API_URL}/alimentos`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const alimentosData = await alimentosResponse.json();
+            
+            if (alimentosData.success) {
+                const alimentos = alimentosData.data;
+                
+                // Verificar cada producto contra los alimentos
+                availableProducts = data.data.map(producto => {
+                    // Buscar alimentos que usan este producto
+                    const alimentosDelProducto = alimentos.filter(alimento => 
+                        alimento.productos.some(p => p.productoId._id === producto._id)
+                    );
+                    
+                    // Verificar si algún alimento está agotado
+                    const alimentosAgotados = alimentosDelProducto.filter(alimento => {
+                        const config = alimento.productos.find(p => p.productoId._id === producto._id);
+                        return alimento.stock < config.cantidadRequerida;
+                    });
+                    
+                    return {
+                        ...producto,
+                        alimentosAgotados: alimentosAgotados.map(a => a.nombre)
+                    };
+                });
+            } else {
+                availableProducts = data.data.map(p => ({ ...p, alimentosAgotados: [] }));
+            }
+            
+            allProductsCache = availableProducts;
             displayProducts(availableProducts);
         }
     } catch (error) {
@@ -1325,18 +1356,30 @@ function displayProducts(products) {
         return;
     }
 
-    list.innerHTML = products.map(p => `
-        <div class="product-item ${!p.disponible ? 'product-agotado' : ''}" 
-             onclick="${p.disponible ? `addProduct('${p._id}')` : `mostrarAgotado(this)`}">
-            <div class="product-info">
-                <h4>${p.nombre} ${!p.disponible ? '<span style="color: #e53e3e; font-size: 12px; font-weight: 700;">● AGOTADO</span>' : ''}</h4>
-                <p>${p.categoria}</p>
+    list.innerHTML = products.map(p => {
+        const tieneAlimentosAgotados = p.alimentosAgotados && p.alimentosAgotados.length > 0;
+        const estiloAgotado = !p.disponible ? 'opacity: 0.6; background: #f7fafc;' : '';
+        const estiloAdvertencia = tieneAlimentosAgotados && p.disponible ? 'border-left: 3px solid #f59e0b;' : '';
+        
+        return `
+            <div class="product-item ${!p.disponible ? 'product-agotado' : ''}" 
+                 onclick="${!p.disponible ? `mostrarAgotado(this)` : `addProduct('${p._id}')`}"
+                 style="${estiloAgotado} ${estiloAdvertencia}">
+                <div class="product-info">
+                    <h4>
+                        ${p.nombre} 
+                        ${!p.disponible ? '<span style="color: #e53e3e; font-size: 12px; font-weight: 700;">● AGOTADO</span>' : ''}
+                        ${tieneAlimentosAgotados && p.disponible ? '<span style="color: #f59e0b; font-size: 11px; font-weight: 700;">⚠️ Alimento agotado</span>' : ''}
+                    </h4>
+                    <p>${p.categoria}</p>
+                    ${tieneAlimentosAgotados && p.disponible ? `<p style="font-size: 11px; color: #f59e0b; margin-top: 4px;">Falta: ${p.alimentosAgotados.join(', ')}</p>` : ''}
+                </div>
+                <div class="product-price" style="${!p.disponible ? 'color: #a0aec0; text-decoration: line-through;' : ''}">
+                    $${p.precio.toLocaleString('es-CO')}
+                </div>
             </div>
-            <div class="product-price" style="${!p.disponible ? 'color: #a0aec0; text-decoration: line-through;' : ''}">
-                $${p.precio.toLocaleString('es-CO')}
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function mostrarAgotado(elemento) {
@@ -1476,57 +1519,77 @@ function setQuantity(index, value) {
             updateSelectedProducts();
         }
 
-        document.getElementById('orderForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+document.getElementById('orderForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-            const mesa = document.getElementById('mesa').value;
-            const notas = document.getElementById('notas').value.trim();
+    const mesa = document.getElementById('mesa').value;
+    const notas = document.getElementById('notas').value.trim();
 
-            if (selectedItems.length === 0) {
-                alert('Debe seleccionar al menos un producto');
-                return;
-            }
+    if (selectedItems.length === 0) {
+        alert('Debe seleccionar al menos un producto');
+        return;
+    }
 
-            const orderData = {
-                mesa: (mesa),
-                items: selectedItems.map(item => ({
-                    producto: item.producto._id,
-                    cantidad: item.cantidad,
-                    precio: item.producto.precio
-                })),
-                notas: notas,
-                userId: currentUser._id
-            };
+    // Verificar si hay productos con alimentos agotados
+    const productosConAlimentosAgotados = selectedItems.filter(item => 
+        item.producto.alimentosAgotados && item.producto.alimentosAgotados.length > 0
+    );
 
-            const token = localStorage.getItem('token');
+    if (productosConAlimentosAgotados.length > 0) {
+        const listaProductos = productosConAlimentosAgotados.map(item => {
+            const alimentosAgotados = item.producto.alimentosAgotados.join(', ');
+            return `• ${item.producto.nombre}: Falta ${alimentosAgotados}`;
+        }).join('\n');
 
-            try {
-                const response = await fetch(`${API_URL}/orders`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify(orderData)
-                });
+        const confirmar = confirm(
+            `⚠️ ADVERTENCIA: Los siguientes platos tienen alimentos agotados:\n\n${listaProductos}\n\n¿Deseas continuar con la creación del pedido?`
+        );
 
-                const data = await response.json();
+        if (!confirmar) {
+            return;
+        }
+    }
 
-                if (data.success) {
-                    alert('✅ Pedido creado exitosamente');
-                    document.getElementById('orderForm').reset();
-                    selectedItems = [];
-                    updateSelectedProducts();
-                    await loadOrders();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error al crear el pedido');
-            }
+    const orderData = {
+        mesa: mesa,
+        items: selectedItems.map(item => ({
+            producto: item.producto._id,
+            cantidad: item.cantidad,
+            precio: item.producto.precio
+        })),
+        notas: notas,
+        userId: currentUser._id,
+        ignorarStockAlimentos: productosConAlimentosAgotados.length > 0
+    };
+
+    const token = localStorage.getItem('token');
+
+    try {
+        const response = await fetch(`${API_URL}/orders`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(orderData)
         });
 
+        const data = await response.json();
+
+        if (data.success) {
+            alert('✅ Pedido creado exitosamente');
+            document.getElementById('orderForm').reset();
+            selectedItems = [];
+            updateSelectedProducts();
+            await loadOrders();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al crear el pedido');
+    }
+});
         async function loadOrders() {
             const token = localStorage.getItem('token');
             const estado = document.getElementById('filterEstado').value;
