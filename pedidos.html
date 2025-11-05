@@ -1051,7 +1051,14 @@
     }
 }
 
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.8; }
+}
+
     </style>
+
+    
 </head>
 <body>
     <!-- Menú Toggle - Solo visible en móvil -->
@@ -1240,6 +1247,8 @@
         let selectedItems = [];
         let allProducts = [];
         let allProductsCache = [];
+        let pedidoParaImprimir = null;
+let metodoPagoSeleccionado = null;
         // DEBE ESTAR después de:
 
 // AGREGAR ESTA LÍNEA:
@@ -1780,19 +1789,254 @@ async function confirmarMetodoPago(metodoPago) {
         return;
     }
     
-    // Guardar el ID en una variable temporal ANTES de cerrar el modal
-    const orderIdTemp = currentOrderIdForPayment;
+    // Guardar el método de pago
+    metodoPagoSeleccionado = metodoPago;
     
-    // Cerrar el modal
-    const modal = document.getElementById('modalMetodoPago');
+    // Cerrar modal de método de pago
+    document.getElementById('modalMetodoPago').style.display = 'none';
+    
+    // Obtener los datos completos del pedido antes de preguntar por impresión
+    await obtenerDatosPedidoParaImprimir(currentOrderIdForPayment);
+    
+    // Mostrar modal de confirmación de impresión
+    document.getElementById('modalConfirmarImpresion').style.display = 'flex';
+}
+
+async function obtenerDatosPedidoParaImprimir(orderId) {
+    const token = localStorage.getItem('token');
+    
+    try {
+        const response = await fetch(`${API_URL}/orders/${orderId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            pedidoParaImprimir = data.data;
+            console.log('📋 Datos del pedido cargados para impresión:', pedidoParaImprimir);
+        }
+    } catch (error) {
+        console.error('Error al obtener datos del pedido:', error);
+    }
+}
+
+
+async function confirmarImpresion(imprimir) {
+    const modal = document.getElementById('modalConfirmarImpresion');
     modal.style.display = 'none';
     
-    // Limpiar la variable
-    currentOrderIdForPayment = null;
+    if (imprimir && pedidoParaImprimir) {
+        // Mostrar modal de estado de impresión
+        mostrarEstadoImpresion('imprimiendo');
+        
+        try {
+            await imprimirFacturaPOS();
+            mostrarEstadoImpresion('exito');
+        } catch (error) {
+            console.error('Error al imprimir:', error);
+            mostrarEstadoImpresion('error');
+        }
+    }
     
-    // Usar la variable temporal para actualizar
-    await actualizarEstadoPedido(orderIdTemp, 'entregado', metodoPago);
+    // Actualizar el pedido con el método de pago
+    const orderIdTemp = currentOrderIdForPayment;
+    currentOrderIdForPayment = null;
+    pedidoParaImprimir = null;
+    
+    await actualizarEstadoPedido(orderIdTemp, 'entregado', metodoPagoSeleccionado);
 }
+
+
+function mostrarEstadoImpresion(estado) {
+    const modal = document.getElementById('modalEstadoImpresion');
+    const spinner = document.getElementById('impresionSpinner');
+    const titulo = document.getElementById('impresionTitulo');
+    const mensaje = document.getElementById('impresionMensaje');
+    
+    if (estado === 'imprimiendo') {
+        modal.style.display = 'flex';
+        spinner.textContent = '🖨️';
+        spinner.style.animation = 'pulse 1s infinite';
+        titulo.textContent = 'Imprimiendo factura...';
+        mensaje.textContent = 'Por favor, espere';
+    } else if (estado === 'exito') {
+        spinner.textContent = '✅';
+        spinner.style.animation = 'none';
+        titulo.textContent = '¡Factura impresa!';
+        mensaje.textContent = 'La factura se ha impreso correctamente';
+        
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 2000);
+    } else if (estado === 'error') {
+        spinner.textContent = '❌';
+        spinner.style.animation = 'none';
+        titulo.textContent = 'Error al imprimir';
+        mensaje.textContent = 'No se pudo imprimir la factura. Verifique la impresora.';
+        
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 3000);
+    }
+}
+
+async function imprimirFacturaPOS() {
+    if (!pedidoParaImprimir) {
+        throw new Error('No hay datos del pedido para imprimir');
+    }
+    
+    try {
+        // Verificar si el navegador soporta Web Bluetooth
+        if (!navigator.bluetooth) {
+            console.warn('Web Bluetooth no disponible, usando método alternativo');
+            await imprimirFacturaAlternativa();
+            return;
+        }
+        
+        // Intentar conectar con impresora Bluetooth
+        const device = await navigator.bluetooth.requestDevice({
+            filters: [
+                { services: ['000018f0-0000-1000-8000-00805f9b34fb'] }, // Servicio común de impresoras POS
+            ],
+            optionalServices: ['battery_service']
+        });
+        
+        const server = await device.gatt.connect();
+        const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
+        const characteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
+        
+        // Generar comandos ESC/POS
+        const comandos = generarComandosESCPOS();
+        
+        // Enviar a la impresora
+        await characteristic.writeValue(comandos);
+        
+        console.log('✅ Factura enviada a impresora POS');
+        
+    } catch (error) {
+        console.error('Error con Web Bluetooth:', error);
+        // Intentar método alternativo
+        await imprimirFacturaAlternativa();
+    }
+}
+
+function generarComandosESCPOS() {
+    const ESC = 0x1B;
+    const GS = 0x1D;
+    const LF = 0x0A;
+    const comandos = [];
+    
+    // Inicializar impresora
+    comandos.push(ESC, 0x40);
+    
+    // Centrar texto
+    comandos.push(ESC, 0x61, 0x01);
+    
+    // Negrita ON
+    comandos.push(ESC, 0x45, 0x01);
+    
+    // Nombre del restaurante
+    const nombreRestaurante = currentUser.nombreRestaurante || 'RESTAURANTE';
+    agregarTexto(comandos, nombreRestaurante);
+    comandos.push(LF);
+    
+    // Negrita OFF
+    comandos.push(ESC, 0x45, 0x00);
+    
+    // Información adicional
+    agregarTexto(comandos, '================================');
+    comandos.push(LF);
+    agregarTexto(comandos, 'FACTURA DE VENTA');
+    comandos.push(LF);
+    agregarTexto(comandos, '================================');
+    comandos.push(LF, LF);
+    
+    // Alinear a la izquierda
+    comandos.push(ESC, 0x61, 0x00);
+    
+    // Fecha y hora
+    const fecha = new Date(pedidoParaImprimir.createdAt);
+    const fechaStr = fecha.toLocaleDateString('es-CO');
+    const horaStr = fecha.toLocaleTimeString('es-CO');
+    agregarTexto(comandos, `Fecha: ${fechaStr}`);
+    comandos.push(LF);
+    agregarTexto(comandos, `Hora: ${horaStr}`);
+    comandos.push(LF);
+    
+    // Mesa
+    agregarTexto(comandos, `Mesa: ${pedidoParaImprimir.mesa}`);
+    comandos.push(LF);
+    
+    // Método de pago
+    const metodoPagoTexto = metodoPagoSeleccionado === 'transferencia' ? 'TRANSFERENCIA' : 'EFECTIVO';
+    agregarTexto(comandos, `Metodo de pago: ${metodoPagoTexto}`);
+    comandos.push(LF, LF);
+    
+    // Línea separadora
+    agregarTexto(comandos, '--------------------------------');
+    comandos.push(LF);
+    
+    // Encabezado de productos
+    agregarTexto(comandos, 'PRODUCTO        CANT   PRECIO   TOTAL');
+    comandos.push(LF);
+    agregarTexto(comandos, '--------------------------------');
+    comandos.push(LF);
+    
+    // Lista de productos
+    pedidoParaImprimir.items.forEach(item => {
+        const nombre = item.productoInfo ? item.productoInfo.nombre : 
+                      (item.nombreProducto || 'Producto');
+        const cantidad = item.cantidad;
+        const precio = item.precio;
+        const subtotal = cantidad * precio;
+        
+        // Formatear línea de producto (limitando nombre a 15 caracteres)
+        const nombreCorto = nombre.substring(0, 15).padEnd(15);
+        const cantStr = String(cantidad).padStart(4);
+        const precioStr = formatearPrecio(precio).padStart(8);
+        const totalStr = formatearPrecio(subtotal).padStart(8);
+        
+        agregarTexto(comandos, `${nombreCorto} ${cantStr} ${precioStr} ${totalStr}`);
+        comandos.push(LF);
+    });
+    
+    // Línea separadora
+    agregarTexto(comandos, '--------------------------------');
+    comandos.push(LF);
+    
+    // Total
+    comandos.push(ESC, 0x45, 0x01); // Negrita ON
+    agregarTexto(comandos, `TOTAL: $${pedidoParaImprimir.total.toLocaleString('es-CO')}`);
+    comandos.push(LF);
+    comandos.push(ESC, 0x45, 0x00); // Negrita OFF
+    
+    comandos.push(LF, LF);
+    
+    // Centrar
+    comandos.push(ESC, 0x61, 0x01);
+    agregarTexto(comandos, 'Gracias por su compra!');
+    comandos.push(LF);
+    agregarTexto(comandos, 'Vuelva pronto');
+    comandos.push(LF, LF, LF);
+    
+    // Cortar papel
+    comandos.push(GS, 0x56, 0x00);
+    
+    return new Uint8Array(comandos);
+}
+
+function agregarTexto(comandos, texto) {
+    for (let i = 0; i < texto.length; i++) {
+        comandos.push(texto.charCodeAt(i));
+    }
+}
+
+function formatearPrecio(precio) {
+    return `$${precio.toLocaleString('es-CO')}`;
+}
+
+
 
 // Debe estar ASÍ:
 async function actualizarEstadoPedido(orderId, newStatus, metodoPago = null) {
@@ -2594,6 +2838,8 @@ async function guardarEdicionPedido() {
     }
 }
 
+
+
     </script>
 
 <!-- Modal para método de pago -->
@@ -2617,6 +2863,34 @@ async function guardarEdicionPedido() {
         <button onclick="cerrarModalMetodoPago()" style="width: 100%; padding: 0.75rem; background: #e2e8f0; color: #2d3748; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">
             Cancelar
         </button>
+    </div>
+</div>
+
+<!-- Modal para confirmar impresión de factura -->
+<div id="modalConfirmarImpresion" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10001; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 16px; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+        <h3 style="font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 1rem; text-align: center;">🖨️ Imprimir Factura</h3>
+        <p style="font-size: 14px; color: #718096; text-align: center; margin-bottom: 1.5rem;">¿Deseas imprimir la factura en la impresora POS?</p>
+        
+        <div style="display: grid; gap: 1rem;">
+            <button onclick="confirmarImpresion(true)" style="padding: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <span style="font-size: 24px;">🖨️</span>
+                <span>Sí, imprimir</span>
+            </button>
+            
+            <button onclick="confirmarImpresion(false)" style="padding: 1rem; background: #e2e8f0; color: #2d3748; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                No imprimir
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de estado de impresión -->
+<div id="modalEstadoImpresion" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 10002; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 16px; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center;">
+        <div id="impresionSpinner" style="font-size: 48px; margin-bottom: 1rem;">⏳</div>
+        <h3 id="impresionTitulo" style="font-size: 18px; font-weight: 700; color: #1a202c; margin-bottom: 0.5rem;">Imprimiendo factura...</h3>
+        <p id="impresionMensaje" style="font-size: 14px; color: #718096;">Por favor, espere</p>
     </div>
 </div>
 
