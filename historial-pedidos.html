@@ -704,6 +704,250 @@
     50% { transform: scale(1.2); opacity: 0.8; }
 }
 
+/* FILTRO DE PLATOS */
+.filter-platos-container {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+.btn-cambiar-estado-global {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.btn-cambiar-estado-global:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-cambiar-estado-global:disabled {
+    background: #cbd5e0;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* CARD DE NOTAS */
+.notas-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.notas-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.notas-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a202c;
+}
+
+.notas-count {
+    background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.notas-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.notas-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notas-list::-webkit-scrollbar-track {
+    background: #f7fafc;
+    border-radius: 3px;
+}
+
+.notas-list::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 3px;
+}
+
+.nota-item {
+    background: #fff5e1;
+    border-left: 3px solid #f6ad55;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #744210;
+}
+
+.nota-mesa {
+    font-weight: 700;
+    color: #c05621;
+    margin-bottom: 4px;
+}
+
+.notas-empty {
+    text-align: center;
+    padding: 2rem;
+    color: #a0aec0;
+    font-style: italic;
+}
+
+/* ==========================================
+   ESTILOS DE IMPRESIÓN
+   ========================================== */
+
+/* Ocultar el contenedor de impresión en pantalla */
+#print-container {
+    display: none;
+}
+
+/* Estilos para cuando se imprime */
+@media print {
+    /* Ocultar todo excepto el contenedor de impresión */
+    body > *:not(#print-container) {
+        display: none !important;
+    }
+    
+    #print-container {
+        display: block !important;
+    }
+    
+    /* Configuración de página */
+    @page {
+        size: 80mm auto;
+        margin: 0;
+    }
+    
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+    
+    #print-container {
+        width: 80mm;
+        padding: 10mm;
+    }
+    
+    .print-header {
+        text-align: center;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #000;
+    }
+    
+    .print-header h1 {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .print-subtitle {
+        font-size: 10px;
+        color: #666;
+    }
+    
+    .print-info-section {
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px dashed #000;
+    }
+    
+    .print-info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 3px;
+        font-size: 11px;
+    }
+    
+    .print-info-label {
+        font-weight: bold;
+    }
+    
+    .print-metodo-pago {
+        text-align: center;
+        font-size: 12px;
+        font-weight: bold;
+        padding: 8px;
+        background: #f0f0f0;
+        border-radius: 5px;
+        margin: 10px 0;
+    }
+    
+    .print-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 15px;
+    }
+    
+    .print-table th {
+        background: #f0f0f0;
+        padding: 8px 4px;
+        text-align: left;
+        font-size: 11px;
+        font-weight: bold;
+        border-top: 1px solid #000;
+        border-bottom: 1px solid #000;
+    }
+    
+    .print-table td {
+        padding: 8px 4px;
+        font-size: 11px;
+        border-bottom: 1px dashed #ddd;
+    }
+    
+    .print-total-section {
+        margin-top: 15px;
+        padding-top: 10px;
+        border-top: 2px solid #000;
+    }
+    
+    .print-total-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .print-footer {
+        text-align: center;
+        margin-top: 20px;
+        padding-top: 10px;
+        border-top: 1px dashed #000;
+        font-size: 11px;
+    }
+    
+    .print-footer p {
+        margin: 5px 0;
+    }
+}
+
     </style>
 </head>
 <body>
@@ -727,7 +971,7 @@
                 <div class="nav-section-title">Principal</div>
                 <a href="productos.html" class="nav-item">
                     <span class="nav-icon">📦</span>
-                    <span>Productos</span>
+                    <span>Platos</span>
                 </a>
                 <a href="pedidos.html" class="nav-item">
                     <span class="nav-icon">🍽️</span>
@@ -745,19 +989,19 @@
                     <span class="nav-icon">📊</span>
                     <span>Reportes</span>
                 </a>
-                <a href="historial-pedidos.html" class="nav-item">
+                <a href="historial-pedidos.html" class="nav-item active">
                     <span class="nav-icon">📜</span>
                     <span>Historial</span>
                 </a>
                 <a href="catalogo-productos.html" class="nav-item">
                     <span class="nav-icon">📜📦</span>
-                    <span>Inventario</span>
+                    <span>Todos los platos</span>
                 </a>
                 <a href="alimentos.html" class="nav-item">
                     <span class="nav-icon">🥘</span>
                     <span>Alimentos</span>
                 </a>
-                <a href="inventario-alimentos.html" class="nav-item active">
+                <a href="inventario-alimentos.html" class="nav-item ">
                     <span class="nav-icon">📋</span>
                     <span>Inventario Alimentos</span>
                 </a>
@@ -843,42 +1087,76 @@
             </div>
 
             <!-- Filtros -->
-            <div class="filters-card">
-                <div class="filters-header">
-                    <h2 class="filters-title">🔍 Filtros de Búsqueda</h2>
-                    <button class="btn-clear" onclick="clearFilters()">Limpiar Filtros</button>
-                </div>
-                <div class="filters-grid">
-                    <div class="filter-group">
-                        <label class="filter-label">Estado</label>
-<select id="filterEstado" class="filter-select" onchange="applyFilters()">
-    <option value="">Todos los estados</option>
-    <option value="activos">📋 Activos (sin entregados)</option>
-    <option value="pendiente">Pendientes</option>
-    <option value="preparando">Preparando</option>
-    <option value="listo">Listos</option>
-    <option value="entregado">Pagado</option>
-    <option value="cancelado">Cancelados</option>
-</select>
-                    </div>
-<div class="filter-group">
-    <label class="filter-label">Mesa</label>
-    <input type="text" id="filterMesa" class="filter-input" placeholder="Nombre/Número de mesa" maxlength="20" onchange="applyFilters()">
-</div>
-                    <div class="filter-group">
-                        <label class="filter-label">Desde</label>
-                        <input type="date" id="filterFechaDesde" class="filter-input" onchange="applyFilters()">
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label">Hasta</label>
-                        <input type="date" id="filterFechaHasta" class="filter-input" onchange="applyFilters()">
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label">Buscar</label>
-                        <input type="text" id="filterSearch" class="filter-input" placeholder="Producto, notas..." oninput="applyFilters()">
-                    </div>
-                </div>
+           <!-- Filtros -->
+<div class="filters-card">
+    <div class="filters-header">
+        <h2 class="filters-title">🔍 Filtros de Búsqueda</h2>
+        <button class="btn-clear" onclick="clearFilters()">Limpiar Filtros</button>
+    </div>
+    <div class="filters-grid">
+        <div class="filter-group">
+            <label class="filter-label">Estado</label>
+            <select id="filterEstado" class="filter-select" onchange="applyFilters()">
+                <option value="">Todos los estados</option>
+                <option value="activos">📋 Activos (sin entregados)</option>
+                <option value="pendiente">Pendientes</option>
+                <option value="preparando">Preparando</option>
+                <option value="listo">Listos</option>
+                <option value="entregado">Pagado</option>
+                <option value="cancelado">Cancelados</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label class="filter-label">Mesa</label>
+            <input type="text" id="filterMesa" class="filter-input" placeholder="Nombre/Número de mesa" maxlength="20" onchange="applyFilters()">
+        </div>
+        <div class="filter-group">
+            <label class="filter-label">Desde</label>
+            <input type="date" id="filterFechaDesde" class="filter-input" onchange="applyFilters()">
+        </div>
+        <div class="filter-group">
+            <label class="filter-label">Hasta</label>
+            <input type="date" id="filterFechaHasta" class="filter-input" onchange="applyFilters()">
+        </div>
+        <div class="filter-group">
+            <label class="filter-label">Buscar</label>
+            <input type="text" id="filterSearch" class="filter-input" placeholder="Producto, notas..." oninput="applyFilters()">
+        </div>
+    </div>
+    
+    <!-- NUEVO: Filtro por plato -->
+    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid #e2e8f0;">
+        <div class="filter-platos-container">
+            <div class="filter-group" style="flex: 1;">
+                <label class="filter-label">🍽️ Filtrar por Plato</label>
+                <select id="filterPlato" class="filter-select" onchange="applyFilters()">
+                    <option value="">Todos los platos</option>
+                </select>
             </div>
+            <button 
+                id="btnCambiarEstadoGlobal" 
+                class="btn-cambiar-estado-global" 
+                onclick="cambiarEstadoGlobal()"
+                disabled
+            >
+                <span>⚡</span>
+                <span id="textoBotonGlobal">Cambiar Estado Global</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- NUEVO: Card de Notas -->
+<div class="notas-card" id="notasCard" style="display: none;">
+    <div class="notas-header">
+        <span style="font-size: 24px;">📝</span>
+        <h3 class="notas-title">Notas de Pedidos</h3>
+        <span class="notas-count" id="notasCount">0</span>
+    </div>
+    <div class="notas-list" id="notasList">
+        <div class="notas-empty">No hay notas en los pedidos mostrados</div>
+    </div>
+</div>
 
             <!-- Lista de Pedidos -->
             <div class="orders-header">
@@ -909,6 +1187,9 @@ let audioContext = null;
 let audioUnlocked = false;
 let pedidoParaImprimir = null;
 let metodoPagoSeleccionado = null;
+let todosLosPlatos = new Set();
+let platoSeleccionado = null;
+let productosFiltrados = [];
 
 // Inicializar AudioContext
 function initAudioContext() {
@@ -1175,11 +1456,12 @@ async function loadOrders() {
 
         const data = await response.json();
         
-        if (data.success) {
-            allOrders = data.data;
-            console.log(`✅ ${allOrders.length} pedidos cargados`);
-            applyFilters();
-        }
+if (data.success) {
+    allOrders = data.data;
+    console.log(`✅ ${allOrders.length} pedidos cargados`);
+    cargarTodosLosPlatos(); // ✅ NUEVO
+    applyFilters();
+}
     } catch (error) {
         console.error('Error al cargar pedidos:', error);
         grid.innerHTML = `
@@ -1197,6 +1479,10 @@ function applyFilters() {
     const fechaDesde = document.getElementById('filterFechaDesde').value;
     const fechaHasta = document.getElementById('filterFechaHasta').value;
     const search = document.getElementById('filterSearch').value.toLowerCase();
+    const plato = document.getElementById('filterPlato').value;
+
+    // Guardar plato seleccionado
+    platoSeleccionado = plato;
 
     // Filtrado optimizado
     filteredOrders = allOrders.filter(order => {
@@ -1204,7 +1490,6 @@ function applyFilters() {
         if (estado === 'activos') {
             if (order.estado === 'entregado') return false;
         } else if (estado) {
-            // Filtro normal de estado
             if (order.estado !== estado) return false;
         }
         
@@ -1235,12 +1520,35 @@ function applyFilters() {
             if (!notasMatch && !productMatch) return false;
         }
 
+        // ✅ NUEVO: Filtro por plato
+        if (plato) {
+            const tieneElPlato = order.items.some(item => {
+                let nombre = 'Producto eliminado';
+                if (item.productoInfo) {
+                    nombre = item.productoInfo.nombre;
+                } else if (item.producto && item.producto.nombre) {
+                    nombre = item.producto.nombre;
+                } else if (item.nombreProducto) {
+                    nombre = item.nombreProducto;
+                }
+                return nombre === plato;
+            });
+            
+            if (!tieneElPlato) return false;
+        }
+
         return true;
     });
 
+    // ✅ Recopilar productos filtrados para el botón global
+    recopilarProductosFiltrados();
+
     updateStatistics();
     displayOrders();
+    mostrarNotas(); // ✅ NUEVO: Mostrar notas
+    actualizarBotonGlobal(); // ✅ NUEVO: Actualizar estado del botón
 }
+
 function updateStatistics() {
     const total = filteredOrders.length;
     const pendientes = filteredOrders.filter(o => o.estado === 'pendiente').length;
@@ -1513,6 +1821,8 @@ async function confirmarImpresion(imprimir) {
 }
 
 
+
+
 function mostrarEstadoImpresion(estado) {
     const modal = document.getElementById('modalEstadoImpresion');
     const spinner = document.getElementById('impresionSpinner');
@@ -1553,39 +1863,136 @@ async function imprimirFacturaPOS() {
     }
     
     try {
-        // Verificar si el navegador soporta Web Bluetooth
-        if (!navigator.bluetooth) {
-            console.warn('Web Bluetooth no disponible, usando método alternativo');
-            await imprimirFacturaAlternativa();
-            return;
-        }
+        // Crear elemento de impresión
+        crearElementoImpresion();
         
-        // Intentar conectar con impresora Bluetooth
-        const device = await navigator.bluetooth.requestDevice({
-            filters: [
-                { services: ['000018f0-0000-1000-8000-00805f9b34fb'] }, // Servicio común de impresoras POS
-            ],
-            optionalServices: ['battery_service']
-        });
+        // Esperar un momento para que se renderice
+        await new Promise(resolve => setTimeout(resolve, 300));
         
-        const server = await device.gatt.connect();
-        const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
-        const characteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
+        // Imprimir
+        window.print();
         
-        // Generar comandos ESC/POS
-        const comandos = generarComandosESCPOS();
+        // Remover después de imprimir o cancelar
+        window.onafterprint = () => {
+            removerElementoImpresion();
+        };
         
-        // Enviar a la impresora
-        await characteristic.writeValue(comandos);
-        
-        console.log('✅ Factura enviada a impresora POS');
+        console.log('✅ Diálogo de impresión abierto');
         
     } catch (error) {
-        console.error('Error con Web Bluetooth:', error);
-        // Intentar método alternativo
-        await imprimirFacturaAlternativa();
+        console.error('Error al imprimir:', error);
+        removerElementoImpresion();
+        throw error;
     }
 }
+
+
+
+function crearElementoImpresion() {
+    // Remover si ya existe
+    removerElementoImpresion();
+    
+    const fecha = new Date(pedidoParaImprimir.createdAt);
+    const fechaStr = fecha.toLocaleDateString('es-CO', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+    const horaStr = fecha.toLocaleTimeString('es-CO', {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    
+    const metodoPagoTexto = metodoPagoSeleccionado === 'transferencia' ? 'TRANSFERENCIA' : 'EFECTIVO';
+    const nombreRestaurante = currentUser.nombreRestaurante || 'RESTAURANTE';
+    
+    // Generar filas de productos
+    const productosHTML = pedidoParaImprimir.items.map(item => {
+        const nombre = item.productoInfo ? item.productoInfo.nombre : 
+                      (item.nombreProducto || 'Producto');
+        const cantidad = item.cantidad;
+        const precio = item.precio;
+        const subtotal = cantidad * precio;
+        
+        return `
+            <tr>
+                <td>${nombre}</td>
+                <td style="text-align: center;">${cantidad}</td>
+                <td style="text-align: right;">$${precio.toLocaleString('es-CO')}</td>
+                <td style="text-align: right; font-weight: bold;">$${subtotal.toLocaleString('es-CO')}</td>
+            </tr>
+        `;
+    }).join('');
+    
+    // Crear contenedor de impresión
+    const printContainer = document.createElement('div');
+    printContainer.id = 'print-container';
+    printContainer.innerHTML = `
+        <div class="print-header">
+            <h1>${nombreRestaurante}</h1>
+            <div class="print-subtitle">FACTURA DE VENTA</div>
+        </div>
+        
+        <div class="print-info-section">
+            <div class="print-info-row">
+                <span class="print-info-label">Fecha:</span>
+                <span>${fechaStr}</span>
+            </div>
+            <div class="print-info-row">
+                <span class="print-info-label">Hora:</span>
+                <span>${horaStr}</span>
+            </div>
+            <div class="print-info-row">
+                <span class="print-info-label">Mesa:</span>
+                <span>${pedidoParaImprimir.mesa}</span>
+            </div>
+            <div class="print-info-row">
+                <span class="print-info-label">Pedido:</span>
+                <span>#${pedidoParaImprimir._id.slice(-6).toUpperCase()}</span>
+            </div>
+        </div>
+        
+        <div class="print-metodo-pago">
+            💳 ${metodoPagoTexto}
+        </div>
+        
+        <table class="print-table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th style="text-align: center;">Cant.</th>
+                    <th style="text-align: right;">Precio</th>
+                    <th style="text-align: right;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${productosHTML}
+            </tbody>
+        </table>
+        
+        <div class="print-total-section">
+            <div class="print-total-row">
+                <span>TOTAL:</span>
+                <span>$${pedidoParaImprimir.total.toLocaleString('es-CO')}</span>
+            </div>
+        </div>
+        
+        <div class="print-footer">
+            <p><strong>¡Gracias por su compra!</strong></p>
+            <p>Vuelva pronto</p>
+        </div>
+    `;
+    
+    document.body.appendChild(printContainer);
+}
+
+function removerElementoImpresion() {
+    const printContainer = document.getElementById('print-container');
+    if (printContainer) {
+        printContainer.remove();
+    }
+}
+
 
 function generarComandosESCPOS() {
     const ESC = 0x1B;
@@ -1718,9 +2125,13 @@ async function actualizarEstadoPedido(orderId, newStatus, metodoPago = null) {
 
     try {
         const body = { 
-            estado: newStatus,
-            actualizarTodosLosProductos: true  // ✅ NUEVO: Flag para actualizar todos los productos
+            estado: newStatus
         };
+        
+        // ✅ SOLO agregar actualizarTodosLosProductos si NO es cancelado
+        if (newStatus !== 'cancelado') {
+            body.actualizarTodosLosProductos = true;
+        }
         
         // SOLO agregar metodoPago si existe Y el estado es 'entregado'
         if (metodoPago && newStatus === 'entregado') {
@@ -1758,6 +2169,7 @@ async function actualizarEstadoPedido(orderId, newStatus, metodoPago = null) {
         alert('Error al actualizar el estado: ' + error.message);
     }
 }
+
 async function cancelOrder(orderId) {
     if (!confirm('¿Está seguro de cancelar este pedido?')) return;
     await actualizarEstadoPedido(orderId, 'cancelado', null);
@@ -1789,40 +2201,42 @@ async function cancelOrder(orderId) {
         }
     }
 
-    function clearFilters() {
-        document.getElementById('filterEstado').value = '';
-        document.getElementById('filterMesa').value = '';
-        document.getElementById('filterSearch').value = '';
-        document.getElementById('filterFechaDesde').value = '';
-        document.getElementById('filterFechaHasta').value = '';
-        
-        applyFilters();
-        
-        const notification = document.createElement('div');
-        notification.textContent = '✅ Filtros restablecidos';
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 14px;
-            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
-            z-index: 10000;
-            animation: slideInRight 0.3s ease-out;
-        `;
-        
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.style.animation = 'slideOutRight 0.3s ease-out';
-            setTimeout(() => notification.remove(), 300);
-        }, 2000);
-    }
-
+function clearFilters() {
+    document.getElementById('filterEstado').value = '';
+    document.getElementById('filterMesa').value = '';
+    document.getElementById('filterSearch').value = '';
+    document.getElementById('filterFechaDesde').value = '';
+    document.getElementById('filterFechaHasta').value = '';
+    document.getElementById('filterPlato').value = ''; // ✅ NUEVO
+    
+    platoSeleccionado = null; // ✅ NUEVO
+    
+    applyFilters();
+    
+    const notification = document.createElement('div');
+    notification.textContent = '✅ Filtros restablecidos';
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+        z-index: 10000;
+        animation: slideInRight 0.3s ease-out;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => notification.remove(), 300);
+    }, 2000);
+}
     function toggleMenu() {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
@@ -2374,7 +2788,303 @@ function reproducirSonidoEdicion() {
     }
 }
 
+// ✅ FUNCIÓN PARA CARGAR TODOS LOS PLATOS
+// ✅ FUNCIÓN PARA CARGAR TODOS LOS PLATOS (SOLO DE PEDIDOS ACTIVOS)
+function cargarTodosLosPlatos() {
+    todosLosPlatos = new Set();
+    
+    // ✅ FILTRAR SOLO PEDIDOS ACTIVOS (NO ENTREGADOS)
+    const pedidosActivos = allOrders.filter(order => order.estado !== 'entregado');
+    
+    pedidosActivos.forEach(order => {
+        order.items.forEach(item => {
+            let nombre = 'Producto eliminado';
+            
+            if (item.productoInfo) {
+                nombre = item.productoInfo.nombre;
+            } else if (item.producto && item.producto.nombre) {
+                nombre = item.producto.nombre;
+            } else if (item.nombreProducto) {
+                nombre = item.nombreProducto;
+            }
+            
+            if (nombre !== 'Producto eliminado') {
+                todosLosPlatos.add(nombre);
+            }
+        });
+    });
+    
+    // Actualizar el select
+    const selectPlato = document.getElementById('filterPlato');
+    const platoActual = selectPlato.value;
+    
+    selectPlato.innerHTML = '<option value="">Todos los platos</option>';
+    
+    // ✅ Si no hay platos activos, mostrar mensaje
+    if (todosLosPlatos.size === 0) {
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'No hay platos en pedidos activos';
+        option.disabled = true;
+        selectPlato.appendChild(option);
+    } else {
+        Array.from(todosLosPlatos).sort().forEach(plato => {
+            const option = document.createElement('option');
+            option.value = plato;
+            option.textContent = plato;
+            selectPlato.appendChild(option);
+        });
+    }
+    
+    // Restaurar selección si existía y sigue siendo válida
+    if (platoActual && todosLosPlatos.has(platoActual)) {
+        selectPlato.value = platoActual;
+    } else if (platoActual && !todosLosPlatos.has(platoActual)) {
+        // Si el plato seleccionado ya no está disponible, limpiar filtro
+        selectPlato.value = '';
+        platoSeleccionado = null;
+        // Re-aplicar filtros sin el plato
+        applyFilters();
+    }
+}
+// ✅ FUNCIÓN PARA RECOPILAR PRODUCTOS FILTRADOS
+function recopilarProductosFiltrados() {
+    productosFiltrados = [];
+    
+    if (!platoSeleccionado) {
+        return;
+    }
+    
+    filteredOrders.forEach(order => {
+        order.items.forEach((item, itemIndex) => {
+            let nombre = 'Producto eliminado';
+            
+            if (item.productoInfo) {
+                nombre = item.productoInfo.nombre;
+            } else if (item.producto && item.producto.nombre) {
+                nombre = item.producto.nombre;
+            } else if (item.nombreProducto) {
+                nombre = item.nombreProducto;
+            }
+            
+            if (nombre === platoSeleccionado) {
+                // Agregar cada grupo de estados individuales
+                (item.estadosIndividuales || []).forEach(grupo => {
+                    productosFiltrados.push({
+                        orderId: order._id,
+                        itemIndex: itemIndex,
+                        cantidad: grupo.cantidad,
+                        estado: grupo.estado,
+                        nombreProducto: nombre
+                    });
+                });
+            }
+        });
+    });
+}
 
+// ✅ FUNCIÓN PARA ACTUALIZAR EL BOTÓN GLOBAL
+function actualizarBotonGlobal() {
+    const btn = document.getElementById('btnCambiarEstadoGlobal');
+    const texto = document.getElementById('textoBotonGlobal');
+    
+    if (!platoSeleccionado || productosFiltrados.length === 0) {
+        btn.disabled = true;
+        texto.textContent = 'Cambiar Estado Global';
+        return;
+    }
+    
+    // Determinar el estado predominante
+    const estadosCount = {};
+    productosFiltrados.forEach(p => {
+        estadosCount[p.estado] = (estadosCount[p.estado] || 0) + 1;
+    });
+    
+    // Encontrar el estado más común
+    let estadoPredominante = 'pendiente';
+    let maxCount = 0;
+    
+    for (const [estado, count] of Object.entries(estadosCount)) {
+        if (count > maxCount && estado !== 'entregado') {
+            estadoPredominante = estado;
+            maxCount = count;
+        }
+    }
+    
+    // Si todos están entregados, deshabilitar
+    if (estadoPredominante === 'entregado' || maxCount === 0) {
+        btn.disabled = true;
+        texto.textContent = 'Cambiar Estado Global';
+        return;
+    }
+    
+    // Determinar siguiente estado
+    const siguienteEstado = obtenerSiguienteEstado(estadoPredominante);
+    const emojiEstado = {
+        'preparando': '👨‍🍳',
+        'listo': '✅',
+        'entregado': '🎉'
+    }[siguienteEstado] || '▶️';
+    
+    btn.disabled = false;
+    texto.textContent = `${emojiEstado} Cambiar a ${siguienteEstado} (${productosFiltrados.length})`;
+}
+
+// ✅ FUNCIÓN PARA CAMBIAR ESTADO GLOBAL
+async function cambiarEstadoGlobal() {
+    if (!platoSeleccionado || productosFiltrados.length === 0) {
+        alert('⚠️ No hay productos filtrados para cambiar de estado');
+        return;
+    }
+    
+    // Determinar el estado predominante
+    const estadosCount = {};
+    productosFiltrados.forEach(p => {
+        estadosCount[p.estado] = (estadosCount[p.estado] || 0) + 1;
+    });
+    
+    let estadoPredominante = 'pendiente';
+    let maxCount = 0;
+    
+    for (const [estado, count] of Object.entries(estadosCount)) {
+        if (count > maxCount && estado !== 'entregado') {
+            estadoPredominante = estado;
+            maxCount = count;
+        }
+    }
+    
+    const siguienteEstado = obtenerSiguienteEstado(estadoPredominante);
+    
+    const confirmacion = confirm(
+        `🔄 ¿Cambiar el estado de ${productosFiltrados.length} unidades de "${platoSeleccionado}" a "${siguienteEstado}"?\n\n` +
+        `Esta acción afectará a múltiples pedidos.`
+    );
+    
+    if (!confirmacion) return;
+    
+    // Deshabilitar botón
+    const btn = document.getElementById('btnCambiarEstadoGlobal');
+    btn.disabled = true;
+    btn.innerHTML = '<span>⏳</span><span>Actualizando...</span>';
+    
+    try {
+        // Agrupar por pedido para hacer menos peticiones
+        const cambiosPorPedido = {};
+        
+        productosFiltrados.forEach(p => {
+            if (p.estado !== 'entregado') {
+                if (!cambiosPorPedido[p.orderId]) {
+                    cambiosPorPedido[p.orderId] = [];
+                }
+                cambiosPorPedido[p.orderId].push({
+                    itemIndex: p.itemIndex,
+                    cantidad: p.cantidad,
+                    estado: p.estado
+                });
+            }
+        });
+        
+        // Ejecutar cambios
+        let exitosos = 0;
+        let fallidos = 0;
+        
+        for (const [orderId, cambios] of Object.entries(cambiosPorPedido)) {
+            for (const cambio of cambios) {
+                try {
+                    await actualizarEstadoProducto(
+                        orderId,
+                        cambio.itemIndex,
+                        cambio.cantidad,
+                        siguienteEstado
+                    );
+                    exitosos++;
+                } catch (error) {
+                    console.error('Error al actualizar:', error);
+                    fallidos++;
+                }
+            }
+        }
+        
+        // Recargar pedidos
+        await loadOrders();
+        
+        // Mostrar resultado
+        if (fallidos === 0) {
+            mostrarNotificacionExito(`✅ ${exitosos} productos actualizados a "${siguienteEstado}"`);
+        } else {
+            alert(`⚠️ Proceso completado:\n✅ ${exitosos} actualizados\n❌ ${fallidos} fallidos`);
+        }
+        
+    } catch (error) {
+        console.error('Error en cambio global:', error);
+        alert('❌ Error al cambiar estados: ' + error.message);
+    } finally {
+        actualizarBotonGlobal();
+    }
+}
+
+// ✅ FUNCIÓN PARA MOSTRAR NOTAS
+// ✅ FUNCIÓN PARA MOSTRAR NOTAS (SOLO PEDIDOS ACTIVOS)
+function mostrarNotas() {
+    const notasCard = document.getElementById('notasCard');
+    const notasList = document.getElementById('notasList');
+    const notasCount = document.getElementById('notasCount');
+    
+    // ✅ SOLO recopilar notas de pedidos ACTIVOS (no entregados/pagados)
+    const notas = [];
+    
+    filteredOrders.forEach(order => {
+        // ✅ Excluir pedidos entregados/pagados
+        if (order.estado === 'entregado') {
+            return; // Saltar este pedido
+        }
+        
+        if (order.notas && order.notas.trim() !== '') {
+            notas.push({
+                mesa: order.mesa,
+                nota: order.notas,
+                fecha: new Date(order.createdAt),
+                estado: order.estado // Para mostrar el estado
+            });
+        }
+    });
+    
+    if (notas.length === 0) {
+        notasCard.style.display = 'none';
+        return;
+    }
+    
+    // Mostrar card
+    notasCard.style.display = 'block';
+    notasCount.textContent = notas.length;
+    
+    // Ordenar por fecha (más reciente primero)
+    notas.sort((a, b) => b.fecha - a.fecha);
+    
+    // Generar HTML con badge de estado
+    notasList.innerHTML = notas.map(n => {
+        const badgeColor = {
+            'pendiente': '#ed8936',
+            'preparando': '#4299e1',
+            'listo': '#48bb78',
+            'cancelado': '#fc8181'
+        }[n.estado] || '#718096';
+        
+        const estadoTexto = n.estado.charAt(0).toUpperCase() + n.estado.slice(1);
+        
+        return `
+            <div class="nota-item">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <div class="nota-mesa">Mesa ${n.mesa}</div>
+                    <span style="background: ${badgeColor}; color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; text-transform: uppercase;">
+                        ${estadoTexto}
+                    </span>
+                </div>
+                <div>📝 ${n.nota}</div>
+            </div>
+        `;
+    }).join('');
+}
 
 </script>
 

@@ -1056,6 +1056,139 @@
     50% { transform: scale(1.2); opacity: 0.8; }
 }
 
+/* ==========================================
+   ESTILOS DE IMPRESIÓN
+   ========================================== */
+
+/* Ocultar el contenedor de impresión en pantalla */
+#print-container {
+    display: none;
+}
+
+/* Estilos para cuando se imprime */
+@media print {
+    /* Ocultar todo excepto el contenedor de impresión */
+    body > *:not(#print-container) {
+        display: none !important;
+    }
+    
+    #print-container {
+        display: block !important;
+    }
+    
+    /* Configuración de página */
+    @page {
+        size: 80mm auto;
+        margin: 0;
+    }
+    
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+    
+    #print-container {
+        width: 80mm;
+        padding: 10mm;
+    }
+    
+    .print-header {
+        text-align: center;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #000;
+    }
+    
+    .print-header h1 {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .print-subtitle {
+        font-size: 10px;
+        color: #666;
+    }
+    
+    .print-info-section {
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px dashed #000;
+    }
+    
+    .print-info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 3px;
+        font-size: 11px;
+    }
+    
+    .print-info-label {
+        font-weight: bold;
+    }
+    
+    .print-metodo-pago {
+        text-align: center;
+        font-size: 12px;
+        font-weight: bold;
+        padding: 8px;
+        background: #f0f0f0;
+        border-radius: 5px;
+        margin: 10px 0;
+    }
+    
+    .print-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 15px;
+    }
+    
+    .print-table th {
+        background: #f0f0f0;
+        padding: 8px 4px;
+        text-align: left;
+        font-size: 11px;
+        font-weight: bold;
+        border-top: 1px solid #000;
+        border-bottom: 1px solid #000;
+    }
+    
+    .print-table td {
+        padding: 8px 4px;
+        font-size: 11px;
+        border-bottom: 1px dashed #ddd;
+    }
+    
+    .print-total-section {
+        margin-top: 15px;
+        padding-top: 10px;
+        border-top: 2px solid #000;
+    }
+    
+    .print-total-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .print-footer {
+        text-align: center;
+        margin-top: 20px;
+        padding-top: 10px;
+        border-top: 1px dashed #000;
+        font-size: 11px;
+    }
+    
+    .print-footer p {
+        margin: 5px 0;
+    }
+}
+
     </style>
 
     
@@ -1848,6 +1981,7 @@ async function confirmarImpresion(imprimir) {
 }
 
 
+
 function mostrarEstadoImpresion(estado) {
     const modal = document.getElementById('modalEstadoImpresion');
     const spinner = document.getElementById('impresionSpinner');
@@ -1887,37 +2021,131 @@ async function imprimirFacturaPOS() {
     }
     
     try {
-        // Verificar si el navegador soporta Web Bluetooth
-        if (!navigator.bluetooth) {
-            console.warn('Web Bluetooth no disponible, usando método alternativo');
-            await imprimirFacturaAlternativa();
-            return;
-        }
+        // Crear elemento de impresión
+        crearElementoImpresion();
         
-        // Intentar conectar con impresora Bluetooth
-        const device = await navigator.bluetooth.requestDevice({
-            filters: [
-                { services: ['000018f0-0000-1000-8000-00805f9b34fb'] }, // Servicio común de impresoras POS
-            ],
-            optionalServices: ['battery_service']
-        });
+        // Esperar un momento para que se renderice
+        await new Promise(resolve => setTimeout(resolve, 300));
         
-        const server = await device.gatt.connect();
-        const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
-        const characteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
+        // Imprimir
+        window.print();
         
-        // Generar comandos ESC/POS
-        const comandos = generarComandosESCPOS();
+        // Remover después de imprimir o cancelar
+        window.onafterprint = () => {
+            removerElementoImpresion();
+        };
         
-        // Enviar a la impresora
-        await characteristic.writeValue(comandos);
-        
-        console.log('✅ Factura enviada a impresora POS');
+        console.log('✅ Diálogo de impresión abierto');
         
     } catch (error) {
-        console.error('Error con Web Bluetooth:', error);
-        // Intentar método alternativo
-        await imprimirFacturaAlternativa();
+        console.error('Error al imprimir:', error);
+        removerElementoImpresion();
+        throw error;
+    }
+}
+
+function crearElementoImpresion() {
+    // Remover si ya existe
+    removerElementoImpresion();
+    
+    const fecha = new Date(pedidoParaImprimir.createdAt);
+    const fechaStr = fecha.toLocaleDateString('es-CO', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+    const horaStr = fecha.toLocaleTimeString('es-CO', {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    
+    const metodoPagoTexto = metodoPagoSeleccionado === 'transferencia' ? 'TRANSFERENCIA' : 'EFECTIVO';
+    const nombreRestaurante = currentUser.nombreRestaurante || 'RESTAURANTE';
+    
+    // Generar filas de productos
+    const productosHTML = pedidoParaImprimir.items.map(item => {
+        const nombre = item.productoInfo ? item.productoInfo.nombre : 
+                      (item.nombreProducto || 'Producto');
+        const cantidad = item.cantidad;
+        const precio = item.precio;
+        const subtotal = cantidad * precio;
+        
+        return `
+            <tr>
+                <td>${nombre}</td>
+                <td style="text-align: center;">${cantidad}</td>
+                <td style="text-align: right;">$${precio.toLocaleString('es-CO')}</td>
+                <td style="text-align: right; font-weight: bold;">$${subtotal.toLocaleString('es-CO')}</td>
+            </tr>
+        `;
+    }).join('');
+    
+    // Crear contenedor de impresión
+    const printContainer = document.createElement('div');
+    printContainer.id = 'print-container';
+    printContainer.innerHTML = `
+        <div class="print-header">
+            <h1>${nombreRestaurante}</h1>
+            <div class="print-subtitle">FACTURA DE VENTA</div>
+        </div>
+        
+        <div class="print-info-section">
+            <div class="print-info-row">
+                <span class="print-info-label">Fecha:</span>
+                <span>${fechaStr}</span>
+            </div>
+            <div class="print-info-row">
+                <span class="print-info-label">Hora:</span>
+                <span>${horaStr}</span>
+            </div>
+            <div class="print-info-row">
+                <span class="print-info-label">Mesa:</span>
+                <span>${pedidoParaImprimir.mesa}</span>
+            </div>
+            <div class="print-info-row">
+                <span class="print-info-label">Pedido:</span>
+                <span>#${pedidoParaImprimir._id.slice(-6).toUpperCase()}</span>
+            </div>
+        </div>
+        
+        <div class="print-metodo-pago">
+            💳 ${metodoPagoTexto}
+        </div>
+        
+        <table class="print-table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th style="text-align: center;">Cant.</th>
+                    <th style="text-align: right;">Precio</th>
+                    <th style="text-align: right;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${productosHTML}
+            </tbody>
+        </table>
+        
+        <div class="print-total-section">
+            <div class="print-total-row">
+                <span>TOTAL:</span>
+                <span>$${pedidoParaImprimir.total.toLocaleString('es-CO')}</span>
+            </div>
+        </div>
+        
+        <div class="print-footer">
+            <p><strong>¡Gracias por su compra!</strong></p>
+            <p>Vuelva pronto</p>
+        </div>
+    `;
+    
+    document.body.appendChild(printContainer);
+}
+
+function removerElementoImpresion() {
+    const printContainer = document.getElementById('print-container');
+    if (printContainer) {
+        printContainer.remove();
     }
 }
 
@@ -2055,11 +2283,16 @@ async function actualizarEstadoPedido(orderId, newStatus, metodoPago = null) {
 
     try {
         const body = { 
-            estado: newStatus,
-            actualizarTodosLosProductos: true  // ✅ NUEVO: Flag para actualizar todos los productos
+            estado: newStatus
         };
         
-        if (metodoPago) {
+        // ✅ SOLO agregar actualizarTodosLosProductos si NO es cancelado
+        if (newStatus !== 'cancelado') {
+            body.actualizarTodosLosProductos = true;
+        }
+        
+        // SOLO agregar metodoPago si existe Y el estado es 'entregado'
+        if (metodoPago && newStatus === 'entregado') {
             body.metodoPago = metodoPago;
         }
 
