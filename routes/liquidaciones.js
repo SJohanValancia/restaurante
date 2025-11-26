@@ -92,11 +92,12 @@ router.get('/stats/resumen', protect, async (req, res) => {
 
     console.log('📊 Total liquidaciones encontradas:', liquidaciones.length);
 
-    // Calcular transferencias y movimientos
+    // Calcular transferencias, movimientos y GASTOS EN EFECTIVO
     let totalTransferenciasIngresos = 0;
     let totalTransferenciasGastos = 0;
     let totalAportes = 0;
     let totalRetiros = 0;
+    let totalGastosEfectivo = 0;  // ✅ NUEVO
 
     liquidaciones.forEach((liq, index) => {
       console.log(`\n🔍 Liquidación ${index + 1}:`, liq._id);
@@ -111,14 +112,18 @@ router.get('/stats/resumen', protect, async (req, res) => {
         });
       }
 
-      // Transferencias de gastos
+      // ✅ CALCULAR GASTOS EN EFECTIVO Y TRANSFERENCIAS
       if (liq.egresos && Array.isArray(liq.egresos.gastos)) {
         liq.egresos.gastos.forEach(registro => {
           if (registro && Array.isArray(registro.gastos)) {
             registro.gastos.forEach(gasto => {
-              if (gasto && gasto.metodoPago === 'transferencia') {
+              if (gasto.metodoPago === 'transferencia') {
                 console.log('  💳 Gasto transferencia:', gasto.monto);
                 totalTransferenciasGastos += gasto.monto;
+              } else {
+                // Asumimos que si no es transferencia, es efectivo
+                console.log('  💵 Gasto efectivo:', gasto.monto);
+                totalGastosEfectivo += gasto.monto;
               }
             });
           }
@@ -144,6 +149,7 @@ router.get('/stats/resumen', protect, async (req, res) => {
     console.log('\n💰 Totales calculados:');
     console.log('  - Transferencias Ingresos:', totalTransferenciasIngresos);
     console.log('  - Transferencias Gastos:', totalTransferenciasGastos);
+    console.log('  - Gastos Efectivo:', totalGastosEfectivo);  // ✅ NUEVO LOG
     console.log('  - Total Aportes:', totalAportes);
     console.log('  - Total Retiros:', totalRetiros);
     console.log('  - Total Movimientos:', totalMovimientos);
@@ -156,6 +162,7 @@ router.get('/stats/resumen', protect, async (req, res) => {
       totalLiquidaciones: liquidaciones.length,
       totalIngresos,
       totalEgresos,
+      totalGastosEfectivo,  // ✅ NUEVO CAMPO
       totalAportes,
       totalRetiros,
       totalMovimientos,

@@ -840,6 +840,12 @@
         <div class="stat-label">Total Egresos</div>
         <div class="stat-value" id="totalEgresos">$0</div>
     </div>
+
+        <div class="stat-card">
+        <div class="stat-icon red" style="background: linear-gradient(135deg, #fc8181 0%, #c53030 100%);">💵</div>
+        <div class="stat-label">Gastos en Efectivo</div>
+        <div class="stat-value" id="totalGastosEfectivo">$0</div>
+    </div>
     
     <div class="stat-card">
         <div class="stat-icon blue">💰</div>
@@ -1036,6 +1042,11 @@ async function cargarEstadisticas(fechaInicio = null, fechaFin = null) {
                 `$${(stats.totalIngresos || 0).toLocaleString('es-CO')}`;
             document.getElementById('totalEgresos').textContent = 
                 `$${(stats.totalEgresos || 0).toLocaleString('es-CO')}`;
+            
+            // ✅ NUEVA LÍNEA: MOSTRAR GASTOS EN EFECTIVO
+            document.getElementById('totalGastosEfectivo').textContent = 
+                `$${(stats.totalGastosEfectivo || 0).toLocaleString('es-CO')}`;
+            
             document.getElementById('promedioIngresos').textContent = 
                 `$${Math.round(stats.promedioIngresosPorDia || 0).toLocaleString('es-CO')}`;
             
@@ -1047,11 +1058,12 @@ async function cargarEstadisticas(fechaInicio = null, fechaFin = null) {
             document.getElementById('cajaTransferencias').textContent = 
                 `$${(stats.cajaTransferencias || 0).toLocaleString('es-CO')}`;
 
-                const cajaEfectivo = (stats.totalIngresos || 0) - (stats.totalTransferenciasIngresos || 0) - 
-                     ((stats.totalEgresos || 0) - (stats.totalTransferenciasGastos || 0));
+            // Calcular caja efectivo correctamente
+            const ingresosEfectivo = (stats.totalIngresos || 0) - (stats.totalTransferenciasIngresos || 0);
+            const cajaEfectivo = ingresosEfectivo - (stats.totalGastosEfectivo || 0);
 
-document.getElementById('cajaEfectivo').textContent = 
-    `$${cajaEfectivo.toLocaleString('es-CO')}`;
+            document.getElementById('cajaEfectivo').textContent = 
+                `$${cajaEfectivo.toLocaleString('es-CO')}`;
             
             // Movimientos
             document.getElementById('totalAportes').textContent = 
@@ -1061,7 +1073,7 @@ document.getElementById('cajaEfectivo').textContent =
             document.getElementById('totalMovimientos').textContent = 
                 `$${(stats.totalMovimientos || 0).toLocaleString('es-CO')}`;
             
-            // Caja Final Total (ahora incluye movimientos)
+            // Caja Final Total
             document.getElementById('cajaFinalTotal').textContent = 
                 `$${(stats.cajaFinalTotal || 0).toLocaleString('es-CO')}`;
         }
@@ -1070,6 +1082,7 @@ document.getElementById('cajaEfectivo').textContent =
         document.getElementById('statsContainer').style.display = 'none';
     }
 }
+
 function mostrarLiquidaciones() {
             const container = document.getElementById('liquidacionesContainer');
 
