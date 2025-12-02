@@ -986,10 +986,148 @@
     animation: none;
 }
     
+/* Banner de notificación de vencimiento */
+.notification-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+    animation: slideDownBanner 0.5s ease-out;
+    display: none;
+}
+
+.notification-banner.show {
+    display: block;
+}
+
+@keyframes slideDownBanner {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.notification-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.notification-text {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.notification-icon {
+    font-size: 2.5rem;
+    animation: pulse-icon 2s ease-in-out infinite;
+}
+
+@keyframes pulse-icon {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.notification-message {
+    flex: 1;
+}
+
+.notification-message h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.notification-message p {
+    font-size: 1rem;
+    opacity: 0.95;
+}
+
+.btn-renovar {
+    background: white;
+    color: #d97706;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+}
+
+.btn-renovar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Ajustar el contenido para que no quede debajo del banner */
+body.has-notification {
+    padding-top: 100px;
+}
+
+@media (max-width: 768px) {
+    .notification-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .notification-text {
+        flex-direction: column;
+    }
+    
+    .notification-message h3 {
+        font-size: 1.1rem;
+    }
+    
+    .notification-message p {
+        font-size: 0.9rem;
+    }
+    
+    .btn-renovar {
+        width: 100%;
+    }
+}
 
     </style>
 </head>
 <body>
+    <!-- Banner de Notificación -->
+    <div id="notificationBanner" class="notification-banner">
+        <div class="notification-content">
+            <div class="notification-text">
+                <div class="notification-icon">⚠️</div>
+                <div class="notification-message">
+                    <h3>¡Atención! Tu licencia está por vencer</h3>
+                    <p id="notificationText">Su licencia vence en X días. Por favor renueve su mensualidad para seguir utilizando JC-RT</p>
+                </div>
+            </div>
+            <a href="https://wa.me/573128540908?text=Hola,%20necesito%20renovar%20mi%20licencia%20de%20JC-RT" target="_blank">
+                <button class="btn-renovar">
+                    📱 Renovar Ahora
+                </button>
+            </a>
+        </div>
+    </div>
+
     <!-- Overlay para móvil -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
@@ -1643,6 +1781,60 @@
                 window.location.href = 'index.html';
             }
         }
+
+        // Verificar fecha de vencimiento
+async function verificarFechaVencimiento() {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_URL}/auth/me`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+        const usuario = data.data;
+
+        if (usuario.fechaPago) {
+            const fechaPago = new Date(usuario.fechaPago);
+            const hoy = new Date();
+            const diferenciaDias = Math.ceil((fechaPago - hoy) / (1000 * 60 * 60 * 24));
+
+            // Mostrar notificación si faltan 5 días o menos
+            if (diferenciaDias <= 5 && diferenciaDias >= 0) {
+                const banner = document.getElementById('notificationBanner');
+                const texto = document.getElementById('notificationText');
+                
+                texto.textContent = `Su licencia vence en ${diferenciaDias} día${diferenciaDias !== 1 ? 's' : ''}. Por favor renueve su mensualidad para seguir utilizando JC-RT`;
+                
+                banner.classList.add('show');
+                document.body.classList.add('has-notification');
+            } else if (diferenciaDias < 0) {
+                // Licencia vencida
+                const banner = document.getElementById('notificationBanner');
+                const texto = document.getElementById('notificationText');
+                
+                banner.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                texto.textContent = `¡Su licencia ha vencido! Por favor renueve su mensualidad para seguir utilizando JC-RT`;
+                
+                banner.classList.add('show');
+                document.body.classList.add('has-notification');
+            }
+        }
+    } catch (error) {
+        console.error('Error al verificar fecha de vencimiento:', error);
+    }
+}
+
+// Ejecutar al cargar la página
+verificarFechaVencimiento();
+
+// Verificar cada hora
+setInterval(verificarFechaVencimiento, 3600000);
+
     </script>
 </body>
+
+
+
 </html>

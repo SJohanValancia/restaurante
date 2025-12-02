@@ -379,6 +379,26 @@
                 padding: 35px 25px;
             }
         }
+
+        .whatsapp-link {
+    color: #10b981;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px 16px;
+    background: #d1fae5;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.whatsapp-link:hover {
+    background: #10b981;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
     </style>
 </head>
 <body>
@@ -458,15 +478,33 @@
             }
         }
 
-        function showAlert(message, type = 'error') {
-            const alert = document.getElementById('alert');
-            alert.textContent = message;
-            alert.className = `alert alert-${type} show`;
-            
-            setTimeout(() => {
-                alert.classList.remove('show');
-            }, 5000);
-        }
+
+        function showAlert(message, type = 'error', showWhatsApp = false) {
+    const alert = document.getElementById('alert');
+    
+    if (showWhatsApp) {
+        const phoneNumber = '573128540908'; // Número con código de país (57 para Colombia)
+        const whatsappMessage = encodeURIComponent('Hola, mi cuenta ha sido bloqueada y necesito ayuda');
+        
+        alert.innerHTML = `
+            ${message}
+            <br><br>
+            <a href="https://wa.me/${phoneNumber}?text=${whatsappMessage}" 
+               class="whatsapp-link" 
+               target="_blank">
+                📱 Contactar por WhatsApp al 3128540908
+            </a>
+        `;
+    } else {
+        alert.textContent = message;
+    }
+    
+    alert.className = `alert alert-${type} show`;
+    
+    setTimeout(() => {
+        alert.classList.remove('show');
+    }, showWhatsApp ? 10000 : 5000); // Más tiempo si hay WhatsApp
+}
 
         function setLoading(isLoading) {
             const btn = document.getElementById('loginBtn');
@@ -523,14 +561,14 @@ const data = await response.json();
                             window.location.href = 'productos.html';
                         }
                     }, 1500);
-                } else {
-                    // Si la cuenta está bloqueada, mostrar mensaje especial
-                    if (data.bloqueado) {
-                        showAlert(data.motivoBloqueo || data.message, 'error');
-                    } else {
-                        showAlert(data.message || 'Error al iniciar sesión', 'error');
-                    }
-                }
+               } else {
+    // Si la cuenta está bloqueada, mostrar mensaje especial con WhatsApp
+    if (data.bloqueado) {
+        showAlert(data.motivoBloqueo || data.message, 'error', true);
+    } else {
+        showAlert(data.message || 'Error al iniciar sesión', 'error', false);
+    }
+}
             } catch (error) {
                 console.error('Error:', error);
                 showAlert('Error de conexión. Por favor intente nuevamente', 'error');

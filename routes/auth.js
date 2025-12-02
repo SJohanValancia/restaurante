@@ -386,4 +386,72 @@ router.patch('/superadmin/toggle-bloqueo/:userId', async (req, res) => {
   }
 });
 
+// Actualizar fecha de pago para un restaurante (solo superadmin)
+router.patch('/superadmin/fecha-pago/:userId', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: 'No autorizado'
+      });
+    }
+
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || 'secreto-super-seguro-cambiar-en-produccion'
+    );
+
+    const usuarioActual = await User.findById(decoded.id);
+
+    if (!usuarioActual || usuarioActual.rol !== 'superadmin') {
+      return res.status(403).json({
+        success: false,
+        message: 'No tiene permisos de superadmin'
+      });
+    }
+
+    const usuario = await User.findById(req.params.userId);
+
+    if (!usuario) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario no encontrado'
+      });
+    }
+
+    const { fechaPago } = req.body;
+
+    if (!fechaPago) {
+      return res.status(400).json({
+        success: false,
+        message: 'Debe proporcionar una fecha de pago'
+      });
+    }
+
+    // Actualizar todos los usuarios del mismo restaurante
+    await User.updateMany(
+      { nombreRestaurante: usuario.nombreRestaurante },
+      {
+        fechaPago: new Date(fechaPago),
+        fechaUltimoPago: new Date()
+      }
+    );
+
+    res.json({
+      success: true,
+      message: `Fecha de pago actualizada para el restaurante "${usuario.nombreRestaurante}"`,
+      fechaPago: fechaPago
+    });
+
+  } catch (error) {
+    console.error('Error al actualizar fecha de pago:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al actualizar fecha de pago'
+    });
+  }
+});
+
 module.exports = router;

@@ -61,6 +61,15 @@ fechaBloqueo: {
   default: null
 },
 
+fechaPago: {
+  type: Date,
+  default: null
+},
+fechaUltimoPago: {
+  type: Date,
+  default: null
+},
+
   ultimoAcceso: {
     type: Date,
     default: null
@@ -105,7 +114,9 @@ userSchema.methods.obtenerDatosPublicos = function() {
     sede: this.sede,
     createdAt: this.createdAt,
     bloqueado: this.bloqueado,
-    motivoBloqueo: this.motivoBloqueo
+    motivoBloqueo: this.motivoBloqueo,
+    fechaPago: this.fechaPago,
+    fechaUltimoPago: this.fechaUltimoPago
   };
 };
 

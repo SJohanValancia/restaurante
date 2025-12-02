@@ -314,6 +314,19 @@
                 padding: 10px;
             }
         }
+
+        .phone-link {
+    color: #10b981;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.phone-link:hover {
+    color: #059669;
+    text-decoration: underline;
+}
+
     </style>
 </head>
 <body>
@@ -374,7 +387,8 @@
                             <th>Rol</th>
                             <th>Estado</th>
                             <th>Fecha Registro</th>
-                            <th>Acción</th>
+                            <th>Fecha Pago</th>
+<th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="usuariosTable">
@@ -464,16 +478,34 @@
                         }
                     </td>
                     <td>${new Date(usuario.createdAt).toLocaleDateString('es-ES')}</td>
-                    <td>
-                        ${usuario.rol !== 'superadmin' ? `
-                            <button 
-                                class="btn ${usuario.bloqueado ? 'btn-unblock' : 'btn-block'}"
-                                onclick="toggleBloqueo('${usuario._id}', ${usuario.bloqueado})"
-                            >
-                                ${usuario.bloqueado ? '✓ Desbloquear' : '🚫 Bloquear'}
-                            </button>
-                        ` : '<span style="color: var(--text-light);">-</span>'}
-                    </td>
+<td>
+    ${usuario.fechaPago 
+        ? `<span style="font-size: 0.9rem; color: var(--text-dark);">
+            ${new Date(usuario.fechaPago).toLocaleDateString('es-ES')}
+           </span>` 
+        : '<span style="color: var(--text-light);">Sin fecha</span>'
+    }
+</td>
+<td>
+    ${usuario.rol !== 'superadmin' ? `
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button 
+                class="btn ${usuario.bloqueado ? 'btn-unblock' : 'btn-block'}"
+                onclick="toggleBloqueo('${usuario._id}', ${usuario.bloqueado})"
+                style="white-space: nowrap;"
+            >
+                ${usuario.bloqueado ? '✓ Desbloquear' : '🚫 Bloquear'}
+            </button>
+            <button 
+                class="btn"
+                onclick="abrirModalFechaPago('${usuario._id}', '${usuario.nombreRestaurante}')"
+                style="background: #8b5cf6; color: white; white-space: nowrap;"
+            >
+                📅 Fecha Pago
+            </button>
+        </div>
+    ` : '<span style="color: var(--text-light);">-</span>'}
+</td>
                 </tr>
             `).join('');
         }
@@ -548,5 +580,101 @@
             }
         }
     </script>
+
+<!-- Modal Fecha de Pago -->
+<div id="modalFechaPago" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 2000; align-items: center; justify-content: center; padding: 1rem;">
+    <div style="background: white; border-radius: 12px; padding: 2rem; max-width: 500px; width: 100%;">
+        <h2 style="margin-bottom: 1.5rem; font-size: 1.5rem;">📅 Asignar Fecha de Pago</h2>
+        <p style="margin-bottom: 1rem; color: var(--text-light);">
+            Restaurante: <strong id="modalRestauranteNombre"></strong>
+        </p>
+        <form id="formFechaPago" style="display: flex; flex-direction: column; gap: 1rem;">
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Fecha de Vencimiento:</label>
+                <input 
+                    type="date" 
+                    id="inputFechaPago" 
+                    required
+                    style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 1rem;"
+                >
+            </div>
+            <div style="background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; padding: 12px; font-size: 0.9rem; color: #92400e;">
+                ℹ️ Los usuarios recibirán una notificación 5 días antes del vencimiento
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button 
+                    type="button" 
+                    onclick="cerrarModalFechaPago()"
+                    style="flex: 1; padding: 12px; background: white; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-weight: 600;"
+                >
+                    Cancelar
+                </button>
+                <button 
+                    type="submit" 
+                    style="flex: 1; padding: 12px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;"
+                >
+                    Guardar Fecha
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+let usuarioIdFechaPago = null;
+
+function abrirModalFechaPago(userId, restauranteNombre) {
+    usuarioIdFechaPago = userId;
+    document.getElementById('modalRestauranteNombre').textContent = restauranteNombre;
+    document.getElementById('modalFechaPago').style.display = 'flex';
+    
+    // Establecer fecha mínima como hoy
+    const hoy = new Date().toISOString().split('T')[0];
+    document.getElementById('inputFechaPago').setAttribute('min', hoy);
+}
+
+function cerrarModalFechaPago() {
+    document.getElementById('modalFechaPago').style.display = 'none';
+    document.getElementById('formFechaPago').reset();
+    usuarioIdFechaPago = null;
+}
+
+document.getElementById('formFechaPago').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const fechaPago = document.getElementById('inputFechaPago').value;
+    
+    if (!usuarioIdFechaPago || !fechaPago) {
+        alert('Por favor complete todos los campos');
+        return;
+    }
+
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_URL}/superadmin/fecha-pago/${usuarioIdFechaPago}`, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ fechaPago })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert('✅ ' + data.message);
+            cerrarModalFechaPago();
+            await cargarUsuarios();
+        } else {
+            alert('❌ ' + (data.message || 'Error al actualizar fecha'));
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error de conexión');
+    }
+});
+</script>
+
 </body>
 </html>
