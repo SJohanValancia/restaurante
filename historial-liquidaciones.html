@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <title>Historial de Liquidaciones</title>
     <style>
         * {
@@ -498,7 +499,7 @@
         .caja-final-value {
             font-size: 36px;
             font-weight: 800;
-            color: #667eea;
+            color: #000000;
         }
 
         .liquidacion-actions {
@@ -706,6 +707,9 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        
+
     </style>
 </head>
 <body>
@@ -814,11 +818,16 @@
                         <label class="filter-label">Fecha Fin</label>
                         <input type="date" id="fechaFin" class="filter-input">
                     </div>
-                    <div class="filter-group">
-                        <button class="btn-filter" onclick="aplicarFiltros()">
-                            🔍 Buscar
-                        </button>
-                    </div>
+<div class="filter-group">
+    <button class="btn-filter" onclick="aplicarFiltros()">
+        🔍 Buscar
+    </button>
+</div>
+<div class="filter-group">
+    <button class="btn-filter" onclick="descargarExcel()" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">
+        📊 Descargar Excel
+    </button>
+</div>
                 </div>
             </div>
 
@@ -1480,6 +1489,118 @@ const cajaEfectivoModal = ingresosEfectivoModal - gastosEfectivoModal;
                 cerrarModal();
             }
         });
+
+        async function descargarExcel() {
+    if (liquidaciones.length === 0) {
+        alert('No hay liquidaciones para descargar');
+        return;
+    }
+
+    const token = localStorage.getItem('token');
+    
+    try {
+        // Preparar datos para Excel
+        const datosExcel = [];
+        
+        for (const liq of liquidaciones) {
+            // Calcular transferencias
+            let transferenciasPedidos = 0;
+            let transferenciasGastos = 0;
+            let gastosEfectivo = 0;
+            
+            if (liq.ingresos && liq.ingresos.pedidos) {
+                liq.ingresos.pedidos.forEach(pedido => {
+                    if (pedido && pedido.metodoPago === 'transferencia') {
+                        transferenciasPedidos += pedido.total;
+                    }
+                });
+            }
+            
+            if (liq.egresos && liq.egresos.gastos) {
+                liq.egresos.gastos.forEach(registro => {
+                    if (registro && registro.gastos) {
+                        registro.gastos.forEach(gasto => {
+                            if (gasto.metodoPago === 'transferencia') {
+                                transferenciasGastos += gasto.monto;
+                            } else {
+                                gastosEfectivo += gasto.monto;
+                            }
+                        });
+                    }
+                });
+            }
+            
+            const cajaTransferencias = transferenciasPedidos - transferenciasGastos;
+            const ingresosEfectivo = liq.ingresos.totalPedidos - transferenciasPedidos;
+            const cajaEfectivo = ingresosEfectivo - gastosEfectivo;
+            
+            const fecha = new Date(liq.fecha);
+            
+            datosExcel.push({
+                'ID': liq._id.slice(-8).toUpperCase(),
+                'Fecha': fecha.toLocaleDateString('es-CO'),
+                'Hora': fecha.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }),
+                'Caja Inicial': liq.cajaInicial,
+                'Total Ingresos': liq.ingresos.totalPedidos,
+                'Total Egresos': liq.egresos.totalGastos,
+                'Gastos Efectivo': gastosEfectivo,
+                'Movimientos': liq.totalMovimientos,
+                'Pagos Transferencia': transferenciasPedidos,
+                'Gastos Transferencia': transferenciasGastos,
+                'Caja Final': liq.cajaFinal,
+                'Caja Efectivo': cajaEfectivo,
+                'Caja Transferencias': cajaTransferencias,
+                'Cantidad Pedidos': liq.ingresos.pedidos ? liq.ingresos.pedidos.length : 0,
+                'Cantidad Gastos': liq.egresos.gastos ? liq.egresos.gastos.length : 0,
+                'Observaciones': liq.observaciones || ''
+            });
+        }
+        
+        // Crear libro de Excel
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(datosExcel);
+        
+        // Ajustar ancho de columnas
+        const wscols = [
+            { wch: 10 },  // ID
+            { wch: 12 },  // Fecha
+            { wch: 8 },   // Hora
+            { wch: 15 },  // Caja Inicial
+            { wch: 15 },  // Total Ingresos
+            { wch: 15 },  // Total Egresos
+            { wch: 15 },  // Gastos Efectivo
+            { wch: 15 },  // Movimientos
+            { wch: 18 },  // Pagos Transferencia
+            { wch: 18 },  // Gastos Transferencia
+            { wch: 15 },  // Caja Final
+            { wch: 15 },  // Caja Efectivo
+            { wch: 18 },  // Caja Transferencias
+            { wch: 15 },  // Cantidad Pedidos
+            { wch: 15 },  // Cantidad Gastos
+            { wch: 30 }   // Observaciones
+        ];
+        ws['!cols'] = wscols;
+        
+        // Agregar hoja al libro
+        XLSX.utils.book_append_sheet(wb, ws, "Liquidaciones");
+        
+        // Generar nombre de archivo con fecha
+        const nombreArchivo = `Liquidaciones_${new Date().toISOString().split('T')[0]}.xlsx`;
+        
+        // Descargar archivo
+        XLSX.writeFile(wb, nombreArchivo);
+        
+        alert('✅ Excel descargado correctamente');
+        
+    } catch (error) {
+        console.error('Error al generar Excel:', error);
+        alert('❌ Error al generar el archivo Excel');
+    }
+}
+
     </script>
 </body>
+
+
+
 </html>

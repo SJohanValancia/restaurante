@@ -46,6 +46,21 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+
+  // En userSchema, después del campo 'activo':
+bloqueado: {
+  type: Boolean,
+  default: false
+},
+motivoBloqueo: {
+  type: String,
+  default: ''
+},
+fechaBloqueo: {
+  type: Date,
+  default: null
+},
+
   ultimoAcceso: {
     type: Date,
     default: null
@@ -58,8 +73,7 @@ const userSchema = new mongoose.Schema({
 // Índices
 userSchema.index({ email: 1 });
 userSchema.index({ activo: 1 });
-userSchema.index({ nombreRestaurante: 1, sede: 1 }); // Nuevo índice
-
+userSchema.index({ nombreRestaurante: 1, sede: 1, bloqueado: 1 });
 // Encriptar password antes de guardar
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) {
@@ -80,7 +94,6 @@ userSchema.methods.compararPassword = async function(passwordIngresado) {
   return await bcrypt.compare(passwordIngresado, this.password);
 };
 
-// Método para obtener datos públicos del usuario
 userSchema.methods.obtenerDatosPublicos = function() {
   return {
     id: this._id,
@@ -90,7 +103,9 @@ userSchema.methods.obtenerDatosPublicos = function() {
     activo: this.activo,
     nombreRestaurante: this.nombreRestaurante,
     sede: this.sede,
-    createdAt: this.createdAt
+    createdAt: this.createdAt,
+    bloqueado: this.bloqueado,
+    motivoBloqueo: this.motivoBloqueo
   };
 };
 

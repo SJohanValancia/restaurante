@@ -134,12 +134,23 @@ router.post('/login', async (req, res) => {
     }
 
     // Verificar si el usuario está activo
-    if (!usuario.activo) {
-      return res.status(401).json({
-        success: false,
-        message: 'Usuario inactivo. Contacte al administrador'
-      });
-    }
+// Verificar si el usuario está activo
+if (!usuario.activo) {
+  return res.status(401).json({
+    success: false,
+    message: 'Usuario inactivo. Contacte al administrador'
+  });
+}
+
+// Verificar si el usuario está bloqueado
+if (usuario.bloqueado) {
+  return res.status(403).json({
+    success: false,
+    message: 'Cuenta suspendida',
+    bloqueado: true,
+    motivoBloqueo: usuario.motivoBloqueo || 'Su cuenta ha sido suspendida. Para más información contacte al equipo de soporte al número 3128540908'
+  });
+}
 
     // Verificar password
     const passwordCorrecto = await usuario.compararPassword(password);
@@ -260,6 +271,117 @@ router.get('/me', async (req, res) => {
     res.status(401).json({
       success: false,
       message: 'Token inválido'
+    });
+  }
+});
+
+
+// RUTAS DE SUPERADMIN
+
+// Obtener todos los usuarios (solo superadmin)
+router.get('/superadmin/usuarios', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: 'No autorizado'
+      });
+    }
+
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || 'secreto-super-seguro-cambiar-en-produccion'
+    );
+
+    const usuarioActual = await User.findById(decoded.id);
+
+    if (!usuarioActual || usuarioActual.rol !== 'superadmin') {
+      return res.status(403).json({
+        success: false,
+        message: 'No tiene permisos de superadmin'
+      });
+    }
+
+    // Obtener todos los usuarios ordenados por fecha de creación
+    const usuarios = await User.find({})
+      .select('-password')
+      .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      data: usuarios
+    });
+
+  } catch (error) {
+    console.error('Error al obtener usuarios:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener usuarios'
+    });
+  }
+});
+
+// Bloquear/Desbloquear usuario y su restaurante
+router.patch('/superadmin/toggle-bloqueo/:userId', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: 'No autorizado'
+      });
+    }
+
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || 'secreto-super-seguro-cambiar-en-produccion'
+    );
+
+    const usuarioActual = await User.findById(decoded.id);
+
+    if (!usuarioActual || usuarioActual.rol !== 'superadmin') {
+      return res.status(403).json({
+        success: false,
+        message: 'No tiene permisos de superadmin'
+      });
+    }
+
+    const usuario = await User.findById(req.params.userId);
+
+    if (!usuario) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario no encontrado'
+      });
+    }
+
+    // Cambiar estado de bloqueo
+    const nuevoEstado = !usuario.bloqueado;
+    
+    // Actualizar todos los usuarios del mismo restaurante
+    await User.updateMany(
+      { nombreRestaurante: usuario.nombreRestaurante },
+      {
+        bloqueado: nuevoEstado,
+        motivoBloqueo: nuevoEstado ? 'Su cuenta ha sido suspendida. Para más información contacte al equipo de soporte al número 3128540908' : '',
+        fechaBloqueo: nuevoEstado ? new Date() : null
+      }
+    );
+
+    res.json({
+      success: true,
+      message: `Restaurante "${usuario.nombreRestaurante}" ${nuevoEstado ? 'bloqueado' : 'desbloqueado'} exitosamente`,
+      bloqueado: nuevoEstado
+    });
+
+  } catch (error) {
+    console.error('Error al cambiar estado de bloqueo:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al cambiar estado de bloqueo'
     });
   }
 });

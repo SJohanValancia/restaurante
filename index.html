@@ -508,22 +508,33 @@
 
                 const data = await response.json();
 
+// En el evento submit del loginForm, reemplazar la sección de respuesta:
+
 if (data.success) {
-    // Guardar token y datos del usuario
     localStorage.setItem('token', data.token);
     localStorage.setItem('usuario', JSON.stringify(data.usuario));
     
     showAlert('¡Inicio de sesión exitoso! Redirigiendo...', 'success');
     
     setTimeout(() => {
-        // Redirigir según el rol
-        if (data.usuario.rol === 'admin') {
+        if (data.usuario.rol === 'superadmin') {
+            window.location.href = 'superadmin.html';
+        } else if (data.usuario.rol === 'admin') {
             window.location.href = 'administrador.html';
         } else {
             window.location.href = 'productos.html';
         }
     }, 1500);
 } else {
+    // Si la cuenta está bloqueada, mostrar mensaje especial
+    if (data.bloqueado) {
+        showAlert(data.motivoBloqueo || data.message, 'error');
+    } else {
+        showAlert(data.message || 'Error al iniciar sesión', 'error');
+    }
+} {
+  
+  
     showAlert(data.message || 'Error al iniciar sesión', 'error');
 }
             } catch (error) {
