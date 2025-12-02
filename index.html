@@ -506,37 +506,31 @@
                     body: JSON.stringify({ email, password })
                 });
 
-                const data = await response.json();
+const data = await response.json();
 
-// En el evento submit del loginForm, reemplazar la sección de respuesta:
-
-if (data.success) {
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('usuario', JSON.stringify(data.usuario));
-    
-    showAlert('¡Inicio de sesión exitoso! Redirigiendo...', 'success');
-    
-    setTimeout(() => {
-        if (data.usuario.rol === 'superadmin') {
-            window.location.href = 'superadmin.html';
-        } else if (data.usuario.rol === 'admin') {
-            window.location.href = 'administrador.html';
-        } else {
-            window.location.href = 'productos.html';
-        }
-    }, 1500);
-} else {
-    // Si la cuenta está bloqueada, mostrar mensaje especial
-    if (data.bloqueado) {
-        showAlert(data.motivoBloqueo || data.message, 'error');
-    } else {
-        showAlert(data.message || 'Error al iniciar sesión', 'error');
-    }
-} {
-  
-  
-    showAlert(data.message || 'Error al iniciar sesión', 'error');
-}
+                if (data.success) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('usuario', JSON.stringify(data.usuario));
+                    
+                    showAlert('¡Inicio de sesión exitoso! Redirigiendo...', 'success');
+                    
+                    setTimeout(() => {
+                        if (data.usuario.rol === 'superadmin') {
+                            window.location.href = 'superadmin.html';
+                        } else if (data.usuario.rol === 'admin') {
+                            window.location.href = 'administrador.html';
+                        } else {
+                            window.location.href = 'productos.html';
+                        }
+                    }, 1500);
+                } else {
+                    // Si la cuenta está bloqueada, mostrar mensaje especial
+                    if (data.bloqueado) {
+                        showAlert(data.motivoBloqueo || data.message, 'error');
+                    } else {
+                        showAlert(data.message || 'Error al iniciar sesión', 'error');
+                    }
+                }
             } catch (error) {
                 console.error('Error:', error);
                 showAlert('Error de conexión. Por favor intente nuevamente', 'error');
