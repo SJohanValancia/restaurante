@@ -1783,22 +1783,38 @@ body.has-notification {
         }
 
         // Verificar fecha de vencimiento
+// Verificar fecha de vencimiento
 async function verificarFechaVencimiento() {
     try {
+        // Esperar a que currentUser esté cargado
+        if (!currentUser) {
+            console.log('Esperando a que currentUser se cargue...');
+            setTimeout(verificarFechaVencimiento, 1000);
+            return;
+        }
+
         const token = localStorage.getItem('token');
-        const response = await fetch(`${API_URL}/auth/me`, {
+        const response = await fetch(`${API_URL}/auth/verify`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
         if (!response.ok) return;
 
         const data = await response.json();
-        const usuario = data.data;
+        const usuario = data.usuario;
+
+        console.log('Verificando fecha de pago:', usuario.fechaPago);
 
         if (usuario.fechaPago) {
             const fechaPago = new Date(usuario.fechaPago);
             const hoy = new Date();
+            // Reiniciar horas para comparación correcta de días
+            fechaPago.setHours(0, 0, 0, 0);
+            hoy.setHours(0, 0, 0, 0);
+            
             const diferenciaDias = Math.ceil((fechaPago - hoy) / (1000 * 60 * 60 * 24));
+
+            console.log('Días restantes:', diferenciaDias);
 
             // Mostrar notificación si faltan 5 días o menos
             if (diferenciaDias <= 5 && diferenciaDias >= 0) {
@@ -1809,6 +1825,8 @@ async function verificarFechaVencimiento() {
                 
                 banner.classList.add('show');
                 document.body.classList.add('has-notification');
+                
+                console.log('✅ Banner de advertencia mostrado');
             } else if (diferenciaDias < 0) {
                 // Licencia vencida
                 const banner = document.getElementById('notificationBanner');
@@ -1819,13 +1837,24 @@ async function verificarFechaVencimiento() {
                 
                 banner.classList.add('show');
                 document.body.classList.add('has-notification');
+                
+                console.log('❌ Banner de vencimiento mostrado');
+            } else {
+                console.log(`ℹ️ Licencia válida por ${diferenciaDias} días más`);
             }
+        } else {
+            console.log('ℹ️ No hay fecha de pago asignada');
         }
     } catch (error) {
         console.error('Error al verificar fecha de vencimiento:', error);
     }
 }
 
+// Ejecutar después de que se cargue el usuario
+setTimeout(verificarFechaVencimiento, 2000);
+
+// Verificar cada hora
+setInterval(verificarFechaVencimiento, 3600000);
 // Ejecutar al cargar la página
 verificarFechaVencimiento();
 

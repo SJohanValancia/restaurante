@@ -1720,7 +1720,8 @@ function getOrderActions(order) {
 
     // FUNCIONES DEL MODAL DE MÉTODO DE PAGO
 
-async function updateOrderStatus(orderId, newStatus) {
+
+    async function updateOrderStatus(orderId, newStatus) {
     console.log('🔄 updateOrderStatus llamado con:', { orderId, newStatus });
     
     // Si el nuevo estado es "entregado", mostrar modal de método de pago
@@ -1734,6 +1735,7 @@ async function updateOrderStatus(orderId, newStatus) {
     // Para otros estados, proceder normalmente SIN metodoPago
     await actualizarEstadoPedido(orderId, newStatus, null);
 }
+
 
 function mostrarModalMetodoPago() {
     console.log('🪟 Mostrando modal con orderId:', currentOrderIdForPayment);
@@ -2123,6 +2125,23 @@ async function actualizarEstadoPedido(orderId, newStatus, metodoPago = null) {
         return;
     }
 
+    // 🔒 BLOQUEAR TODOS LOS BOTONES DEL PEDIDO
+    const orderCard = document.querySelector(`[id*="${orderId}"]`)?.closest('.order-card');
+    if (orderCard) {
+        const botones = orderCard.querySelectorAll('.btn-action, button[onclick*="cambiarEstadoProducto"]');
+        botones.forEach(btn => {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+            // Guardar el contenido original
+            btn.dataset.originalContent = btn.innerHTML;
+            // Mostrar spinner
+            if (btn.classList.contains('btn-action')) {
+                btn.innerHTML = '<span class="loading-spinner" style="display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite;"></span>';
+            }
+        });
+    }
+
     try {
         const body = { 
             estado: newStatus
@@ -2163,10 +2182,34 @@ async function actualizarEstadoPedido(orderId, newStatus, metodoPago = null) {
         } else {
             console.error('❌ Error del servidor:', data.message);
             alert('Error: ' + data.message);
+            // 🔓 RESTAURAR BOTONES EN CASO DE ERROR
+            if (orderCard) {
+                const botones = orderCard.querySelectorAll('.btn-action, button[onclick*="cambiarEstadoProducto"]');
+                botones.forEach(btn => {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+                    if (btn.dataset.originalContent) {
+                        btn.innerHTML = btn.dataset.originalContent;
+                    }
+                });
+            }
         }
     } catch (error) {
         console.error('❌ Error en la petición:', error);
         alert('Error al actualizar el estado: ' + error.message);
+        // 🔓 RESTAURAR BOTONES EN CASO DE ERROR
+        if (orderCard) {
+            const botones = orderCard.querySelectorAll('.btn-action, button[onclick*="cambiarEstadoProducto"]');
+            botones.forEach(btn => {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+                if (btn.dataset.originalContent) {
+                    btn.innerHTML = btn.dataset.originalContent;
+                }
+            });
+        }
     }
 }
 
@@ -2677,6 +2720,24 @@ async function confirmarCambioEstadoProducto(nuevoEstado) {
 async function actualizarEstadoProducto(orderId, itemIndex, cantidadCambiar, nuevoEstado) {
     const token = localStorage.getItem('token');
     
+    // 🔒 BLOQUEAR EL BOTÓN ESPECÍFICO
+    const orderCard = document.querySelector(`[id*="${orderId}"]`)?.closest('.order-card');
+    let botonClickeado = null;
+    
+    if (orderCard) {
+        const botones = orderCard.querySelectorAll('button[onclick*="cambiarEstadoProducto"]');
+        botones.forEach(btn => {
+            if (btn.onclick && btn.onclick.toString().includes(`'${orderId}'`) && 
+                btn.onclick.toString().includes(`${itemIndex}`)) {
+                botonClickeado = btn;
+                btn.disabled = true;
+                btn.style.opacity = '0.5';
+                btn.style.cursor = 'not-allowed';
+                btn.innerHTML = '⏳';
+            }
+        });
+    }
+    
     try {
         const response = await fetch(`${API_URL}/orders/${orderId}/item/${itemIndex}/estado`, {
             method: 'PATCH',
@@ -2705,10 +2766,24 @@ async function actualizarEstadoProducto(orderId, itemIndex, cantidadCambiar, nue
             mostrarNotificacionExito(`Producto marcado como ${nuevoEstado}`);
         } else {
             alert('Error: ' + data.message);
+            // 🔓 RESTAURAR BOTÓN EN CASO DE ERROR
+            if (botonClickeado) {
+                botonClickeado.disabled = false;
+                botonClickeado.style.opacity = '1';
+                botonClickeado.style.cursor = 'pointer';
+                botonClickeado.innerHTML = '▶️';
+            }
         }
     } catch (error) {
         console.error('Error:', error);
         alert('Error al actualizar el estado del producto');
+        // 🔓 RESTAURAR BOTÓN EN CASO DE ERROR
+        if (botonClickeado) {
+            botonClickeado.disabled = false;
+            botonClickeado.style.opacity = '1';
+            botonClickeado.style.cursor = 'pointer';
+            botonClickeado.innerHTML = '▶️';
+        }
     }
 }
 
