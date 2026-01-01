@@ -206,25 +206,48 @@
             await verificarRestaurante();
         });
 
-        async function verificarRestaurante() {
-            try {
-                // Verificar que el restaurante existe
-                const url = `${API_URL}/orders/mesa/${mesa}?restaurante=${encodeURIComponent(restaurante)}${sede ? '&sede=' + encodeURIComponent(sede) : ''}`;
-                const response = await fetch(url);
-                
-                if (response.ok || response.status === 404) {
-                    // El restaurante existe (aunque no tenga pedidos)
-                    showOptions();
-                } else {
-                    showError();
-                }
-            } catch (error) {
-                console.error('Error:', error);
+async function verificarRestaurante() {
+    try {
+        // Construir los parámetros correctamente
+        const params = new URLSearchParams();
+        params.append('restaurante', restaurante);
+        
+        if (sede) {
+            params.append('sede', sede);
+        }
+        
+        console.log('🔍 Verificando:', restaurante, sede || '(sin sede)');
+        console.log('📍 URL:', `${API_URL}/products/public/restaurante?${params.toString()}`);
+        
+        // Usar el endpoint público de productos para verificar que el restaurante existe
+        const response = await fetch(`${API_URL}/products/public/restaurante?${params.toString()}`);
+        
+        console.log('📊 Response status:', response.status);
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log('✅ Data:', data);
+            
+            if (data.success) {
+                // El restaurante existe
+                showOptions();
+            } else {
+                console.log('❌ Sin éxito:', data.message);
                 showError();
             }
+        } else {
+            console.log('❌ Response no OK:', response.status);
+            const errorData = await response.json().catch(() => ({}));
+            console.log('Error data:', errorData);
+            showError();
         }
+    } catch (error) {
+        console.error('❌ Error completo:', error);
+        showError();
+    }
+}
 
-        function showOptions() {
+function showOptions() {
             const content = document.getElementById('content');
             const sedeText = sede ? `<p>Sede: ${sede}</p>` : '';
             
