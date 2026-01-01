@@ -4,13 +4,9 @@ const Product = require('../models/Product');
 const { protect } = require('../middleware/auth');
 const { checkPermission } = require('../middleware/permissions');
 
-// ✅ RUTA PÚBLICA PRIMERO - Obtener productos por nombre de restaurante (para clientes)
-// ✅ RUTA PÚBLICA PRIMERO - Obtener productos por nombre de restaurante (para clientes)
 router.get('/public/restaurante', async (req, res) => {
   try {
     const { restaurante, sede } = req.query;
-    
-    console.log('📥 Endpoint público llamado:', { restaurante, sede });
     
     if (!restaurante) {
       return res.status(400).json({
@@ -19,46 +15,38 @@ router.get('/public/restaurante', async (req, res) => {
       });
     }
 
-    // Buscar usuario del restaurante
     const User = require('../models/User');
     const query = { nombreRestaurante: restaurante };
     if (sede) query.sede = sede;
 
-    console.log('🔍 Query de búsqueda:', query);
+    // ✅ CAMBIO 1: Buscar TODOS los usuarios del restaurante
+    const usuarios = await User.find(query);
 
-    const usuario = await User.findOne(query);
-
-    if (!usuario) {
-      console.log('❌ Restaurante no encontrado');
+    if (!usuarios || usuarios.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'Restaurante no encontrado'
       });
     }
 
-    console.log('✅ Usuario encontrado:', usuario._id, usuario.nombreRestaurante);
+    // ✅ CAMBIO 2: Extraer todos los IDs
+    const userIds = usuarios.map(u => u._id);
 
-    // ✅ TRAER TODOS LOS PRODUCTOS (disponibles y no disponibles)
+    // ✅ CAMBIO 3: Buscar productos de TODOS esos usuarios
     const products = await Product.find({ 
-      userId: usuario._id
-      // ❌ QUITAR: disponible: true
+      userId: { $in: userIds }
     }).sort({ nombre: 1 });
     
     console.log('✅ Productos encontrados:', products.length);
-    console.log('📊 Desglose:', {
-      total: products.length,
-      disponibles: products.filter(p => p.disponible).length,
-      noDisponibles: products.filter(p => !p.disponible).length
-    });
     
     res.json({
       success: true,
       count: products.length,
       data: products,
-      userId: usuario._id
+      userId: usuarios[0]._id // Para mantener compatibilidad
     });
   } catch (error) {
-    console.error('❌ Error al obtener productos públicos:', error);
+    console.error('❌ Error:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener productos',
