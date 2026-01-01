@@ -1189,6 +1189,11 @@
     }
 }
 
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
     </style>
 
     
@@ -1661,16 +1666,26 @@ function setQuantity(index, value) {
             updateSelectedProducts();
         }
 
+// Reemplaza tu función del formulario actual con esta versión mejorada:
+
 document.getElementById('orderForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const mesa = document.getElementById('mesa').value;
     const notas = document.getElementById('notas').value.trim();
+    const btnSubmit = document.getElementById('btnSubmit');
 
     if (selectedItems.length === 0) {
         alert('Debe seleccionar al menos un producto');
         return;
     }
+
+    // 🔒 BLOQUEAR BOTÓN
+    btnSubmit.disabled = true;
+    btnSubmit.style.opacity = '0.6';
+    btnSubmit.style.cursor = 'not-allowed';
+    const textoOriginal = btnSubmit.innerHTML;
+    btnSubmit.innerHTML = '<span style="display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px;"></span> Creando...';
 
     // Verificar si hay productos con alimentos agotados
     const productosConAlimentosAgotados = selectedItems.filter(item => 
@@ -1688,6 +1703,11 @@ document.getElementById('orderForm').addEventListener('submit', async (e) => {
         );
 
         if (!confirmar) {
+            // 🔓 DESBLOQUEAR BOTÓN si cancela
+            btnSubmit.disabled = false;
+            btnSubmit.style.opacity = '1';
+            btnSubmit.style.cursor = 'pointer';
+            btnSubmit.innerHTML = textoOriginal;
             return;
         }
     }
@@ -1730,8 +1750,15 @@ document.getElementById('orderForm').addEventListener('submit', async (e) => {
     } catch (error) {
         console.error('Error:', error);
         alert('Error al crear el pedido');
+    } finally {
+        // 🔓 DESBLOQUEAR BOTÓN siempre al final
+        btnSubmit.disabled = false;
+        btnSubmit.style.opacity = '1';
+        btnSubmit.style.cursor = 'pointer';
+        btnSubmit.innerHTML = textoOriginal;
     }
-});
+});  
+       
         async function loadOrders() {
             const token = localStorage.getItem('token');
             const estado = document.getElementById('filterEstado').value;

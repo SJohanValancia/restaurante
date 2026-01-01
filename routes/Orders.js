@@ -418,6 +418,73 @@ router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
   }
 });
 
+// RUTA PÚBLICA PARA CREAR PEDIDOS DESDE EL CLIENTE
+router.post('/public', async (req, res) => {
+  try {
+    const { mesa, items, notas, userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID de usuario es requerido'
+      });
+    }
+
+    if (!items || items.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'El pedido debe tener al menos un producto'
+      });
+    }
+
+    // Obtener información completa de los productos
+    const Product = require('../models/Product');
+    const itemsConInfo = await Promise.all(items.map(async (item) => {
+      const producto = await Product.findById(item.producto);
+      if (!producto) {
+        throw new Error(`Producto ${item.producto} no encontrado`);
+      }
+      return {
+        producto: item.producto,
+        nombreProducto: producto.nombre,
+        categoriaProducto: producto.categoria,
+        cantidad: item.cantidad,
+        precio: producto.precio
+      };
+    }));
+
+    const total = itemsConInfo.reduce((sum, item) => {
+      return sum + (item.precio * item.cantidad);
+    }, 0);
+
+    const orderData = {
+      mesa,
+      items: itemsConInfo,
+      total,
+      notas,
+      userId: userId,
+      estado: 'pendiente',
+      origenPedido: 'cliente' // Marca para identificar pedidos hechos por el cliente
+    };
+
+    const order = await Order.create(orderData);
+    await order.populate('items.producto', 'nombre categoria precio');
+
+    res.status(201).json({
+      success: true,
+      message: 'Pedido creado exitosamente',
+      data: order
+    });
+  } catch (error) {
+    console.error('Error al crear pedido público:', error);
+    res.status(400).json({
+      success: false,
+      message: 'Error al crear el pedido',
+      error: error.message
+    });
+  }
+});
+
 router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (req, res) => {
   try {
     const { estado, metodoPago, actualizarTodosLosProductos } = req.body;

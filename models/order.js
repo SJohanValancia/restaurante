@@ -13,6 +13,11 @@ const orderSchema = new mongoose.Schema({
       ref: 'Product',
       required: true
     },
+    origenPedido: {
+  type: String,
+  enum: ['mesero', 'cliente'],
+  default: 'mesero'
+},
     nombreProducto: {
       type: String,
       required: true
