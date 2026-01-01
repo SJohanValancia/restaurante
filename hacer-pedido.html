@@ -710,50 +710,36 @@
 
             await loadUserAndProducts();
         });
-
-        async function loadUserAndProducts() {
-            try {
-                // Buscar el usuario del restaurante
-                const query = sede 
-                    ? `nombreRestaurante=${encodeURIComponent(restaurante)}&sede=${encodeURIComponent(sede)}`
-                    : `nombreRestaurante=${encodeURIComponent(restaurante)}`;
-                
-                const userResponse = await fetch(`${API_URL}/orders/mesa/${mesa}?restaurante=${encodeURIComponent(restaurante)}${sede ? '&sede=' + encodeURIComponent(sede) : ''}`);
-                
-                // Aunque falle, intentamos cargar productos directamente
-                let userId = null;
-                
-                if (userResponse.ok) {
-                    const userData = await userResponse.json();
-                    if (userData.success && userData.data && userData.data.userId) {
-                        userId = userData.data.userId;
-                    }
-                }
-
-                // Si no obtuvimos userId del pedido, buscar productos de todas formas
-                const productsUrl = userId 
-                    ? `${API_URL}/products?userId=${userId}`
-                    : `${API_URL}/products`;
-                
-                const productsResponse = await fetch(productsUrl);
-                const productsData = await productsResponse.json();
-
-                if (productsData.success) {
-                    allProducts = productsData.data.filter(p => p.disponible);
-                    currentUser = { _id: userId || productsData.data[0]?.userId };
-                    
-                    setupFilters();
-                    displayProducts(allProducts);
-                    setupSearch();
-                } else {
-                    showError('No se pudieron cargar los productos del menú');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showError('Error de conexión. Por favor, intente más tarde.');
-            }
+async function loadUserAndProducts() {
+    try {
+        // Construir query para buscar productos del restaurante
+        const query = new URLSearchParams({
+            restaurante: restaurante
+        });
+        
+        if (sede) {
+            query.append('sede', sede);
         }
+        
+        // Cargar productos usando el endpoint público
+        const productsResponse = await fetch(`${API_URL}/products/public/restaurante?${query.toString()}`);
+        const productsData = await productsResponse.json();
 
+        if (productsData.success) {
+            allProducts = productsData.data;
+            currentUser = { _id: productsData.userId }; // Guardar userId para crear pedidos
+            
+            setupFilters();
+            displayProducts(allProducts);
+            setupSearch();
+        } else {
+            showError(productsData.message || 'No se pudieron cargar los productos del menú');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showError('Error de conexión. Por favor, intente más tarde.');
+    }
+}
         function setupFilters() {
             const filtersContainer = document.getElementById('filters');
             
@@ -973,60 +959,61 @@
             document.getElementById('cartModal').classList.remove('active');
         }
 
-        async function sendOrder() {
-            if (cart.length === 0) {
-                alert('El carrito está vacío');
-                return;
-            }
+async function sendOrder() {
+    if (cart.length === 0) {
+        alert('El carrito está vacío');
+        return;
+    }
 
-            const btnSend = document.getElementById('btnSendOrder');
-            btnSend.disabled = true;
-            btnSend.innerHTML = '<div style="display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite;"></div> Enviando...';
+    const btnSend = document.getElementById('btnSendOrder');
+    btnSend.disabled = true;
+    btnSend.innerHTML = '<div style="display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite;"></div> Enviando...';
 
-            try {
-                // Preparar datos del pedido
-                const orderData = {
-                    mesa: mesa,
-                    items: cart.map(item => ({
-                        producto: item.producto._id,
-                        cantidad: item.cantidad,
-                        precio: item.producto.precio
-                    })),
-                    notas: cart.map(item => 
-                        item.notas ? `${item.producto.nombre}: ${item.notas}` : ''
-                    ).filter(n => n).join(' | ') || '',
-                    userId: currentUser._id,
-                    ignorarStockAlimentos: true
-                };
+    try {
+        // Preparar datos del pedido
+        const orderData = {
+            mesa: mesa, // ✅ Ya tiene el número/nombre de mesa del QR
+            items: cart.map(item => ({
+                producto: item.producto._id,
+                cantidad: item.cantidad,
+                precio: item.producto.precio,
+                nombreProducto: item.producto.nombre,
+                categoriaProducto: item.producto.categoria
+            })),
+            notas: cart.map(item => 
+                item.notas ? `${item.producto.nombre}: ${item.notas}` : ''
+            ).filter(n => n).join(' | ') || '',
+            userId: currentUser._id, // ✅ Ya tiene el userId del restaurante
+            ignorarStockAlimentos: true
+        };
 
-                const response = await fetch(`${API_URL}/orders`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(orderData)
-                });
+        const response = await fetch(`${API_URL}/orders`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(orderData)
+        });
 
-                const data = await response.json();
+        const data = await response.json();
 
-                if (data.success) {
-                    cart = [];
-                    updateCart();
-                    closeCart();
-                    showSuccessModal();
-                } else {
-                    alert('Error al enviar el pedido: ' + (data.message || 'Error desconocido'));
-                    btnSend.disabled = false;
-                    btnSend.innerHTML = '📤 Enviar a Cocina';
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error de conexión. Por favor, intente nuevamente.');
-                btnSend.disabled = false;
-                btnSend.innerHTML = '📤 Enviar a Cocina';
-            }
+        if (data.success) {
+            cart = [];
+            updateCart();
+            closeCart();
+            showSuccessModal();
+        } else {
+            alert('Error al enviar el pedido: ' + (data.message || 'Error desconocido'));
+            btnSend.disabled = false;
+            btnSend.innerHTML = '📤 Enviar a Cocina';
         }
-
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error de conexión. Por favor, intente nuevamente.');
+        btnSend.disabled = false;
+        btnSend.innerHTML = '📤 Enviar a Cocina';
+    }
+}
         function showSuccessModal() {
             const modal = document.createElement('div');
             modal.style.cssText = `

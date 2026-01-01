@@ -1,3 +1,4 @@
 {
-  "liveServer.settings.injectHtml": false
+  "liveServer.settings.injectHtml": false,
+  "liveServer.settings.port": 5503
 }

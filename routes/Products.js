@@ -4,6 +4,53 @@ const Product = require('../models/Product');
 const { protect } = require('../middleware/auth');
 const { checkPermission } = require('../middleware/permissions');
 
+// RUTA PÚBLICA - Obtener productos por nombre de restaurante (para clientes)
+router.get('/public/restaurante', async (req, res) => {
+  try {
+    const { restaurante, sede } = req.query;
+    
+    if (!restaurante) {
+      return res.status(400).json({
+        success: false,
+        message: 'Nombre del restaurante es requerido'
+      });
+    }
+
+    // Buscar usuario del restaurante
+    const User = require('../models/User');
+    const query = { nombreRestaurante: restaurante };
+    if (sede) query.sede = sede;
+
+    const usuario = await User.findOne(query);
+
+    if (!usuario) {
+      return res.status(404).json({
+        success: false,
+        message: 'Restaurante no encontrado'
+      });
+    }
+
+    // Obtener productos disponibles
+    const products = await Product.find({ 
+      userId: usuario._id,
+      disponible: true 
+    }).sort({ nombre: 1 });
+    
+    res.json({
+      success: true,
+      count: products.length,
+      data: products,
+      userId: usuario._id // Enviar userId para crear pedidos
+    });
+  } catch (error) {
+    console.error('Error al obtener productos públicos:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener productos',
+      error: error.message
+    });
+  }
+});
 
 // Obtener todos los productos del restaurante
 router.get('/', protect, checkPermission('verProductos'), async (req, res) => {

@@ -387,7 +387,7 @@
                 params.append('sede', sede);
             }
 
-            const url = `${baseUrl}seguimiento.html?${params.toString()}`;
+const url = `${baseUrl}menu-cliente.html?${params.toString()}`;
 
             // Crear contenedor del QR
             const qrContainer = document.createElement('div');
@@ -458,7 +458,7 @@
             // Subtítulo
             ctx.font = '16px Inter, sans-serif';
             ctx.fillStyle = '#718096';
-            ctx.fillText('Escanea para seguir tu pedido', 200, 70);
+            ctx.fillText('Escanea para ver el menú', 200, 70);
 
             // Dibujar el QR en el centro
             const qrSize = 280;
@@ -481,7 +481,7 @@
             ctx.font = '12px Inter, sans-serif';
             ctx.fillStyle = '#a0aec0';
             ctx.fillText('Escanea este código con tu cámara', 200, 510);
-            ctx.fillText('para ver el estado de tu pedido', 200, 530);
+            ctx.fillText('para ver el menú y hacer pedidos', 200, 530); 
 
             // Descargar
             const link = document.createElement('a');
