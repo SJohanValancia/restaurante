@@ -5,6 +5,7 @@ const { protect } = require('../middleware/auth');
 const { checkPermission } = require('../middleware/permissions');
 
 // ✅ RUTA PÚBLICA PRIMERO - Obtener productos por nombre de restaurante (para clientes)
+// ✅ RUTA PÚBLICA PRIMERO - Obtener productos por nombre de restaurante (para clientes)
 router.get('/public/restaurante', async (req, res) => {
   try {
     const { restaurante, sede } = req.query;
@@ -37,13 +38,18 @@ router.get('/public/restaurante', async (req, res) => {
 
     console.log('✅ Usuario encontrado:', usuario._id, usuario.nombreRestaurante);
 
-    // Obtener productos disponibles
+    // ✅ TRAER TODOS LOS PRODUCTOS (disponibles y no disponibles)
     const products = await Product.find({ 
-      userId: usuario._id,
-      disponible: true 
+      userId: usuario._id
+      // ❌ QUITAR: disponible: true
     }).sort({ nombre: 1 });
     
     console.log('✅ Productos encontrados:', products.length);
+    console.log('📊 Desglose:', {
+      total: products.length,
+      disponibles: products.filter(p => p.disponible).length,
+      noDisponibles: products.filter(p => !p.disponible).length
+    });
     
     res.json({
       success: true,
