@@ -5,8 +5,9 @@ const path = require('path');
 const expensesRoutes = require('./routes/Expenses');
 const liquidacionesRoutes = require('./routes/liquidaciones');
 const adminMeserosRoutes = require('./routes/adminMeseros');
-const ordersRoutes = require('./routes/Orders'); // IMPORTAR EXPLÍCITAMENTE
+const ordersRoutes = require('./routes/Orders');
 const alimentosRoutes = require('./routes/alimentos');
+const productsRoutes = require('./routes/Products'); // ✅ Importar explícitamente
 const { protect } = require('./middleware/auth');
 require('dotenv').config();
 
@@ -23,15 +24,12 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Conectado a MongoDB Atlas'))
   .catch((err) => console.error('❌ Error de conexión a MongoDB:', err.message));
 
-// ⭐ IMPORTANTE: Rutas públicas de orders DEBEN IR PRIMERO
-// Esta ruta NO tiene el middleware protect
-app.use('/api/orders', ordersRoutes);
-
-// Rutas públicas (sin autenticación)
+// ⭐ RUTAS PÚBLICAS PRIMERO (SIN protect)
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/orders', ordersRoutes); // Tiene rutas públicas y protegidas dentro
+app.use('/api/products', productsRoutes); // ✅ SIN protect aquí - las rutas individuales ya tienen protect
 
-// Rutas protegidas (requieren autenticación)
-app.use('/api/products', protect, require('./routes/Products'));
+// ⭐ RUTAS PROTEGIDAS (CON protect)
 app.use('/api/expenses', protect, expensesRoutes);
 app.use('/api/liquidaciones', protect, liquidacionesRoutes);
 app.use('/api/admin-meseros', protect, adminMeserosRoutes);
