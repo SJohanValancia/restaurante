@@ -4,6 +4,54 @@ const Alimento = require('../models/Alimento');
 const Product = require('../models/Product');
 const { protect } = require('../middleware/auth');
 
+
+router.get('/public/restaurante', async (req, res) => {
+  try {
+    const { restaurante, sede } = req.query;
+    
+    if (!restaurante) {
+      return res.status(400).json({
+        success: false,
+        message: 'Nombre del restaurante es requerido'
+      });
+    }
+
+    const User = require('../models/User');
+    const query = { nombreRestaurante: restaurante };
+    if (sede) query.sede = sede;
+
+    const usuarios = await User.find(query);
+
+    if (!usuarios || usuarios.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Restaurante no encontrado'
+      });
+    }
+
+    const userIds = usuarios.map(u => u._id);
+
+    const alimentos = await Alimento.find({ 
+      userId: { $in: userIds }
+    })
+    .populate('productos.productoId', 'nombre precio categoria')
+    .sort({ nombre: 1 });
+    
+    res.json({
+      success: true,
+      count: alimentos.length,
+      data: alimentos
+    });
+  } catch (error) {
+    console.error('❌ Error al obtener alimentos públicos:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener alimentos',
+      error: error.message
+    });
+  }
+});
+
 // Obtener todos los alimentos del restaurante
 router.get('/', protect, async (req, res) => {
   try {

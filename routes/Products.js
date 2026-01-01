@@ -4,7 +4,6 @@ const Product = require('../models/Product');
 const { protect } = require('../middleware/auth');
 const { checkPermission } = require('../middleware/permissions');
 
-// ✅ RUTA PÚBLICA PRIMERO - Obtener alimentos por nombre de restaurante (para clientes)
 router.get('/public/restaurante', async (req, res) => {
   try {
     const { restaurante, sede } = req.query;
@@ -20,6 +19,7 @@ router.get('/public/restaurante', async (req, res) => {
     const query = { nombreRestaurante: restaurante };
     if (sede) query.sede = sede;
 
+    // ✅ CAMBIO 1: Buscar TODOS los usuarios del restaurante
     const usuarios = await User.find(query);
 
     if (!usuarios || usuarios.length === 0) {
@@ -29,29 +29,33 @@ router.get('/public/restaurante', async (req, res) => {
       });
     }
 
+    // ✅ CAMBIO 2: Extraer todos los IDs
     const userIds = usuarios.map(u => u._id);
 
-    const alimentos = await Alimento.find({ 
+    // ✅ CAMBIO 3: Buscar productos de TODOS esos usuarios
+    const products = await Product.find({ 
       userId: { $in: userIds }
-    })
-    .populate('productos.productoId', 'nombre precio categoria')
-    .sort({ nombre: 1 });
+    }).sort({ nombre: 1 });
+    
+    console.log('✅ Productos encontrados:', products.length);
     
     res.json({
       success: true,
-      count: alimentos.length,
-      data: alimentos
+      count: products.length,
+      data: products,
+      userId: usuarios[0]._id // Para mantener compatibilidad
     });
   } catch (error) {
-    console.error('❌ Error al obtener alimentos públicos:', error);
+    console.error('❌ Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Error al obtener alimentos',
+      message: 'Error al obtener productos',
       error: error.message
     });
   }
 });
 
+// ⭐ RUTAS PROTEGIDAS
 
 // Obtener todos los productos del restaurante
 router.get('/', protect, checkPermission('verProductos'), async (req, res) => {
