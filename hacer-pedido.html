@@ -844,30 +844,67 @@
             await loadUserAndProducts();
         });
 
-        async function loadUserAndProducts() {
-            try {
-                const query = new URLSearchParams({ restaurante });
-                if (sede) query.append('sede', sede);
-                
-                const productsResponse = await fetch(`${API_URL}/products/public/restaurante?${query.toString()}`);
-                const productsData = await productsResponse.json();
+async function loadUserAndProducts() {
+    try {
+        const query = new URLSearchParams({ restaurante });
+        if (sede) query.append('sede', sede);
+        
+        const productsResponse = await fetch(`${API_URL}/products/public/restaurante?${query.toString()}`);
+        const productsData = await productsResponse.json();
 
-                if (productsData.success) {
-                    allProducts = productsData.data;
-                    currentUser = { _id: productsData.userId };
+        if (productsData.success) {
+            // ✅ CARGAR ALIMENTOS PARA VERIFICAR STOCK
+            try {
+                const alimentosResponse = await fetch(`${API_URL}/alimentos/public/restaurante?${query.toString()}`);
+                const alimentosData = await alimentosResponse.json();
+                
+                if (alimentosData.success) {
+                    const alimentos = alimentosData.data;
                     
-                    setupFilters();
-                    displayProducts(allProducts);
-                    setupSearch();
+                    // Verificar cada producto contra los alimentos
+                    allProducts = productsData.data.map(producto => {
+                        // Buscar alimentos que usan este producto
+                        const alimentosDelProducto = alimentos.filter(alimento => 
+                            alimento.productos && alimento.productos.some(p => 
+                                p.productoId && p.productoId._id === producto._id
+                            )
+                        );
+                        
+                        // Verificar si algún alimento está agotado
+                        const alimentosAgotados = alimentosDelProducto.filter(alimento => {
+                            const config = alimento.productos.find(p => 
+                                p.productoId && p.productoId._id === producto._id
+                            );
+                            return config && alimento.stock < config.cantidadRequerida;
+                        });
+                        
+                        return {
+                            ...producto,
+                            alimentosAgotados: alimentosAgotados.map(a => a.nombre)
+                        };
+                    });
                 } else {
-                    showError(productsData.message || 'No se pudieron cargar los productos del menú');
+                    // Si falla la carga de alimentos, usar productos sin verificación
+                    allProducts = productsData.data.map(p => ({ ...p, alimentosAgotados: [] }));
                 }
             } catch (error) {
-                console.error('Error:', error);
-                showError('Error de conexión. Por favor, intente más tarde.');
+                console.error('Error al cargar alimentos:', error);
+                allProducts = productsData.data.map(p => ({ ...p, alimentosAgotados: [] }));
             }
+            
+            currentUser = { _id: productsData.userId };
+            
+            setupFilters();
+            displayProducts(allProducts);
+            setupSearch();
+        } else {
+            showError(productsData.message || 'No se pudieron cargar los productos del menú');
         }
-
+    } catch (error) {
+        console.error('Error:', error);
+        showError('Error de conexión. Por favor, intente más tarde.');
+    }
+}
         function setupFilters() {
             const filtersContainer = document.getElementById('filters');
             const categories = [...new Set(allProducts.map(p => p.categoria))].sort();
@@ -935,48 +972,63 @@
             });
         }
 
-        function displayProducts(products) {
-            const container = document.getElementById('productsContainer');
-            
-            if (products.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">🍽️</div>
-                        <p>No se encontraron productos</p>
-                    </div>
-                `;
-                return;
-            }
+function displayProducts(products) {
+    const container = document.getElementById('productsContainer');
+    
+    if (products.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">🍽️</div>
+                <p>No se encontraron productos</p>
+            </div>
+        `;
+        return;
+    }
 
-            container.innerHTML = `
-                <div class="products-grid">
-                    ${products.map(p => `
-                        <div class="product-card ${!p.disponible ? 'agotado' : ''}" 
-                             onclick="${p.disponible ? `addToCart('${p._id}')` : ''}">
-                            <div class="product-image">
-                                🍽️
-                                ${!p.disponible ? '<div class="product-badge">Agotado</div>' : ''}
-                            </div>
-                            <div class="product-info">
-                                <span class="product-category">${p.categoria}</span>
-                                <h3 class="product-name">${p.nombre}</h3>
-                                ${p.descripcion ? `<p class="product-description">${p.descripcion}</p>` : ''}
-                                <div class="product-footer">
-                                    <div class="product-price">$${p.precio.toLocaleString('es-CO')}</div>
-                                    ${p.disponible ? `
-                                        <button class="btn-add" onclick="event.stopPropagation(); addToCart('${p._id}')">
-                                            <span>+</span>
-                                            <span>Agregar</span>
-                                        </button>
-                                    ` : ''}
+    container.innerHTML = `
+        <div class="products-grid">
+            ${products.map(p => {
+                // ✅ VERIFICAR SI TIENE ALIMENTOS AGOTADOS
+                const tieneAlimentosAgotados = p.alimentosAgotados && p.alimentosAgotados.length > 0;
+                const estiloAdvertencia = tieneAlimentosAgotados && p.disponible ? 'border-left: 4px solid #f59e0b;' : '';
+                
+                return `
+                    <div class="product-card ${!p.disponible ? 'agotado' : ''}" 
+                         style="${estiloAdvertencia}"
+                         onclick="${p.disponible ? `addToCart('${p._id}')` : ''}">
+                        <div class="product-image">
+                            🍽️
+                            ${!p.disponible ? '<div class="product-badge">Agotado</div>' : ''}
+                            ${tieneAlimentosAgotados && p.disponible ? '<div class="product-badge" style="background: rgba(245, 158, 11, 0.9); right: 12px; top: 12px;">⚠️ Alimento faltante</div>' : ''}
+                        </div>
+                        <div class="product-info">
+                            <span class="product-category">${p.categoria}</span>
+                            <h3 class="product-name">${p.nombre}</h3>
+                            ${p.descripcion ? `<p class="product-description">${p.descripcion}</p>` : ''}
+                            
+                            ${tieneAlimentosAgotados && p.disponible ? `
+                                <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 8px; margin-bottom: 10px;">
+                                    <p style="font-size: 11px; color: #f59e0b; font-weight: 600; margin-bottom: 4px;">⚠️ Alimentos agotados:</p>
+                                    <p style="font-size: 11px; color: #d97706; line-height: 1.4;">${p.alimentosAgotados.join(', ')}</p>
                                 </div>
+                            ` : ''}
+                            
+                            <div class="product-footer">
+                                <div class="product-price">$${p.precio.toLocaleString('es-CO')}</div>
+                                ${p.disponible ? `
+                                    <button class="btn-add" onclick="event.stopPropagation(); addToCart('${p._id}')">
+                                        <span>+</span>
+                                        <span>Agregar</span>
+                                    </button>
+                                ` : ''}
                             </div>
                         </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
+}
         function addToCart(productId) {
             const product = allProducts.find(p => p._id === productId);
             if (!product) return;
