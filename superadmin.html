@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -272,7 +273,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .empty-state {
@@ -310,25 +313,26 @@
                 font-size: 0.85rem;
             }
 
-            th, td {
+            th,
+            td {
                 padding: 10px;
             }
         }
 
         .phone-link {
-    color: #10b981;
-    font-weight: 700;
-    text-decoration: none;
-    transition: all 0.3s;
-}
+            color: #10b981;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
 
-.phone-link:hover {
-    color: #059669;
-    text-decoration: underline;
-}
-
+        .phone-link:hover {
+            color: #059669;
+            text-decoration: underline;
+        }
     </style>
 </head>
+
 <body>
     <div class="header">
         <div class="header-content">
@@ -363,12 +367,8 @@
         <div class="card">
             <div class="card-header">
                 <h2>Gestión de Usuarios</h2>
-                <input 
-                    type="text" 
-                    class="search-box" 
-                    id="searchInput" 
-                    placeholder="Buscar por nombre, email o restaurante..."
-                >
+                <input type="text" class="search-box" id="searchInput"
+                    placeholder="Buscar por nombre, email o restaurante...">
             </div>
 
             <div id="loadingContainer" class="loading">
@@ -388,7 +388,7 @@
                             <th>Estado</th>
                             <th>Fecha Registro</th>
                             <th>Fecha Pago</th>
-<th>Acciones</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="usuariosTable">
@@ -404,7 +404,9 @@
     </div>
 
     <script>
-        const API_URL = 'https://restaurante-co77.onrender.com/api/auth';
+        const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+            ? 'http://localhost:3000/api/auth'
+            : 'https://restaurante-co77.onrender.com/api/auth';
         let todosLosUsuarios = [];
 
         // Verificar autenticación al cargar
@@ -470,21 +472,21 @@
                     <td>${usuario.sede || '-'}</td>
                     <td><span class="badge badge-${usuario.rol}">${usuario.rol}</span></td>
                     <td>
-                        ${usuario.bloqueado 
-                            ? '<span class="badge badge-bloqueado">🚫 BLOQUEADO</span>' 
-                            : usuario.activo 
-                                ? '<span class="badge badge-activo">✓ Activo</span>' 
-                                : '<span class="badge badge-inactivo">✗ Inactivo</span>'
-                        }
+                        ${usuario.bloqueado
+                    ? '<span class="badge badge-bloqueado">🚫 BLOQUEADO</span>'
+                    : usuario.activo
+                        ? '<span class="badge badge-activo">✓ Activo</span>'
+                        : '<span class="badge badge-inactivo">✗ Inactivo</span>'
+                }
                     </td>
                     <td>${new Date(usuario.createdAt).toLocaleDateString('es-ES')}</td>
 <td>
-    ${usuario.fechaPago 
-        ? `<span style="font-size: 0.9rem; color: var(--text-dark);">
+    ${usuario.fechaPago
+                    ? `<span style="font-size: 0.9rem; color: var(--text-dark);">
             ${new Date(usuario.fechaPago).toLocaleDateString('es-ES')}
-           </span>` 
-        : '<span style="color: var(--text-light);">Sin fecha</span>'
-    }
+           </span>`
+                    : '<span style="color: var(--text-light);">Sin fecha</span>'
+                }
 </td>
 <td>
     ${usuario.rol !== 'superadmin' ? `
@@ -495,6 +497,14 @@
                 style="white-space: nowrap;"
             >
                 ${usuario.bloqueado ? '✓ Desbloquear' : '🚫 Bloquear'}
+            </button>
+            <button 
+                class="btn"
+                onclick="confirmarPago('${usuario._id}', '${usuario.nombreRestaurante}')"
+                style="background: #10b981; color: white; white-space: nowrap;"
+                title="Confirmar pago y extender 1 mes"
+            >
+                💰 Pagado
             </button>
             <button 
                 class="btn"
@@ -550,10 +560,38 @@
             }
         }
 
+        async function confirmarPago(userId, nombreRestaurante) {
+            if (!confirm(`¿Confirmar pago del mes para el restaurante "${nombreRestaurante}"?\n\nEsto extenderá su fecha de vencimiento por 1 mes.`)) {
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_URL}/superadmin/confirmar-pago/${userId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ ' + data.message);
+                    await cargarUsuarios();
+                } else {
+                    alert('❌ ' + (data.message || 'Error al confirmar pago'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error de conexión');
+            }
+        }
+
         // Búsqueda en tiempo real
         document.getElementById('searchInput').addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
-            const usuariosFiltrados = todosLosUsuarios.filter(usuario => 
+            const usuariosFiltrados = todosLosUsuarios.filter(usuario =>
                 usuario.nombre.toLowerCase().includes(searchTerm) ||
                 usuario.email.toLowerCase().includes(searchTerm) ||
                 usuario.nombreRestaurante.toLowerCase().includes(searchTerm) ||
@@ -581,100 +619,95 @@
         }
     </script>
 
-<!-- Modal Fecha de Pago -->
-<div id="modalFechaPago" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 2000; align-items: center; justify-content: center; padding: 1rem;">
-    <div style="background: white; border-radius: 12px; padding: 2rem; max-width: 500px; width: 100%;">
-        <h2 style="margin-bottom: 1.5rem; font-size: 1.5rem;">📅 Asignar Fecha de Pago</h2>
-        <p style="margin-bottom: 1rem; color: var(--text-light);">
-            Restaurante: <strong id="modalRestauranteNombre"></strong>
-        </p>
-        <form id="formFechaPago" style="display: flex; flex-direction: column; gap: 1rem;">
-            <div>
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Fecha de Vencimiento:</label>
-                <input 
-                    type="date" 
-                    id="inputFechaPago" 
-                    required
-                    style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 1rem;"
-                >
-            </div>
-            <div style="background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; padding: 12px; font-size: 0.9rem; color: #92400e;">
-                ℹ️ Los usuarios recibirán una notificación 5 días antes del vencimiento
-            </div>
-            <div style="display: flex; gap: 1rem;">
-                <button 
-                    type="button" 
-                    onclick="cerrarModalFechaPago()"
-                    style="flex: 1; padding: 12px; background: white; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-weight: 600;"
-                >
-                    Cancelar
-                </button>
-                <button 
-                    type="submit" 
-                    style="flex: 1; padding: 12px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;"
-                >
-                    Guardar Fecha
-                </button>
-            </div>
-        </form>
+    <!-- Modal Fecha de Pago -->
+    <div id="modalFechaPago"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 2000; align-items: center; justify-content: center; padding: 1rem;">
+        <div style="background: white; border-radius: 12px; padding: 2rem; max-width: 500px; width: 100%;">
+            <h2 style="margin-bottom: 1.5rem; font-size: 1.5rem;">📅 Asignar Fecha de Pago</h2>
+            <p style="margin-bottom: 1rem; color: var(--text-light);">
+                Restaurante: <strong id="modalRestauranteNombre"></strong>
+            </p>
+            <form id="formFechaPago" style="display: flex; flex-direction: column; gap: 1rem;">
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Fecha de
+                        Vencimiento:</label>
+                    <input type="date" id="inputFechaPago" required
+                        style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 1rem;">
+                </div>
+                <div
+                    style="background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; padding: 12px; font-size: 0.9rem; color: #92400e;">
+                    ℹ️ Los usuarios recibirán una notificación 5 días antes del vencimiento
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button type="button" onclick="cerrarModalFechaPago()"
+                        style="flex: 1; padding: 12px; background: white; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        style="flex: 1; padding: 12px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        Guardar Fecha
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-<script>
-let usuarioIdFechaPago = null;
+    <script>
+        let usuarioIdFechaPago = null;
 
-function abrirModalFechaPago(userId, restauranteNombre) {
-    usuarioIdFechaPago = userId;
-    document.getElementById('modalRestauranteNombre').textContent = restauranteNombre;
-    document.getElementById('modalFechaPago').style.display = 'flex';
-    
-    // Establecer fecha mínima como hoy
-    const hoy = new Date().toISOString().split('T')[0];
-    document.getElementById('inputFechaPago').setAttribute('min', hoy);
-}
+        function abrirModalFechaPago(userId, restauranteNombre) {
+            usuarioIdFechaPago = userId;
+            document.getElementById('modalRestauranteNombre').textContent = restauranteNombre;
+            document.getElementById('modalFechaPago').style.display = 'flex';
 
-function cerrarModalFechaPago() {
-    document.getElementById('modalFechaPago').style.display = 'none';
-    document.getElementById('formFechaPago').reset();
-    usuarioIdFechaPago = null;
-}
-
-document.getElementById('formFechaPago').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const fechaPago = document.getElementById('inputFechaPago').value;
-    
-    if (!usuarioIdFechaPago || !fechaPago) {
-        alert('Por favor complete todos los campos');
-        return;
-    }
-
-    try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`${API_URL}/superadmin/fecha-pago/${usuarioIdFechaPago}`, {
-            method: 'PATCH',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ fechaPago })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            alert('✅ ' + data.message);
-            cerrarModalFechaPago();
-            await cargarUsuarios();
-        } else {
-            alert('❌ ' + (data.message || 'Error al actualizar fecha'));
+            // Establecer fecha mínima como hoy
+            const hoy = new Date().toISOString().split('T')[0];
+            document.getElementById('inputFechaPago').setAttribute('min', hoy);
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('❌ Error de conexión');
-    }
-});
-</script>
+
+        function cerrarModalFechaPago() {
+            document.getElementById('modalFechaPago').style.display = 'none';
+            document.getElementById('formFechaPago').reset();
+            usuarioIdFechaPago = null;
+        }
+
+        document.getElementById('formFechaPago').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const fechaPago = document.getElementById('inputFechaPago').value;
+
+            if (!usuarioIdFechaPago || !fechaPago) {
+                alert('Por favor complete todos los campos');
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_URL}/superadmin/fecha-pago/${usuarioIdFechaPago}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ fechaPago })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ ' + data.message);
+                    cerrarModalFechaPago();
+                    await cargarUsuarios();
+                } else {
+                    alert('❌ ' + (data.message || 'Error al actualizar fecha'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error de conexión');
+            }
+        });
+    </script>
 
 </body>
+
 </html>

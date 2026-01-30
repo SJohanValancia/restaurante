@@ -446,10 +446,90 @@ router.patch('/superadmin/fecha-pago/:userId', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error al actualizar fecha de pago:', error);
     res.status(500).json({
       success: false,
       message: 'Error al actualizar fecha de pago'
+    });
+  }
+});
+
+// Confirmar pago (extender fecha 1 mes) - solo superadmin
+router.patch('/superadmin/confirmar-pago/:userId', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: 'No autorizado'
+      });
+    }
+
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || 'secreto-super-seguro-cambiar-en-produccion'
+    );
+
+    const usuarioActual = await User.findById(decoded.id);
+
+    if (!usuarioActual || usuarioActual.rol !== 'superadmin') {
+      return res.status(403).json({
+        success: false,
+        message: 'No tiene permisos de superadmin'
+      });
+    }
+
+    const usuario = await User.findById(req.params.userId);
+
+    if (!usuario) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario no encontrado'
+      });
+    }
+
+    // Calcular nueva fecha
+    let nuevaFecha;
+    const fechaActual = usuario.fechaPago ? new Date(usuario.fechaPago) : new Date();
+    
+    // Si la fecha actual es anterior a hoy, usar hoy como base, si no, usar la fecha actual (para extender desde la fecha de vencimiento)
+    // El usuario pidió: "que no le aparezca ese mensaje hasta la proxima fecha de pago"
+    // Lo lógico es sumar 1 mes a la fecha existente si es futura, o 1 mes a hoy si ya pasó.
+    // PERO la lógica más robusta para suscripciones es: si no está vencido, sumar al vencimiento. Si está vencido, sumar a hoy.
+    
+    const hoy = new Date();
+    // Resetear horas para comparar solo fechas
+    hoy.setHours(0,0,0,0);
+    
+    if (fechaActual < hoy) {
+        // Si ya venció, la nueva fecha es 1 mes desde hoy
+        nuevaFecha = new Date();
+    } else {
+        // Si no ha vencido, extender 1 mes desde la fecha actual
+        nuevaFecha = new Date(fechaActual);
+    }
+    
+    nuevaFecha.setMonth(nuevaFecha.getMonth() + 1);
+
+    // Actualizar todos los usuarios del mismo restaurante
+    await User.updateMany(
+      { nombreRestaurante: usuario.nombreRestaurante },
+      {
+        fechaPago: nuevaFecha,
+        fechaUltimoPago: new Date()
+      }
+    );
+
+    res.json({
+      success: true,
+      message: `Pago confirmado para "${usuario.nombreRestaurante}". Nueva fecha: ${nuevaFecha.toLocaleDateString('es-ES')}`
+    });
+
+  } catch (error) {
+    console.error('Error al confirmar pago:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al confirmar pago'
     });
   }
 });
