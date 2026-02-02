@@ -1187,8 +1187,14 @@
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging-compat.js"></script>
+
     <script>
-        const API_URL = 'https://restaurante-co77.onrender.com/api';
+        // Usar ruta relativa para que funcione tanto en local como en producción
+        const API_URL = '/api';
+        // const API_URL = 'https://restaurante-co77.onrender.com/api';
         let orderData = null;
         let previousStatus = null;
         let previousItems = null;
@@ -1205,17 +1211,91 @@
         // SERVICE WORKER & NOTIFICATIONS
         // ======================
 
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDoGAGH3G0ZXbQ0C2oAVu5VVKWhLAjNj10",
+            authDomain: "restaurante-24114.firebaseapp.com",
+            projectId: "restaurante-24114",
+            storageBucket: "restaurante-24114.firebasestorage.app",
+            messagingSenderId: "475296003209",
+            appId: "1:475296003209:web:31e470e3559f4ccb540258"
+        };
+
+        const VAPID_KEY = 'BA5zJD_PtRo--1vhIMefMpQ1BPbrezjmTzXZe1ScYp3qgpV03sEmTa3P1At7kh9wzIFK-123RoptilmGEFCv9O8';
+        let fcmToken = null;
+
         async function registerServiceWorker() {
-            if ('serviceWorker' in navigator) {
-                try {
-                    const registration = await navigator.serviceWorker.register('/sw.js');
-                    console.log('✅ Service Worker registrado:', registration.scope);
-                    return registration;
-                } catch (error) {
-                    console.log('❌ Error registrando Service Worker:', error);
-                }
+            if (!('serviceWorker' in navigator)) {
+                console.log('❌ Service Worker no soportado');
+                return null;
             }
-            return null;
+
+            try {
+                // Registrar Firebase Messaging Service Worker
+                const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+                console.log('✅ Firebase SW registrado:', registration.scope);
+
+                // Inicializar Firebase
+                if (!window.firebase) {
+                    console.log('⚠️ Firebase SDK no cargado');
+                    return registration;
+                }
+
+                const app = firebase.initializeApp(firebaseConfig);
+                const messaging = firebase.messaging();
+
+                // Obtener token FCM
+                const token = await messaging.getToken({
+                    vapidKey: VAPID_KEY,
+                    serviceWorkerRegistration: registration
+                });
+
+                if (token) {
+                    fcmToken = token;
+                    console.log('🔑 Token FCM obtenido:', token.substring(0, 20) + '...');
+
+                    // Registrar token en backend
+                    await registerPushToken(token);
+
+                    // Escuchar mensajes en primer plano
+                    messaging.onMessage((payload) => {
+                        console.log('📬 Push recibido en foreground:', payload);
+                        showPushNotification(
+                            payload.notification?.title?.split(' ')[0] || '📋',
+                            payload.notification?.title || 'Actualización',
+                            payload.notification?.body || 'Tu pedido ha sido actualizado'
+                        );
+                    });
+                }
+
+                return registration;
+            } catch (error) {
+                console.log('❌ Error con Firebase Messaging:', error);
+                return null;
+            }
+        }
+
+        async function registerPushToken(token) {
+            try {
+                const response = await fetch(`${API_URL}/push/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        token: token,
+                        mesa: mesa,
+                        restaurante: restaurante,
+                        sede: sede
+                    })
+                });
+
+                if (response.ok) {
+                    console.log('✅ Token registrado en backend');
+                } else {
+                    console.log('⚠️ Error registrando token en backend');
+                }
+            } catch (error) {
+                console.log('❌ Error enviando token:', error);
+            }
         }
 
         async function checkNotificationPermission() {

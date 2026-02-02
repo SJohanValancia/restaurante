@@ -7,9 +7,14 @@ const liquidacionesRoutes = require('./routes/liquidaciones');
 const adminMeserosRoutes = require('./routes/adminMeseros');
 const ordersRoutes = require('./routes/Orders');
 const alimentosRoutes = require('./routes/alimentos');
-const productsRoutes = require('./routes/Products'); // ✅ Importar explícitamente
+const productsRoutes = require('./routes/Products');
+const pushRoutes = require('./routes/push'); // ✅ Push notifications
 const { protect } = require('./middleware/auth');
 require('dotenv').config();
+
+// ✅ Inicializar Firebase Admin
+const { initializeFirebase } = require('./services/pushNotification');
+initializeFirebase();
 
 const app = express();
 
@@ -26,8 +31,9 @@ mongoose.connect(process.env.MONGO_URI)
 
 // ⭐ RUTAS PÚBLICAS PRIMERO (SIN protect)
 app.use('/api/auth', require('./routes/auth'));
-app.use('/api/orders', ordersRoutes); // Tiene rutas públicas y protegidas dentro
-app.use('/api/products', productsRoutes); // ✅ SIN protect aquí - las rutas individuales ya tienen protect
+app.use('/api/orders', ordersRoutes);
+app.use('/api/products', productsRoutes);
+app.use('/api/push', pushRoutes); // ✅ Notificaciones push (público)
 
 // ⭐ RUTAS PROTEGIDAS (CON protect)
 app.use('/api/expenses', protect, expensesRoutes);

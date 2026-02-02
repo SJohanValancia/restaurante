@@ -6,6 +6,7 @@ const Product = require('../models/Product');
 const mongoose = require('mongoose');
 const { protect } = require('../middleware/auth');
 const { checkPermission } = require('../middleware/permissions');
+const { notifyOrderStatusChange } = require('../services/pushNotification'); // ✅ Push notifications
 
 // ✅ FUNCIÓN PARA DESCONTAR STOCK DE ALIMENTOS
 async function descontarStockAlimentos(items, userId, ignorarStock = false) {
@@ -548,6 +549,17 @@ router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (re
       console.log('✅ Todos los productos actualizados a:', estado);
     }
 
+    // ✅ ENVIAR PUSH NOTIFICATION AL CLIENTE
+    try {
+      const user = await User.findById(order.userId);
+      if (user && user.nombreRestaurante) {
+        await notifyOrderStatusChange(order.mesa, user.nombreRestaurante, estado);
+      }
+    } catch (pushError) {
+      console.error('⚠️ Error enviando push notification:', pushError);
+      // No fallar la request por error de push
+    }
+
     res.json({
       success: true,
       message: `Pedido actualizado a estado: ${estado}`,
@@ -617,8 +629,19 @@ router.patch('/:id/item/:itemIndex/estado', protect, checkPermission('editarPedi
     );
 
     if (todosEntregados && order.estado !== 'entregado') {
-      // No cambiar automÃ¡ticamente, solo notificar
+      // No cambiar automáticamente, solo notificar
       await order.save();
+
+      // ✅ ENVIAR PUSH NOTIFICATION
+      try {
+        const user = await User.findById(order.userId);
+        if (user && user.nombreRestaurante) {
+          await notifyOrderStatusChange(order.mesa, user.nombreRestaurante, nuevoEstado);
+        }
+      } catch (pushError) {
+        console.error('⚠️ Error enviando push:', pushError);
+      }
+
       return res.json({
         success: true,
         message: 'Estado del producto actualizado',
@@ -628,6 +651,16 @@ router.patch('/:id/item/:itemIndex/estado', protect, checkPermission('editarPedi
     }
 
     await order.save();
+
+    // ✅ ENVIAR PUSH NOTIFICATION
+    try {
+      const user = await User.findById(order.userId);
+      if (user && user.nombreRestaurante) {
+        await notifyOrderStatusChange(order.mesa, user.nombreRestaurante, nuevoEstado);
+      }
+    } catch (pushError) {
+      console.error('⚠️ Error enviando push:', pushError);
+    }
 
     res.json({
       success: true,
