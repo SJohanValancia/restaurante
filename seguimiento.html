@@ -3,9 +3,17 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Seguimiento de Pedido</title>
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
         * {
             margin: 0;
             padding: 0;
@@ -41,6 +49,100 @@
         .header p {
             font-size: 16px;
             opacity: 0.9;
+        }
+
+        /* NOTIFICATION PERMISSION BANNER */
+        .notification-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            z-index: 2000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(-100%);
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .notification-banner.show {
+            transform: translateY(0);
+        }
+
+        .notification-banner-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .notification-banner-icon {
+            font-size: 1.75rem;
+            animation: bellRing 1s ease-in-out infinite;
+        }
+
+        @keyframes bellRing {
+
+            0%,
+            100% {
+                transform: rotate(0deg);
+            }
+
+            25% {
+                transform: rotate(15deg);
+            }
+
+            50% {
+                transform: rotate(-15deg);
+            }
+
+            75% {
+                transform: rotate(10deg);
+            }
+        }
+
+        .notification-banner-text h4 {
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .notification-banner-text p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+        }
+
+        .btn-enable-notifications {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-enable-notifications:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-close-banner {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 4px;
+            line-height: 1;
         }
 
         .live-indicator {
@@ -589,61 +691,338 @@
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
 
-        .change-notification {
+        /* PREMIUM PUSH NOTIFICATION */
+        .push-notification {
             position: fixed;
-            top: 80px;
-            right: 20px;
-            background: white;
-            padding: 16px 20px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            z-index: 1001;
-            animation: slideInNotification 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            border-left: 4px solid #48bb78;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(-200%);
+            width: calc(100% - 2rem);
+            max-width: 400px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 20px;
+            padding: 1.25rem;
+            z-index: 10000;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        @keyframes slideInNotification {
+        .push-notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .push-notification-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 0.75rem;
+        }
+
+        .push-notification-app {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .push-notification-app-icon {
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+
+        .push-notification-time {
+            margin-left: auto;
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .push-notification-body {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .push-notification-emoji {
+            font-size: 2.5rem;
+            line-height: 1;
+            animation: emojiPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
+        }
+
+        @keyframes emojiPop {
             from {
-                transform: translateX(400px) rotate(10deg);
-                opacity: 0;
+                transform: scale(0) rotate(-45deg);
             }
 
             to {
-                transform: translateX(0) rotate(0deg);
-                opacity: 1;
+                transform: scale(1) rotate(0deg);
             }
         }
 
-        .notification-icon {
-            font-size: 24px;
-            animation: bounce 0.6s ease-in-out 3;
+        .push-notification-content {
+            flex: 1;
         }
 
-        @keyframes bounce {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
-        .notification-content h4 {
-            font-size: 14px;
+        .push-notification-title {
+            color: white;
+            font-size: 1.1rem;
             font-weight: 700;
-            color: #1a202c;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
         }
 
-        .notification-content p {
-            font-size: 12px;
-            color: #718096;
+        .push-notification-message {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .push-notification-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .push-notification-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .push-notification-btn.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .push-notification-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .push-notification-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .push-notification-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 0 0 20px 20px;
+            animation: progressShrink 5s linear forwards;
+        }
+
+        @keyframes progressShrink {
+            from {
+                width: 100%;
+            }
+
+            to {
+                width: 0%;
+            }
+        }
+
+        /* iOS PWA INSTALL MODAL */
+        .ios-pwa-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 20000;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .ios-pwa-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .ios-pwa-content {
+            background: #1c1c1e;
+            border-radius: 20px 20px 0 0;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .ios-pwa-modal.show .ios-pwa-content {
+            transform: translateY(0);
+        }
+
+        .ios-pwa-handle {
+            width: 40px;
+            height: 4px;
+            background: #48484a;
+            border-radius: 2px;
+            margin: 10px auto 0;
+        }
+
+        .ios-pwa-header {
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid #38383a;
+        }
+
+        .ios-pwa-header h2 {
+            color: white;
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .ios-pwa-header p {
+            color: #8e8e93;
+            font-size: 0.9rem;
+        }
+
+        .ios-pwa-steps {
+            padding: 1.5rem;
+        }
+
+        .ios-pwa-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #38383a;
+        }
+
+        .ios-pwa-step:last-child {
+            border-bottom: none;
+        }
+
+        .ios-pwa-step-number {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .ios-pwa-step-content h3 {
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .ios-pwa-step-content p {
+            color: #8e8e93;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .ios-pwa-step-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #007aff;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .ios-pwa-step-icon.share {
+            background: #007aff;
+        }
+
+        .ios-pwa-step-icon.add {
+            background: #30d158;
+        }
+
+        .ios-pwa-benefits {
+            padding: 1rem 1.5rem;
+            background: #2c2c2e;
+            margin: 0 1rem 1rem;
+            border-radius: 12px;
+        }
+
+        .ios-pwa-benefits h4 {
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .ios-pwa-benefit {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #8e8e93;
+            font-size: 0.85rem;
+            padding: 6px 0;
+        }
+
+        .ios-pwa-benefit-icon {
+            font-size: 1.1rem;
+        }
+
+        .ios-pwa-footer {
+            padding: 1rem 1.5rem 2rem;
+        }
+
+        .ios-pwa-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .ios-pwa-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .ios-pwa-btn-secondary {
+            width: 100%;
+            padding: 0.75rem;
+            background: transparent;
+            border: none;
+            color: #8e8e93;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 0.75rem;
         }
 
         @media (max-width: 600px) {
@@ -670,16 +1049,125 @@
                 padding: 6px 12px;
             }
 
-            .change-notification {
-                top: 60px;
-                right: 10px;
-                left: 10px;
+            .notification-banner {
+                flex-wrap: wrap;
+                padding: 1rem;
+            }
+
+            .notification-banner-content {
+                width: 100%;
+            }
+
+            .btn-enable-notifications {
+                width: 100%;
+                margin-top: 0.75rem;
+            }
+
+            .btn-close-banner {
+                position: absolute;
+                top: 0.75rem;
+                right: 0.75rem;
             }
         }
     </style>
 </head>
 
 <body>
+    <!-- NOTIFICATION PERMISSION BANNER -->
+    <div class="notification-banner" id="notificationBanner">
+        <div class="notification-banner-content">
+            <div class="notification-banner-icon">🔔</div>
+            <div class="notification-banner-text">
+                <h4>Activa las notificaciones</h4>
+                <p>Te avisaremos cuando tu pedido cambie de estado</p>
+            </div>
+        </div>
+        <button class="btn-enable-notifications" id="btnEnableNotifications" onclick="requestNotificationPermission()">
+            Activar
+        </button>
+        <button class="btn-close-banner" onclick="closeBanner()">×</button>
+    </div>
+
+    <!-- iOS PWA INSTALL MODAL -->
+    <div class="ios-pwa-modal" id="iosPwaModal">
+        <div class="ios-pwa-content">
+            <div class="ios-pwa-handle"></div>
+            <div class="ios-pwa-header">
+                <h2>📱 Instalar la App</h2>
+                <p>Para recibir notificaciones en iPhone, instala esta página como app</p>
+            </div>
+
+            <div class="ios-pwa-steps">
+                <div class="ios-pwa-step">
+                    <div class="ios-pwa-step-number">1</div>
+                    <div class="ios-pwa-step-content">
+                        <h3>Toca el botón Compartir</h3>
+                        <p>Busca el ícono de compartir en la barra inferior de Safari</p>
+                        <span class="ios-pwa-step-icon share">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                                <polyline points="16,6 12,2 8,6" />
+                                <line x1="12" y1="2" x2="12" y2="15" />
+                            </svg>
+                            &nbsp;Compartir
+                        </span>
+                    </div>
+                </div>
+
+                <div class="ios-pwa-step">
+                    <div class="ios-pwa-step-number">2</div>
+                    <div class="ios-pwa-step-content">
+                        <h3>Desliza hacia abajo</h3>
+                        <p>Busca la opción "Agregar a pantalla de inicio"</p>
+                        <span class="ios-pwa-step-icon add">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                <line x1="12" y1="8" x2="12" y2="16" />
+                                <line x1="8" y1="12" x2="16" y2="12" />
+                            </svg>
+                            &nbsp;Agregar
+                        </span>
+                    </div>
+                </div>
+
+                <div class="ios-pwa-step">
+                    <div class="ios-pwa-step-number">3</div>
+                    <div class="ios-pwa-step-content">
+                        <h3>Confirma "Agregar"</h3>
+                        <p>Toca "Agregar" en la esquina superior derecha para instalar</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ios-pwa-benefits">
+                <h4>✨ Beneficios de la App:</h4>
+                <div class="ios-pwa-benefit">
+                    <span class="ios-pwa-benefit-icon">🔔</span>
+                    <span>Notificaciones push cuando cambie tu pedido</span>
+                </div>
+                <div class="ios-pwa-benefit">
+                    <span class="ios-pwa-benefit-icon">📱</span>
+                    <span>Acceso rápido desde tu pantalla de inicio</span>
+                </div>
+                <div class="ios-pwa-benefit">
+                    <span class="ios-pwa-benefit-icon">⚡</span>
+                    <span>Carga más rápida y experiencia mejorada</span>
+                </div>
+            </div>
+
+            <div class="ios-pwa-footer">
+                <button class="ios-pwa-btn" onclick="closeIosPwaModal()">
+                    ¡Entendido!
+                </button>
+                <button class="ios-pwa-btn-secondary" onclick="dismissIosPwaModal()">
+                    Recordarme después
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="live-indicator">
         <div class="live-dot"></div>
         <span>Actualización en tiempo real</span>
@@ -705,13 +1193,292 @@
         let previousStatus = null;
         let previousItems = null;
         let pollingInterval = null;
+        let notificationPermission = 'default';
+        let audioContext = null;
 
         const urlParams = new URLSearchParams(window.location.search);
         const restaurante = urlParams.get('restaurante');
         const mesa = urlParams.get('mesa');
         const sede = urlParams.get('sede');
 
-        window.addEventListener('DOMContentLoaded', () => {
+        // ======================
+        // SERVICE WORKER & NOTIFICATIONS
+        // ======================
+
+        async function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                try {
+                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    console.log('✅ Service Worker registrado:', registration.scope);
+                    return registration;
+                } catch (error) {
+                    console.log('❌ Error registrando Service Worker:', error);
+                }
+            }
+            return null;
+        }
+
+        async function checkNotificationPermission() {
+            if (!('Notification' in window)) {
+                console.log('Este navegador no soporta notificaciones');
+                return;
+            }
+
+            notificationPermission = Notification.permission;
+
+            if (notificationPermission === 'default') {
+                // Mostrar banner para pedir permiso
+                setTimeout(() => {
+                    document.getElementById('notificationBanner').classList.add('show');
+                }, 2000);
+            } else if (notificationPermission === 'granted') {
+                console.log('✅ Notificaciones habilitadas');
+            }
+        }
+
+        async function requestNotificationPermission() {
+            try {
+                const permission = await Notification.requestPermission();
+                notificationPermission = permission;
+
+                if (permission === 'granted') {
+                    console.log('✅ Permiso de notificaciones concedido');
+                    closeBanner();
+
+                    // Mostrar notificación de confirmación
+                    showPushNotification(
+                        '✅',
+                        '¡Notificaciones activadas!',
+                        'Te avisaremos cuando tu pedido cambie de estado'
+                    );
+
+                    // Registrar Service Worker
+                    await registerServiceWorker();
+                } else {
+                    console.log('❌ Permiso de notificaciones denegado');
+                    closeBanner();
+                }
+            } catch (error) {
+                console.error('Error solicitando permisos:', error);
+            }
+        }
+
+        function closeBanner() {
+            document.getElementById('notificationBanner').classList.remove('show');
+        }
+
+        // ======================
+        // PUSH NOTIFICATIONS
+        // ======================
+
+        function showPushNotification(emoji, title, message, isImportant = true) {
+            // 1. Vibración (Android principalmente)
+            triggerVibration(isImportant);
+
+            // 2. Sonido
+            playNotificationSound();
+
+            // 3. Notificación flotante premium
+            showFloatingNotification(emoji, title, message);
+
+            // 4. Notificación nativa del sistema (si está permitida)
+            if (notificationPermission === 'granted') {
+                showNativeNotification(emoji, title, message);
+            }
+        }
+
+        function triggerVibration(isImportant) {
+            if ('vibrate' in navigator) {
+                if (isImportant) {
+                    // Patrón de vibración más intenso para notificaciones importantes
+                    navigator.vibrate([200, 100, 200, 100, 300]);
+                } else {
+                    navigator.vibrate([150, 50, 150]);
+                }
+            }
+        }
+
+        function showNativeNotification(emoji, title, message) {
+            try {
+                const notification = new Notification(`${emoji} ${title}`, {
+                    body: message,
+                    icon: '/icon-192.png',
+                    badge: '/icon-badge.png',
+                    tag: 'order-status-update',
+                    renotify: true,
+                    requireInteraction: false,
+                    vibrate: [200, 100, 200],
+                    silent: false
+                });
+
+                notification.onclick = () => {
+                    window.focus();
+                    notification.close();
+                };
+
+                // Auto-cerrar después de 6 segundos
+                setTimeout(() => notification.close(), 6000);
+            } catch (error) {
+                console.log('Error mostrando notificación nativa:', error);
+            }
+        }
+
+        function showFloatingNotification(emoji, title, message) {
+            // Remover notificación anterior si existe
+            const existing = document.querySelector('.push-notification');
+            if (existing) existing.remove();
+
+            const notification = document.createElement('div');
+            notification.className = 'push-notification';
+            notification.innerHTML = `
+                <div class="push-notification-header">
+                    <div class="push-notification-app">
+                        <div class="push-notification-app-icon">🍽️</div>
+                        JC Restaurant
+                    </div>
+                    <span class="push-notification-time">ahora</span>
+                </div>
+                <div class="push-notification-body">
+                    <div class="push-notification-emoji">${emoji}</div>
+                    <div class="push-notification-content">
+                        <div class="push-notification-title">${title}</div>
+                        <div class="push-notification-message">${message}</div>
+                    </div>
+                </div>
+                <div class="push-notification-actions">
+                    <button class="push-notification-btn primary" onclick="this.closest('.push-notification').remove()">
+                        Entendido
+                    </button>
+                </div>
+                <div class="push-notification-progress"></div>
+            `;
+
+            document.body.appendChild(notification);
+
+            // Animar entrada
+            requestAnimationFrame(() => {
+                notification.classList.add('show');
+            });
+
+            // Auto-cerrar después de 5 segundos
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 600);
+            }, 5000);
+        }
+
+        function playNotificationSound() {
+            try {
+                // Crear o reutilizar AudioContext
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+
+                // Despertar el contexto si está suspendido (iOS)
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+
+                const now = audioContext.currentTime;
+
+                function playTone(frequency, startTime, duration, type = 'sine', volume = 0.3) {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+
+                    oscillator.frequency.value = frequency;
+                    oscillator.type = type;
+
+                    gainNode.gain.setValueAtTime(0, now + startTime);
+                    gainNode.gain.linearRampToValueAtTime(volume, now + startTime + 0.03);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + startTime + duration);
+
+                    oscillator.start(now + startTime);
+                    oscillator.stop(now + startTime + duration);
+                }
+
+                // Melodía de notificación elegante
+                playTone(880, 0, 0.15, 'sine', 0.4);       // A5
+                playTone(1047, 0.1, 0.15, 'sine', 0.35);   // C6
+                playTone(1319, 0.2, 0.2, 'sine', 0.3);     // E6
+                playTone(1568, 0.35, 0.3, 'sine', 0.25);   // G6
+
+            } catch (error) {
+                console.log('No se pudo reproducir sonido:', error);
+            }
+        }
+
+        // ======================
+        // ORDER TRACKING
+        // ======================
+
+        // iOS PWA Detection and Modal Functions
+        function isIOS() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        }
+
+        function isInStandaloneMode() {
+            return ('standalone' in window.navigator) && window.navigator.standalone;
+        }
+
+        function isPWAInstalled() {
+            return isInStandaloneMode() || window.matchMedia('(display-mode: standalone)').matches;
+        }
+
+        function shouldShowIOSModal() {
+            // Only show on iOS, not in standalone mode, and not dismissed recently
+            if (!isIOS()) return false;
+            if (isPWAInstalled()) return false;
+
+            const dismissed = localStorage.getItem('iosPwaModalDismissed');
+            if (dismissed) {
+                const dismissedTime = parseInt(dismissed);
+                const hoursSinceDismiss = (Date.now() - dismissedTime) / (1000 * 60 * 60);
+                if (hoursSinceDismiss < 24) return false; // Don't show again for 24 hours
+            }
+
+            return true;
+        }
+
+        function showIosPwaModal() {
+            const modal = document.getElementById('iosPwaModal');
+            if (modal) {
+                modal.classList.add('show');
+            }
+        }
+
+        function closeIosPwaModal() {
+            const modal = document.getElementById('iosPwaModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+            // Mark as seen (won't show again this session)
+            sessionStorage.setItem('iosPwaModalSeen', 'true');
+        }
+
+        function dismissIosPwaModal() {
+            closeIosPwaModal();
+            // Remember dismissal for 24 hours
+            localStorage.setItem('iosPwaModalDismissed', Date.now().toString());
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Inicializar audio context con interacción del usuario
+            document.addEventListener('click', () => {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }, { once: true });
+
+            // Check if iOS and should show PWA modal
+            if (shouldShowIOSModal() && !sessionStorage.getItem('iosPwaModalSeen')) {
+                setTimeout(() => {
+                    showIosPwaModal();
+                }, 1500); // Show after 1.5 seconds
+            }
+
             if (!restaurante) {
                 showError('Información incompleta', 'El código QR no contiene el nombre del restaurante.');
                 return;
@@ -721,6 +1488,12 @@
                 showSearchUI();
                 return;
             }
+
+            // Verificar permisos de notificación
+            await checkNotificationPermission();
+
+            // Registrar Service Worker
+            await registerServiceWorker();
 
             loadOrder();
             pollingInterval = setInterval(checkForUpdates, 3000);
@@ -752,8 +1525,6 @@
                 alert('Por favor, ingresa un nombre o mesa');
                 return;
             }
-
-            // Actualizar la variable mesa y relanzar la carga
             window.location.href = `seguimiento.html?restaurante=${encodeURIComponent(restaurante)}&mesa=${encodeURIComponent(input)}${sede ? '&sede=' + encodeURIComponent(sede) : ''}`;
         }
 
@@ -767,20 +1538,15 @@
             try {
                 console.log('🔍 Cargando pedido...');
                 const url = `${API_URL}/orders/mesa/${mesa}?restaurante=${encodeURIComponent(restaurante)}${sede ? '&sede=' + encodeURIComponent(sede) : ''}`;
-                console.log('URL:', url);
 
                 const response = await fetch(url);
 
-                console.log('Status:', response.status);
-
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => ({}));
-                    console.error('Error del servidor:', errorData);
                     throw new Error(errorData.message || 'No se pudo obtener el pedido');
                 }
 
                 const data = await response.json();
-                console.log('✅ Datos recibidos:', data);
 
                 if (data.success && data.data) {
                     orderData = data.data;
@@ -791,7 +1557,7 @@
                     showError('Sin pedidos', 'No hay pedidos activos para esta mesa en este momento.');
                 }
             } catch (error) {
-                console.error('❌ Error completo:', error);
+                console.error('❌ Error:', error);
                 showError('Error de conexión', `No se pudo cargar la información del pedido: ${error.message}`);
             }
         }
@@ -810,21 +1576,31 @@
                     const newOverallStatus = calculateOverallStatus(newOrder);
                     const newItemsString = JSON.stringify(newOrder.items);
 
-                    // Detectar cambios en items individuales
                     const itemsChanged = previousItems !== newItemsString;
-
-                    // Detectar cambios en el estado general
                     const statusChanged = previousStatus !== newOverallStatus;
 
                     if (itemsChanged || statusChanged) {
                         console.log('🔔 Cambios detectados');
 
                         if (statusChanged) {
-                            console.log('📊 Estado general cambió:', previousStatus, '→', newOverallStatus);
-                            showChangeNotification(previousStatus, newOverallStatus);
+                            console.log('📊 Estado cambió:', previousStatus, '→', newOverallStatus);
+                            const statusInfo = getStatusInfo(newOverallStatus);
+
+                            // ¡Notificación push completa!
+                            showPushNotification(
+                                statusInfo.emoji,
+                                statusInfo.title,
+                                statusInfo.message,
+                                true // Es importante
+                            );
                         } else if (itemsChanged) {
-                            console.log('🍽️ Estados de productos cambiaron');
-                            showItemChangeNotification();
+                            console.log('🍽️ Productos actualizados');
+                            showPushNotification(
+                                '🍽️',
+                                '¡Producto actualizado!',
+                                'El estado de un producto de tu pedido cambió',
+                                false
+                            );
                         }
 
                         previousStatus = newOverallStatus;
@@ -843,7 +1619,6 @@
             }
         }
 
-        // Calcular el estado general basado en los estados individuales de productos
         function calculateOverallStatus(order) {
             if (!order.items || order.items.length === 0) return 'pendiente';
 
@@ -853,101 +1628,12 @@
                 allGroups.push(...grupos.map(g => g.estado));
             });
 
-            // Si todos están entregados
             if (allGroups.every(e => e === 'entregado')) return 'entregado';
-
-            // Si al menos uno está listo y ninguno pendiente/preparando
             if (allGroups.some(e => e === 'listo') && !allGroups.some(e => e === 'pendiente' || e === 'preparando')) return 'listo';
-
-            // Si al menos uno está listo o preparando
             if (allGroups.some(e => e === 'listo')) return 'listo';
-
-            // Si al menos uno está preparando
             if (allGroups.some(e => e === 'preparando')) return 'preparando';
 
-            // Por defecto, pendiente
             return 'pendiente';
-        }
-
-        function showItemChangeNotification() {
-            const notification = document.createElement('div');
-            notification.className = 'change-notification';
-            notification.innerHTML = `
-                <div class="notification-icon">🍽️</div>
-                <div class="notification-content">
-                    <h4>¡Producto actualizado!</h4>
-                    <p>El estado de un producto cambió</p>
-                </div>
-            `;
-
-            document.body.appendChild(notification);
-            playNotificationSound();
-
-            setTimeout(() => {
-                notification.style.animation = 'slideInNotification 0.3s ease reverse';
-                setTimeout(() => notification.remove(), 300);
-            }, 4000);
-        }
-
-        function showChangeNotification(oldStatus, newStatus) {
-            const statusInfo = getStatusInfo(newStatus);
-
-            const notification = document.createElement('div');
-            notification.className = 'change-notification';
-            notification.innerHTML = `
-                <div class="notification-icon">${statusInfo.emoji}</div>
-                <div class="notification-content">
-                    <h4>¡Estado actualizado!</h4>
-                    <p>${statusInfo.title}</p>
-                </div>
-            `;
-
-            document.body.appendChild(notification);
-            playNotificationSound();
-
-            setTimeout(() => {
-                notification.style.animation = 'slideInNotification 0.3s ease reverse';
-                setTimeout(() => notification.remove(), 300);
-            }, 4000);
-        }
-
-        function playNotificationSound() {
-            try {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-                // Sonido "JC" mejorado
-                function playTone(frequency, startTime, duration, type = 'sine', volume = 0.3) {
-                    const oscillator = audioContext.createOscillator();
-                    const gainNode = audioContext.createGain();
-
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioContext.destination);
-
-                    oscillator.frequency.value = frequency;
-                    oscillator.type = type;
-
-                    gainNode.gain.setValueAtTime(0, audioContext.currentTime + startTime);
-                    gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + startTime + 0.05);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + startTime + duration);
-
-                    oscillator.start(audioContext.currentTime + startTime);
-                    oscillator.stop(audioContext.currentTime + startTime + duration);
-                }
-
-                // Sonido "J"
-                playTone(880, 0, 0.2, 'square', 0.4);
-                playTone(1320, 0, 0.2, 'sine', 0.3);
-
-                // Sonido "C"
-                playTone(523, 0.25, 0.35, 'triangle', 0.4);
-                playTone(659, 0.25, 0.35, 'sine', 0.3);
-
-                // Echo
-                playTone(440, 0.45, 0.25, 'sine', 0.2);
-
-            } catch (error) {
-                console.log('No se pudo reproducir sonido de notificación');
-            }
         }
 
         function displayOrder(isUpdate = false, itemsChanged = false) {
@@ -958,7 +1644,6 @@
             const statusInfo = getStatusInfo(overallStatus);
             const timeline = getTimeline(overallStatus, isUpdate ? previousStatus : null);
 
-            // Items con animación si cambiaron
             const itemsHTML = order.items.map(item => {
                 const info = item.productoInfo || item.producto || {};
                 const grupos = item.estadosIndividuales || [{ cantidad: item.cantidad, estado: 'pendiente' }];
@@ -1063,7 +1748,7 @@
                 },
                 'preparando': {
                     emoji: '👨‍🍳',
-                    title: 'Preparando tu Pedido',
+                    title: '¡Preparando tu Pedido!',
                     message: 'Nuestro chef está preparando tu orden con cuidado'
                 },
                 'listo': {
@@ -1073,7 +1758,7 @@
                 },
                 'entregado': {
                     emoji: '🎉',
-                    title: 'Pedido Entregado',
+                    title: '¡Pedido Entregado!',
                     message: '¡Disfruta tu comida! Gracias por tu preferencia'
                 },
                 'cancelado': {
