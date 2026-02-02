@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,7 +35,7 @@
             font-size: 32px;
             font-weight: 800;
             margin-bottom: 8px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
 
         .header p {
@@ -46,7 +47,7 @@
             position: fixed;
             top: 20px;
             right: 20px;
-            background: rgba(255,255,255,0.95);
+            background: rgba(255, 255, 255, 0.95);
             padding: 8px 16px;
             border-radius: 20px;
             display: flex;
@@ -55,7 +56,7 @@
             font-size: 12px;
             font-weight: 600;
             color: #2d3748;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             z-index: 1000;
             animation: slideIn 0.3s ease;
         }
@@ -65,6 +66,7 @@
                 transform: translateX(100px);
                 opacity: 0;
             }
+
             to {
                 transform: translateX(0);
                 opacity: 1;
@@ -80,10 +82,13 @@
         }
 
         @keyframes pulse {
-            0%, 100% {
+
+            0%,
+            100% {
                 opacity: 1;
                 transform: scale(1);
             }
+
             50% {
                 opacity: 0.5;
                 transform: scale(1.2);
@@ -95,7 +100,7 @@
             border-radius: 16px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
         }
 
@@ -104,9 +109,12 @@
         }
 
         @keyframes cardPulse {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: scale(1);
             }
+
             50% {
                 transform: scale(1.02);
             }
@@ -148,7 +156,7 @@
             background: white;
             border-radius: 16px;
             padding: 1.5rem;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
             margin-bottom: 1.5rem;
             transition: all 0.3s ease;
         }
@@ -183,10 +191,12 @@
                 transform: translateX(0);
                 opacity: 1;
             }
+
             50% {
                 transform: translateX(-20px);
                 opacity: 0;
             }
+
             100% {
                 transform: translateX(0);
                 opacity: 1;
@@ -204,9 +214,12 @@
         }
 
         @keyframes fadeInOut {
-            0%, 100% {
+
+            0%,
+            100% {
                 opacity: 1;
             }
+
             50% {
                 opacity: 0.3;
             }
@@ -227,15 +240,20 @@
         }
 
         @keyframes statusChange {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: scale(1);
             }
+
             25% {
                 transform: scale(1.15) rotate(5deg);
             }
+
             50% {
                 transform: scale(0.95) rotate(-5deg);
             }
+
             75% {
                 transform: scale(1.05);
             }
@@ -346,9 +364,11 @@
                 transform: scale(0.5) rotate(-180deg);
                 opacity: 0;
             }
+
             50% {
                 transform: scale(1.3) rotate(10deg);
             }
+
             100% {
                 transform: scale(1) rotate(0deg);
                 opacity: 1;
@@ -375,9 +395,12 @@
         }
 
         @keyframes labelGlow {
-            0%, 100% {
+
+            0%,
+            100% {
                 color: #2d3748;
             }
+
             50% {
                 color: #48bb78;
                 transform: translateX(5px);
@@ -417,18 +440,22 @@
                 transform: translateX(0) scale(1);
                 box-shadow: 0 0 0 rgba(72, 187, 120, 0);
             }
+
             25% {
                 transform: translateX(-10px) scale(1.05);
                 box-shadow: 0 4px 20px rgba(72, 187, 120, 0.4);
             }
+
             50% {
                 transform: translateX(10px) scale(1.05);
                 box-shadow: 0 4px 20px rgba(72, 187, 120, 0.6);
             }
+
             75% {
                 transform: translateX(-5px) scale(1.02);
                 box-shadow: 0 4px 20px rgba(72, 187, 120, 0.4);
             }
+
             100% {
                 transform: translateX(0) scale(1);
                 box-shadow: 0 0 0 rgba(72, 187, 120, 0);
@@ -506,7 +533,7 @@
         .loading-spinner {
             width: 50px;
             height: 50px;
-            border: 4px solid rgba(255,255,255,0.3);
+            border: 4px solid rgba(255, 255, 255, 0.3);
             border-top-color: white;
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -514,7 +541,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .error-card {
@@ -522,7 +551,7 @@
             border-radius: 16px;
             padding: 2rem;
             text-align: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
         }
 
         .error-icon {
@@ -567,7 +596,7 @@
             background: white;
             padding: 16px 20px;
             border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
             display: flex;
             align-items: center;
             gap: 12px;
@@ -581,6 +610,7 @@
                 transform: translateX(400px) rotate(10deg);
                 opacity: 0;
             }
+
             to {
                 transform: translateX(0) rotate(0deg);
                 opacity: 1;
@@ -593,9 +623,12 @@
         }
 
         @keyframes bounce {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: translateY(0);
             }
+
             50% {
                 transform: translateY(-10px);
             }
@@ -645,6 +678,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="live-indicator">
         <div class="live-dot"></div>
@@ -678,14 +712,50 @@
         const sede = urlParams.get('sede');
 
         window.addEventListener('DOMContentLoaded', () => {
-            if (!restaurante || !mesa) {
-                showError('Información incompleta', 'El código QR no contiene la información necesaria.');
+            if (!restaurante) {
+                showError('Información incompleta', 'El código QR no contiene el nombre del restaurante.');
+                return;
+            }
+
+            if (!mesa) {
+                showSearchUI();
                 return;
             }
 
             loadOrder();
             pollingInterval = setInterval(checkForUpdates, 3000);
         });
+
+        function showSearchUI() {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="info-card">
+                    <h2>🔍 Buscar Pedido</h2>
+                    <p style="color: #718096; font-size: 14px; margin-bottom: 20px;">
+                        Ingresa tu nombre o número de mesa para ver el estado de tu pedido:
+                    </p>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <input type="text" id="mesaInput" class="btn-refresh" 
+                               style="background: white; border: 2px solid #667eea; color: #1a202c; text-align: left; cursor: text;"
+                               placeholder="Ej: Mesa 5, Juan...">
+                        <button onclick="buscarPedidoPorInput()" class="btn-refresh">
+                            Ver Mi Pedido
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function buscarPedidoPorInput() {
+            const input = document.getElementById('mesaInput').value.trim();
+            if (!input) {
+                alert('Por favor, ingresa un nombre o mesa');
+                return;
+            }
+
+            // Actualizar la variable mesa y relanzar la carga
+            window.location.href = `seguimiento.html?restaurante=${encodeURIComponent(restaurante)}&mesa=${encodeURIComponent(input)}${sede ? '&sede=' + encodeURIComponent(sede) : ''}`;
+        }
 
         window.addEventListener('beforeunload', () => {
             if (pollingInterval) {
@@ -698,11 +768,11 @@
                 console.log('🔍 Cargando pedido...');
                 const url = `${API_URL}/orders/mesa/${mesa}?restaurante=${encodeURIComponent(restaurante)}${sede ? '&sede=' + encodeURIComponent(sede) : ''}`;
                 console.log('URL:', url);
-                
+
                 const response = await fetch(url);
-                
+
                 console.log('Status:', response.status);
-                
+
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => ({}));
                     console.error('Error del servidor:', errorData);
@@ -730,7 +800,7 @@
             try {
                 const url = `${API_URL}/orders/mesa/${mesa}?restaurante=${encodeURIComponent(restaurante)}${sede ? '&sede=' + encodeURIComponent(sede) : ''}`;
                 const response = await fetch(url);
-                
+
                 if (!response.ok) return;
 
                 const data = await response.json();
@@ -739,16 +809,16 @@
                     const newOrder = data.data;
                     const newOverallStatus = calculateOverallStatus(newOrder);
                     const newItemsString = JSON.stringify(newOrder.items);
-                    
+
                     // Detectar cambios en items individuales
                     const itemsChanged = previousItems !== newItemsString;
-                    
+
                     // Detectar cambios en el estado general
                     const statusChanged = previousStatus !== newOverallStatus;
-                    
+
                     if (itemsChanged || statusChanged) {
                         console.log('🔔 Cambios detectados');
-                        
+
                         if (statusChanged) {
                             console.log('📊 Estado general cambió:', previousStatus, '→', newOverallStatus);
                             showChangeNotification(previousStatus, newOverallStatus);
@@ -756,7 +826,7 @@
                             console.log('🍽️ Estados de productos cambiaron');
                             showItemChangeNotification();
                         }
-                        
+
                         previousStatus = newOverallStatus;
                         previousItems = newItemsString;
                         orderData = newOrder;
@@ -776,25 +846,25 @@
         // Calcular el estado general basado en los estados individuales de productos
         function calculateOverallStatus(order) {
             if (!order.items || order.items.length === 0) return 'pendiente';
-            
+
             const allGroups = [];
             order.items.forEach(item => {
-                const grupos = item.estadosIndividuales || [{cantidad: item.cantidad, estado: 'pendiente'}];
+                const grupos = item.estadosIndividuales || [{ cantidad: item.cantidad, estado: 'pendiente' }];
                 allGroups.push(...grupos.map(g => g.estado));
             });
-            
+
             // Si todos están entregados
             if (allGroups.every(e => e === 'entregado')) return 'entregado';
-            
+
             // Si al menos uno está listo y ninguno pendiente/preparando
             if (allGroups.some(e => e === 'listo') && !allGroups.some(e => e === 'pendiente' || e === 'preparando')) return 'listo';
-            
+
             // Si al menos uno está listo o preparando
             if (allGroups.some(e => e === 'listo')) return 'listo';
-            
+
             // Si al menos uno está preparando
             if (allGroups.some(e => e === 'preparando')) return 'preparando';
-            
+
             // Por defecto, pendiente
             return 'pendiente';
         }
@@ -809,10 +879,10 @@
                     <p>El estado de un producto cambió</p>
                 </div>
             `;
-            
+
             document.body.appendChild(notification);
             playNotificationSound();
-            
+
             setTimeout(() => {
                 notification.style.animation = 'slideInNotification 0.3s ease reverse';
                 setTimeout(() => notification.remove(), 300);
@@ -821,7 +891,7 @@
 
         function showChangeNotification(oldStatus, newStatus) {
             const statusInfo = getStatusInfo(newStatus);
-            
+
             const notification = document.createElement('div');
             notification.className = 'change-notification';
             notification.innerHTML = `
@@ -831,10 +901,10 @@
                     <p>${statusInfo.title}</p>
                 </div>
             `;
-            
+
             document.body.appendChild(notification);
             playNotificationSound();
-            
+
             setTimeout(() => {
                 notification.style.animation = 'slideInNotification 0.3s ease reverse';
                 setTimeout(() => notification.remove(), 300);
@@ -844,37 +914,37 @@
         function playNotificationSound() {
             try {
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                
+
                 // Sonido "JC" mejorado
                 function playTone(frequency, startTime, duration, type = 'sine', volume = 0.3) {
                     const oscillator = audioContext.createOscillator();
                     const gainNode = audioContext.createGain();
-                    
+
                     oscillator.connect(gainNode);
                     gainNode.connect(audioContext.destination);
-                    
+
                     oscillator.frequency.value = frequency;
                     oscillator.type = type;
-                    
+
                     gainNode.gain.setValueAtTime(0, audioContext.currentTime + startTime);
                     gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + startTime + 0.05);
                     gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + startTime + duration);
-                    
+
                     oscillator.start(audioContext.currentTime + startTime);
                     oscillator.stop(audioContext.currentTime + startTime + duration);
                 }
-                
+
                 // Sonido "J"
                 playTone(880, 0, 0.2, 'square', 0.4);
                 playTone(1320, 0, 0.2, 'sine', 0.3);
-                
+
                 // Sonido "C"
                 playTone(523, 0.25, 0.35, 'triangle', 0.4);
                 playTone(659, 0.25, 0.35, 'sine', 0.3);
-                
+
                 // Echo
                 playTone(440, 0.45, 0.25, 'sine', 0.2);
-                
+
             } catch (error) {
                 console.log('No se pudo reproducir sonido de notificación');
             }
@@ -883,7 +953,7 @@
         function displayOrder(isUpdate = false, itemsChanged = false) {
             const content = document.getElementById('content');
             const order = orderData;
-            
+
             const overallStatus = calculateOverallStatus(order);
             const statusInfo = getStatusInfo(overallStatus);
             const timeline = getTimeline(overallStatus, isUpdate ? previousStatus : null);
@@ -891,8 +961,8 @@
             // Items con animación si cambiaron
             const itemsHTML = order.items.map(item => {
                 const info = item.productoInfo || item.producto || {};
-                const grupos = item.estadosIndividuales || [{cantidad: item.cantidad, estado: 'pendiente'}];
-                
+                const grupos = item.estadosIndividuales || [{ cantidad: item.cantidad, estado: 'pendiente' }];
+
                 return grupos.map(grupo => `
                     <div class="order-item ${itemsChanged ? 'item-updated' : ''}" style="border-left: 4px solid ${getColorEstado(grupo.estado)};">
                         <div class="item-details">
@@ -1064,4 +1134,5 @@
         }
     </script>
 </body>
+
 </html>

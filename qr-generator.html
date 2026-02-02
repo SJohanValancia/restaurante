@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,7 +26,7 @@
         .container {
             background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             max-width: 900px;
             width: 100%;
             overflow: hidden;
@@ -50,7 +51,7 @@
 
         .header p {
             font-size: 14px;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.8);
         }
 
         .content {
@@ -139,7 +140,7 @@
             background: white;
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             margin-bottom: 1rem;
         }
 
@@ -243,6 +244,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -260,38 +262,36 @@
                 <!-- Formulario -->
                 <div class="section">
                     <h2>📝 Información de la Mesa</h2>
-                    
+
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Código QR</label>
+                        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="tipoQr" value="mesa" checked onchange="toggleTipoQr('mesa')">
+                                Por Mesa
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="tipoQr" value="general" onchange="toggleTipoQr('general')">
+                                General (Restaurante)
+                            </label>
+                        </div>
+                    </div>
+
                     <form id="qrForm">
                         <div class="form-group">
                             <label class="form-label" for="nombreRestaurante">Nombre del Restaurante *</label>
-                            <input 
-                                type="text" 
-                                id="nombreRestaurante" 
-                                class="form-input" 
-                                placeholder="Ej: Restaurante El Sabor"
-                                required
-                            >
+                            <input type="text" id="nombreRestaurante" class="form-input"
+                                placeholder="Ej: Restaurante El Sabor" required>
                         </div>
 
-<div class="form-group">
-    <label class="form-label" for="numeroMesa">Nombre/Número de Mesa *</label>
-    <input 
-        type="text" 
-        id="numeroMesa" 
-        class="form-input" 
-        placeholder="Ej: 5, Mesa A, VIP1"
-        maxlength="20"
-        required
-    >
-</div>
+                        <div id="mesaGroup" class="form-group">
+                            <label class="form-label" for="numeroMesa">Nombre/Número de Mesa *</label>
+                            <input type="text" id="numeroMesa" class="form-input" placeholder="Ej: 5, Mesa A, VIP1"
+                                maxlength="20" required>
+                        </div>
                         <div class="form-group">
                             <label class="form-label" for="sede">Sede (Opcional)</label>
-                            <input 
-                                type="text" 
-                                id="sede" 
-                                class="form-input" 
-                                placeholder="Ej: Centro, Norte, etc."
-                            >
+                            <input type="text" id="sede" class="form-input" placeholder="Ej: Centro, Norte, etc.">
                         </div>
 
                         <button type="submit" class="btn-generate">
@@ -303,7 +303,7 @@
                 <!-- Preview del QR -->
                 <div class="section">
                     <h2>🔍 Vista Previa</h2>
-                    
+
                     <div class="qr-preview" id="qrPreview">
                         <div class="empty-qr">
                             <div class="icon">📱</div>
@@ -353,22 +353,36 @@
             }
         });
 
-        document.getElementById('qrForm').addEventListener('submit', function(e) {
+        function toggleTipoQr(tipo) {
+            const mesaGroup = document.getElementById('mesaGroup');
+            const numeroMesaInput = document.getElementById('numeroMesa');
+
+            if (tipo === 'general') {
+                mesaGroup.style.display = 'none';
+                numeroMesaInput.required = false;
+            } else {
+                mesaGroup.style.display = 'block';
+                numeroMesaInput.required = true;
+            }
+        }
+
+        document.getElementById('qrForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
             const nombreRestaurante = document.getElementById('nombreRestaurante').value.trim();
-            const numeroMesa = document.getElementById('numeroMesa').value;
+            const tipoQr = document.querySelector('input[name="tipoQr"]:checked').value;
+            const numeroMesa = tipoQr === 'mesa' ? document.getElementById('numeroMesa').value : null;
             const sede = document.getElementById('sede').value.trim();
 
-            if (!nombreRestaurante || !numeroMesa) {
+            if (!nombreRestaurante || (tipoQr === 'mesa' && !numeroMesa)) {
                 alert('Por favor complete los campos obligatorios');
                 return;
             }
 
-            generateQR(nombreRestaurante, numeroMesa, sede);
+            generateQR(nombreRestaurante, numeroMesa, sede, tipoQr);
         });
 
-        function generateQR(restaurante, mesa, sede) {
+        function generateQR(restaurante, mesa, sede, tipoQr) {
             // Limpiar QR anterior
             const qrPreview = document.getElementById('qrPreview');
             qrPreview.innerHTML = '';
@@ -376,18 +390,23 @@
             // Obtener la URL base actual
             const baseUrl = window.location.origin + '/';
 
-            
+
             // Crear URL con parámetros
             const params = new URLSearchParams({
-                restaurante: restaurante,
-                mesa: mesa
+                restaurante: restaurante
             });
+
+            if (mesa) {
+                params.append('mesa', mesa);
+            } else {
+                params.append('tipo', 'general');
+            }
 
             if (sede) {
                 params.append('sede', sede);
             }
 
-const url = `${baseUrl}menu-cliente.html?${params.toString()}`;
+            const url = `${baseUrl}menu-cliente.html?${params.toString()}`;
 
             // Crear contenedor del QR
             const qrContainer = document.createElement('div');
@@ -412,10 +431,17 @@ const url = `${baseUrl}menu-cliente.html?${params.toString()}`;
                     <strong>Restaurante:</strong>
                     <span>${restaurante}</span>
                 </div>
+                ${mesa ? `
                 <div>
                     <strong>Mesa:</strong>
                     <span>#${mesa}</span>
                 </div>
+                ` : `
+                <div>
+                    <strong>Tipo:</strong>
+                    <span>General (Sin mesa fija)</span>
+                </div>
+                `}
                 ${sede ? `
                 <div>
                     <strong>Sede:</strong>
@@ -429,18 +455,18 @@ const url = `${baseUrl}menu-cliente.html?${params.toString()}`;
             const btnDownload = document.createElement('button');
             btnDownload.className = 'btn-download';
             btnDownload.innerHTML = '💾 Descargar QR';
-            btnDownload.onclick = () => downloadQR(restaurante, mesa, sede);
+            btnDownload.onclick = () => downloadQR(restaurante, mesa, sede, tipoQr);
             qrPreview.appendChild(btnDownload);
         }
 
-        function downloadQR(restaurante, mesa, sede) {
+        function downloadQR(restaurante, mesa, sede, tipoQr) {
             const canvas = document.querySelector('#qrcode canvas');
             if (!canvas) return;
 
             // Crear un canvas más grande con información adicional
             const finalCanvas = document.createElement('canvas');
             const ctx = finalCanvas.getContext('2d');
-            
+
             // Tamaño del canvas final
             finalCanvas.width = 400;
             finalCanvas.height = 550;
@@ -467,9 +493,15 @@ const url = `${baseUrl}menu-cliente.html?${params.toString()}`;
             ctx.drawImage(canvas, qrX, qrY, qrSize, qrSize);
 
             // Información de la mesa
-            ctx.font = 'bold 32px Inter, sans-serif';
-            ctx.fillStyle = '#667eea';
-            ctx.fillText(`Mesa ${mesa}`, 200, 430);
+            if (tipoQr === 'mesa') {
+                ctx.font = 'bold 32px Inter, sans-serif';
+                ctx.fillStyle = '#667eea';
+                ctx.fillText(`Mesa ${mesa}`, 200, 430);
+            } else {
+                ctx.font = 'bold 28px Inter, sans-serif';
+                ctx.fillStyle = '#667eea';
+                ctx.fillText(`QR General`, 200, 430);
+            }
 
             if (sede) {
                 ctx.font = '18px Inter, sans-serif';
@@ -481,15 +513,16 @@ const url = `${baseUrl}menu-cliente.html?${params.toString()}`;
             ctx.font = '12px Inter, sans-serif';
             ctx.fillStyle = '#a0aec0';
             ctx.fillText('Escanea este código con tu cámara', 200, 510);
-            ctx.fillText('para ver el menú y hacer pedidos', 200, 530); 
+            ctx.fillText('para ver el menú y hacer pedidos', 200, 530);
 
             // Descargar
             const link = document.createElement('a');
-            const fileName = `QR_Mesa${mesa}${sede ? '_' + sede.replace(/\s+/g, '_') : ''}.png`;
+            const fileName = tipoQr === 'mesa' ? `QR_Mesa${mesa}${sede ? '_' + sede.replace(/\s+/g, '_') : ''}.png` : `QR_General_${restaurante}${sede ? '_' + sede.replace(/\s+/g, '_') : ''}.png`;
             link.download = fileName;
             link.href = finalCanvas.toDataURL('image/png');
             link.click();
         }
     </script>
 </body>
+
 </html>

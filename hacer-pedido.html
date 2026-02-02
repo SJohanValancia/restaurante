@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -663,7 +664,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         @keyframes slideUp {
@@ -671,6 +674,7 @@
                 opacity: 0;
                 transform: translateY(40px) scale(0.95);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
@@ -698,6 +702,7 @@
                 transform: translateX(400px);
                 opacity: 0;
             }
+
             to {
                 transform: translateX(0);
                 opacity: 1;
@@ -752,6 +757,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- HEADER -->
     <div class="header">
@@ -816,10 +822,10 @@
     <script>
         // [TODO EL JAVASCRIPT ANTERIOR SE MANTIENE IGUAL - NO CAMBIES NADA]
         const API_URL = 'https://restaurante-co77.onrender.com/api';
-        
+
         const urlParams = new URLSearchParams(window.location.search);
         const restaurante = urlParams.get('restaurante');
-        const mesa = urlParams.get('mesa');
+        let mesa = urlParams.get('mesa');
         const sede = urlParams.get('sede');
 
         let allProducts = [];
@@ -828,93 +834,94 @@
         let currentFilter = 'todos';
 
         window.addEventListener('DOMContentLoaded', async () => {
-            if (!restaurante || !mesa) {
-                alert('Información incompleta en el código QR');
-                window.location.href = 'menu-cliente.html';
+            if (!restaurante) {
+                alert('Información incompleta: restaurante no especificado');
+                window.location.href = 'index.html';
                 return;
             }
 
             document.getElementById('headerRestaurante').textContent = restaurante;
-            document.getElementById('headerMesa').textContent = `Mesa ${mesa}${sede ? ` - ${sede}` : ''}`;
-            
-            const backParams = new URLSearchParams({ restaurante, mesa });
+            document.getElementById('headerMesa').textContent = mesa ? `Mesa ${mesa}${sede ? ` - ${sede}` : ''}` : `Mesa - ${sede || ''}`;
+
+            const backParams = new URLSearchParams({ restaurante });
+            if (mesa) backParams.append('mesa', mesa);
             if (sede) backParams.append('sede', sede);
             document.getElementById('btnBack').href = `menu-cliente.html?${backParams.toString()}`;
 
             await loadUserAndProducts();
         });
 
-async function loadUserAndProducts() {
-    try {
-        const query = new URLSearchParams({ restaurante });
-        if (sede) query.append('sede', sede);
-        
-        const productsResponse = await fetch(`${API_URL}/products/public/restaurante?${query.toString()}`);
-        const productsData = await productsResponse.json();
-
-        if (productsData.success) {
-            // ✅ CARGAR ALIMENTOS PARA VERIFICAR STOCK
+        async function loadUserAndProducts() {
             try {
-                const alimentosResponse = await fetch(`${API_URL}/alimentos/public/restaurante?${query.toString()}`);
-                const alimentosData = await alimentosResponse.json();
-                
-                if (alimentosData.success) {
-                    const alimentos = alimentosData.data;
-                    
-                    // Verificar cada producto contra los alimentos
-                    allProducts = productsData.data.map(producto => {
-                        // Buscar alimentos que usan este producto
-                        const alimentosDelProducto = alimentos.filter(alimento => 
-                            alimento.productos && alimento.productos.some(p => 
-                                p.productoId && p.productoId._id === producto._id
-                            )
-                        );
-                        
-                        // Verificar si algún alimento está agotado
-                        const alimentosAgotados = alimentosDelProducto.filter(alimento => {
-                            const config = alimento.productos.find(p => 
-                                p.productoId && p.productoId._id === producto._id
-                            );
-                            return config && alimento.stock < config.cantidadRequerida;
-                        });
-                        
-                        return {
-                            ...producto,
-                            alimentosAgotados: alimentosAgotados.map(a => a.nombre)
-                        };
-                    });
+                const query = new URLSearchParams({ restaurante });
+                if (sede) query.append('sede', sede);
+
+                const productsResponse = await fetch(`${API_URL}/products/public/restaurante?${query.toString()}`);
+                const productsData = await productsResponse.json();
+
+                if (productsData.success) {
+                    // ✅ CARGAR ALIMENTOS PARA VERIFICAR STOCK
+                    try {
+                        const alimentosResponse = await fetch(`${API_URL}/alimentos/public/restaurante?${query.toString()}`);
+                        const alimentosData = await alimentosResponse.json();
+
+                        if (alimentosData.success) {
+                            const alimentos = alimentosData.data;
+
+                            // Verificar cada producto contra los alimentos
+                            allProducts = productsData.data.map(producto => {
+                                // Buscar alimentos que usan este producto
+                                const alimentosDelProducto = alimentos.filter(alimento =>
+                                    alimento.productos && alimento.productos.some(p =>
+                                        p.productoId && p.productoId._id === producto._id
+                                    )
+                                );
+
+                                // Verificar si algún alimento está agotado
+                                const alimentosAgotados = alimentosDelProducto.filter(alimento => {
+                                    const config = alimento.productos.find(p =>
+                                        p.productoId && p.productoId._id === producto._id
+                                    );
+                                    return config && alimento.stock < config.cantidadRequerida;
+                                });
+
+                                return {
+                                    ...producto,
+                                    alimentosAgotados: alimentosAgotados.map(a => a.nombre)
+                                };
+                            });
+                        } else {
+                            // Si falla la carga de alimentos, usar productos sin verificación
+                            allProducts = productsData.data.map(p => ({ ...p, alimentosAgotados: [] }));
+                        }
+                    } catch (error) {
+                        console.error('Error al cargar alimentos:', error);
+                        allProducts = productsData.data.map(p => ({ ...p, alimentosAgotados: [] }));
+                    }
+
+                    currentUser = { _id: productsData.userId };
+
+                    setupFilters();
+                    displayProducts(allProducts);
+                    setupSearch();
                 } else {
-                    // Si falla la carga de alimentos, usar productos sin verificación
-                    allProducts = productsData.data.map(p => ({ ...p, alimentosAgotados: [] }));
+                    showError(productsData.message || 'No se pudieron cargar los productos del menú');
                 }
             } catch (error) {
-                console.error('Error al cargar alimentos:', error);
-                allProducts = productsData.data.map(p => ({ ...p, alimentosAgotados: [] }));
+                console.error('Error:', error);
+                showError('Error de conexión. Por favor, intente más tarde.');
             }
-            
-            currentUser = { _id: productsData.userId };
-            
-            setupFilters();
-            displayProducts(allProducts);
-            setupSearch();
-        } else {
-            showError(productsData.message || 'No se pudieron cargar los productos del menú');
         }
-    } catch (error) {
-        console.error('Error:', error);
-        showError('Error de conexión. Por favor, intente más tarde.');
-    }
-}
         function setupFilters() {
             const filtersContainer = document.getElementById('filters');
             const categories = [...new Set(allProducts.map(p => p.categoria))].sort();
-            
+
             const filters = [
                 { id: 'todos', label: '🍽️ Todos', value: 'todos' },
-                ...categories.map(cat => ({ 
-                    id: cat.toLowerCase().replace(/\s+/g, '-'), 
-                    label: cat, 
-                    value: cat 
+                ...categories.map(cat => ({
+                    id: cat.toLowerCase().replace(/\s+/g, '-'),
+                    label: cat,
+                    value: cat
                 }))
             ];
 
@@ -928,7 +935,7 @@ async function loadUserAndProducts() {
 
         function filterProducts(filterValue, element) {
             currentFilter = filterValue;
-            
+
             document.querySelectorAll('.filter-chip').forEach(chip => {
                 chip.classList.remove('active');
             });
@@ -942,16 +949,16 @@ async function loadUserAndProducts() {
             }
 
             if (searchTerm) {
-                filtered = filtered.filter(p => 
+                filtered = filtered.filter(p =>
                     p.nombre.toLowerCase().includes(searchTerm) ||
                     p.categoria.toLowerCase().includes(searchTerm)
                 );
             }
 
             displayProducts(filtered);
-        }function setupSearch() {
+        } function setupSearch() {
             const searchInput = document.getElementById('searchInput');
-            
+
             searchInput.addEventListener('input', (e) => {
                 const searchTerm = e.target.value.toLowerCase();
                 let filtered = allProducts;
@@ -961,7 +968,7 @@ async function loadUserAndProducts() {
                 }
 
                 if (searchTerm) {
-                    filtered = filtered.filter(p => 
+                    filtered = filtered.filter(p =>
                         p.nombre.toLowerCase().includes(searchTerm) ||
                         p.categoria.toLowerCase().includes(searchTerm) ||
                         (p.descripcion && p.descripcion.toLowerCase().includes(searchTerm))
@@ -972,26 +979,26 @@ async function loadUserAndProducts() {
             });
         }
 
-function displayProducts(products) {
-    const container = document.getElementById('productsContainer');
-    
-    if (products.length === 0) {
-        container.innerHTML = `
+        function displayProducts(products) {
+            const container = document.getElementById('productsContainer');
+
+            if (products.length === 0) {
+                container.innerHTML = `
             <div class="empty-state">
                 <div class="empty-icon">🍽️</div>
                 <p>No se encontraron productos</p>
             </div>
         `;
-        return;
-    }
+                return;
+            }
 
-    container.innerHTML = `
+            container.innerHTML = `
         <div class="products-grid">
             ${products.map(p => {
                 // ✅ VERIFICAR SI TIENE ALIMENTOS AGOTADOS
                 const tieneAlimentosAgotados = p.alimentosAgotados && p.alimentosAgotados.length > 0;
                 const estiloAdvertencia = tieneAlimentosAgotados && p.disponible ? 'border-left: 4px solid #f59e0b;' : '';
-                
+
                 return `
                     <div class="product-card ${!p.disponible ? 'agotado' : ''}" 
                          style="${estiloAdvertencia}"
@@ -1028,7 +1035,7 @@ function displayProducts(products) {
             }).join('')}
         </div>
     `;
-}
+        }
         function addToCart(productId) {
             const product = allProducts.find(p => p._id === productId);
             if (!product) return;
@@ -1136,6 +1143,16 @@ function displayProducts(products) {
                 return;
             }
 
+            if (!mesa) {
+                const nombreMesa = prompt("Por favor, ingresa tu nombre o número de mesa para este pedido:");
+                if (!nombreMesa || !nombreMesa.trim()) {
+                    alert('Es necesario un nombre o número de mesa para realizar el pedido');
+                    return;
+                }
+                mesa = nombreMesa.trim();
+                document.getElementById('headerMesa').textContent = `Mesa ${mesa}${sede ? ` - ${sede}` : ''}`;
+            }
+
             const btnSend = document.getElementById('btnSendOrder');
             btnSend.disabled = true;
             btnSend.innerHTML = '<div style="display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite;"></div> Enviando...';
@@ -1150,7 +1167,7 @@ function displayProducts(products) {
                         nombreProducto: item.producto.nombre,
                         categoriaProducto: item.producto.categoria
                     })),
-                    notas: cart.map(item => 
+                    notas: cart.map(item =>
                         item.notas ? `${item.producto.nombre}: ${item.notas}` : ''
                     ).filter(n => n).join(' | ') || '',
                     userId: currentUser._id
@@ -1273,4 +1290,5 @@ function displayProducts(products) {
         });
     </script>
 </body>
+
 </html>

@@ -10,29 +10,29 @@ const { checkPermission } = require('../middleware/permissions');
 // ✅ FUNCIÓN PARA DESCONTAR STOCK DE ALIMENTOS
 async function descontarStockAlimentos(items, userId, ignorarStock = false) {
   const Alimento = require('../models/Alimento');
-  
+
   try {
     // Por cada item del pedido
     for (const item of items) {
       const productoId = item.producto;
       const cantidadPedida = item.cantidad;
-      
+
       // Buscar todos los alimentos que usan este producto
       const alimentos = await Alimento.find({
         'productos.productoId': productoId,
         userId: userId
       });
-      
+
       // Descontar stock de cada alimento
       for (const alimento of alimentos) {
         // Encontrar la configuración del producto en este alimento
         const productoConfig = alimento.productos.find(
           p => p.productoId.toString() === productoId.toString()
         );
-        
+
         if (productoConfig) {
           const cantidadADescontar = productoConfig.cantidadRequerida * cantidadPedida;
-          
+
           // ✅ Si ignorarStock es true, solo descontar lo que hay disponible
           if (ignorarStock) {
             if (alimento.stock > 0) {
@@ -51,22 +51,33 @@ async function descontarStockAlimentos(items, userId, ignorarStock = false) {
                 `Disponible: ${alimento.stock}, Requerido: ${cantidadADescontar}`
               );
             }
-            
+
             // Descontar stock
             alimento.stock -= cantidadADescontar;
             await alimento.save();
-            
+
             console.log(`✅ Descontado ${cantidadADescontar} unidades de "${alimento.nombre}". Stock restante: ${alimento.stock}`);
           }
         }
       }
     }
-    
+
     return { success: true };
   } catch (error) {
     console.error('❌ Error al descontar stock:', error);
     throw error;
   }
+}
+
+// ✅ FUNCIÓN PARA NORMALIZAR TEXTO (QUITAR TILDES)
+function normalizeText(text) {
+  if (!text) return '';
+  return text
+    .toString()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
 }
 
 // ⭐ RUTA PÚBLICA - Sin protect
@@ -102,9 +113,11 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
 
     console.log('✅ Usuario encontrado:', usuario._id);
 
+    const mesaNorm = normalizeText(numeroMesa);
+
     // Buscar pedido activo primero (estados activos)
     const orderQuery = {
-      mesa: numeroMesa.trim(), // ✅ QUITAR String()
+      mesaNormalizada: mesaNorm,
       userId: usuario._id,
       estado: { $in: ['pendiente', 'preparando', 'listo'] }
     };
@@ -122,8 +135,8 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
     // Si no hay pedido activo, buscar el último pedido (cualquier estado)
     if (!order) {
       console.log('🔍 Buscando último pedido de la mesa...');
-      order = await Order.findOne({ 
-        mesa: numeroMesa.trim(),
+      order = await Order.findOne({
+        mesaNormalizada: mesaNorm,
         userId: usuario._id
       })
         .populate('items.producto', 'nombre categoria precio')
@@ -186,12 +199,15 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
 router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
   try {
     const { estado, mesa, fecha } = req.query;
-    
+
     let query = { userId: { $in: req.userIdsRestaurante } };
 
     if (estado) query.estado = estado;
-    if (mesa) query.mesa = (mesa);
-    
+    if (mesa) {
+      const mesaNorm = normalizeText(mesa);
+      query.mesaNormalizada = { $regex: mesaNorm, $options: 'i' };
+    }
+
     if (fecha === 'hoy') {
       const hoy = new Date();
       hoy.setHours(0, 0, 0, 0);
@@ -256,11 +272,11 @@ router.get('/stats/resumen', protect, async (req, res) => {
     hoy.setHours(0, 0, 0, 0);
 
     const stats = await Order.aggregate([
-      { 
-        $match: { 
+      {
+        $match: {
           userId: { $in: req.userIdsRestaurante.map(id => mongoose.Types.ObjectId(id)) },
-          createdAt: { $gte: hoy } 
-        } 
+          createdAt: { $gte: hoy }
+        }
       },
       {
         $group: {
@@ -271,18 +287,18 @@ router.get('/stats/resumen', protect, async (req, res) => {
       }
     ]);
 
-    const totalPedidos = await Order.countDocuments({ 
-      userId: { $in: req.userIdsRestaurante }, 
-      createdAt: { $gte: hoy } 
+    const totalPedidos = await Order.countDocuments({
+      userId: { $in: req.userIdsRestaurante },
+      createdAt: { $gte: hoy }
     });
-    
+
     const totalVentas = await Order.aggregate([
-      { 
-        $match: { 
+      {
+        $match: {
           userId: { $in: req.userIdsRestaurante.map(id => mongoose.Types.ObjectId(id)) },
-          createdAt: { $gte: hoy }, 
-          estado: { $ne: 'cancelado' } 
-        } 
+          createdAt: { $gte: hoy },
+          estado: { $ne: 'cancelado' }
+        }
       },
       { $group: { _id: null, total: { $sum: '$total' } } }
     ]);
@@ -488,7 +504,7 @@ router.post('/public', async (req, res) => {
 router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (req, res) => {
   try {
     const { estado, metodoPago, actualizarTodosLosProductos } = req.body;
-    
+
     const estadosValidos = ['pendiente', 'preparando', 'listo', 'entregado', 'cancelado'];
     if (!estadosValidos.includes(estado)) {
       return res.status(400).json({
@@ -498,7 +514,7 @@ router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (re
     }
 
     const order = await Order.findById(req.params.id);
-    
+
     if (!order) {
       return res.status(404).json({
         success: false,
@@ -518,7 +534,7 @@ router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (re
 
     // Actualizar el estado general del pedido
     order.estado = estado;
-    
+
     // Si es entregado y hay método de pago, guardarlo
     if (estado === 'entregado' && metodoPago) {
       order.metodoPago = metodoPago;
@@ -526,7 +542,7 @@ router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (re
 
     await order.save();
     await order.populate('items.producto', 'nombre categoria precio');
-    
+
     console.log('✅ Estado actualizado:', order._id, '→', estado);
     if (actualizarTodosLosProductos) {
       console.log('✅ Todos los productos actualizados a:', estado);
@@ -551,9 +567,9 @@ router.patch('/:id/item/:itemIndex/estado', protect, checkPermission('editarPedi
   try {
     const { itemIndex } = req.params;
     const { cantidadCambiar, nuevoEstado } = req.body;
-    
+
     const order = await Order.findById(req.params.id);
-    
+
     if (!order) {
       return res.status(404).json({
         success: false,
@@ -562,7 +578,7 @@ router.patch('/:id/item/:itemIndex/estado', protect, checkPermission('editarPedi
     }
 
     const item = order.items[itemIndex];
-    
+
     if (!item) {
       return res.status(404).json({
         success: false,
@@ -572,7 +588,7 @@ router.patch('/:id/item/:itemIndex/estado', protect, checkPermission('editarPedi
 
     // Buscar si ya existe un grupo con el estado actual
     const grupoExistente = item.estadosIndividuales.find(e => e.estado === nuevoEstado);
-    
+
     if (grupoExistente) {
       // Agregar al grupo existente
       grupoExistente.cantidad += cantidadCambiar;
@@ -588,7 +604,7 @@ router.patch('/:id/item/:itemIndex/estado', protect, checkPermission('editarPedi
     const grupoActual = item.estadosIndividuales.find(e => e.estado !== nuevoEstado);
     if (grupoActual) {
       grupoActual.cantidad -= cantidadCambiar;
-      
+
       // Eliminar si llega a 0
       if (grupoActual.cantidad <= 0) {
         item.estadosIndividuales = item.estadosIndividuales.filter(e => e.cantidad > 0);
@@ -596,7 +612,7 @@ router.patch('/:id/item/:itemIndex/estado', protect, checkPermission('editarPedi
     }
 
     // Verificar si todos los items estÃ¡n entregados
-    const todosEntregados = order.items.every(item => 
+    const todosEntregados = order.items.every(item =>
       item.estadosIndividuales.every(grupo => grupo.estado === 'entregado')
     );
 
@@ -612,7 +628,7 @@ router.patch('/:id/item/:itemIndex/estado', protect, checkPermission('editarPedi
     }
 
     await order.save();
-    
+
     res.json({
       success: true,
       message: 'Estado del producto actualizado',
@@ -630,10 +646,10 @@ router.patch('/:id/item/:itemIndex/estado', protect, checkPermission('editarPedi
 router.put('/:id', protect, checkPermission('editarPedidos'), async (req, res) => {
   try {
     const { mesa, items, notas } = req.body;
-    
+
     // Obtener el pedido actual
     const order = await Order.findById(req.params.id);
-    
+
     if (!order) {
       return res.status(404).json({
         success: false,
@@ -659,11 +675,11 @@ router.put('/:id', protect, checkPermission('editarPedidos'), async (req, res) =
 
       // Calcular diferencias (solo productos agregados o aumentados)
       const productosParaDescontar = [];
-      
+
       productosNuevos.forEach((cantidadNueva, prodId) => {
         const cantidadOriginal = productosOriginales.get(prodId) || 0;
         const diferencia = cantidadNueva - cantidadOriginal;
-        
+
         // Si la diferencia es positiva, significa que se agregaron más unidades
         if (diferencia > 0) {
           productosParaDescontar.push({
@@ -690,7 +706,7 @@ router.put('/:id', protect, checkPermission('editarPedidos'), async (req, res) =
     // Actualizar campos básicos
     order.mesa = mesa;
     order.notas = notas;
-    
+
     // Si hay items, actualizarlos con estadosIndividuales inicializados
     if (items && items.length > 0) {
       order.items = items.map(item => ({
@@ -705,7 +721,7 @@ router.put('/:id', protect, checkPermission('editarPedidos'), async (req, res) =
           estado: 'pendiente'
         }]
       }));
-      
+
       // Recalcular total
       order.total = items.reduce((sum, item) => {
         return sum + (item.precio * item.cantidad);
@@ -714,10 +730,10 @@ router.put('/:id', protect, checkPermission('editarPedidos'), async (req, res) =
 
     // Guardar con el middleware pre-save
     await order.save();
-    
+
     // Populate para la respuesta
     await order.populate('items.producto', 'nombre categoria precio');
-    
+
     // Normalizar la respuesta
     const orderObj = order.toObject();
     orderObj.items = orderObj.items.map(item => {
@@ -760,7 +776,7 @@ router.put('/:id', protect, checkPermission('editarPedidos'), async (req, res) =
 router.delete('/:id', protect, checkPermission('cancelarPedidos'), async (req, res) => {
   try {
     const order = await Order.findByIdAndDelete(req.params.id);
-    
+
     if (!order) {
       return res.status(404).json({
         success: false,

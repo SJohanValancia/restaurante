@@ -7,6 +7,11 @@ const orderSchema = new mongoose.Schema({
     trim: true,
     maxlength: [20, 'El nombre de mesa no puede exceder 20 caracteres']
   },
+  mesaNormalizada: {
+    type: String,
+    lowercase: true,
+    trim: true
+  },
   items: [{
     producto: {
       type: mongoose.Schema.Types.ObjectId,
@@ -14,10 +19,10 @@ const orderSchema = new mongoose.Schema({
       required: true
     },
     origenPedido: {
-  type: String,
-  enum: ['mesero', 'cliente'],
-  default: 'mesero'
-},
+      type: String,
+      enum: ['mesero', 'cliente'],
+      default: 'mesero'
+    },
     nombreProducto: {
       type: String,
       required: true
@@ -81,7 +86,7 @@ const orderSchema = new mongoose.Schema({
   },
   mesero: {
     type: String,
-    default: function() {
+    default: function () {
       return this.userId ? 'Usuario' : 'Desconocido';
     }
   }
@@ -96,8 +101,24 @@ orderSchema.index({ userId: 1 });
 orderSchema.index({ createdAt: -1 });
 orderSchema.index({ reciboDia: 1 });
 
-// ✅ MIDDLEWARE PARA INICIALIZAR ESTADOS INDIVIDUALES
-orderSchema.pre('save', function(next) {
+// ✅ FUNCIÓN PARA NORMALIZAR TEXTO (QUITAR TILDES)
+function normalizeText(text) {
+  if (!text) return '';
+  return text
+    .toString()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+// ✅ MIDDLEWARE PARA INICIALIZAR ESTADOS INDIVIDUALES Y NORMALIZAR MESA
+orderSchema.pre('save', function (next) {
+  // Normalizar mesa
+  if (this.mesa) {
+    this.mesaNormalizada = normalizeText(this.mesa);
+  }
+
   // Inicializar estadosIndividuales si no existen
   this.items.forEach(item => {
     if (!item.estadosIndividuales || item.estadosIndividuales.length === 0) {
@@ -107,22 +128,22 @@ orderSchema.pre('save', function(next) {
       }];
     }
   });
-  
+
   // Calcular total
   if (this.items && this.items.length > 0) {
     this.total = this.items.reduce((sum, item) => {
       return sum + (item.precio * item.cantidad);
     }, 0);
   }
-  
+
   next();
 });
 
-orderSchema.virtual('totalFormateado').get(function() {
+orderSchema.virtual('totalFormateado').get(function () {
   return `$${this.total.toLocaleString('es-CO')}`;
 });
 
-orderSchema.virtual('totalItems').get(function() {
+orderSchema.virtual('totalItems').get(function () {
   return this.items.reduce((sum, item) => sum + item.cantidad, 0);
 });
 

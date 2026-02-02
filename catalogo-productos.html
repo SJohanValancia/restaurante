@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo de Productos - RestaurantApp</title>
+    <title>Catálogo de Productos - JC-RT</title>
     <style>
         * {
             margin: 0;
@@ -28,7 +29,7 @@
             background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
             padding: 0;
             z-index: 1000;
-            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
         }
 
@@ -38,8 +39,8 @@
 
         .sidebar-header {
             padding: 1.5rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .sidebar-brand {
@@ -70,28 +71,28 @@
 
         .brand-text p {
             font-size: 11px;
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
             margin: 2px 0 0 0;
         }
 
-.sidebar-nav {
-    padding: 1rem 0;
-    max-height: calc(100vh - 250px);
-    overflow-y: auto;
-}
+        .sidebar-nav {
+            padding: 1rem 0;
+            max-height: calc(100vh - 250px);
+            overflow-y: auto;
+        }
 
-.sidebar-nav::-webkit-scrollbar {
-    width: 6px;
-}
+        .sidebar-nav::-webkit-scrollbar {
+            width: 6px;
+        }
 
-.sidebar-nav::-webkit-scrollbar-track {
-    background: rgba(255,255,255,0.05);
-}
+        .sidebar-nav::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
 
-.sidebar-nav::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.2);
-    border-radius: 3px;
-}
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
 
         .nav-section {
             margin-bottom: 1.5rem;
@@ -101,7 +102,7 @@
             padding: 0.5rem 1.5rem;
             font-size: 11px;
             font-weight: 700;
-            color: rgba(255,255,255,0.5);
+            color: rgba(255, 255, 255, 0.5);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -111,7 +112,7 @@
             align-items: center;
             gap: 12px;
             padding: 12px 1.5rem;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
             transition: all 0.2s;
             font-size: 14px;
@@ -120,7 +121,7 @@
         }
 
         .nav-item:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             color: white;
         }
 
@@ -151,8 +152,8 @@
             left: 0;
             right: 0;
             padding: 1.5rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .user-info {
@@ -183,7 +184,7 @@
 
         .user-details p {
             font-size: 11px;
-            color: rgba(255,255,255,0.6);
+            color: rgba(255, 255, 255, 0.6);
             margin: 2px 0 0 0;
         }
 
@@ -241,7 +242,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 999;
             display: none;
         }
@@ -304,7 +305,7 @@
 
         .stat-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
         .stat-icon {
@@ -370,7 +371,8 @@
             margin-bottom: 6px;
         }
 
-        .filter-input, .filter-select {
+        .filter-input,
+        .filter-select {
             width: 100%;
             padding: 10px 14px;
             border: 1px solid #e2e8f0;
@@ -379,7 +381,8 @@
             transition: all 0.2s;
         }
 
-        .filter-input:focus, .filter-select:focus {
+        .filter-input:focus,
+        .filter-select:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
@@ -626,27 +629,27 @@
         }
 
         .spinner {
-    display: inline-block;
-    width: 14px;
-    height: 14px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-top-color: #fff;
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
-}
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
 
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
+
 <body>
     <!-- Menú Toggle -->
     <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">☰</button>
-    
+
     <!-- Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
 
@@ -662,7 +665,7 @@
             </a>
         </div>
 
-     <nav class="sidebar-nav">
+        <nav class="sidebar-nav">
             <div class="nav-section">
                 <div class="nav-section-title">Principal</div>
                 <a href="productos.html" class="nav-item">
@@ -703,23 +706,23 @@
                 </a>
             </div>
 
-    <!-- SOLO PARA ADMINISTRADORES -->
-    <div class="nav-section" id="adminSection" style="display: none;">
-        <div class="nav-section-title">Administración</div>
-        <a href="administrador.html" class="nav-item">
-            <span class="nav-icon">👥</span>
-            <span>Gestión de Meseros</span>
-        </a>
-        <a href="liquidacion.html" class="nav-item">
-            <span class="nav-icon">💵</span>
-            <span>Liquidación</span>
-        </a>
-        <a href="historial-liquidaciones.html" class="nav-item">
-            <span class="nav-icon">📋</span>
-            <span>Hist. Liquidaciones</span>
-        </a>
-    </div>
-</nav>
+            <!-- SOLO PARA ADMINISTRADORES -->
+            <div class="nav-section" id="adminSection" style="display: none;">
+                <div class="nav-section-title">Administración</div>
+                <a href="administrador.html" class="nav-item">
+                    <span class="nav-icon">👥</span>
+                    <span>Gestión de Meseros</span>
+                </a>
+                <a href="liquidacion.html" class="nav-item">
+                    <span class="nav-icon">💵</span>
+                    <span>Liquidación</span>
+                </a>
+                <a href="historial-liquidaciones.html" class="nav-item">
+                    <span class="nav-icon">📋</span>
+                    <span>Hist. Liquidaciones</span>
+                </a>
+            </div>
+        </nav>
         <div class="sidebar-footer">
             <div class="user-info">
                 <div class="user-avatar-sidebar" id="sidebarUserAvatar">U</div>
@@ -865,43 +868,43 @@
                     }
                 });
 
-if (response.status === 401) {
-    console.warn('⚠️ Token expirado');
-    localStorage.removeItem('token');
-    window.location.href = 'index.html';
-    return;
-}
+                if (response.status === 401) {
+                    console.warn('⚠️ Token expirado');
+                    localStorage.removeItem('token');
+                    window.location.href = 'index.html';
+                    return;
+                }
 
-if (!response.ok) {
-    console.error('Error al cargar usuario');
-    alert('Error al cargar datos. Intente recargar.');
-    return;
-}
+                if (!response.ok) {
+                    console.error('Error al cargar usuario');
+                    alert('Error al cargar datos. Intente recargar.');
+                    return;
+                }
 
                 const data = await response.json();
                 currentUser = data.data;
-                
+
                 if (currentUser.id && !currentUser._id) {
                     currentUser._id = currentUser.id;
                 }
-                
+
                 if (!currentUser || !currentUser._id) {
                     throw new Error('Datos de usuario incompletos');
                 }
-                
+
                 document.getElementById('sidebarUserName').textContent = currentUser.nombre;
                 document.getElementById('sidebarUserAvatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
 
                 // MOSTRAR SECCIÓN DE ADMIN SOLO SI ES ADMINISTRADOR
-if (currentUser.rol === 'admin') {
-    document.getElementById('adminSection').style.display = 'block';
-}
-                
+                if (currentUser.rol === 'admin') {
+                    document.getElementById('adminSection').style.display = 'block';
+                }
+
                 await loadProducts();
             } catch (error) {
-    console.error('❌ Error de red:', error);
-    alert('Error de conexión. Recargue la página.');
-}
+                console.error('❌ Error de red:', error);
+                alert('Error de conexión. Recargue la página.');
+            }
         });
 
         // CARGAR PRODUCTOS
@@ -916,7 +919,7 @@ if (currentUser.rol === 'admin') {
                 });
 
                 const data = await response.json();
-                
+
                 if (data.success) {
                     allProducts = data.data;
                     filteredProducts = [...allProducts];
@@ -935,15 +938,15 @@ if (currentUser.rol === 'admin') {
             const totalProducts = allProducts.length;
             const available = allProducts.filter(p => p.disponible).length;
             const unavailable = totalProducts - available;
-            
+
             const totalValue = allProducts.reduce((sum, p) => {
                 return sum + (p.disponible ? p.precio * (p.stock || 1) : 0);
             }, 0);
-            
-            const avgPrice = totalProducts > 0 
-                ? allProducts.reduce((sum, p) => sum + p.precio, 0) / totalProducts 
+
+            const avgPrice = totalProducts > 0
+                ? allProducts.reduce((sum, p) => sum + p.precio, 0) / totalProducts
                 : 0;
-            
+
             const categories = new Set(allProducts.map(p => p.categoria)).size;
 
             document.getElementById('statTotalProducts').textContent = totalProducts;
@@ -958,7 +961,7 @@ if (currentUser.rol === 'admin') {
         function populateCategoryFilter() {
             const categories = [...new Set(allProducts.map(p => p.categoria))].sort();
             const select = document.getElementById('categoryFilter');
-            
+
             select.innerHTML = '<option value="">Todas las categorías</option>';
             categories.forEach(cat => {
                 const option = document.createElement('option');
@@ -976,10 +979,10 @@ if (currentUser.rol === 'admin') {
             const sort = document.getElementById('sortFilter').value;
 
             filteredProducts = allProducts.filter(product => {
-                const matchSearch = !searchTerm || 
+                const matchSearch = !searchTerm ||
                     product.nombre.toLowerCase().includes(searchTerm) ||
                     (product.descripcion && product.descripcion.toLowerCase().includes(searchTerm));
-                
+
                 const matchCategory = !category || product.categoria === category;
                 const matchStatus = status === '' || product.disponible.toString() === status;
 
@@ -1007,7 +1010,7 @@ if (currentUser.rol === 'admin') {
             document.getElementById('categoryFilter').value = '';
             document.getElementById('statusFilter').value = '';
             document.getElementById('sortFilter').value = 'nombre-asc';
-            
+
             filteredProducts = [...allProducts];
             displayProducts(filteredProducts);
         }
@@ -1015,7 +1018,7 @@ if (currentUser.rol === 'admin') {
         // MOSTRAR PRODUCTOS EN TABLA
         function displayProducts(products) {
             const container = document.getElementById('tableContainer');
-            
+
             if (products.length === 0) {
                 showEmptyState('empty');
                 return;
@@ -1082,7 +1085,7 @@ if (currentUser.rol === 'admin') {
         // MOSTRAR ESTADO VACÍO
         function showEmptyState(type) {
             const container = document.getElementById('tableContainer');
-            
+
             if (type === 'empty') {
                 container.innerHTML = `
                     <div class="empty-state">
@@ -1115,48 +1118,48 @@ if (currentUser.rol === 'admin') {
             window.location.href = `productos.html?edit=${id}`;
         }
 
-async function toggleDisponibilidad(id, nuevoEstado) {
-    const token = localStorage.getItem('token');
+        async function toggleDisponibilidad(id, nuevoEstado) {
+            const token = localStorage.getItem('token');
 
-    // 🔍 Buscar el botón que fue presionado
-    const boton = event.target.closest('.btn-toggle');
-    const textoOriginal = boton.innerHTML;
+            // 🔍 Buscar el botón que fue presionado
+            const boton = event.target.closest('.btn-toggle');
+            const textoOriginal = boton.innerHTML;
 
-    // 🔄 Cambiar el botón a estado de carga
-    boton.disabled = true;
-    boton.innerHTML = `
+            // 🔄 Cambiar el botón a estado de carga
+            boton.disabled = true;
+            boton.innerHTML = `
         <span class="spinner"></span> Procesando...
     `;
 
-    try {
-        const response = await fetch(`${API_URL}/products/${id}/disponibilidad`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ disponible: nuevoEstado })
-        });
+            try {
+                const response = await fetch(`${API_URL}/products/${id}/disponibilidad`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ disponible: nuevoEstado })
+                });
 
-        const data = await response.json();
+                const data = await response.json();
 
-        if (data.success) {
-            await loadProducts();
-            applyFilters();
-        } else {
-            alert('Error: ' + data.message);
-            // ❌ Restaurar botón si hay error
-            boton.innerHTML = textoOriginal;
-            boton.disabled = false;
+                if (data.success) {
+                    await loadProducts();
+                    applyFilters();
+                } else {
+                    alert('Error: ' + data.message);
+                    // ❌ Restaurar botón si hay error
+                    boton.innerHTML = textoOriginal;
+                    boton.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al actualizar disponibilidad');
+                // ❌ Restaurar botón si hay error
+                boton.innerHTML = textoOriginal;
+                boton.disabled = false;
+            }
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error al actualizar disponibilidad');
-        // ❌ Restaurar botón si hay error
-        boton.innerHTML = textoOriginal;
-        boton.disabled = false;
-    }
-}
         // ELIMINAR PRODUCTO
         async function deleteProduct(id, nombre) {
             if (!confirm(`¿Estás seguro de eliminar "${nombre}"?\n\nEsta acción no se puede deshacer.`)) {
@@ -1197,10 +1200,10 @@ async function toggleDisponibilidad(id, nuevoEstado) {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
             const contentWrapper = document.getElementById('contentWrapper');
-            
+
             sidebar.classList.toggle('active');
             overlay.classList.toggle('active');
-            
+
             if (window.innerWidth > 1024) {
                 sidebar.classList.toggle('collapsed');
                 contentWrapper.classList.toggle('expanded');
@@ -1220,11 +1223,12 @@ async function toggleDisponibilidad(id, nuevoEstado) {
         window.addEventListener('resize', () => {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
-            
+
             if (window.innerWidth > 1024) {
                 overlay.classList.remove('active');
             }
         });
     </script>
 </body>
+
 </html>
