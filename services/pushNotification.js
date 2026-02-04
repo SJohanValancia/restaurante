@@ -44,6 +44,7 @@ function initializeFirebase() {
 
 /**
  * Envía una notificación push a un token específico
+ * ✅ Usa DATA-ONLY messages para máxima compatibilidad con Android heads-up
  * @param {string} token - Token FCM del dispositivo
  * @param {string} titulo - Título de la notificación
  * @param {string} mensaje - Cuerpo de la notificación
@@ -59,45 +60,45 @@ async function sendPushNotification(token, titulo, mensaje, data = {}) {
         return { success: false, error: 'No token provided' };
     }
 
+    // ✅ DATA-ONLY MESSAGE - El service worker siempre lo maneja
+    // Esto permite control total sobre la notificación y funciona mejor para heads-up
     const message = {
         token: token,
-        notification: {
-            title: titulo,
-            body: mensaje
-        },
+        // ✅ NO usamos 'notification' - usamos solo 'data'
         data: {
-            ...data,
-            timestamp: Date.now().toString()
+            title: titulo,
+            body: mensaje,
+            emoji: data.emoji || '📋',
+            estado: data.estado || '',
+            mesa: data.mesa || '',
+            restaurante: data.restaurante || '',
+            timestamp: Date.now().toString(),
+            click_action: '/seguimiento.html'
         },
+        // ✅ Android: Máxima prioridad para heads-up
         android: {
             priority: 'high',
-            notification: {
-                sound: 'default',
-                channelId: 'order-updates',
-                priority: 'high',
-                defaultVibrateTimings: true
-            }
+            ttl: 60 * 1000, // 1 minuto TTL
+            // Sin notification aquí - todo a través de data
         },
+        // ✅ APNs (iOS): Alta prioridad
         apns: {
             payload: {
                 aps: {
-                    sound: 'default',
-                    badge: 1,
-                    'content-available': 1
+                    'content-available': 1,
+                    sound: 'default'
                 }
             },
             headers: {
                 'apns-priority': '10',
-                'apns-push-type': 'alert'
+                'apns-push-type': 'background'
             }
         },
+        // ✅ Web Push: Configuración de urgencia
         webpush: {
-            notification: {
-                icon: '/icon-192.png',
-                badge: '/icon-badge.png',
-                vibrate: [200, 100, 200],
-                requireInteraction: true,
-                tag: 'order-update'
+            headers: {
+                'Urgency': 'high',
+                'TTL': '60'
             },
             fcmOptions: {
                 link: '/seguimiento.html'
@@ -107,7 +108,7 @@ async function sendPushNotification(token, titulo, mensaje, data = {}) {
 
     try {
         const response = await admin.messaging().send(message);
-        console.log('✅ Push enviado:', response);
+        console.log('✅ Push DATA-ONLY enviado:', response);
         return { success: true, messageId: response };
     } catch (error) {
         console.error('❌ Error enviando push:', error);
@@ -153,12 +154,12 @@ async function notifyOrderStatusChange(mesa, restaurante, estado) {
         return { success: true, sent: 0 };
     }
 
-    // Mapeo de estados a mensajes
+    // Mapeo de estados a mensajes con emoji
     const estadoInfo = {
         'pendiente': { emoji: '⏳', titulo: 'Pedido Recibido', mensaje: 'Tu pedido ha sido recibido y será procesado pronto' },
-        'preparando': { emoji: '👨‍🍳', titulo: '¡Preparando tu Pedido!', mensaje: 'Nuestro chef está preparando tu orden' },
-        'listo': { emoji: '✅', titulo: '¡Pedido Listo!', mensaje: 'Tu pedido está listo para ser servido' },
-        'entregado': { emoji: '🎉', titulo: '¡Buen Provecho!', mensaje: 'Disfruta tu comida' }
+        'preparando': { emoji: '👨‍🍳', titulo: '¡Preparando tu Pedido!', mensaje: 'Nuestro chef está preparando tu orden con mucho cariño' },
+        'listo': { emoji: '✅', titulo: '¡Pedido Listo!', mensaje: '¡Tu pedido está listo para ser servido!' },
+        'entregado': { emoji: '🎉', titulo: '¡Buen Provecho!', mensaje: 'Disfruta tu comida. ¡Gracias por preferirnos!' }
     };
 
     const info = estadoInfo[estado] || { emoji: '📋', titulo: 'Actualización', mensaje: `Estado: ${estado}` };
@@ -168,9 +169,9 @@ async function notifyOrderStatusChange(mesa, restaurante, estado) {
     for (const tokenDoc of tokens) {
         const result = await sendPushNotification(
             tokenDoc.token,
-            `${info.emoji} ${info.titulo}`,
+            info.titulo,
             info.mensaje,
-            { estado, mesa, restaurante }
+            { estado, mesa, restaurante, emoji: info.emoji }
         );
 
         if (result.success) sent++;
@@ -180,7 +181,7 @@ async function notifyOrderStatusChange(mesa, restaurante, estado) {
         await tokenDoc.save();
     }
 
-    console.log(`✅ Notificaciones enviadas: ${sent}/${tokens.length} para mesa ${mesa}`);
+    console.log(`✅ Notificaciones DATA-ONLY enviadas: ${sent}/${tokens.length} para mesa ${mesa}`);
     return { success: true, sent, total: tokens.length };
 }
 

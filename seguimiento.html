@@ -10,6 +10,8 @@
     <meta name="theme-color" content="#667eea">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icon-192.png">
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -1192,9 +1194,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging-compat.js"></script>
 
     <script>
-        // Usar ruta relativa para que funcione tanto en local como en producción
-        const API_URL = '/api';
-        // const API_URL = 'https://restaurante-co77.onrender.com/api';
+        // Usar la URL de producción directamente
+        const API_URL = 'https://restaurante-co77.onrender.com/api';
+        // const API_URL = '/api';
         let orderData = null;
         let previousStatus = null;
         let previousItems = null;
@@ -1257,14 +1259,17 @@
                     // Registrar token en backend
                     await registerPushToken(token);
 
-                    // Escuchar mensajes en primer plano
+                    // Escuchar mensajes en primer plano (data-only messages)
                     messaging.onMessage((payload) => {
                         console.log('📬 Push recibido en foreground:', payload);
-                        showPushNotification(
-                            payload.notification?.title?.split(' ')[0] || '📋',
-                            payload.notification?.title || 'Actualización',
-                            payload.notification?.body || 'Tu pedido ha sido actualizado'
-                        );
+
+                        // Handle data-only message
+                        const data = payload.data || {};
+                        const emoji = data.emoji || '📋';
+                        const title = data.title || payload.notification?.title || 'Actualización';
+                        const body = data.body || payload.notification?.body || 'Tu pedido ha sido actualizado';
+
+                        showPushNotification(emoji, title, body);
                     });
                 }
 
