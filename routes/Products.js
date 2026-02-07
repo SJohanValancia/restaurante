@@ -3,11 +3,12 @@ const router = express.Router();
 const Product = require('../models/Product');
 const { protect } = require('../middleware/auth');
 const { checkPermission } = require('../middleware/permissions');
+const { upload } = require('../config/cloudinary');
 
 router.get('/public/restaurante', async (req, res) => {
   try {
     const { restaurante, sede } = req.query;
-    
+
     if (!restaurante) {
       return res.status(400).json({
         success: false,
@@ -33,12 +34,12 @@ router.get('/public/restaurante', async (req, res) => {
     const userIds = usuarios.map(u => u._id);
 
     // ✅ CAMBIO 3: Buscar productos de TODOS esos usuarios
-    const products = await Product.find({ 
+    const products = await Product.find({
       userId: { $in: userIds }
     }).sort({ nombre: 1 });
-    
+
     console.log('✅ Productos encontrados:', products.length);
-    
+
     res.json({
       success: true,
       count: products.length,
@@ -61,7 +62,7 @@ router.get('/public/restaurante', async (req, res) => {
 router.get('/', protect, checkPermission('verProductos'), async (req, res) => {
   try {
     const { categoria, disponible, search } = req.query;
-    
+
     // Filtrar por todos los usuarios del mismo restaurante
     let query = { userId: { $in: req.userIdsRestaurante } };
 
@@ -117,7 +118,7 @@ router.post('/', protect, checkPermission('crearProductos'), async (req, res) =>
       ...req.body,
       userId: req.user._id
     };
-    
+
     const product = await Product.create(productData);
     res.status(201).json({
       success: true,
@@ -141,7 +142,7 @@ router.put('/:id', protect, checkPermission('editarProductos'), async (req, res)
       req.body,
       { new: true, runValidators: true }
     );
-    
+
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -167,7 +168,7 @@ router.put('/:id', protect, checkPermission('editarProductos'), async (req, res)
 router.delete('/:id', protect, checkPermission('eliminarProductos'), async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
-    
+
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -198,7 +199,7 @@ router.patch('/:id/disponibilidad', protect, checkPermission('editarProductos'),
       { disponible },
       { new: true }
     );
-    
+
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -215,6 +216,31 @@ router.patch('/:id/disponibilidad', protect, checkPermission('editarProductos'),
     res.status(400).json({
       success: false,
       message: 'Error al actualizar disponibilidad',
+      error: error.message
+    });
+  }
+});
+
+// ⭐ SUBIR IMAGEN DE PRODUCTO
+router.post('/upload', protect, upload.single('imagen'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No se subió ninguna imagen'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Imagen subida exitosamente',
+      imageUrl: req.file.path // URL de Cloudinary
+    });
+  } catch (error) {
+    console.error('❌ Error en subida:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al procesar la imagen',
       error: error.message
     });
   }

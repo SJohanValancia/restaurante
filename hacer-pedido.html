@@ -1469,7 +1469,9 @@
                                         ${!p.disponible ? '<span class="product-badge">Agotado</span>' : ''}
                                         ${hasShortage && p.disponible ? '<span class="product-badge warning">⚠️ Faltante</span>' : ''}
                                         
-                                        <div class="product-image">${itemEmoji}</div>
+                                        <div class="product-image">
+                                            ${p.imagen ? `<img src="${p.imagen}" alt="${p.nombre}" style="width: 100%; height: 100%; object-fit: cover;">` : itemEmoji}
+                                        </div>
                                         
                                         <div class="product-info">
                                             <div>
