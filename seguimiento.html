@@ -1205,9 +1205,26 @@
         let audioContext = null;
 
         const urlParams = new URLSearchParams(window.location.search);
-        const restaurante = urlParams.get('restaurante');
-        const mesa = urlParams.get('mesa');
-        const sede = urlParams.get('sede');
+        let restaurante = urlParams.get('restaurante');
+        let mesa = urlParams.get('mesa');
+        let sede = urlParams.get('sede');
+
+        // 🛠️ CORRECCIÓN PWA iOS: Persistencia de parámetros
+        if (restaurante && mesa) {
+            // Si hay params en URL, guardarlos (siempre actualiza con el último escaneo)
+            localStorage.setItem('jc_restaurante', restaurante);
+            localStorage.setItem('jc_mesa', mesa);
+            if (sede) localStorage.setItem('jc_sede', sede);
+        } else {
+            // Si NO hay params (PWA launch), intentar recuperar
+            restaurante = localStorage.getItem('jc_restaurante');
+            mesa = localStorage.getItem('jc_mesa');
+            sede = localStorage.getItem('jc_sede');
+
+            if (restaurante && mesa) {
+                console.log('📱 Recuperado de almacenamiento local:', { restaurante, mesa });
+            }
+        }
 
         // ======================
         // SERVICE WORKER & NOTIFICATIONS
@@ -1350,6 +1367,41 @@
 
         function closeBanner() {
             document.getElementById('notificationBanner').classList.remove('show');
+        }
+
+        async function testPushNotification() {
+            if (!fcmToken) {
+                alert('⚠️ No hay token de notificación activo. Activa las notificaciones primero.');
+                return;
+            }
+
+            try {
+                const btn = document.getElementById('btnTestPush');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = 'Enviando...';
+                btn.disabled = true;
+
+                const response = await fetch(`${API_URL}/push/test`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: fcmToken })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ Notificación enviada desde el servidor');
+                } else {
+                    alert('❌ Error: ' + (data.message || 'Desconocido'));
+                }
+
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            } catch (error) {
+                console.error('Error probando push:', error);
+                alert('❌ Error de conexión');
+                document.getElementById('btnTestPush').disabled = false;
+            }
         }
 
         // ======================
@@ -1582,7 +1634,24 @@
 
             loadOrder();
             pollingInterval = setInterval(checkForUpdates, 3000);
+
+            // Agregar botón de prueba de notificaciones si es admin o para debug
+            addTestButton();
         });
+
+        function addTestButton() {
+            const container = document.querySelector('.container');
+            const testBtn = document.createElement('button');
+            testBtn.id = 'btnTestPush';
+            testBtn.className = 'btn-refresh';
+            testBtn.style.marginTop = '20px';
+            testBtn.style.background = '#4a5568';
+            testBtn.innerHTML = '🔔 Probar Notificación';
+            testBtn.onclick = testPushNotification;
+
+            // Insertar al final del contenedor
+            container.appendChild(testBtn);
+        }
 
         function showSearchUI() {
             const content = document.getElementById('content');
