@@ -22,10 +22,25 @@ function initializeFirebase() {
 
         // 2️⃣ Intentar cargar desde variables de entorno
         if (process.env.FIREBASE_PRIVATE_KEY) {
+            let privateKey = process.env.FIREBASE_PRIVATE_KEY;
+
+            // 🛠️ 1. Reemplazar \n literales por saltos de línea reales
+            privateKey = privateKey.replace(/\\n/g, '\n');
+
+            // 🛠️ 2. Eliminar comillas dobles al inicio y final (común en Render/enviromments)
+            if (privateKey.startsWith('"') && privateKey.endsWith('"')) {
+                privateKey = privateKey.slice(1, -1);
+            }
+
+            // 🛠️ 3. Eliminar comillas simples
+            if (privateKey.startsWith("'") && privateKey.endsWith("'")) {
+                privateKey = privateKey.slice(1, -1);
+            }
+
             const serviceAccount = {
                 projectId: process.env.FIREBASE_PROJECT_ID,
                 clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-                privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
+                privateKey: privateKey
             };
 
             admin.initializeApp({
