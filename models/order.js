@@ -16,7 +16,7 @@ const orderSchema = new mongoose.Schema({
     producto: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Product',
-      required: true
+      required: false // Permitir null para pedidos externos como Mandao
     },
     origenPedido: {
       type: String,

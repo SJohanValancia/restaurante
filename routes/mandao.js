@@ -48,14 +48,15 @@ router.post('/order', async (req, res) => {
 
         // 1. Mapear productos de Mandao a JC-RT
         const itemsJC = await Promise.all(items.map(async (item) => {
+            const nombreLimpio = item.nombre.trim();
             const product = await Product.findOne({
                 userId: req.user._id,
-                nombre: { $regex: new RegExp(`^${item.nombre}$`, 'i') }
+                nombre: { $regex: new RegExp(`^\\s*${nombreLimpio}\\s*$`, 'i') }
             });
 
             return {
                 producto: product ? product._id : null,
-                nombreProducto: item.nombre,
+                nombreProducto: nombreLimpio,
                 categoriaProducto: product ? product.categoria : 'Mandao',
                 cantidad: item.cantidad,
                 precio: item.precio,
