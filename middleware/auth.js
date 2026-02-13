@@ -41,18 +41,25 @@ exports.protect = async (req, res, next) => {
     // AGREGAR DATOS DEL RESTAURANTE AL REQUEST
     req.nombreRestaurante = req.user.nombreRestaurante;
     req.sede = req.user.sede;
-    
+
     // BUSCAR TODOS LOS USUARIOS DEL MISMO RESTAURANTE
     const query = { nombreRestaurante: req.nombreRestaurante };
     if (req.sede) {
       query.sede = req.sede;
     }
-    
+
     const usuariosRestaurante = await User.find(query).select('_id');
     req.userIdsRestaurante = usuariosRestaurante.map(u => u._id);
 
     next();
   } catch (error) {
+    console.error('❌ Error de verificación JWT:', error.message);
+    if (error.name === 'TokenExpiredError') {
+      console.error('⏰ El token ha expirado. Fecha de expiración:', error.expiredAt);
+    } else if (error.name === 'JsonWebTokenError') {
+      console.error('🚫 Token malformado o secreto inválido.');
+    }
+
     return res.status(401).json({
       success: false,
       message: 'Token inválido o expirado'
