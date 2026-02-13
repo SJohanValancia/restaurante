@@ -8,6 +8,7 @@ const adminMeserosRoutes = require('./routes/adminMeseros');
 const ordersRoutes = require('./routes/Orders');
 const alimentosRoutes = require('./routes/alimentos');
 const productsRoutes = require('./routes/Products');
+const mandaoRoutes = require('./routes/mandao'); // ✅ Integración Mandao
 const pushRoutes = require('./routes/push'); // ✅ Push notifications
 const { protect } = require('./middleware/auth');
 require('dotenv').config();
@@ -33,6 +34,7 @@ mongoose.connect(process.env.MONGO_URI)
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/orders', ordersRoutes);
 app.use('/api/products', productsRoutes);
+app.use('/api/mandao', protect, mandaoRoutes); // ✅ Integración Mandao
 app.use('/api/push', pushRoutes); // ✅ Notificaciones push (público)
 
 // ⭐ RUTAS PROTEGIDAS (CON protect)

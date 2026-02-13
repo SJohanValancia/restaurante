@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const { protect } = require('../middleware/auth');
 const { checkPermission } = require('../middleware/permissions');
 const { notifyOrderStatusChange } = require('../services/pushNotification'); // ✅ Push notifications
+const { notifyMandaoStatusChange } = require('../services/mandaoIntegration'); // ✅ Integración Mandao
 
 // ✅ FUNCIÓN PARA DESCONTAR STOCK DE ALIMENTOS
 async function descontarStockAlimentos(items, userId, ignorarStock = false) {
@@ -558,6 +559,11 @@ router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (re
     } catch (pushError) {
       console.error('⚠️ Error enviando push notification:', pushError);
       // No fallar la request por error de push
+    }
+
+    // ✅ NOTIFICAR A MANDAO SI ES UN PEDIDO EXTERNO
+    if (order.source === 'mandao' && order.mandaoOrderId) {
+      notifyMandaoStatusChange(order.mandaoOrderId, estado).catch(console.error);
     }
 
     res.json({

@@ -3,8 +3,15 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Menú del Cliente</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icon-192.png">
     <style>
         * {
             margin: 0;
@@ -248,7 +255,8 @@
                     console.log('✅ Data:', data);
 
                     if (data.success) {
-                        // El restaurante existe
+                        // El restaurante existe - configurar PWA
+                        await setupPWA();
                         showOptions();
                     } else {
                         console.log('❌ Sin éxito:', data.message);
@@ -306,6 +314,39 @@
                     </div>
                 </div>
             `;
+        }
+
+        async function setupPWA() {
+            try {
+                const manifestLink = document.querySelector('link[rel="manifest"]');
+                const response = await fetch('/manifest.json');
+                const manifest = await response.json();
+
+                // Actualizar nombre del restaurante para iOS PWA
+                if (mesa) {
+                    manifest.name = `${restaurante} - Mesa ${mesa}`;
+                    manifest.short_name = `${restaurante} - ${mesa}`;
+                } else {
+                    manifest.name = restaurante;
+                    manifest.short_name = restaurante;
+                }
+                
+                // Asegurar que la start_url sea la actual completa
+                manifest.start_url = window.location.href;
+
+                const stringManifest = JSON.stringify(manifest);
+                const blob = new Blob([stringManifest], { type: 'application/json' });
+                const manifestURL = URL.createObjectURL(blob);
+
+                manifestLink.setAttribute('href', manifestURL);
+                console.log('✅ Manifest dinámico generado:', {
+                    name: manifest.name,
+                    short_name: manifest.short_name,
+                    start_url: manifest.start_url
+                });
+            } catch (e) {
+                console.error('Error configurando PWA:', e);
+            }
         }
 
         function irASeguimiento() {

@@ -89,6 +89,15 @@ const orderSchema = new mongoose.Schema({
     default: function () {
       return this.userId ? 'Usuario' : 'Desconocido';
     }
+  },
+  mandaoOrderId: {
+    type: String,
+    default: null
+  },
+  source: {
+    type: String,
+    enum: ['local', 'mandao'],
+    default: 'local'
   }
 }, {
   timestamps: true,

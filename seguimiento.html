@@ -1626,6 +1626,36 @@
                 return;
             }
 
+            // 🛠️ FIX DEFINITIVO PWA iOS: Manifest Dinámico
+            // Sobrescribimos el manifest para que incluya el nombre del restaurante y la mesa actual
+            if (restaurante && mesa) {
+                try {
+                    const manifestLink = document.querySelector('link[rel="manifest"]');
+                    const response = await fetch('/manifest.json');
+                    const manifest = await response.json();
+
+                    // Actualizar nombre del restaurante para iOS PWA
+                    manifest.name = `${restaurante} - Mesa ${mesa}`;
+                    manifest.short_name = `${restaurante} - ${mesa}`;
+                    
+                    // Asegurar que la start_url sea la actual completa
+                    manifest.start_url = window.location.href;
+
+                    const stringManifest = JSON.stringify(manifest);
+                    const blob = new Blob([stringManifest], { type: 'application/json' });
+                    const manifestURL = URL.createObjectURL(blob);
+
+                    manifestLink.setAttribute('href', manifestURL);
+                    console.log('✅ Manifest dinámico generado:', {
+                        name: manifest.name,
+                        short_name: manifest.short_name,
+                        start_url: manifest.start_url
+                    });
+                } catch (e) {
+                    console.error('Error generando manifest dinámico:', e);
+                }
+            }
+
             // Verificar permisos de notificación
             await checkNotificationPermission();
 

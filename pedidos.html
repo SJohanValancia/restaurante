@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,14 +29,14 @@
             background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
             padding: 0;
             z-index: 1000;
-            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
         }
 
         .sidebar-header {
             padding: 1.5rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .sidebar-brand {
@@ -66,7 +67,7 @@
 
         .brand-text p {
             font-size: 11px;
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
             margin: 2px 0 0 0;
         }
 
@@ -82,7 +83,7 @@
             padding: 0.5rem 1.5rem;
             font-size: 11px;
             font-weight: 700;
-            color: rgba(255,255,255,0.5);
+            color: rgba(255, 255, 255, 0.5);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -92,7 +93,7 @@
             align-items: center;
             gap: 12px;
             padding: 12px 1.5rem;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
             transition: all 0.2s;
             font-size: 14px;
@@ -101,7 +102,7 @@
         }
 
         .nav-item:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             color: white;
         }
 
@@ -132,8 +133,8 @@
             left: 0;
             right: 0;
             padding: 1.5rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .user-info {
@@ -164,7 +165,7 @@
 
         .user-details p {
             font-size: 11px;
-            color: rgba(255,255,255,0.6);
+            color: rgba(255, 255, 255, 0.6);
             margin: 2px 0 0 0;
         }
 
@@ -205,7 +206,8 @@
             font-size: 20px;
             cursor: pointer;
             z-index: 1001;
-            display: none; /* Oculto por defecto */
+            display: none;
+            /* Oculto por defecto */
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
@@ -223,7 +225,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 999;
             display: none;
         }
@@ -571,7 +573,7 @@
 
         .order-card:hover {
             border-color: #cbd5e0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
         .order-header {
@@ -618,14 +620,40 @@
             color: #22543d;
         }
 
-.status-entregado {
-    background: #c6f6d5;
-    color: #22543d;
-}
+        .status-entregado {
+            background: #c6f6d5;
+            color: #22543d;
+        }
 
         .status-cancelado {
             background: #fed7d7;
             color: #742a2a;
+        }
+
+        .source-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-right: 8px;
+        }
+
+        .source-mandao {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        .mandao-icon {
+            color: #d97706;
+        }
+
+        .order-card.mandao-order {
+            border-left: 5px solid #f59e0b;
         }
 
         .order-items {
@@ -734,7 +762,8 @@
             }
 
             .menu-toggle {
-                display: flex; /* Mostrar en móvil */
+                display: flex;
+                /* Mostrar en móvil */
             }
 
             .content-wrapper {
@@ -746,462 +775,531 @@
             }
         }
 
-.product-item.product-agotado {
-    opacity: 0.6;
-    background: #f7fafc;
-    cursor: not-allowed;
-}
+        .product-item.product-agotado {
+            opacity: 0.6;
+            background: #f7fafc;
+            cursor: not-allowed;
+        }
 
-.product-item.product-agotado:hover {
-    background: #edf2f7;
-}
+        .product-item.product-agotado:hover {
+            background: #edf2f7;
+        }
 
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-    20%, 40%, 60%, 80% { transform: translateX(5px); }
-}
+        @keyframes shake {
 
-@keyframes fadeInOut {
-    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
-    20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
-}
+            0%,
+            100% {
+                transform: translateX(0);
+            }
 
-@keyframes slideInRight {
-    from {
-        transform: translateX(400px);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
+            10%,
+            30%,
+            50%,
+            70%,
+            90% {
+                transform: translateX(-5px);
+            }
 
-@keyframes slideOutRight {
-    from {
-        transform: translateX(0);
-        opacity: 1;
-    }
-    to {
-        transform: translateX(400px);
-        opacity: 0;
-    }
-}
+            20%,
+            40%,
+            60%,
+            80% {
+                transform: translateX(5px);
+            }
+        }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
 
-@keyframes fadeOut {
-    from { opacity: 1; }
-    to { opacity: 0; }
-}
+            20% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
 
-@keyframes slideUp {
-    from { transform: translateY(30px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
+            80% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
 
-/* RESPONSIVE MÓVIL MEJORADO */
-@media (max-width: 768px) {
-    .container {
-        padding: 1rem;
-    }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+        }
 
-    .page-title {
-        font-size: 24px;
-    }
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
 
-    .page-subtitle {
-        font-size: 14px;
-    }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
 
-    .layout {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
 
-    /* Formulario de pedido más compacto */
-    .card-header {
-        padding: 1rem;
-    }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
 
-    .card-body {
-        padding: 1rem;
-    }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
 
-    .card-header h2 {
-        font-size: 16px;
-    }
+            to {
+                opacity: 1;
+            }
+        }
 
-    .card-header p {
-        font-size: 12px;
-    }
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
 
-    /* Productos seleccionados en columna */
-    .selected-item {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.75rem;
-    }
+            to {
+                opacity: 0;
+            }
+        }
 
-    .selected-item-info {
-        width: 100%;
-    }
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
 
-    .quantity-controls {
-        justify-content: space-between;
-        width: 100%;
-    }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
 
-    /* Lista de productos más compacta */
-    .products-list {
-        max-height: 250px;
-    }
+        /* RESPONSIVE MÓVIL MEJORADO */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
 
-    .product-item {
-        padding: 10px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-    }
+            .page-title {
+                font-size: 24px;
+            }
 
-    .product-price {
-        font-size: 16px;
-        align-self: flex-end;
-    }
+            .page-subtitle {
+                font-size: 14px;
+            }
 
-    /* Tarjetas de pedidos */
-    .order-card {
-        padding: 1rem;
-    }
+            .layout {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
 
-    .order-header {
-        flex-direction: column;
-        gap: 0.75rem;
-        align-items: flex-start;
-    }
+            /* Formulario de pedido más compacto */
+            .card-header {
+                padding: 1rem;
+            }
 
-    .order-info h3 {
-        font-size: 16px;
-    }
+            .card-body {
+                padding: 1rem;
+            }
 
-    .order-meta {
-        font-size: 11px;
-    }
+            .card-header h2 {
+                font-size: 16px;
+            }
 
-    /* Botones de acción en columna en móvil */
-    .order-actions {
-        grid-template-columns: 1fr;
-        gap: 0.5rem;
-    }
+            .card-header p {
+                font-size: 12px;
+            }
 
-    .btn-action {
-        width: 100%;
-        padding: 12px;
-        font-size: 13px;
-    }
+            /* Productos seleccionados en columna */
+            .selected-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.75rem;
+            }
 
-    /* Header de pedidos */
-    .orders-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
+            .selected-item-info {
+                width: 100%;
+            }
 
-    .filters {
-        width: 100%;
-    }
+            .quantity-controls {
+                justify-content: space-between;
+                width: 100%;
+            }
 
-    .filter-select {
-        width: 100%;
-    }
+            /* Lista de productos más compacta */
+            .products-list {
+                max-height: 250px;
+            }
 
-    /* Items de pedido en columna */
-    .order-item {
-        flex-direction: column;
-        align-items: stretch !important;
-        gap: 0.5rem;
-        padding: 8px !important;
-    }
+            .product-item {
+                padding: 10px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
 
-    .order-item > div:first-child {
-        width: 100%;
-    }
+            .product-price {
+                font-size: 16px;
+                align-self: flex-end;
+            }
 
-    .order-item > div:last-child {
-        width: 100%;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-    }
+            /* Tarjetas de pedidos */
+            .order-card {
+                padding: 1rem;
+            }
 
-    /* Total del pedido */
-    .order-total {
-        font-size: 16px;
-    }
+            .order-header {
+                flex-direction: column;
+                gap: 0.75rem;
+                align-items: flex-start;
+            }
 
-    /* Resumen del pedido */
-    .order-summary {
-        padding: 0.75rem;
-    }
+            .order-info h3 {
+                font-size: 16px;
+            }
 
-    .summary-row {
-        font-size: 13px;
-    }
+            .order-meta {
+                font-size: 11px;
+            }
 
-    .summary-row.total {
-        font-size: 16px;
-    }
+            /* Botones de acción en columna en móvil */
+            .order-actions {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
 
-    /* Formulario */
-    .form-group {
-        margin-bottom: 1rem;
-    }
+            .btn-action {
+                width: 100%;
+                padding: 12px;
+                font-size: 13px;
+            }
 
-    .form-input,
-    .form-select,
-    .form-textarea {
-        font-size: 16px; /* Evita zoom en iOS */
-    }
+            /* Header de pedidos */
+            .orders-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
 
-    /* Botón submit */
-    .btn-submit {
-        padding: 12px;
-        font-size: 15px;
-    }
-}
+            .filters {
+                width: 100%;
+            }
 
-@media (max-width: 480px) {
-    .container {
-        padding: 0.5rem;
-    }
+            .filter-select {
+                width: 100%;
+            }
 
-    .page-header {
-        margin-bottom: 1rem;
-    }
+            /* Items de pedido en columna */
+            .order-item {
+                flex-direction: column;
+                align-items: stretch !important;
+                gap: 0.5rem;
+                padding: 8px !important;
+            }
 
-    .page-title {
-        font-size: 20px;
-    }
+            .order-item>div:first-child {
+                width: 100%;
+            }
 
-    .card {
-        border-radius: 8px;
-    }
+            .order-item>div:last-child {
+                width: 100%;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
 
-    .order-card {
-        padding: 0.75rem;
-    }
+            /* Total del pedido */
+            .order-total {
+                font-size: 16px;
+            }
 
-    /* Hacer más pequeños los badges */
-    .status-badge {
-        font-size: 10px;
-        padding: 4px 8px;
-    }
+            /* Resumen del pedido */
+            .order-summary {
+                padding: 0.75rem;
+            }
 
-    /* Cantidad y precio más compactos */
-    .item-qty {
-        font-size: 11px;
-    }
+            .summary-row {
+                font-size: 13px;
+            }
 
-    /* Botones de cantidad */
-    .qty-btn {
-        width: 32px;
-        height: 32px;
-        font-size: 18px;
-    }
+            .summary-row.total {
+                font-size: 16px;
+            }
 
-    /* Empty state */
-    .empty-icon {
-        font-size: 36px;
-    }
+            /* Formulario */
+            .form-group {
+                margin-bottom: 1rem;
+            }
 
-    .empty-state p {
-        font-size: 13px;
-    }
-}
+            .form-input,
+            .form-select,
+            .form-textarea {
+                font-size: 16px;
+                /* Evita zoom en iOS */
+            }
 
-/* Mejoras para pantallas táctiles */
-@media (hover: none) and (pointer: coarse) {
-    /* Hacer botones más grandes para dedos */
-    .btn-action,
-    .btn-submit,
-    .btn-remove,
-    .qty-btn {
-        min-height: 44px; /* Tamaño mínimo recomendado por Apple */
-    }
+            /* Botón submit */
+            .btn-submit {
+                padding: 12px;
+                font-size: 15px;
+            }
+        }
 
-    /* Mejorar espaciado entre elementos táctiles */
-    .order-actions {
-        gap: 0.75rem;
-    }
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.5rem;
+            }
 
-    .quantity-controls {
-        gap: 12px;
-    }
+            .page-header {
+                margin-bottom: 1rem;
+            }
 
-    /* Hacer más fácil seleccionar productos */
-    .product-item {
-        min-height: 60px;
-        padding: 12px;
-    }
-}
+            .page-title {
+                font-size: 20px;
+            }
 
-@keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.2); opacity: 0.8; }
-}
+            .card {
+                border-radius: 8px;
+            }
 
-/* ==========================================
+            .order-card {
+                padding: 0.75rem;
+            }
+
+            /* Hacer más pequeños los badges */
+            .status-badge {
+                font-size: 10px;
+                padding: 4px 8px;
+            }
+
+            /* Cantidad y precio más compactos */
+            .item-qty {
+                font-size: 11px;
+            }
+
+            /* Botones de cantidad */
+            .qty-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 18px;
+            }
+
+            /* Empty state */
+            .empty-icon {
+                font-size: 36px;
+            }
+
+            .empty-state p {
+                font-size: 13px;
+            }
+        }
+
+        /* Mejoras para pantallas táctiles */
+        @media (hover: none) and (pointer: coarse) {
+
+            /* Hacer botones más grandes para dedos */
+            .btn-action,
+            .btn-submit,
+            .btn-remove,
+            .qty-btn {
+                min-height: 44px;
+                /* Tamaño mínimo recomendado por Apple */
+            }
+
+            /* Mejorar espaciado entre elementos táctiles */
+            .order-actions {
+                gap: 0.75rem;
+            }
+
+            .quantity-controls {
+                gap: 12px;
+            }
+
+            /* Hacer más fácil seleccionar productos */
+            .product-item {
+                min-height: 60px;
+                padding: 12px;
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 0.8;
+            }
+        }
+
+        /* ==========================================
    ESTILOS DE IMPRESIÓN
    ========================================== */
 
-/* Ocultar el contenedor de impresión en pantalla */
-#print-container {
-    display: none;
-}
+        /* Ocultar el contenedor de impresión en pantalla */
+        #print-container {
+            display: none;
+        }
 
-/* Estilos para cuando se imprime */
-@media print {
-    /* Ocultar todo excepto el contenedor de impresión */
-    body > *:not(#print-container) {
-        display: none !important;
-    }
-    
-    #print-container {
-        display: block !important;
-    }
-    
-    /* Configuración de página */
-    @page {
-        size: 80mm auto;
-        margin: 0;
-    }
-    
-    body {
-        margin: 0;
-        padding: 0;
-        font-family: 'Courier New', monospace;
-        font-size: 12px;
-        line-height: 1.4;
-    }
-    
-    #print-container {
-        width: 80mm;
-        padding: 10mm;
-    }
-    
-    .print-header {
-        text-align: center;
-        margin-bottom: 15px;
-        padding-bottom: 10px;
-        border-bottom: 2px solid #000;
-    }
-    
-    .print-header h1 {
-        font-size: 18px;
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-    
-    .print-subtitle {
-        font-size: 10px;
-        color: #666;
-    }
-    
-    .print-info-section {
-        margin-bottom: 15px;
-        padding-bottom: 10px;
-        border-bottom: 1px dashed #000;
-    }
-    
-    .print-info-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 3px;
-        font-size: 11px;
-    }
-    
-    .print-info-label {
-        font-weight: bold;
-    }
-    
-    .print-metodo-pago {
-        text-align: center;
-        font-size: 12px;
-        font-weight: bold;
-        padding: 8px;
-        background: #f0f0f0;
-        border-radius: 5px;
-        margin: 10px 0;
-    }
-    
-    .print-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 15px;
-    }
-    
-    .print-table th {
-        background: #f0f0f0;
-        padding: 8px 4px;
-        text-align: left;
-        font-size: 11px;
-        font-weight: bold;
-        border-top: 1px solid #000;
-        border-bottom: 1px solid #000;
-    }
-    
-    .print-table td {
-        padding: 8px 4px;
-        font-size: 11px;
-        border-bottom: 1px dashed #ddd;
-    }
-    
-    .print-total-section {
-        margin-top: 15px;
-        padding-top: 10px;
-        border-top: 2px solid #000;
-    }
-    
-    .print-total-row {
-        display: flex;
-        justify-content: space-between;
-        font-size: 16px;
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-    
-    .print-footer {
-        text-align: center;
-        margin-top: 20px;
-        padding-top: 10px;
-        border-top: 1px dashed #000;
-        font-size: 11px;
-    }
-    
-    .print-footer p {
-        margin: 5px 0;
-    }
-}
+        /* Estilos para cuando se imprime */
+        @media print {
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
+            /* Ocultar todo excepto el contenedor de impresión */
+            body>*:not(#print-container) {
+                display: none !important;
+            }
 
+            #print-container {
+                display: block !important;
+            }
+
+            /* Configuración de página */
+            @page {
+                size: 80mm auto;
+                margin: 0;
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+                font-family: 'Courier New', monospace;
+                font-size: 12px;
+                line-height: 1.4;
+            }
+
+            #print-container {
+                width: 80mm;
+                padding: 10mm;
+            }
+
+            .print-header {
+                text-align: center;
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+                border-bottom: 2px solid #000;
+            }
+
+            .print-header h1 {
+                font-size: 18px;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+
+            .print-subtitle {
+                font-size: 10px;
+                color: #666;
+            }
+
+            .print-info-section {
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+                border-bottom: 1px dashed #000;
+            }
+
+            .print-info-row {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 3px;
+                font-size: 11px;
+            }
+
+            .print-info-label {
+                font-weight: bold;
+            }
+
+            .print-metodo-pago {
+                text-align: center;
+                font-size: 12px;
+                font-weight: bold;
+                padding: 8px;
+                background: #f0f0f0;
+                border-radius: 5px;
+                margin: 10px 0;
+            }
+
+            .print-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 15px;
+            }
+
+            .print-table th {
+                background: #f0f0f0;
+                padding: 8px 4px;
+                text-align: left;
+                font-size: 11px;
+                font-weight: bold;
+                border-top: 1px solid #000;
+                border-bottom: 1px solid #000;
+            }
+
+            .print-table td {
+                padding: 8px 4px;
+                font-size: 11px;
+                border-bottom: 1px dashed #ddd;
+            }
+
+            .print-total-section {
+                margin-top: 15px;
+                padding-top: 10px;
+                border-top: 2px solid #000;
+            }
+
+            .print-total-row {
+                display: flex;
+                justify-content: space-between;
+                font-size: 16px;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+
+            .print-footer {
+                text-align: center;
+                margin-top: 20px;
+                padding-top: 10px;
+                border-top: 1px dashed #000;
+                font-size: 11px;
+            }
+
+            .print-footer p {
+                margin: 5px 0;
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 
-    
+
 </head>
+
 <body>
     <!-- Menú Toggle - Solo visible en móvil -->
     <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">☰</button>
-    
+
     <!-- Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
 
@@ -1217,7 +1315,7 @@
             </a>
         </div>
 
-    <nav class="sidebar-nav">
+        <nav class="sidebar-nav">
             <div class="nav-section">
                 <div class="nav-section-title">Principal</div>
                 <a href="productos.html" class="nav-item">
@@ -1258,23 +1356,23 @@
                 </a>
             </div>
 
-    <!-- SOLO PARA ADMINISTRADORES -->
-    <div class="nav-section" id="adminSection" style="display: none;">
-        <div class="nav-section-title">Administración</div>
-        <a href="administrador.html" class="nav-item">
-            <span class="nav-icon">👥</span>
-            <span>Gestión de Meseros</span>
-        </a>
-        <a href="liquidacion.html" class="nav-item">
-            <span class="nav-icon">💵</span>
-            <span>Liquidación</span>
-        </a>
-        <a href="historial-liquidaciones.html" class="nav-item">
-            <span class="nav-icon">📋</span>
-            <span>Hist. Liquidaciones</span>
-        </a>
-    </div>
-</nav>
+            <!-- SOLO PARA ADMINISTRADORES -->
+            <div class="nav-section" id="adminSection" style="display: none;">
+                <div class="nav-section-title">Administración</div>
+                <a href="administrador.html" class="nav-item">
+                    <span class="nav-icon">👥</span>
+                    <span>Gestión de Meseros</span>
+                </a>
+                <a href="liquidacion.html" class="nav-item">
+                    <span class="nav-icon">💵</span>
+                    <span>Liquidación</span>
+                </a>
+                <a href="historial-liquidaciones.html" class="nav-item">
+                    <span class="nav-icon">📋</span>
+                    <span>Hist. Liquidaciones</span>
+                </a>
+            </div>
+        </nav>
 
         <div class="sidebar-footer">
             <div class="user-info">
@@ -1308,16 +1406,18 @@
                     </div>
                     <div class="card-body">
                         <form id="orderForm">
-<div class="form-group">
-    <label class="form-label" for="mesa">Nombre/Número de Mesa *</label>
-    <input type="text" id="mesa" class="form-input" required maxlength="20" placeholder="Ej: 5, Mesa A, VIP1">
-</div>
+                            <div class="form-group">
+                                <label class="form-label" for="mesa">Nombre/Número de Mesa *</label>
+                                <input type="text" id="mesa" class="form-input" required maxlength="20"
+                                    placeholder="Ej: 5, Mesa A, VIP1">
+                            </div>
 
                             <div class="products-selector">
                                 <label class="form-label">Seleccionar Productos *</label>
                                 <div class="search-box">
                                     <span class="search-icon">🔍</span>
-                                    <input type="text" id="searchProduct" class="form-input search-input" placeholder="Buscar producto...">
+                                    <input type="text" id="searchProduct" class="form-input search-input"
+                                        placeholder="Buscar producto...">
                                 </div>
                                 <div class="products-list" id="productsList"></div>
                             </div>
@@ -1326,7 +1426,8 @@
 
                             <div class="form-group">
                                 <label class="form-label" for="notas">Notas del Pedido</label>
-                                <textarea id="notas" class="form-textarea" maxlength="500" placeholder="Observaciones especiales del cliente..."></textarea>
+                                <textarea id="notas" class="form-textarea" maxlength="500"
+                                    placeholder="Observaciones especiales del cliente..."></textarea>
                             </div>
 
                             <div class="order-summary" id="orderSummary" style="display: none;">
@@ -1361,6 +1462,7 @@
                                     <option value="listo">Listos</option>
                                     <option value="entregado">Pagados</option>
                                     <option value="cancelado">Cancelados</option>
+                                    <option value="mandao">Solo Mandao</option>
                                 </select>
                             </div>
                         </div>
@@ -1386,11 +1488,11 @@
         let allProducts = [];
         let allProductsCache = [];
         let pedidoParaImprimir = null;
-let metodoPagoSeleccionado = null;
+        let metodoPagoSeleccionado = null;
         // DEBE ESTAR después de:
 
-// AGREGAR ESTA LÍNEA:
-let currentOrderIdForPayment = null;
+        // AGREGAR ESTA LÍNEA:
+        let currentOrderIdForPayment = null;
 
         // CARGA INICIAL
         window.addEventListener('DOMContentLoaded', async () => {
@@ -1405,21 +1507,21 @@ let currentOrderIdForPayment = null;
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
-if (response.status === 401) {
-    console.warn('⚠️ Token expirado');
-    localStorage.removeItem('token');
-    window.location.href = 'index.html';
-    return;
-}
+                if (response.status === 401) {
+                    console.warn('⚠️ Token expirado');
+                    localStorage.removeItem('token');
+                    window.location.href = 'index.html';
+                    return;
+                }
 
-if (!response.ok) {
-    console.error('Error al cargar usuario');
-    alert('Error al cargar datos. Intente recargar.');
-    return;
-}
+                if (!response.ok) {
+                    console.error('Error al cargar usuario');
+                    alert('Error al cargar datos. Intente recargar.');
+                    return;
+                }
                 const data = await response.json();
                 currentUser = data.data;
-                
+
                 if (currentUser.id && !currentUser._id) {
                     currentUser._id = currentUser.id;
                 }
@@ -1427,88 +1529,88 @@ if (!response.ok) {
                 if (!currentUser || !currentUser._id) {
                     throw new Error('Datos de usuario incompletos');
                 }
-                
+
                 console.log('✅ Usuario cargado:', currentUser);
                 document.getElementById('sidebarUserName').textContent = currentUser.nombre;
                 document.getElementById('sidebarUserAvatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
 
                 // MOSTRAR SECCIÓN DE ADMIN SOLO SI ES ADMINISTRADOR
-if (currentUser.rol === 'admin') {
-    document.getElementById('adminSection').style.display = 'block';
-}
-                
+                if (currentUser.rol === 'admin') {
+                    document.getElementById('adminSection').style.display = 'block';
+                }
+
                 await loadProducts();
                 await loadOrders();
             } catch (error) {
-    console.error('❌ Error de red:', error);
-    alert('Error de conexión. Recargue la página.');
-}
-        });
-
-async function loadProducts() {
-    const token = localStorage.getItem('token');
-    try {
-        // Cargar productos
-        const response = await fetch(`${API_URL}/products?userId=${currentUser._id}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await response.json();
-        
-        if (data.success) {
-            // Cargar alimentos para verificar stock
-            const alimentosResponse = await fetch(`${API_URL}/alimentos`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const alimentosData = await alimentosResponse.json();
-            
-            if (alimentosData.success) {
-                const alimentos = alimentosData.data;
-                
-                // Verificar cada producto contra los alimentos
-                availableProducts = data.data.map(producto => {
-                    // Buscar alimentos que usan este producto
-                    const alimentosDelProducto = alimentos.filter(alimento => 
-                        alimento.productos.some(p => p.productoId._id === producto._id)
-                    );
-                    
-                    // Verificar si algún alimento está agotado
-                    const alimentosAgotados = alimentosDelProducto.filter(alimento => {
-                        const config = alimento.productos.find(p => p.productoId._id === producto._id);
-                        return alimento.stock < config.cantidadRequerida;
-                    });
-                    
-                    return {
-                        ...producto,
-                        alimentosAgotados: alimentosAgotados.map(a => a.nombre)
-                    };
-                });
-            } else {
-                availableProducts = data.data.map(p => ({ ...p, alimentosAgotados: [] }));
+                console.error('❌ Error de red:', error);
+                alert('Error de conexión. Recargue la página.');
             }
-            
-            allProductsCache = availableProducts;
-            displayProducts(availableProducts);
+        });
+
+        async function loadProducts() {
+            const token = localStorage.getItem('token');
+            try {
+                // Cargar productos
+                const response = await fetch(`${API_URL}/products?userId=${currentUser._id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    // Cargar alimentos para verificar stock
+                    const alimentosResponse = await fetch(`${API_URL}/alimentos`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const alimentosData = await alimentosResponse.json();
+
+                    if (alimentosData.success) {
+                        const alimentos = alimentosData.data;
+
+                        // Verificar cada producto contra los alimentos
+                        availableProducts = data.data.map(producto => {
+                            // Buscar alimentos que usan este producto
+                            const alimentosDelProducto = alimentos.filter(alimento =>
+                                alimento.productos.some(p => p.productoId._id === producto._id)
+                            );
+
+                            // Verificar si algún alimento está agotado
+                            const alimentosAgotados = alimentosDelProducto.filter(alimento => {
+                                const config = alimento.productos.find(p => p.productoId._id === producto._id);
+                                return alimento.stock < config.cantidadRequerida;
+                            });
+
+                            return {
+                                ...producto,
+                                alimentosAgotados: alimentosAgotados.map(a => a.nombre)
+                            };
+                        });
+                    } else {
+                        availableProducts = data.data.map(p => ({ ...p, alimentosAgotados: [] }));
+                    }
+
+                    allProductsCache = availableProducts;
+                    displayProducts(availableProducts);
+                }
+            } catch (error) {
+                console.error('Error al cargar productos:', error);
+            }
         }
-    } catch (error) {
-        console.error('Error al cargar productos:', error);
-    }
-}
 
 
-function displayProducts(products) {
-    const list = document.getElementById('productsList');
-    
-    if (products.length === 0) {
-        list.innerHTML = '<div class="empty-state" style="padding: 2rem;"><p>No hay productos disponibles</p></div>';
-        return;
-    }
+        function displayProducts(products) {
+            const list = document.getElementById('productsList');
 
-    list.innerHTML = products.map(p => {
-        const tieneAlimentosAgotados = p.alimentosAgotados && p.alimentosAgotados.length > 0;
-        const estiloAgotado = !p.disponible ? 'opacity: 0.6; background: #f7fafc;' : '';
-        const estiloAdvertencia = tieneAlimentosAgotados && p.disponible ? 'border-left: 3px solid #f59e0b;' : '';
-        
-        return `
+            if (products.length === 0) {
+                list.innerHTML = '<div class="empty-state" style="padding: 2rem;"><p>No hay productos disponibles</p></div>';
+                return;
+            }
+
+            list.innerHTML = products.map(p => {
+                const tieneAlimentosAgotados = p.alimentosAgotados && p.alimentosAgotados.length > 0;
+                const estiloAgotado = !p.disponible ? 'opacity: 0.6; background: #f7fafc;' : '';
+                const estiloAdvertencia = tieneAlimentosAgotados && p.disponible ? 'border-left: 3px solid #f59e0b;' : '';
+
+                return `
             <div class="product-item ${!p.disponible ? 'product-agotado' : ''}" 
                  onclick="${!p.disponible ? `mostrarAgotado(this)` : `addProduct('${p._id}')`}"
                  style="${estiloAgotado} ${estiloAdvertencia}">
@@ -1526,17 +1628,17 @@ function displayProducts(products) {
                 </div>
             </div>
         `;
-    }).join('');
-}
+            }).join('');
+        }
 
-function mostrarAgotado(elemento) {
-    // Efecto de shake
-    elemento.style.animation = 'shake 0.5s';
-    
-    // Mostrar mensaje temporal
-    const mensaje = document.createElement('div');
-    mensaje.textContent = '❌ Producto agotado';
-    mensaje.style.cssText = `
+        function mostrarAgotado(elemento) {
+            // Efecto de shake
+            elemento.style.animation = 'shake 0.5s';
+
+            // Mostrar mensaje temporal
+            const mensaje = document.createElement('div');
+            mensaje.textContent = '❌ Producto agotado';
+            mensaje.style.cssText = `
         position: fixed;
         top: 50%;
         left: 50%;
@@ -1551,25 +1653,25 @@ function mostrarAgotado(elemento) {
         z-index: 10000;
         animation: fadeInOut 2s ease-in-out;
     `;
-    document.body.appendChild(mensaje);
-    
-    // Remover mensaje después de 2 segundos
-    setTimeout(() => {
-        mensaje.remove();
-    }, 2000);
-    
-    // Resetear animación
-    setTimeout(() => {
-        elemento.style.animation = '';
-    }, 500);
-}
+            document.body.appendChild(mensaje);
+
+            // Remover mensaje después de 2 segundos
+            setTimeout(() => {
+                mensaje.remove();
+            }, 2000);
+
+            // Resetear animación
+            setTimeout(() => {
+                elemento.style.animation = '';
+            }, 500);
+        }
 
 
 
         document.getElementById('searchProduct').addEventListener('input', (e) => {
             const search = e.target.value.toLowerCase();
-            const filtered = availableProducts.filter(p => 
-                p.nombre.toLowerCase().includes(search) || 
+            const filtered = availableProducts.filter(p =>
+                p.nombre.toLowerCase().includes(search) ||
                 p.categoria.toLowerCase().includes(search)
             );
             displayProducts(filtered);
@@ -1580,7 +1682,7 @@ function mostrarAgotado(elemento) {
             if (!product) return;
 
             const existing = selectedItems.find(item => item.producto._id === productId);
-            
+
             if (existing) {
                 existing.cantidad++;
             } else {
@@ -1593,22 +1695,22 @@ function mostrarAgotado(elemento) {
             updateSelectedProducts();
         }
 
-function updateSelectedProducts() {
-    const container = document.getElementById('selectedProducts');
-    const summary = document.getElementById('orderSummary');
-    const btnSubmit = document.getElementById('btnSubmit');
+        function updateSelectedProducts() {
+            const container = document.getElementById('selectedProducts');
+            const summary = document.getElementById('orderSummary');
+            const btnSubmit = document.getElementById('btnSubmit');
 
-    if (selectedItems.length === 0) {
-        container.innerHTML = '';
-        summary.style.display = 'none';
-        btnSubmit.disabled = true;
-        return;
-    }
+            if (selectedItems.length === 0) {
+                container.innerHTML = '';
+                summary.style.display = 'none';
+                btnSubmit.disabled = true;
+                return;
+            }
 
-    summary.style.display = 'block';
-    btnSubmit.disabled = false;
+            summary.style.display = 'block';
+            btnSubmit.disabled = false;
 
-    container.innerHTML = `
+            container.innerHTML = `
         <label class="form-label">Productos Seleccionados</label>
         ${selectedItems.map((item, index) => `
             <div class="selected-item">
@@ -1634,12 +1736,12 @@ function updateSelectedProducts() {
         `).join('')}
     `;
 
-    const totalItems = selectedItems.reduce((sum, item) => sum + item.cantidad, 0);
-    const totalPrice = selectedItems.reduce((sum, item) => sum + (item.producto.precio * item.cantidad), 0);
+            const totalItems = selectedItems.reduce((sum, item) => sum + item.cantidad, 0);
+            const totalPrice = selectedItems.reduce((sum, item) => sum + (item.producto.precio * item.cantidad), 0);
 
-    document.getElementById('summaryItems').textContent = totalItems;
-    document.getElementById('summaryTotal').textContent = `$${totalPrice.toLocaleString('es-CO')}`;
-}
+            document.getElementById('summaryItems').textContent = totalItems;
+            document.getElementById('summaryTotal').textContent = `$${totalPrice.toLocaleString('es-CO')}`;
+        }
 
         function changeQuantity(index, delta) {
             selectedItems[index].cantidad += delta;
@@ -1649,16 +1751,16 @@ function updateSelectedProducts() {
             updateSelectedProducts();
         }
 
-function setQuantity(index, value) {
-    let cantidad = parseInt(value);
-    
-    if (isNaN(cantidad) || cantidad < 1) {
-        cantidad = 1;
-    }
-    
-    selectedItems[index].cantidad = cantidad;
-    updateSelectedProducts();
-}
+        function setQuantity(index, value) {
+            let cantidad = parseInt(value);
+
+            if (isNaN(cantidad) || cantidad < 1) {
+                cantidad = 1;
+            }
+
+            selectedItems[index].cantidad = cantidad;
+            updateSelectedProducts();
+        }
 
 
         function removeItem(index) {
@@ -1666,99 +1768,99 @@ function setQuantity(index, value) {
             updateSelectedProducts();
         }
 
-// Reemplaza tu función del formulario actual con esta versión mejorada:
+        // Reemplaza tu función del formulario actual con esta versión mejorada:
 
-document.getElementById('orderForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
+        document.getElementById('orderForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-    const mesa = document.getElementById('mesa').value;
-    const notas = document.getElementById('notas').value.trim();
-    const btnSubmit = document.getElementById('btnSubmit');
+            const mesa = document.getElementById('mesa').value;
+            const notas = document.getElementById('notas').value.trim();
+            const btnSubmit = document.getElementById('btnSubmit');
 
-    if (selectedItems.length === 0) {
-        alert('Debe seleccionar al menos un producto');
-        return;
-    }
+            if (selectedItems.length === 0) {
+                alert('Debe seleccionar al menos un producto');
+                return;
+            }
 
-    // 🔒 BLOQUEAR BOTÓN
-    btnSubmit.disabled = true;
-    btnSubmit.style.opacity = '0.6';
-    btnSubmit.style.cursor = 'not-allowed';
-    const textoOriginal = btnSubmit.innerHTML;
-    btnSubmit.innerHTML = '<span style="display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px;"></span> Creando...';
+            // 🔒 BLOQUEAR BOTÓN
+            btnSubmit.disabled = true;
+            btnSubmit.style.opacity = '0.6';
+            btnSubmit.style.cursor = 'not-allowed';
+            const textoOriginal = btnSubmit.innerHTML;
+            btnSubmit.innerHTML = '<span style="display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px;"></span> Creando...';
 
-    // Verificar si hay productos con alimentos agotados
-    const productosConAlimentosAgotados = selectedItems.filter(item => 
-        item.producto.alimentosAgotados && item.producto.alimentosAgotados.length > 0
-    );
+            // Verificar si hay productos con alimentos agotados
+            const productosConAlimentosAgotados = selectedItems.filter(item =>
+                item.producto.alimentosAgotados && item.producto.alimentosAgotados.length > 0
+            );
 
-    if (productosConAlimentosAgotados.length > 0) {
-        const listaProductos = productosConAlimentosAgotados.map(item => {
-            const alimentosAgotados = item.producto.alimentosAgotados.join(', ');
-            return `• ${item.producto.nombre}: Falta ${alimentosAgotados}`;
-        }).join('\n');
+            if (productosConAlimentosAgotados.length > 0) {
+                const listaProductos = productosConAlimentosAgotados.map(item => {
+                    const alimentosAgotados = item.producto.alimentosAgotados.join(', ');
+                    return `• ${item.producto.nombre}: Falta ${alimentosAgotados}`;
+                }).join('\n');
 
-        const confirmar = confirm(
-            `⚠️ ADVERTENCIA: Los siguientes platos tienen alimentos agotados:\n\n${listaProductos}\n\n¿Deseas continuar con la creación del pedido?`
-        );
+                const confirmar = confirm(
+                    `⚠️ ADVERTENCIA: Los siguientes platos tienen alimentos agotados:\n\n${listaProductos}\n\n¿Deseas continuar con la creación del pedido?`
+                );
 
-        if (!confirmar) {
-            // 🔓 DESBLOQUEAR BOTÓN si cancela
-            btnSubmit.disabled = false;
-            btnSubmit.style.opacity = '1';
-            btnSubmit.style.cursor = 'pointer';
-            btnSubmit.innerHTML = textoOriginal;
-            return;
-        }
-    }
+                if (!confirmar) {
+                    // 🔓 DESBLOQUEAR BOTÓN si cancela
+                    btnSubmit.disabled = false;
+                    btnSubmit.style.opacity = '1';
+                    btnSubmit.style.cursor = 'pointer';
+                    btnSubmit.innerHTML = textoOriginal;
+                    return;
+                }
+            }
 
-    const orderData = {
-        mesa: mesa,
-        items: selectedItems.map(item => ({
-            producto: item.producto._id,
-            cantidad: item.cantidad,
-            precio: item.producto.precio
-        })),
-        notas: notas,
-        userId: currentUser._id,
-        ignorarStockAlimentos: productosConAlimentosAgotados.length > 0
-    };
+            const orderData = {
+                mesa: mesa,
+                items: selectedItems.map(item => ({
+                    producto: item.producto._id,
+                    cantidad: item.cantidad,
+                    precio: item.producto.precio
+                })),
+                notas: notas,
+                userId: currentUser._id,
+                ignorarStockAlimentos: productosConAlimentosAgotados.length > 0
+            };
 
-    const token = localStorage.getItem('token');
+            const token = localStorage.getItem('token');
 
-    try {
-        const response = await fetch(`${API_URL}/orders`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(orderData)
+            try {
+                const response = await fetch(`${API_URL}/orders`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(orderData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ Pedido creado exitosamente');
+                    document.getElementById('orderForm').reset();
+                    selectedItems = [];
+                    updateSelectedProducts();
+                    await loadOrders();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al crear el pedido');
+            } finally {
+                // 🔓 DESBLOQUEAR BOTÓN siempre al final
+                btnSubmit.disabled = false;
+                btnSubmit.style.opacity = '1';
+                btnSubmit.style.cursor = 'pointer';
+                btnSubmit.innerHTML = textoOriginal;
+            }
         });
 
-        const data = await response.json();
-
-        if (data.success) {
-            alert('✅ Pedido creado exitosamente');
-            document.getElementById('orderForm').reset();
-            selectedItems = [];
-            updateSelectedProducts();
-            await loadOrders();
-        } else {
-            alert('Error: ' + data.message);
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error al crear el pedido');
-    } finally {
-        // 🔓 DESBLOQUEAR BOTÓN siempre al final
-        btnSubmit.disabled = false;
-        btnSubmit.style.opacity = '1';
-        btnSubmit.style.cursor = 'pointer';
-        btnSubmit.innerHTML = textoOriginal;
-    }
-});  
-       
         async function loadOrders() {
             const token = localStorage.getItem('token');
             const estado = document.getElementById('filterEstado').value;
@@ -1772,7 +1874,7 @@ document.getElementById('orderForm').addEventListener('submit', async (e) => {
                 });
 
                 const data = await response.json();
-                
+
                 if (data.success) {
                     displayOrders(data.data);
                     document.getElementById('orderCount').textContent = data.count;
@@ -1783,43 +1885,50 @@ document.getElementById('orderForm').addEventListener('submit', async (e) => {
         }
 
 
-function displayOrders(orders) {
-    const list = document.getElementById('ordersList');
-    
-    if (orders.length === 0) {
-        list.innerHTML = `
+        function displayOrders(orders) {
+            const list = document.getElementById('ordersList');
+
+            if (orders.length === 0) {
+                list.innerHTML = `
             <div class="empty-state">
                 <div class="empty-icon">📋</div>
                 <p>No hay pedidos registrados</p>
             </div>
         `;
-        return;
-    }
+                return;
+            }
 
-    // ORDENAR: Separar en tres grupos
-    const activos = orders.filter(o => !['entregado', 'cancelado'].includes(o.estado));
-    const cancelados = orders.filter(o => o.estado === 'cancelado');
-    const entregados = orders.filter(o => o.estado === 'entregado');
-    
-    // Ordenar por fecha ASCENDENTE (más antiguo primero = orden de llegada)
-    activos.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-    cancelados.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-    entregados.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-    
-    // Combinar: activos arriba, cancelados en medio, entregados abajo
-    const orderedOrders = [...activos, ...cancelados, ...entregados];
+            // ORDENAR: Separar en tres grupos
+            const activos = orders.filter(o => !['entregado', 'cancelado'].includes(o.estado));
+            const cancelados = orders.filter(o => o.estado === 'cancelado');
+            const entregados = orders.filter(o => o.estado === 'entregado');
 
-    list.innerHTML = orderedOrders.map(order => {
-        // Generar HTML para items con estados individuales
-        const itemsHTML = order.items.map((item, itemIndex) => {
-            const nombre = item.productoInfo ? item.productoInfo.nombre : 
-                          (item.producto && item.producto.nombre ? item.producto.nombre : 
-                          (item.nombreProducto || 'Producto eliminado'));
-            
-            // Agrupar por estado
-            const grupos = item.estadosIndividuales || [{cantidad: item.cantidad, estado: 'pendiente'}];
-            
-            return grupos.map(grupo => `
+            // Ordenar por fecha ASCENDENTE (más antiguo primero = orden de llegada)
+            activos.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+            cancelados.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+            entregados.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+            // Combinar: activos arriba, cancelados en medio, entregados abajo
+            const orderedOrders = [...activos, ...cancelados, ...entregados];
+
+            // Filtrar por origen si se selecciona "mandao"
+            const filtroEstado = document.getElementById('filterEstado').value;
+            const finalOrders = filtroEstado === 'mandao'
+                ? orderedOrders.filter(o => o.source === 'mandao')
+                : orderedOrders;
+
+            list.innerHTML = finalOrders.map(order => {
+                const isMandao = order.source === 'mandao';
+                // Generar HTML para items con estados individuales
+                const itemsHTML = order.items.map((item, itemIndex) => {
+                    const nombre = item.productoInfo ? item.productoInfo.nombre :
+                        (item.producto && item.producto.nombre ? item.producto.nombre :
+                            (item.nombreProducto || 'Producto eliminado'));
+
+                    // Agrupar por estado
+                    const grupos = item.estadosIndividuales || [{ cantidad: item.cantidad, estado: 'pendiente' }];
+
+                    return grupos.map(grupo => `
                 <div class="order-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #f7fafc; border-radius: 8px; margin-bottom: 8px;">
                     <div style="flex: 1;">
                         <span class="item-name" style="font-weight: 600; color: #2d3748;">${nombre}</span>
@@ -1839,13 +1948,16 @@ function displayOrders(orders) {
                     </div>
                 </div>
             `).join('');
-        }).join('');
+                }).join('');
 
-        return `
-            <div class="order-card" id="order-card-${order._id}">
+                return `
+            <div class="order-card ${isMandao ? 'mandao-order' : ''}" id="order-card-${order._id}">
                 <div class="order-header">
                     <div class="order-info">
-                        <h3>Mesa ${order.mesa}</h3>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            ${isMandao ? '<span class="source-badge source-mandao"><span class="mandao-icon">🚲</span> MANDAO</span>' : ''}
+                            <h3>Mesa ${order.mesa}</h3>
+                        </div>
                         <div class="order-meta">
                             ${new Date(order.createdAt).toLocaleString('es-CO')}
                             ${order.metodoPago ? `<br><strong style="color: ${order.metodoPago === 'transferencia' ? '#667eea' : '#48bb78'};">💳 ${order.metodoPago === 'transferencia' ? 'Transferencia' : 'Efectivo'}</strong>` : ''}
@@ -1872,232 +1984,232 @@ function displayOrders(orders) {
                 ${getOrderActions(order)}
             </div>
         `;
-    }).join('');
-}
+            }).join('');
+        }
 
-function getOrderActions(order) {
+        function getOrderActions(order) {
             if (order.estado === 'entregado' || order.estado === 'cancelado') return '';
 
 
             let actions = '<div class="order-actions">';
-            
+
             if (order.estado === 'pendiente') {
                 actions += `<button class="btn-action btn-preparar" onclick="updateOrderStatus('${order._id}', 'preparando')">👨‍🍳 Preparar</button>`;
             }
-            
+
             if (order.estado === 'preparando') {
                 actions += `<button class="btn-action btn-listo" onclick="updateOrderStatus('${order._id}', 'listo')">✅ Listo</button>`;
             }
-            
-if (order.estado === 'listo') {
-    actions += `<button class="btn-action btn-entregar" onclick="updateOrderStatus('${order._id}', 'entregado')">💳 Pagar</button>`;
-}
 
-if (order.estado !== 'entregado' && order.estado !== 'cancelado') {
-    actions += `<button class="btn-action btn-cancelar" onclick="cancelOrder('${order._id}')">❌ Cancelar</button>`;
-}
-            
+            if (order.estado === 'listo') {
+                actions += `<button class="btn-action btn-entregar" onclick="updateOrderStatus('${order._id}', 'entregado')">💳 Pagar</button>`;
+            }
+
+            if (order.estado !== 'entregado' && order.estado !== 'cancelado') {
+                actions += `<button class="btn-action btn-cancelar" onclick="cancelOrder('${order._id}')">❌ Cancelar</button>`;
+            }
+
             actions += '</div>';
             return actions;
         }
 
 
 
-// Debe estar ASÍ:
-async function updateOrderStatus(orderId, newStatus) {
-    console.log('🔄 updateOrderStatus llamado con:', { orderId, newStatus });
-    
-    // Si el nuevo estado es "entregado", mostrar modal de método de pago
-    if (newStatus === 'entregado') {
-        currentOrderIdForPayment = orderId;
-        console.log('💾 Guardado orderId para pago:', currentOrderIdForPayment);
-        mostrarModalMetodoPago();
-        return;
-    }
-    
-    // Para otros estados, proceder normalmente SIN metodoPago
-    await actualizarEstadoPedido(orderId, newStatus, null);
-}
+        // Debe estar ASÍ:
+        async function updateOrderStatus(orderId, newStatus) {
+            console.log('🔄 updateOrderStatus llamado con:', { orderId, newStatus });
 
+            // Si el nuevo estado es "entregado", mostrar modal de método de pago
+            if (newStatus === 'entregado') {
+                currentOrderIdForPayment = orderId;
+                console.log('💾 Guardado orderId para pago:', currentOrderIdForPayment);
+                mostrarModalMetodoPago();
+                return;
+            }
 
-// Debe estar ASÍ:
-function mostrarModalMetodoPago() {
-    console.log('🪟 Mostrando modal con orderId:', currentOrderIdForPayment);
-    const modal = document.getElementById('modalMetodoPago');
-    if (!modal) {
-        console.error('❌ Modal no encontrado en el DOM');
-        return;
-    }
-    modal.style.display = 'flex';
-}
-
-function cerrarModalMetodoPago() {
-    console.log('🚪 Cerrando modal');
-    const modal = document.getElementById('modalMetodoPago');
-    modal.style.display = 'none';
-    // NO limpiar aquí - se limpiará después de actualizar
-}
-
-// Debe estar ASÍ:
-async function confirmarMetodoPago(metodoPago) {
-    console.log('✅ Método de pago confirmado:', metodoPago);
-    console.log('📦 Order ID actual:', currentOrderIdForPayment);
-    
-    if (!currentOrderIdForPayment) {
-        console.error('❌ No hay orderId guardado');
-        alert('Error: No se encontró el ID del pedido');
-        return;
-    }
-    
-    // Guardar el método de pago
-    metodoPagoSeleccionado = metodoPago;
-    
-    // Cerrar modal de método de pago
-    document.getElementById('modalMetodoPago').style.display = 'none';
-    
-    // Obtener los datos completos del pedido antes de preguntar por impresión
-    await obtenerDatosPedidoParaImprimir(currentOrderIdForPayment);
-    
-    // Mostrar modal de confirmación de impresión
-    document.getElementById('modalConfirmarImpresion').style.display = 'flex';
-}
-
-async function obtenerDatosPedidoParaImprimir(orderId) {
-    const token = localStorage.getItem('token');
-    
-    try {
-        const response = await fetch(`${API_URL}/orders/${orderId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            pedidoParaImprimir = data.data;
-            console.log('📋 Datos del pedido cargados para impresión:', pedidoParaImprimir);
+            // Para otros estados, proceder normalmente SIN metodoPago
+            await actualizarEstadoPedido(orderId, newStatus, null);
         }
-    } catch (error) {
-        console.error('Error al obtener datos del pedido:', error);
-    }
-}
 
 
-async function confirmarImpresion(imprimir) {
-    const modal = document.getElementById('modalConfirmarImpresion');
-    modal.style.display = 'none';
-    
-    if (imprimir && pedidoParaImprimir) {
-        // Mostrar modal de estado de impresión
-        mostrarEstadoImpresion('imprimiendo');
-        
-        try {
-            await imprimirFacturaPOS();
-            mostrarEstadoImpresion('exito');
-        } catch (error) {
-            console.error('Error al imprimir:', error);
-            mostrarEstadoImpresion('error');
+        // Debe estar ASÍ:
+        function mostrarModalMetodoPago() {
+            console.log('🪟 Mostrando modal con orderId:', currentOrderIdForPayment);
+            const modal = document.getElementById('modalMetodoPago');
+            if (!modal) {
+                console.error('❌ Modal no encontrado en el DOM');
+                return;
+            }
+            modal.style.display = 'flex';
         }
-    }
-    
-    // Actualizar el pedido con el método de pago
-    const orderIdTemp = currentOrderIdForPayment;
-    currentOrderIdForPayment = null;
-    pedidoParaImprimir = null;
-    
-    await actualizarEstadoPedido(orderIdTemp, 'entregado', metodoPagoSeleccionado);
-}
 
-
-
-function mostrarEstadoImpresion(estado) {
-    const modal = document.getElementById('modalEstadoImpresion');
-    const spinner = document.getElementById('impresionSpinner');
-    const titulo = document.getElementById('impresionTitulo');
-    const mensaje = document.getElementById('impresionMensaje');
-    
-    if (estado === 'imprimiendo') {
-        modal.style.display = 'flex';
-        spinner.textContent = '🖨️';
-        spinner.style.animation = 'pulse 1s infinite';
-        titulo.textContent = 'Imprimiendo factura...';
-        mensaje.textContent = 'Por favor, espere';
-    } else if (estado === 'exito') {
-        spinner.textContent = '✅';
-        spinner.style.animation = 'none';
-        titulo.textContent = '¡Factura impresa!';
-        mensaje.textContent = 'La factura se ha impreso correctamente';
-        
-        setTimeout(() => {
+        function cerrarModalMetodoPago() {
+            console.log('🚪 Cerrando modal');
+            const modal = document.getElementById('modalMetodoPago');
             modal.style.display = 'none';
-        }, 2000);
-    } else if (estado === 'error') {
-        spinner.textContent = '❌';
-        spinner.style.animation = 'none';
-        titulo.textContent = 'Error al imprimir';
-        mensaje.textContent = 'No se pudo imprimir la factura. Verifique la impresora.';
-        
-        setTimeout(() => {
-            modal.style.display = 'none';
-        }, 3000);
-    }
-}
+            // NO limpiar aquí - se limpiará después de actualizar
+        }
 
-async function imprimirFacturaPOS() {
-    if (!pedidoParaImprimir) {
-        throw new Error('No hay datos del pedido para imprimir');
-    }
-    
-    try {
-        // Crear elemento de impresión
-        crearElementoImpresion();
-        
-        // Esperar un momento para que se renderice
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
-        // Imprimir
-        window.print();
-        
-        // Remover después de imprimir o cancelar
-        window.onafterprint = () => {
+        // Debe estar ASÍ:
+        async function confirmarMetodoPago(metodoPago) {
+            console.log('✅ Método de pago confirmado:', metodoPago);
+            console.log('📦 Order ID actual:', currentOrderIdForPayment);
+
+            if (!currentOrderIdForPayment) {
+                console.error('❌ No hay orderId guardado');
+                alert('Error: No se encontró el ID del pedido');
+                return;
+            }
+
+            // Guardar el método de pago
+            metodoPagoSeleccionado = metodoPago;
+
+            // Cerrar modal de método de pago
+            document.getElementById('modalMetodoPago').style.display = 'none';
+
+            // Obtener los datos completos del pedido antes de preguntar por impresión
+            await obtenerDatosPedidoParaImprimir(currentOrderIdForPayment);
+
+            // Mostrar modal de confirmación de impresión
+            document.getElementById('modalConfirmarImpresion').style.display = 'flex';
+        }
+
+        async function obtenerDatosPedidoParaImprimir(orderId) {
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch(`${API_URL}/orders/${orderId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    pedidoParaImprimir = data.data;
+                    console.log('📋 Datos del pedido cargados para impresión:', pedidoParaImprimir);
+                }
+            } catch (error) {
+                console.error('Error al obtener datos del pedido:', error);
+            }
+        }
+
+
+        async function confirmarImpresion(imprimir) {
+            const modal = document.getElementById('modalConfirmarImpresion');
+            modal.style.display = 'none';
+
+            if (imprimir && pedidoParaImprimir) {
+                // Mostrar modal de estado de impresión
+                mostrarEstadoImpresion('imprimiendo');
+
+                try {
+                    await imprimirFacturaPOS();
+                    mostrarEstadoImpresion('exito');
+                } catch (error) {
+                    console.error('Error al imprimir:', error);
+                    mostrarEstadoImpresion('error');
+                }
+            }
+
+            // Actualizar el pedido con el método de pago
+            const orderIdTemp = currentOrderIdForPayment;
+            currentOrderIdForPayment = null;
+            pedidoParaImprimir = null;
+
+            await actualizarEstadoPedido(orderIdTemp, 'entregado', metodoPagoSeleccionado);
+        }
+
+
+
+        function mostrarEstadoImpresion(estado) {
+            const modal = document.getElementById('modalEstadoImpresion');
+            const spinner = document.getElementById('impresionSpinner');
+            const titulo = document.getElementById('impresionTitulo');
+            const mensaje = document.getElementById('impresionMensaje');
+
+            if (estado === 'imprimiendo') {
+                modal.style.display = 'flex';
+                spinner.textContent = '🖨️';
+                spinner.style.animation = 'pulse 1s infinite';
+                titulo.textContent = 'Imprimiendo factura...';
+                mensaje.textContent = 'Por favor, espere';
+            } else if (estado === 'exito') {
+                spinner.textContent = '✅';
+                spinner.style.animation = 'none';
+                titulo.textContent = '¡Factura impresa!';
+                mensaje.textContent = 'La factura se ha impreso correctamente';
+
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 2000);
+            } else if (estado === 'error') {
+                spinner.textContent = '❌';
+                spinner.style.animation = 'none';
+                titulo.textContent = 'Error al imprimir';
+                mensaje.textContent = 'No se pudo imprimir la factura. Verifique la impresora.';
+
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        async function imprimirFacturaPOS() {
+            if (!pedidoParaImprimir) {
+                throw new Error('No hay datos del pedido para imprimir');
+            }
+
+            try {
+                // Crear elemento de impresión
+                crearElementoImpresion();
+
+                // Esperar un momento para que se renderice
+                await new Promise(resolve => setTimeout(resolve, 300));
+
+                // Imprimir
+                window.print();
+
+                // Remover después de imprimir o cancelar
+                window.onafterprint = () => {
+                    removerElementoImpresion();
+                };
+
+                console.log('✅ Diálogo de impresión abierto');
+
+            } catch (error) {
+                console.error('Error al imprimir:', error);
+                removerElementoImpresion();
+                throw error;
+            }
+        }
+
+        function crearElementoImpresion() {
+            // Remover si ya existe
             removerElementoImpresion();
-        };
-        
-        console.log('✅ Diálogo de impresión abierto');
-        
-    } catch (error) {
-        console.error('Error al imprimir:', error);
-        removerElementoImpresion();
-        throw error;
-    }
-}
 
-function crearElementoImpresion() {
-    // Remover si ya existe
-    removerElementoImpresion();
-    
-    const fecha = new Date(pedidoParaImprimir.createdAt);
-    const fechaStr = fecha.toLocaleDateString('es-CO', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
-    const horaStr = fecha.toLocaleTimeString('es-CO', {
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-    
-    const metodoPagoTexto = metodoPagoSeleccionado === 'transferencia' ? 'TRANSFERENCIA' : 'EFECTIVO';
-    const nombreRestaurante = currentUser.nombreRestaurante || 'RESTAURANTE';
-    
-    // Generar filas de productos
-    const productosHTML = pedidoParaImprimir.items.map(item => {
-        const nombre = item.productoInfo ? item.productoInfo.nombre : 
-                      (item.nombreProducto || 'Producto');
-        const cantidad = item.cantidad;
-        const precio = item.precio;
-        const subtotal = cantidad * precio;
-        
-        return `
+            const fecha = new Date(pedidoParaImprimir.createdAt);
+            const fechaStr = fecha.toLocaleDateString('es-CO', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            const horaStr = fecha.toLocaleTimeString('es-CO', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const metodoPagoTexto = metodoPagoSeleccionado === 'transferencia' ? 'TRANSFERENCIA' : 'EFECTIVO';
+            const nombreRestaurante = currentUser.nombreRestaurante || 'RESTAURANTE';
+
+            // Generar filas de productos
+            const productosHTML = pedidoParaImprimir.items.map(item => {
+                const nombre = item.productoInfo ? item.productoInfo.nombre :
+                    (item.nombreProducto || 'Producto');
+                const cantidad = item.cantidad;
+                const precio = item.precio;
+                const subtotal = cantidad * precio;
+
+                return `
             <tr>
                 <td>${nombre}</td>
                 <td style="text-align: center;">${cantidad}</td>
@@ -2105,12 +2217,12 @@ function crearElementoImpresion() {
                 <td style="text-align: right; font-weight: bold;">$${subtotal.toLocaleString('es-CO')}</td>
             </tr>
         `;
-    }).join('');
-    
-    // Crear contenedor de impresión
-    const printContainer = document.createElement('div');
-    printContainer.id = 'print-container';
-    printContainer.innerHTML = `
+            }).join('');
+
+            // Crear contenedor de impresión
+            const printContainer = document.createElement('div');
+            printContainer.id = 'print-container';
+            printContainer.innerHTML = `
         <div class="print-header">
             <h1>${nombreRestaurante}</h1>
             <div class="print-subtitle">FACTURA DE VENTA</div>
@@ -2165,405 +2277,415 @@ function crearElementoImpresion() {
             <p>Vuelva pronto</p>
         </div>
     `;
-    
-    document.body.appendChild(printContainer);
-}
 
-function removerElementoImpresion() {
-    const printContainer = document.getElementById('print-container');
-    if (printContainer) {
-        printContainer.remove();
-    }
-}
+            document.body.appendChild(printContainer);
+        }
 
-function generarComandosESCPOS() {
-    const ESC = 0x1B;
-    const GS = 0x1D;
-    const LF = 0x0A;
-    const comandos = [];
-    
-    // Inicializar impresora
-    comandos.push(ESC, 0x40);
-    
-    // Centrar texto
-    comandos.push(ESC, 0x61, 0x01);
-    
-    // Negrita ON
-    comandos.push(ESC, 0x45, 0x01);
-    
-    // Nombre del restaurante
-    const nombreRestaurante = currentUser.nombreRestaurante || 'RESTAURANTE';
-    agregarTexto(comandos, nombreRestaurante);
-    comandos.push(LF);
-    
-    // Negrita OFF
-    comandos.push(ESC, 0x45, 0x00);
-    
-    // Información adicional
-    agregarTexto(comandos, '================================');
-    comandos.push(LF);
-    agregarTexto(comandos, 'FACTURA DE VENTA');
-    comandos.push(LF);
-    agregarTexto(comandos, '================================');
-    comandos.push(LF, LF);
-    
-    // Alinear a la izquierda
-    comandos.push(ESC, 0x61, 0x00);
-    
-    // Fecha y hora
-    const fecha = new Date(pedidoParaImprimir.createdAt);
-    const fechaStr = fecha.toLocaleDateString('es-CO');
-    const horaStr = fecha.toLocaleTimeString('es-CO');
-    agregarTexto(comandos, `Fecha: ${fechaStr}`);
-    comandos.push(LF);
-    agregarTexto(comandos, `Hora: ${horaStr}`);
-    comandos.push(LF);
-    
-    // Mesa
-    agregarTexto(comandos, `Mesa: ${pedidoParaImprimir.mesa}`);
-    comandos.push(LF);
-    
-    // Método de pago
-    const metodoPagoTexto = metodoPagoSeleccionado === 'transferencia' ? 'TRANSFERENCIA' : 'EFECTIVO';
-    agregarTexto(comandos, `Metodo de pago: ${metodoPagoTexto}`);
-    comandos.push(LF, LF);
-    
-    // Línea separadora
-    agregarTexto(comandos, '--------------------------------');
-    comandos.push(LF);
-    
-    // Encabezado de productos
-    agregarTexto(comandos, 'PRODUCTO        CANT   PRECIO   TOTAL');
-    comandos.push(LF);
-    agregarTexto(comandos, '--------------------------------');
-    comandos.push(LF);
-    
-    // Lista de productos
-    pedidoParaImprimir.items.forEach(item => {
-        const nombre = item.productoInfo ? item.productoInfo.nombre : 
-                      (item.nombreProducto || 'Producto');
-        const cantidad = item.cantidad;
-        const precio = item.precio;
-        const subtotal = cantidad * precio;
-        
-        // Formatear línea de producto (limitando nombre a 15 caracteres)
-        const nombreCorto = nombre.substring(0, 15).padEnd(15);
-        const cantStr = String(cantidad).padStart(4);
-        const precioStr = formatearPrecio(precio).padStart(8);
-        const totalStr = formatearPrecio(subtotal).padStart(8);
-        
-        agregarTexto(comandos, `${nombreCorto} ${cantStr} ${precioStr} ${totalStr}`);
-        comandos.push(LF);
-    });
-    
-    // Línea separadora
-    agregarTexto(comandos, '--------------------------------');
-    comandos.push(LF);
-    
-    // Total
-    comandos.push(ESC, 0x45, 0x01); // Negrita ON
-    agregarTexto(comandos, `TOTAL: $${pedidoParaImprimir.total.toLocaleString('es-CO')}`);
-    comandos.push(LF);
-    comandos.push(ESC, 0x45, 0x00); // Negrita OFF
-    
-    comandos.push(LF, LF);
-    
-    // Centrar
-    comandos.push(ESC, 0x61, 0x01);
-    agregarTexto(comandos, 'Gracias por su compra!');
-    comandos.push(LF);
-    agregarTexto(comandos, 'Vuelva pronto');
-    comandos.push(LF, LF, LF);
-    
-    // Cortar papel
-    comandos.push(GS, 0x56, 0x00);
-    
-    return new Uint8Array(comandos);
-}
-
-function agregarTexto(comandos, texto) {
-    for (let i = 0; i < texto.length; i++) {
-        comandos.push(texto.charCodeAt(i));
-    }
-}
-
-function formatearPrecio(precio) {
-    return `$${precio.toLocaleString('es-CO')}`;
-}
-
-
-
-// Debe estar ASÍ:
-
-async function actualizarEstadoPedido(orderId, newStatus, metodoPago = null) {
-    const token = localStorage.getItem('token');
-
-    console.log('📤 Enviando petición:');
-    console.log('  - Order ID:', orderId);
-    console.log('  - Estado:', newStatus);
-    console.log('  - Método de pago:', metodoPago);
-
-    if (!orderId || orderId === 'null' || orderId === 'undefined') {
-        console.error('❌ Order ID inválido:', orderId);
-        alert('Error: ID de pedido inválido');
-        return;
-    }
-
-    // 🔒 BLOQUEAR TODOS LOS BOTONES DEL PEDIDO
-    const orderCard = document.getElementById(`order-card-${orderId}`);
-    if (orderCard) {
-        const botones = orderCard.querySelectorAll('.btn-action, button[onclick*="cambiarEstadoProducto"]');
-        botones.forEach(btn => {
-            btn.disabled = true;
-            btn.style.opacity = '0.5';
-            btn.style.cursor = 'not-allowed';
-            // Guardar el contenido original
-            btn.dataset.originalContent = btn.innerHTML;
-            // Mostrar spinner
-            if (btn.classList.contains('btn-action')) {
-                btn.innerHTML = '<span class="loading-spinner" style="display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite;"></span>';
+        function removerElementoImpresion() {
+            const printContainer = document.getElementById('print-container');
+            if (printContainer) {
+                printContainer.remove();
             }
-        });
-    }
-
-    try {
-        const body = { 
-            estado: newStatus
-        };
-        
-        // ✅ SOLO agregar actualizarTodosLosProductos si NO es cancelado
-        if (newStatus !== 'cancelado') {
-            body.actualizarTodosLosProductos = true;
-        }
-        
-        // SOLO agregar metodoPago si existe Y el estado es 'entregado'
-        if (metodoPago && newStatus === 'entregado') {
-            body.metodoPago = metodoPago;
         }
 
-        console.log('  - Body:', JSON.stringify(body, null, 2));
-        console.log('  - URL:', `${API_URL}/orders/${orderId}/estado`);
+        function generarComandosESCPOS() {
+            const ESC = 0x1B;
+            const GS = 0x1D;
+            const LF = 0x0A;
+            const comandos = [];
 
-        const response = await fetch(`${API_URL}/orders/${orderId}/estado`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(body)
-        });
+            // Inicializar impresora
+            comandos.push(ESC, 0x40);
 
-        console.log('📥 Respuesta del servidor:');
-        console.log('  - Status:', response.status);
-        console.log('  - Status Text:', response.statusText);
+            // Centrar texto
+            comandos.push(ESC, 0x61, 0x01);
 
-        const data = await response.json();
-        console.log('  - Data:', data);
+            // Negrita ON
+            comandos.push(ESC, 0x45, 0x01);
 
-        if (data.success) {
-            console.log('✅ Pedido actualizado correctamente');
-            await loadOrders();
-        } else {
-            console.error('❌ Error del servidor:', data.message);
-            alert('Error: ' + data.message);
-            // 🔓 RESTAURAR BOTONES EN CASO DE ERROR
+            // Nombre del restaurante
+            const nombreRestaurante = currentUser.nombreRestaurante || 'RESTAURANTE';
+            agregarTexto(comandos, nombreRestaurante);
+            comandos.push(LF);
+
+            // Negrita OFF
+            comandos.push(ESC, 0x45, 0x00);
+
+            // Información adicional
+            agregarTexto(comandos, '================================');
+            comandos.push(LF);
+            agregarTexto(comandos, 'FACTURA DE VENTA');
+            comandos.push(LF);
+            agregarTexto(comandos, '================================');
+            comandos.push(LF, LF);
+
+            // Alinear a la izquierda
+            comandos.push(ESC, 0x61, 0x00);
+
+            // Fecha y hora
+            const fecha = new Date(pedidoParaImprimir.createdAt);
+            const fechaStr = fecha.toLocaleDateString('es-CO');
+            const horaStr = fecha.toLocaleTimeString('es-CO');
+            agregarTexto(comandos, `Fecha: ${fechaStr}`);
+            comandos.push(LF);
+            agregarTexto(comandos, `Hora: ${horaStr}`);
+            comandos.push(LF);
+
+            // Mesa
+            agregarTexto(comandos, `Mesa: ${pedidoParaImprimir.mesa}`);
+            comandos.push(LF);
+
+            // Método de pago
+            const metodoPagoTexto = metodoPagoSeleccionado === 'transferencia' ? 'TRANSFERENCIA' : 'EFECTIVO';
+            agregarTexto(comandos, `Metodo de pago: ${metodoPagoTexto}`);
+            comandos.push(LF, LF);
+
+            // Línea separadora
+            agregarTexto(comandos, '--------------------------------');
+            comandos.push(LF);
+
+            // Encabezado de productos
+            agregarTexto(comandos, 'PRODUCTO        CANT   PRECIO   TOTAL');
+            comandos.push(LF);
+            agregarTexto(comandos, '--------------------------------');
+            comandos.push(LF);
+
+            // Lista de productos
+            pedidoParaImprimir.items.forEach(item => {
+                const nombre = item.productoInfo ? item.productoInfo.nombre :
+                    (item.nombreProducto || 'Producto');
+                const cantidad = item.cantidad;
+                const precio = item.precio;
+                const subtotal = cantidad * precio;
+
+                // Formatear línea de producto (limitando nombre a 15 caracteres)
+                const nombreCorto = nombre.substring(0, 15).padEnd(15);
+                const cantStr = String(cantidad).padStart(4);
+                const precioStr = formatearPrecio(precio).padStart(8);
+                const totalStr = formatearPrecio(subtotal).padStart(8);
+
+                agregarTexto(comandos, `${nombreCorto} ${cantStr} ${precioStr} ${totalStr}`);
+                comandos.push(LF);
+            });
+
+            // Línea separadora
+            agregarTexto(comandos, '--------------------------------');
+            comandos.push(LF);
+
+            // Total
+            comandos.push(ESC, 0x45, 0x01); // Negrita ON
+            agregarTexto(comandos, `TOTAL: $${pedidoParaImprimir.total.toLocaleString('es-CO')}`);
+            comandos.push(LF);
+            comandos.push(ESC, 0x45, 0x00); // Negrita OFF
+
+            comandos.push(LF, LF);
+
+            // Centrar
+            comandos.push(ESC, 0x61, 0x01);
+            agregarTexto(comandos, 'Gracias por su compra!');
+            comandos.push(LF);
+            agregarTexto(comandos, 'Vuelva pronto');
+            comandos.push(LF, LF, LF);
+
+            // Cortar papel
+            comandos.push(GS, 0x56, 0x00);
+
+            return new Uint8Array(comandos);
+        }
+
+        function agregarTexto(comandos, texto) {
+            for (let i = 0; i < texto.length; i++) {
+                comandos.push(texto.charCodeAt(i));
+            }
+        }
+
+        function formatearPrecio(precio) {
+            return `$${precio.toLocaleString('es-CO')}`;
+        }
+
+
+
+        // Debe estar ASÍ:
+
+        async function actualizarEstadoPedido(orderId, newStatus, metodoPago = null) {
+            const token = localStorage.getItem('token');
+
+            console.log('📤 Enviando petición:');
+            console.log('  - Order ID:', orderId);
+            console.log('  - Estado:', newStatus);
+            console.log('  - Método de pago:', metodoPago);
+
+            if (!orderId || orderId === 'null' || orderId === 'undefined') {
+                console.error('❌ Order ID inválido:', orderId);
+                alert('Error: ID de pedido inválido');
+                return;
+            }
+
+            // 🔒 BLOQUEAR TODOS LOS BOTONES DEL PEDIDO
+            const orderCard = document.getElementById(`order-card-${orderId}`);
             if (orderCard) {
                 const botones = orderCard.querySelectorAll('.btn-action, button[onclick*="cambiarEstadoProducto"]');
                 botones.forEach(btn => {
-                    btn.disabled = false;
-                    btn.style.opacity = '1';
-                    btn.style.cursor = 'pointer';
-                    if (btn.dataset.originalContent) {
-                        btn.innerHTML = btn.dataset.originalContent;
+                    btn.disabled = true;
+                    btn.style.opacity = '0.5';
+                    btn.style.cursor = 'not-allowed';
+                    // Guardar el contenido original
+                    btn.dataset.originalContent = btn.innerHTML;
+                    // Mostrar spinner
+                    if (btn.classList.contains('btn-action')) {
+                        btn.innerHTML = '<span class="loading-spinner" style="display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite;"></span>';
                     }
                 });
             }
-        }
-    } catch (error) {
-        console.error('❌ Error en la petición:', error);
-        alert('Error al actualizar el estado: ' + error.message);
-        // 🔓 RESTAURAR BOTONES EN CASO DE ERROR
-        if (orderCard) {
-            const botones = orderCard.querySelectorAll('.btn-action, button[onclick*="cambiarEstadoProducto"]');
-            botones.forEach(btn => {
-                btn.disabled = false;
-                btn.style.opacity = '1';
-                btn.style.cursor = 'pointer';
-                if (btn.dataset.originalContent) {
-                    btn.innerHTML = btn.dataset.originalContent;
+
+            try {
+                const body = {
+                    estado: newStatus
+                };
+
+                // ✅ SOLO agregar actualizarTodosLosProductos si NO es cancelado
+                if (newStatus !== 'cancelado') {
+                    body.actualizarTodosLosProductos = true;
                 }
-            });
+
+                // SOLO agregar metodoPago si existe Y el estado es 'entregado'
+                if (metodoPago && newStatus === 'entregado') {
+                    body.metodoPago = metodoPago;
+                }
+
+                console.log('  - Body:', JSON.stringify(body, null, 2));
+                console.log('  - URL:', `${API_URL}/orders/${orderId}/estado`);
+
+                const response = await fetch(`${API_URL}/orders/${orderId}/estado`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                console.log('📥 Respuesta del servidor:');
+                console.log('  - Status:', response.status);
+                console.log('  - Status Text:', response.statusText);
+
+                const data = await response.json();
+                console.log('  - Data:', data);
+
+                if (data.success) {
+                    console.log('✅ Pedido actualizado correctamente');
+                    await loadOrders();
+                } else {
+                    console.error('❌ Error del servidor:', data.message);
+                    alert('Error: ' + data.message);
+                    // 🔓 RESTAURAR BOTONES EN CASO DE ERROR
+                    if (orderCard) {
+                        const botones = orderCard.querySelectorAll('.btn-action, button[onclick*="cambiarEstadoProducto"]');
+                        botones.forEach(btn => {
+                            btn.disabled = false;
+                            btn.style.opacity = '1';
+                            btn.style.cursor = 'pointer';
+                            if (btn.dataset.originalContent) {
+                                btn.innerHTML = btn.dataset.originalContent;
+                            }
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Error en la petición:', error);
+                alert('Error al actualizar el estado: ' + error.message);
+                // 🔓 RESTAURAR BOTONES EN CASO DE ERROR
+                if (orderCard) {
+                    const botones = orderCard.querySelectorAll('.btn-action, button[onclick*="cambiarEstadoProducto"]');
+                    botones.forEach(btn => {
+                        btn.disabled = false;
+                        btn.style.opacity = '1';
+                        btn.style.cursor = 'pointer';
+                        if (btn.dataset.originalContent) {
+                            btn.innerHTML = btn.dataset.originalContent;
+                        }
+                    });
+                }
+            }
         }
-    }
-}
 
-async function cancelOrder(orderId) {
-    if (!confirm('¿Está seguro de cancelar este pedido?')) return;
-    await actualizarEstadoPedido(orderId, 'cancelado', null);
-}
-
-function toggleMenu() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-    
-    sidebar.classList.toggle('active');
-    overlay.classList.toggle('active');
-}
-
-function logout() {
-    if (confirm('¿Cerrar sesión?')) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('usuario');
-        window.location.href = 'index.html';
-    }
-}
-
-
-// ========================
-// SISTEMA DE TIEMPO REAL PARA PEDIDOS
-// ========================
-
-let lastOrderCountPedidos = 0;
-let isFirstLoadPedidos = true;
-let pollingIntervalPedidos = null;
-
-const notificationSoundPedidos = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGmi/7OSfTRAMUKvj8LJgGgU7k9XxxncpBSh+zPLaizsKGGS56+mjUhELTKXh8bllHAU2jdTxxnkqBSh+zPPaizsKGGS56+mjUhELTKXh8bllHAU2jdTxxnkqBSh+zPPaizsKGGS56+mjUhELTKXh8bllHAU2jdTxxnkqBSh+zPPaizsKGGS56+mjUhELTKXh8bllHAU2jdTxxnkqBSh+zPPaizsKGGS56+mjUhELTKXh8bllHAU2jdTxxnkqBQ==');
-
-function playNotificationSoundPedidos() {
-    notificationSoundPedidos.play().catch(e => console.log('No se pudo reproducir el sonido:', e));
-}
-
-async function autoRefreshOrdersPedidos() {
-    // Si no hay usuario, no hacer refresh
-    if (!currentUser || !currentUser._id) {
-        return;
-    }
-    
-    const token = localStorage.getItem('token');
-    if (!token) {
-        console.warn('⚠️ No hay token, deteniendo auto-refresh');
-        if (pollingIntervalPedidos) {
-            clearInterval(pollingIntervalPedidos);
+        async function cancelOrder(orderId) {
+            if (!confirm('¿Está seguro de cancelar este pedido?')) return;
+            await actualizarEstadoPedido(orderId, 'cancelado', null);
         }
-        return;
-    }
-    
-    const estado = document.getElementById('filterEstado')?.value || '';
-    
-    let url = `${API_URL}/orders?userId=${currentUser._id}`;
-    if (estado) url += `&estado=${estado}`;
-    
-    try {
-        const response = await fetch(url, {
-            headers: { 
-                'Authorization': `Bearer ${token}`,
-                'Cache-Control': 'no-cache'
-            },
-            signal: AbortSignal.timeout(5000) // Timeout de 5 segundos
-        });
 
-        if (!response.ok) {
-            if (response.status === 401) {
-                console.warn('⚠️ Token expirado en auto-refresh');
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function logout() {
+            if (confirm('¿Cerrar sesión?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('usuario');
+                window.location.href = 'index.html';
+            }
+        }
+
+
+        // ========================
+        // SISTEMA DE TIEMPO REAL PARA PEDIDOS
+        // ========================
+
+        let lastOrderCountPedidos = 0;
+        let isFirstLoadPedidos = true;
+        let pollingIntervalPedidos = null;
+
+        const notificationSoundPedidos = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGmi/7OSfTRAMUKvj8LJgGgU7k9XxxncpBSh+zPLaizsKGGS56+mjUhELTKXh8bllHAU2jdTxxnkqBSh+zPPaizsKGGS56+mjUhELTKXh8bllHAU2jdTxxnkqBSh+zPPaizsKGGS56+mjUhELTKXh8bllHAU2jdTxxnkqBSh+zPPaizsKGGS56+mjUhELTKXh8bllHAU2jdTxxnkqBSh+zPPaizsKGGS56+mjUhELTKXh8bllHAU2jdTxxnkqBQ==');
+
+        function playNotificationSoundPedidos() {
+            notificationSoundPedidos.play().catch(e => console.log('No se pudo reproducir el sonido:', e));
+        }
+
+        async function autoRefreshOrdersPedidos() {
+            // Si no hay usuario, no hacer refresh
+            if (!currentUser || !currentUser._id) {
+                return;
+            }
+
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.warn('⚠️ No hay token, deteniendo auto-refresh');
                 if (pollingIntervalPedidos) {
                     clearInterval(pollingIntervalPedidos);
                 }
                 return;
             }
-            throw new Error(`HTTP ${response.status}`);
-        }
 
-        const data = await response.json();
-        
-        if (data.success) {
-            const newOrders = data.data;
-            
-            // Detectar cambios en los pedidos existentes
-            const currentOrdersString = JSON.stringify(newOrders.map(o => ({ 
-                id: o._id, 
-                estado: o.estado,
-                itemsCount: o.items.length,
-                total: o.total
-            })));
-            
-            const previousOrdersString = JSON.stringify((window.previousOrders || []).map(o => ({ 
-                id: o._id, 
-                estado: o.estado,
-                itemsCount: o.items.length,
-                total: o.total
-            })));
-            
-            // Si hay cambios, actualizar
-            if (currentOrdersString !== previousOrdersString) {
-                displayOrders(newOrders);
-                document.getElementById('orderCount').textContent = data.count;
-                
-                // Detectar nuevo pedido
-                if (!isFirstLoadPedidos && newOrders.length > lastOrderCountPedidos) {
-                    playNotificationSoundPedidos();
-                    mostrarNotificacionExito('🔔 Nuevo pedido recibido');
+            const estado = document.getElementById('filterEstado')?.value || '';
+
+            let url = `${API_URL}/orders?userId=${currentUser._id}`;
+            if (estado) url += `&estado=${estado}`;
+
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Cache-Control': 'no-cache'
+                    },
+                    signal: AbortSignal.timeout(5000) // Timeout de 5 segundos
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        console.warn('⚠️ Token expirado en auto-refresh');
+                        if (pollingIntervalPedidos) {
+                            clearInterval(pollingIntervalPedidos);
+                        }
+                        return;
+                    }
+                    throw new Error(`HTTP ${response.status}`);
                 }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const newOrders = data.data;
+
+                    // Detectar cambios en los pedidos existentes
+                    const currentOrdersString = JSON.stringify(newOrders.map(o => ({
+                        id: o._id,
+                        estado: o.estado,
+                        itemsCount: o.items.length,
+                        total: o.total
+                    })));
+
+                    const previousOrdersString = JSON.stringify((window.previousOrders || []).map(o => ({
+                        id: o._id,
+                        estado: o.estado,
+                        itemsCount: o.items.length,
+                        total: o.total
+                    })));
+
+                    // Si hay cambios, actualizar
+                    if (currentOrdersString !== previousOrdersString) {
+                        displayOrders(newOrders);
+                        document.getElementById('orderCount').textContent = data.count;
+
+                        // Detectar nuevo pedido
+                        if (!isFirstLoadPedidos && newOrders.length > lastOrderCountPedidos) {
+                            const newestOrder = newOrders[0];
+                            playNotificationSoundPedidos();
+
+                            if (newestOrder.source === 'mandao') {
+                                mostrarNotificacionExito('🚲 ¡TIENES UN MANDAO!');
+                                // Alerta visual más fuerte para Mandao
+                                if (typeof alertarNuevoPedidoMandao === 'function') {
+                                    alertarNuevoPedidoMandao();
+                                }
+                            } else {
+                                mostrarNotificacionExito('🔔 Nuevo pedido recibido');
+                            }
+                        }
+                    }
+
+                    window.previousOrders = newOrders;
+                    lastOrderCountPedidos = newOrders.length;
+                    isFirstLoadPedidos = false;
+                }
+            } catch (error) {
+                // Solo mostrar error si no es timeout o network error común
+                if (error.name !== 'TimeoutError' && error.name !== 'AbortError') {
+                    console.warn('⚠️ Error en auto-refresh (se reintentará):', error.message);
+                }
+                // No hacer nada, simplemente esperar al siguiente ciclo
             }
-            
-            window.previousOrders = newOrders;
-            lastOrderCountPedidos = newOrders.length;
-            isFirstLoadPedidos = false;
         }
-    } catch (error) {
-        // Solo mostrar error si no es timeout o network error común
-        if (error.name !== 'TimeoutError' && error.name !== 'AbortError') {
-            console.warn('⚠️ Error en auto-refresh (se reintentará):', error.message);
+        // Iniciar polling cuando currentUser esté listo
+        const waitForUserPedidos = setInterval(() => {
+            if (currentUser && currentUser._id) {
+                clearInterval(waitForUserPedidos);
+                pollingIntervalPedidos = setInterval(autoRefreshOrdersPedidos, 3000);
+                console.log('✅ Sistema de tiempo real activado en Pedidos');
+            }
+        }, 100);
+
+        window.addEventListener('beforeunload', () => {
+            if (pollingIntervalPedidos) {
+                clearInterval(pollingIntervalPedidos);
+            }
+        });
+
+
+        // ============================================
+        // SISTEMA DE ESTADOS INDIVIDUALES POR PRODUCTO
+        // ============================================
+
+        let modalEstadoProductoData = null;
+
+        function cambiarEstadoProducto(orderId, itemIndex, cantidadTotal, estadoActual) {
+            modalEstadoProductoData = { orderId, itemIndex, cantidadTotal, estadoActual };
+
+            // Determinar siguiente estado
+            const siguienteEstado = obtenerSiguienteEstado(estadoActual);
+
+            if (cantidadTotal === 1) {
+                // Si es solo 1, cambiar directamente
+                actualizarEstadoProducto(orderId, itemIndex, 1, siguienteEstado);
+            } else {
+                // Mostrar modal para seleccionar cantidad
+                mostrarModalCantidadProducto(cantidadTotal, siguienteEstado);
+            }
         }
-        // No hacer nada, simplemente esperar al siguiente ciclo
-    }
-}
-// Iniciar polling cuando currentUser esté listo
-const waitForUserPedidos = setInterval(() => {
-    if (currentUser && currentUser._id) {
-        clearInterval(waitForUserPedidos);
-        pollingIntervalPedidos = setInterval(autoRefreshOrdersPedidos, 3000);
-        console.log('✅ Sistema de tiempo real activado en Pedidos');
-    }
-}, 100);
 
-window.addEventListener('beforeunload', () => {
-    if (pollingIntervalPedidos) {
-        clearInterval(pollingIntervalPedidos);
-    }
-});
+        function obtenerSiguienteEstado(estadoActual) {
+            const flujo = ['pendiente', 'preparando', 'listo', 'pagado'];
+            const index = flujo.indexOf(estadoActual);
+            return flujo[index + 1] || 'pagado';
+        }
 
-
-// ============================================
-// SISTEMA DE ESTADOS INDIVIDUALES POR PRODUCTO
-// ============================================
-
-let modalEstadoProductoData = null;
-
-function cambiarEstadoProducto(orderId, itemIndex, cantidadTotal, estadoActual) {
-    modalEstadoProductoData = { orderId, itemIndex, cantidadTotal, estadoActual };
-    
-    // Determinar siguiente estado
-    const siguienteEstado = obtenerSiguienteEstado(estadoActual);
-    
-    if (cantidadTotal === 1) {
-        // Si es solo 1, cambiar directamente
-        actualizarEstadoProducto(orderId, itemIndex, 1, siguienteEstado);
-    } else {
-        // Mostrar modal para seleccionar cantidad
-        mostrarModalCantidadProducto(cantidadTotal, siguienteEstado);
-    }
-}
-
-function obtenerSiguienteEstado(estadoActual) {
-    const flujo = ['pendiente', 'preparando', 'listo', 'pagado'];
-    const index = flujo.indexOf(estadoActual);
-    return flujo[index + 1] || 'pagado';
-}
-
-function mostrarModalCantidadProducto(cantidadTotal, siguienteEstado) {
-    const modal = document.createElement('div');
-    modal.id = 'modalCantidadProducto';
-    modal.style.cssText = `
+        function mostrarModalCantidadProducto(cantidadTotal, siguienteEstado) {
+            const modal = document.createElement('div');
+            modal.id = 'modalCantidadProducto';
+            modal.style.cssText = `
         position: fixed;
         top: 0;
         left: 0;
@@ -2576,14 +2698,14 @@ function mostrarModalCantidadProducto(cantidadTotal, siguienteEstado) {
         justify-content: center;
         animation: fadeIn 0.2s ease;
     `;
-    
-    const emojiEstado = {
-        'preparando': '👨‍🍳',
-        'listo': '✅',
-        'pagado': '🎉'
-    }[siguienteEstado];
-    
-    modal.innerHTML = `
+
+            const emojiEstado = {
+                'preparando': '👨‍🍳',
+                'listo': '✅',
+                'pagado': '🎉'
+            }[siguienteEstado];
+
+            modal.innerHTML = `
         <div style="background: white; border-radius: 16px; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: slideUp 0.3s ease;">
             <h3 style="font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 1rem; text-align: center;">
                 ${emojiEstado} Cambiar a ${siguienteEstado}
@@ -2615,117 +2737,117 @@ function mostrarModalCantidadProducto(cantidadTotal, siguienteEstado) {
             </div>
         </div>
     `;
-    
-    document.body.appendChild(modal);
-}
 
-function ajustarCantidadModal(delta) {
-    const display = document.getElementById('cantidadSeleccionada');
-    let cantidad = parseInt(display.textContent);
-    cantidad = Math.max(1, Math.min(modalEstadoProductoData.cantidadTotal, cantidad + delta));
-    display.textContent = cantidad;
-}
+            document.body.appendChild(modal);
+        }
 
-function cerrarModalCantidadProducto() {
-    const modal = document.getElementById('modalCantidadProducto');
-    if (modal) {
-        modal.style.animation = 'fadeOut 0.2s ease';
-        setTimeout(() => modal.remove(), 200);
-    }
-    modalEstadoProductoData = null;
-}
+        function ajustarCantidadModal(delta) {
+            const display = document.getElementById('cantidadSeleccionada');
+            let cantidad = parseInt(display.textContent);
+            cantidad = Math.max(1, Math.min(modalEstadoProductoData.cantidadTotal, cantidad + delta));
+            display.textContent = cantidad;
+        }
 
-async function confirmarCambioEstadoProducto(nuevoEstado) {
-    const cantidad = parseInt(document.getElementById('cantidadSeleccionada').textContent);
-    
-    // Guardar los datos ANTES de cerrar el modal
-    const { orderId, itemIndex } = modalEstadoProductoData;
-    
-    cerrarModalCantidadProducto();
-    
-    await actualizarEstadoProducto(
-        orderId,
-        itemIndex,
-        cantidad,
-        nuevoEstado
-    );
-}
-
-
-async function actualizarEstadoProducto(orderId, itemIndex, cantidadCambiar, nuevoEstado) {
-    const token = localStorage.getItem('token');
-    
-    // 🔒 BLOQUEAR EL BOTÓN ESPECÍFICO
-    const orderCard = document.getElementById(`order-card-${orderId}`);
-    let botonClickeado = null;
-    
-    if (orderCard) {
-        const botones = orderCard.querySelectorAll('button[onclick*="cambiarEstadoProducto"]');
-        botones.forEach(btn => {
-            if (btn.onclick && btn.onclick.toString().includes(`'${orderId}'`) && 
-                btn.onclick.toString().includes(`${itemIndex}`)) {
-                botonClickeado = btn;
-                btn.disabled = true;
-                btn.style.opacity = '0.5';
-                btn.style.cursor = 'not-allowed';
-                btn.innerHTML = '⏳';
+        function cerrarModalCantidadProducto() {
+            const modal = document.getElementById('modalCantidadProducto');
+            if (modal) {
+                modal.style.animation = 'fadeOut 0.2s ease';
+                setTimeout(() => modal.remove(), 200);
             }
-        });
-    }
-    
-    try {
-        const response = await fetch(`${API_URL}/orders/${orderId}/item/${itemIndex}/estado`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                cantidadCambiar,
+            modalEstadoProductoData = null;
+        }
+
+        async function confirmarCambioEstadoProducto(nuevoEstado) {
+            const cantidad = parseInt(document.getElementById('cantidadSeleccionada').textContent);
+
+            // Guardar los datos ANTES de cerrar el modal
+            const { orderId, itemIndex } = modalEstadoProductoData;
+
+            cerrarModalCantidadProducto();
+
+            await actualizarEstadoProducto(
+                orderId,
+                itemIndex,
+                cantidad,
                 nuevoEstado
-            })
-        });
+            );
+        }
 
-        const data = await response.json();
 
-        if (data.success) {
-            // Si todos los productos están entregados, preguntar método de pago
-            if (data.todosEntregados) {
-                currentOrderIdForPayment = orderId;
-                mostrarModalMetodoPago();
-            } else {
-                await loadOrders();
+        async function actualizarEstadoProducto(orderId, itemIndex, cantidadCambiar, nuevoEstado) {
+            const token = localStorage.getItem('token');
+
+            // 🔒 BLOQUEAR EL BOTÓN ESPECÍFICO
+            const orderCard = document.getElementById(`order-card-${orderId}`);
+            let botonClickeado = null;
+
+            if (orderCard) {
+                const botones = orderCard.querySelectorAll('button[onclick*="cambiarEstadoProducto"]');
+                botones.forEach(btn => {
+                    if (btn.onclick && btn.onclick.toString().includes(`'${orderId}'`) &&
+                        btn.onclick.toString().includes(`${itemIndex}`)) {
+                        botonClickeado = btn;
+                        btn.disabled = true;
+                        btn.style.opacity = '0.5';
+                        btn.style.cursor = 'not-allowed';
+                        btn.innerHTML = '⏳';
+                    }
+                });
             }
-            
-            // Animación de éxito
-            mostrarNotificacionExito(`Producto marcado como ${nuevoEstado}`);
-        } else {
-            alert('Error: ' + data.message);
-            // 🔓 RESTAURAR BOTÓN EN CASO DE ERROR
-            if (botonClickeado) {
-                botonClickeado.disabled = false;
-                botonClickeado.style.opacity = '1';
-                botonClickeado.style.cursor = 'pointer';
-                botonClickeado.innerHTML = '▶️';
+
+            try {
+                const response = await fetch(`${API_URL}/orders/${orderId}/item/${itemIndex}/estado`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        cantidadCambiar,
+                        nuevoEstado
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Si todos los productos están entregados, preguntar método de pago
+                    if (data.todosEntregados) {
+                        currentOrderIdForPayment = orderId;
+                        mostrarModalMetodoPago();
+                    } else {
+                        await loadOrders();
+                    }
+
+                    // Animación de éxito
+                    mostrarNotificacionExito(`Producto marcado como ${nuevoEstado}`);
+                } else {
+                    alert('Error: ' + data.message);
+                    // 🔓 RESTAURAR BOTÓN EN CASO DE ERROR
+                    if (botonClickeado) {
+                        botonClickeado.disabled = false;
+                        botonClickeado.style.opacity = '1';
+                        botonClickeado.style.cursor = 'pointer';
+                        botonClickeado.innerHTML = '▶️';
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al actualizar el estado del producto');
+                // 🔓 RESTAURAR BOTÓN EN CASO DE ERROR
+                if (botonClickeado) {
+                    botonClickeado.disabled = false;
+                    botonClickeado.style.opacity = '1';
+                    botonClickeado.style.cursor = 'pointer';
+                    botonClickeado.innerHTML = '▶️';
+                }
             }
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error al actualizar el estado del producto');
-        // 🔓 RESTAURAR BOTÓN EN CASO DE ERROR
-        if (botonClickeado) {
-            botonClickeado.disabled = false;
-            botonClickeado.style.opacity = '1';
-            botonClickeado.style.cursor = 'pointer';
-            botonClickeado.innerHTML = '▶️';
-        }
-    }
-}
 
-function mostrarNotificacionExito(mensaje) {
-    const notif = document.createElement('div');
-    notif.textContent = mensaje;
-    notif.style.cssText = `
+        function mostrarNotificacionExito(mensaje) {
+            const notif = document.createElement('div');
+            notif.textContent = mensaje;
+            notif.style.cssText = `
         position: fixed;
         top: 80px;
         right: 20px;
@@ -2739,17 +2861,17 @@ function mostrarNotificacionExito(mensaje) {
         z-index: 10000;
         animation: slideInRight 0.3s ease-out;
     `;
-    document.body.appendChild(notif);
-    
-    setTimeout(() => {
-        notif.style.animation = 'slideOutRight 0.3s ease-out';
-        setTimeout(() => notif.remove(), 300);
-    }, 2500);
-}
+            document.body.appendChild(notif);
 
-// Agregar estilos de animación
-const style = document.createElement('style');
-style.textContent = `
+            setTimeout(() => {
+                notif.style.animation = 'slideOutRight 0.3s ease-out';
+                setTimeout(() => notif.remove(), 300);
+            }, 2500);
+        }
+
+        // Agregar estilos de animación
+        const style = document.createElement('style');
+        style.textContent = `
     @keyframes fadeIn {
         from { opacity: 0; }
         to { opacity: 1; }
@@ -2762,94 +2884,125 @@ style.textContent = `
         from { transform: translateY(30px); opacity: 0; }
         to { transform: translateY(0); opacity: 1; }
     }
+
+    .notificacion-mandao-alert {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(245, 158, 11, 0.95);
+        color: white;
+        padding: 2rem 4rem;
+        border-radius: 20px;
+        font-size: 24px;
+        font-weight: 900;
+        z-index: 20000;
+        box-shadow: 0 0 100px rgba(245, 158, 11, 0.5);
+        border: 4px solid white;
+        text-align: center;
+        animation: shake 0.5s infinite, fadeInOut 3s forwards;
+        pointer-events: none;
+    }
 `;
-document.head.appendChild(style);
+        document.head.appendChild(style);
+
+        function alertarNuevoPedidoMandao() {
+            const alert = document.createElement('div');
+            alert.className = 'notificacion-mandao-alert';
+            alert.innerHTML = `
+        <div style="font-size: 60px; margin-bottom: 10px;">🚲</div>
+        <div>¡TIENES UN MANDAO!</div>
+        <div style="font-size: 16px; margin-top: 10px; font-weight: normal;">Revisa la lista de pedidos</div>
+    `;
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 3000);
+        }
 
 
-// ========================
-// SISTEMA DE EDICIÓN DE PEDIDOS
-// ========================
+        // ========================
+        // SISTEMA DE EDICIÓN DE PEDIDOS
+        // ========================
 
-let currentEditOrderId = null;
-let currentEditOrder = null;
-let editSelectedItems = [];
-let editAvailableProductsList = []; // ✅ GUARDAR LISTA GLOBAL
+        let currentEditOrderId = null;
+        let currentEditOrder = null;
+        let editSelectedItems = [];
+        let editAvailableProductsList = []; // ✅ GUARDAR LISTA GLOBAL
 
-async function abrirModalEditar(orderId) {
-    currentEditOrderId = orderId;
-    
-    // ✅ MOSTRAR MODAL INMEDIATAMENTE con loading
-    document.getElementById('modalEditarPedido').style.display = 'flex';
-    document.getElementById('editProductsList').innerHTML = '<p style="text-align: center; color: #667eea; padding: 2rem;">⏳ Cargando...</p>';
-    
-    // Obtener los datos completos del pedido
-    const token = localStorage.getItem('token');
-    try {
-        const response = await fetch(`${API_URL}/orders/${orderId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await response.json();
-        
-        if (data.success) {
-            currentEditOrder = data.data;
-            
-            // Llenar el formulario
-            document.getElementById('editMesa').value = currentEditOrder.mesa;
-            document.getElementById('editNotas').value = currentEditOrder.notas || '';
-            
-            // Convertir items del pedido a formato de edición
-            editSelectedItems = currentEditOrder.items.map(item => ({
-                producto: {
-                    _id: item.producto ? (item.producto._id || item.producto) : item.producto,
-                    nombre: item.productoInfo ? item.productoInfo.nombre : item.nombreProducto,
-                    precio: item.precio,
-                    categoria: item.productoInfo ? item.productoInfo.categoria : item.categoriaProducto
-                },
-                cantidad: item.cantidad
-            }));
-            
-            actualizarListaProductosEdicion();
-            
-            // ✅ USAR CACHE si ya existe, si no cargar
-            if (allProductsCache.length > 0) {
-                mostrarProductosDisponiblesEdicion(allProductsCache);
-            } else {
-                await cargarProductosParaEdicion();
+        async function abrirModalEditar(orderId) {
+            currentEditOrderId = orderId;
+
+            // ✅ MOSTRAR MODAL INMEDIATAMENTE con loading
+            document.getElementById('modalEditarPedido').style.display = 'flex';
+            document.getElementById('editProductsList').innerHTML = '<p style="text-align: center; color: #667eea; padding: 2rem;">⏳ Cargando...</p>';
+
+            // Obtener los datos completos del pedido
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_URL}/orders/${orderId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    currentEditOrder = data.data;
+
+                    // Llenar el formulario
+                    document.getElementById('editMesa').value = currentEditOrder.mesa;
+                    document.getElementById('editNotas').value = currentEditOrder.notas || '';
+
+                    // Convertir items del pedido a formato de edición
+                    editSelectedItems = currentEditOrder.items.map(item => ({
+                        producto: {
+                            _id: item.producto ? (item.producto._id || item.producto) : item.producto,
+                            nombre: item.productoInfo ? item.productoInfo.nombre : item.nombreProducto,
+                            precio: item.precio,
+                            categoria: item.productoInfo ? item.productoInfo.categoria : item.categoriaProducto
+                        },
+                        cantidad: item.cantidad
+                    }));
+
+                    actualizarListaProductosEdicion();
+
+                    // ✅ USAR CACHE si ya existe, si no cargar
+                    if (allProductsCache.length > 0) {
+                        mostrarProductosDisponiblesEdicion(allProductsCache);
+                    } else {
+                        await cargarProductosParaEdicion();
+                    }
+                }
+            } catch (error) {
+                console.error('Error al cargar pedido:', error);
+                alert('Error al cargar los datos del pedido');
+                cerrarModalEditar();
             }
         }
-    } catch (error) {
-        console.error('Error al cargar pedido:', error);
-        alert('Error al cargar los datos del pedido');
-        cerrarModalEditar();
-    }
-}
 
 
-function cerrarModalEditar() {
-    document.getElementById('modalEditarPedido').style.display = 'none';
-    const searchInput = document.getElementById('editSearchProduct');
-    if (searchInput) searchInput.value = '';
-    const container = document.getElementById('editAvailableProducts');
-    if (container) {
-        container.style.display = 'none';
-        container.innerHTML = '';
-    }
-    currentEditOrderId = null;
-    currentEditOrder = null;
-    editSelectedItems = [];
-    editAvailableProductsList = [];
-}
+        function cerrarModalEditar() {
+            document.getElementById('modalEditarPedido').style.display = 'none';
+            const searchInput = document.getElementById('editSearchProduct');
+            if (searchInput) searchInput.value = '';
+            const container = document.getElementById('editAvailableProducts');
+            if (container) {
+                container.style.display = 'none';
+                container.innerHTML = '';
+            }
+            currentEditOrderId = null;
+            currentEditOrder = null;
+            editSelectedItems = [];
+            editAvailableProductsList = [];
+        }
 
-function actualizarListaProductosEdicion() {
-    const container = document.getElementById('editProductsList');
-    
-    if (editSelectedItems.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: #a0aec0; padding: 1rem;">No hay productos en el pedido</p>';
-        document.getElementById('editTotalDisplay').textContent = '$0';
-        return;
-    }
-    
-    container.innerHTML = editSelectedItems.map((item, index) => `
+        function actualizarListaProductosEdicion() {
+            const container = document.getElementById('editProductsList');
+
+            if (editSelectedItems.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #a0aec0; padding: 1rem;">No hay productos en el pedido</p>';
+                document.getElementById('editTotalDisplay').textContent = '$0';
+                return;
+            }
+
+            container.innerHTML = editSelectedItems.map((item, index) => `
         <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
             <div style="flex: 1;">
                 <div style="font-weight: 600; color: #2d3748; font-size: 14px;">${item.producto.nombre}</div>
@@ -2872,113 +3025,113 @@ function actualizarListaProductosEdicion() {
             </div>
         </div>
     `).join('');
-    
-    const total = editSelectedItems.reduce((sum, item) => sum + (item.producto.precio * item.cantidad), 0);
-    document.getElementById('editTotalDisplay').textContent = `$${total.toLocaleString('es-CO')}`;
-}
 
-function cambiarCantidadEdicion(index, delta) {
-    editSelectedItems[index].cantidad += delta;
-    if (editSelectedItems[index].cantidad <= 0) {
-        editSelectedItems.splice(index, 1);
-    }
-    actualizarListaProductosEdicion();
-}
-
-function setCantidadEdicion(index, value) {
-    let cantidad = parseInt(value);
-    
-    if (isNaN(cantidad) || cantidad < 1) {
-        cantidad = 1;
-    }
-    
-    editSelectedItems[index].cantidad = cantidad;
-    actualizarListaProductosEdicion();
-}
-function eliminarProductoEdicion(index) {
-    if (confirm('¿Eliminar este producto del pedido?')) {
-        editSelectedItems.splice(index, 1);
-        actualizarListaProductosEdicion();
-    }
-}
-
-async function cargarProductosParaEdicion() {
-    // ✅ Si ya tenemos productos en cache, no recargar
-    if (allProductsCache.length > 0) {
-        mostrarProductosDisponiblesEdicion(allProductsCache);
-        return;
-    }
-    
-    const token = localStorage.getItem('token');
-    try {
-        const response = await fetch(`${API_URL}/products?userId=${currentUser._id}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await response.json();
-        
-        if (data.success) {
-            allProductsCache = data.data; // ✅ GUARDAR EN CACHE
-            console.log('📦 Productos cargados y cacheados:', allProductsCache.length);
-            mostrarProductosDisponiblesEdicion(allProductsCache);
+            const total = editSelectedItems.reduce((sum, item) => sum + (item.producto.precio * item.cantidad), 0);
+            document.getElementById('editTotalDisplay').textContent = `$${total.toLocaleString('es-CO')}`;
         }
-    } catch (error) {
-        console.error('Error al cargar productos:', error);
-        alert('Error al cargar productos');
-    }
-}
 
-function mostrarProductosDisponiblesEdicion(products) {
-    const container = document.getElementById('editAvailableProducts');
-    const searchInput = document.getElementById('editSearchProduct');
-    
-    // Limpiar el input
-    searchInput.value = '';
-    
-    // MOSTRAR TODOS LOS PRODUCTOS AL INICIO
-    container.style.display = 'block';
-    renderizarProductosEdicion(products, container);
-    
-    // REMOVER LISTENERS ANTERIORES
-    const newSearchInput = searchInput.cloneNode(true);
-    searchInput.parentNode.replaceChild(newSearchInput, searchInput);
-    
-    // Referenciar el nuevo input
-    const finalSearchInput = document.getElementById('editSearchProduct');
-    
-    // Agregar el event listener para búsqueda
-    finalSearchInput.addEventListener('input', (e) => {
-        const search = e.target.value.toLowerCase().trim();
-        
-        if (search.length > 0) {
-            const filtered = products.filter(p => 
-                p.nombre.toLowerCase().includes(search) || 
-                p.categoria.toLowerCase().includes(search)
-            );
-            
-            if (filtered.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #a0aec0; padding: 1rem;">No se encontraron productos</p>';
-            } else {
-                renderizarProductosEdicion(filtered, container);
+        function cambiarCantidadEdicion(index, delta) {
+            editSelectedItems[index].cantidad += delta;
+            if (editSelectedItems[index].cantidad <= 0) {
+                editSelectedItems.splice(index, 1);
             }
-        } else {
-            // Si borra la búsqueda, mostrar todos de nuevo
-            renderizarProductosEdicion(products, container);
+            actualizarListaProductosEdicion();
         }
-    });
-}
 
-function renderizarProductosEdicion(products, container) {
-    if (products.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: #a0aec0; padding: 1rem;">No hay productos</p>';
-        return;
-    }
-    
-    container.innerHTML = products.map(p => {
-        const isAgotado = !p.disponible;
-        const nombreEscapado = p.nombre.replace(/'/g, "\\'").replace(/"/g, '\\"');
-        const categoriaEscapada = p.categoria.replace(/'/g, "\\'").replace(/"/g, '\\"');
-        
-        return `
+        function setCantidadEdicion(index, value) {
+            let cantidad = parseInt(value);
+
+            if (isNaN(cantidad) || cantidad < 1) {
+                cantidad = 1;
+            }
+
+            editSelectedItems[index].cantidad = cantidad;
+            actualizarListaProductosEdicion();
+        }
+        function eliminarProductoEdicion(index) {
+            if (confirm('¿Eliminar este producto del pedido?')) {
+                editSelectedItems.splice(index, 1);
+                actualizarListaProductosEdicion();
+            }
+        }
+
+        async function cargarProductosParaEdicion() {
+            // ✅ Si ya tenemos productos en cache, no recargar
+            if (allProductsCache.length > 0) {
+                mostrarProductosDisponiblesEdicion(allProductsCache);
+                return;
+            }
+
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_URL}/products?userId=${currentUser._id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    allProductsCache = data.data; // ✅ GUARDAR EN CACHE
+                    console.log('📦 Productos cargados y cacheados:', allProductsCache.length);
+                    mostrarProductosDisponiblesEdicion(allProductsCache);
+                }
+            } catch (error) {
+                console.error('Error al cargar productos:', error);
+                alert('Error al cargar productos');
+            }
+        }
+
+        function mostrarProductosDisponiblesEdicion(products) {
+            const container = document.getElementById('editAvailableProducts');
+            const searchInput = document.getElementById('editSearchProduct');
+
+            // Limpiar el input
+            searchInput.value = '';
+
+            // MOSTRAR TODOS LOS PRODUCTOS AL INICIO
+            container.style.display = 'block';
+            renderizarProductosEdicion(products, container);
+
+            // REMOVER LISTENERS ANTERIORES
+            const newSearchInput = searchInput.cloneNode(true);
+            searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+
+            // Referenciar el nuevo input
+            const finalSearchInput = document.getElementById('editSearchProduct');
+
+            // Agregar el event listener para búsqueda
+            finalSearchInput.addEventListener('input', (e) => {
+                const search = e.target.value.toLowerCase().trim();
+
+                if (search.length > 0) {
+                    const filtered = products.filter(p =>
+                        p.nombre.toLowerCase().includes(search) ||
+                        p.categoria.toLowerCase().includes(search)
+                    );
+
+                    if (filtered.length === 0) {
+                        container.innerHTML = '<p style="text-align: center; color: #a0aec0; padding: 1rem;">No se encontraron productos</p>';
+                    } else {
+                        renderizarProductosEdicion(filtered, container);
+                    }
+                } else {
+                    // Si borra la búsqueda, mostrar todos de nuevo
+                    renderizarProductosEdicion(products, container);
+                }
+            });
+        }
+
+        function renderizarProductosEdicion(products, container) {
+            if (products.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #a0aec0; padding: 1rem;">No hay productos</p>';
+                return;
+            }
+
+            container.innerHTML = products.map(p => {
+                const isAgotado = !p.disponible;
+                const nombreEscapado = p.nombre.replace(/'/g, "\\'").replace(/"/g, '\\"');
+                const categoriaEscapada = p.categoria.replace(/'/g, "\\'").replace(/"/g, '\\"');
+
+                return `
             <div onclick="${isAgotado ? 'mostrarAgotadoEdicion(this)' : `agregarProductoEdicion('${p._id}', '${nombreEscapado}', ${p.precio}, '${categoriaEscapada}')`}" 
                  class="${isAgotado ? 'product-agotado-edit' : ''}"
                  style="padding: 12px; border-bottom: 1px solid #e2e8f0; cursor: ${isAgotado ? 'not-allowed' : 'pointer'}; transition: background 0.2s; display: flex; justify-content: space-between; align-items: center; ${isAgotado ? 'opacity: 0.6; background: #f7fafc;' : ''}" 
@@ -2996,17 +3149,17 @@ function renderizarProductosEdicion(products, container) {
                 </div>
             </div>
         `;
-    }).join('');
-}
+            }).join('');
+        }
 
-function mostrarAgotadoEdicion(elemento) {
-    // Efecto de shake
-    elemento.style.animation = 'shake 0.5s';
-    
-    // Mostrar mensaje temporal
-    const mensaje = document.createElement('div');
-    mensaje.textContent = '❌ Producto agotado';
-    mensaje.style.cssText = `
+        function mostrarAgotadoEdicion(elemento) {
+            // Efecto de shake
+            elemento.style.animation = 'shake 0.5s';
+
+            // Mostrar mensaje temporal
+            const mensaje = document.createElement('div');
+            mensaje.textContent = '❌ Producto agotado';
+            mensaje.style.cssText = `
         position: fixed;
         top: 50%;
         left: 50%;
@@ -3021,61 +3174,61 @@ function mostrarAgotadoEdicion(elemento) {
         z-index: 10001;
         animation: fadeInOut 2s ease-in-out;
     `;
-    document.body.appendChild(mensaje);
-    
-    // Remover mensaje después de 2 segundos
-    setTimeout(() => {
-        mensaje.remove();
-    }, 2000);
-    
-    // Resetear animación
-    setTimeout(() => {
-        elemento.style.animation = '';
-    }, 500);
-}
+            document.body.appendChild(mensaje);
 
+            // Remover mensaje después de 2 segundos
+            setTimeout(() => {
+                mensaje.remove();
+            }, 2000);
 
-function configurarBuscadorProductos() {
-    const searchInput = document.getElementById('editSearchProduct');
-    const container = document.getElementById('editAvailableProducts');
-    
-    // Limpiar
-    searchInput.value = '';
-    container.innerHTML = '';
-    container.style.display = 'none';
-    
-    // Remover listeners previos
-    const newInput = searchInput.cloneNode(true);
-    searchInput.parentNode.replaceChild(newInput, searchInput);
-    
-    // Agregar nuevo listener
-    document.getElementById('editSearchProduct').addEventListener('input', function(e) {
-        const search = e.target.value.toLowerCase().trim();
-        const container = document.getElementById('editAvailableProducts');
-        
-        if (search.length === 0) {
-            container.style.display = 'none';
-            container.innerHTML = '';
-            return;
+            // Resetear animación
+            setTimeout(() => {
+                elemento.style.animation = '';
+            }, 500);
         }
-        
-        const filtered = editAvailableProductsList.filter(p => 
-            p.nombre.toLowerCase().includes(search) || 
-            p.categoria.toLowerCase().includes(search)
-        );
-        
-        container.style.display = 'block';
-        
-        if (filtered.length === 0) {
-            container.innerHTML = '<p style="text-align: center; color: #a0aec0; padding: 1rem;">No se encontraron productos</p>';
-        } else {
-            container.innerHTML = filtered.map(p => {
-                const id = p._id;
-                const nombre = p.nombre.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
-                const categoria = p.categoria.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
-                const precio = p.precio;
-                
-                return `
+
+
+        function configurarBuscadorProductos() {
+            const searchInput = document.getElementById('editSearchProduct');
+            const container = document.getElementById('editAvailableProducts');
+
+            // Limpiar
+            searchInput.value = '';
+            container.innerHTML = '';
+            container.style.display = 'none';
+
+            // Remover listeners previos
+            const newInput = searchInput.cloneNode(true);
+            searchInput.parentNode.replaceChild(newInput, searchInput);
+
+            // Agregar nuevo listener
+            document.getElementById('editSearchProduct').addEventListener('input', function (e) {
+                const search = e.target.value.toLowerCase().trim();
+                const container = document.getElementById('editAvailableProducts');
+
+                if (search.length === 0) {
+                    container.style.display = 'none';
+                    container.innerHTML = '';
+                    return;
+                }
+
+                const filtered = editAvailableProductsList.filter(p =>
+                    p.nombre.toLowerCase().includes(search) ||
+                    p.categoria.toLowerCase().includes(search)
+                );
+
+                container.style.display = 'block';
+
+                if (filtered.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #a0aec0; padding: 1rem;">No se encontraron productos</p>';
+                } else {
+                    container.innerHTML = filtered.map(p => {
+                        const id = p._id;
+                        const nombre = p.nombre.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+                        const categoria = p.categoria.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+                        const precio = p.precio;
+
+                        return `
                     <div onclick="agregarProductoEdicion('${id}', '${nombre}', ${precio}, '${categoria}')" 
                          style="padding: 12px; border-bottom: 1px solid #e2e8f0; cursor: pointer; transition: background 0.2s; display: flex; justify-content: space-between; align-items: center;" 
                          onmouseover="this.style.background='white'" 
@@ -3087,197 +3240,236 @@ function configurarBuscadorProductos() {
                         <div style="font-size: 15px; font-weight: 700; color: #48bb78;">$${p.precio.toLocaleString('es-CO')}</div>
                     </div>
                 `;
-            }).join('');
-        }
-    });
-    
-    console.log('✅ Buscador configurado con', editAvailableProductsList.length, 'productos');
-}
+                    }).join('');
+                }
+            });
 
-function agregarProductoEdicion(id, nombre, precio, categoria) {
-    // Desescapar los datos que vienen del HTML
-    const nombreLimpio = nombre.replace(/\\'/g, "'").replace(/\\"/g, '"');
-    const categoriaLimpia = categoria.replace(/\\'/g, "'").replace(/\\"/g, '"');
-    
-    const existing = editSelectedItems.find(item => item.producto._id === id);
-    
-    if (existing) {
-        existing.cantidad++;
-        mostrarNotificacionExito(`➕ ${nombreLimpio} (x${existing.cantidad})`);
-    } else {
-        editSelectedItems.push({
-            producto: {
-                _id: id,
-                nombre: nombreLimpio,
-                precio: precio,
-                categoria: categoriaLimpia
-            },
-            cantidad: 1
-        });
-        mostrarNotificacionExito(`✅ ${nombreLimpio} agregado`);
-    }
-    
-    actualizarListaProductosEdicion();
-}
-async function guardarEdicionPedido() {
-    const mesa = document.getElementById('editMesa').value.trim();
-    const notas = document.getElementById('editNotas').value.trim();
-    
-    if (!mesa) {
-        alert('El número de mesa es obligatorio');
-        return;
-    }
-    
-    if (editSelectedItems.length === 0) {
-        alert('Debe haber al menos un producto en el pedido');
-        return;
-    }
-    
-    const updateData = {
-        mesa: mesa,
-        items: editSelectedItems.map(item => ({
-            producto: item.producto._id,
-            nombreProducto: item.producto.nombre,
-            categoriaProducto: item.producto.categoria,
-            cantidad: item.cantidad,
-            precio: item.producto.precio
-        })),
-        notas: notas
-    };
-    
-    const token = localStorage.getItem('token');
-    
-    try {
-        const response = await fetch(`${API_URL}/orders/${currentEditOrderId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(updateData)
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            mostrarNotificacionExito('✅ Pedido actualizado correctamente');
-            cerrarModalEditar();
-            await loadOrders();
-        } else {
-            alert('Error: ' + data.message);
+            console.log('✅ Buscador configurado con', editAvailableProductsList.length, 'productos');
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error al actualizar el pedido');
-    }
-}
+
+        function agregarProductoEdicion(id, nombre, precio, categoria) {
+            // Desescapar los datos que vienen del HTML
+            const nombreLimpio = nombre.replace(/\\'/g, "'").replace(/\\"/g, '"');
+            const categoriaLimpia = categoria.replace(/\\'/g, "'").replace(/\\"/g, '"');
+
+            const existing = editSelectedItems.find(item => item.producto._id === id);
+
+            if (existing) {
+                existing.cantidad++;
+                mostrarNotificacionExito(`➕ ${nombreLimpio} (x${existing.cantidad})`);
+            } else {
+                editSelectedItems.push({
+                    producto: {
+                        _id: id,
+                        nombre: nombreLimpio,
+                        precio: precio,
+                        categoria: categoriaLimpia
+                    },
+                    cantidad: 1
+                });
+                mostrarNotificacionExito(`✅ ${nombreLimpio} agregado`);
+            }
+
+            actualizarListaProductosEdicion();
+        }
+        async function guardarEdicionPedido() {
+            const mesa = document.getElementById('editMesa').value.trim();
+            const notas = document.getElementById('editNotas').value.trim();
+
+            if (!mesa) {
+                alert('El número de mesa es obligatorio');
+                return;
+            }
+
+            if (editSelectedItems.length === 0) {
+                alert('Debe haber al menos un producto en el pedido');
+                return;
+            }
+
+            const updateData = {
+                mesa: mesa,
+                items: editSelectedItems.map(item => ({
+                    producto: item.producto._id,
+                    nombreProducto: item.producto.nombre,
+                    categoriaProducto: item.producto.categoria,
+                    cantidad: item.cantidad,
+                    precio: item.producto.precio
+                })),
+                notas: notas
+            };
+
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch(`${API_URL}/orders/${currentEditOrderId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    mostrarNotificacionExito('✅ Pedido actualizado correctamente');
+                    cerrarModalEditar();
+                    await loadOrders();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al actualizar el pedido');
+            }
+        }
 
 
 
     </script>
 
-<!-- Modal para método de pago -->
-<div id="modalMetodoPago" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center;">
-    <div style="background: white; border-radius: 16px; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-        <h3 style="font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 1rem; text-align: center;">💳 Método de Pago</h3>
-        <p style="font-size: 14px; color: #718096; text-align: center; margin-bottom: 1.5rem;">Selecciona cómo se realizó el pago:</p>
-        
-        <div style="display: grid; gap: 1rem; margin-bottom: 1.5rem;">
-            <button onclick="confirmarMetodoPago('efectivo')" style="padding: 1rem; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                <span style="font-size: 24px;">💵</span>
-                <span>Efectivo</span>
-            </button>
-            
-            <button onclick="confirmarMetodoPago('transferencia')" style="padding: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                <span style="font-size: 24px;">📱</span>
-                <span>Transferencia</span>
-            </button>
-        </div>
-        
-        <button onclick="cerrarModalMetodoPago()" style="width: 100%; padding: 0.75rem; background: #e2e8f0; color: #2d3748; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">
-            Cancelar
-        </button>
-    </div>
-</div>
+    <!-- Modal para método de pago -->
+    <div id="modalMetodoPago"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center;">
+        <div
+            style="background: white; border-radius: 16px; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <h3 style="font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 1rem; text-align: center;">💳
+                Método de Pago</h3>
+            <p style="font-size: 14px; color: #718096; text-align: center; margin-bottom: 1.5rem;">Selecciona cómo se
+                realizó el pago:</p>
 
-<!-- Modal para confirmar impresión de factura -->
-<div id="modalConfirmarImpresion" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10001; align-items: center; justify-content: center;">
-    <div style="background: white; border-radius: 16px; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-        <h3 style="font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 1rem; text-align: center;">🖨️ Imprimir Factura</h3>
-        <p style="font-size: 14px; color: #718096; text-align: center; margin-bottom: 1.5rem;">¿Deseas imprimir la factura en la impresora POS?</p>
-        
-        <div style="display: grid; gap: 1rem;">
-            <button onclick="confirmarImpresion(true)" style="padding: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                <span style="font-size: 24px;">🖨️</span>
-                <span>Sí, imprimir</span>
-            </button>
-            
-            <button onclick="confirmarImpresion(false)" style="padding: 1rem; background: #e2e8f0; color: #2d3748; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
-                No imprimir
-            </button>
-        </div>
-    </div>
-</div>
+            <div style="display: grid; gap: 1rem; margin-bottom: 1.5rem;">
+                <button onclick="confirmarMetodoPago('efectivo')"
+                    style="padding: 1rem; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <span style="font-size: 24px;">💵</span>
+                    <span>Efectivo</span>
+                </button>
 
-<!-- Modal de estado de impresión -->
-<div id="modalEstadoImpresion" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 10002; align-items: center; justify-content: center;">
-    <div style="background: white; border-radius: 16px; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center;">
-        <div id="impresionSpinner" style="font-size: 48px; margin-bottom: 1rem;">⏳</div>
-        <h3 id="impresionTitulo" style="font-size: 18px; font-weight: 700; color: #1a202c; margin-bottom: 0.5rem;">Imprimiendo factura...</h3>
-        <p id="impresionMensaje" style="font-size: 14px; color: #718096;">Por favor, espere</p>
-    </div>
-</div>
-
-<!-- Modal para editar pedido -->
-<div id="modalEditarPedido" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center; overflow-y: auto; padding: 20px;">
-    <div style="background: white; border-radius: 16px; padding: 2rem; max-width: 500px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); margin: auto;">
-        <h3 style="font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 1rem;">✏️ Editar Pedido</h3>
-        
-        <div style="margin-bottom: 1.5rem;">
-            <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px;">Nombre/Número de Mesa</label>
-            <input type="text" id="editMesa" style="width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;" maxlength="20">
-        </div>
-
-        <div style="margin-bottom: 1.5rem;">
-            <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px;">Productos del Pedido</label>
-            <div id="editProductsList" style="max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; background: #f7fafc;">
-                <!-- Se llenará dinámicamente -->
+                <button onclick="confirmarMetodoPago('transferencia')"
+                    style="padding: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <span style="font-size: 24px;">📱</span>
+                    <span>Transferencia</span>
+                </button>
             </div>
-        </div>
 
-        <div style="margin-bottom: 1.5rem;">
-            <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px;">Agregar más productos (opcional)</label>
-            <div style="position: relative; margin-bottom: 10px;">
-                <input type="text" id="editSearchProduct" style="width: 100%; padding: 10px 14px 10px 38px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;" placeholder="Buscar producto...">
-                <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #a0aec0;">🔍</span>
-            </div>
-<div id="editAvailableProducts" style="max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; background: #f7fafc;">
-    <!-- Los productos aparecerán aquí automáticamente -->
-</div>
-        </div>
-
-        <div style="margin-bottom: 1.5rem;">
-            <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px;">Notas</label>
-            <textarea id="editNotas" style="width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; resize: vertical; min-height: 80px;" maxlength="500"></textarea>
-        </div>
-
-        <div style="background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
-            <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: 700; color: #48bb78;">
-                <span>Total:</span>
-                <span id="editTotalDisplay">$0</span>
-            </div>
-        </div>
-
-        <div style="display: grid; gap: 0.75rem;">
-            <button onclick="guardarEdicionPedido()" style="padding: 1rem; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer;">
-                ✅ Guardar Cambios
-            </button>
-            <button onclick="cerrarModalEditar()" style="padding: 0.75rem; background: #e2e8f0; color: #2d3748; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">
+            <button onclick="cerrarModalMetodoPago()"
+                style="width: 100%; padding: 0.75rem; background: #e2e8f0; color: #2d3748; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">
                 Cancelar
             </button>
         </div>
     </div>
-</div>
+
+    <!-- Modal para confirmar impresión de factura -->
+    <div id="modalConfirmarImpresion"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10001; align-items: center; justify-content: center;">
+        <div
+            style="background: white; border-radius: 16px; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <h3 style="font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 1rem; text-align: center;">🖨️
+                Imprimir Factura</h3>
+            <p style="font-size: 14px; color: #718096; text-align: center; margin-bottom: 1.5rem;">¿Deseas imprimir la
+                factura en la impresora POS?</p>
+
+            <div style="display: grid; gap: 1rem;">
+                <button onclick="confirmarImpresion(true)"
+                    style="padding: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <span style="font-size: 24px;">🖨️</span>
+                    <span>Sí, imprimir</span>
+                </button>
+
+                <button onclick="confirmarImpresion(false)"
+                    style="padding: 1rem; background: #e2e8f0; color: #2d3748; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                    No imprimir
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de estado de impresión -->
+    <div id="modalEstadoImpresion"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 10002; align-items: center; justify-content: center;">
+        <div
+            style="background: white; border-radius: 16px; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center;">
+            <div id="impresionSpinner" style="font-size: 48px; margin-bottom: 1rem;">⏳</div>
+            <h3 id="impresionTitulo" style="font-size: 18px; font-weight: 700; color: #1a202c; margin-bottom: 0.5rem;">
+                Imprimiendo factura...</h3>
+            <p id="impresionMensaje" style="font-size: 14px; color: #718096;">Por favor, espere</p>
+        </div>
+    </div>
+
+    <!-- Modal para editar pedido -->
+    <div id="modalEditarPedido"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center; overflow-y: auto; padding: 20px;">
+        <div
+            style="background: white; border-radius: 16px; padding: 2rem; max-width: 500px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); margin: auto;">
+            <h3 style="font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 1rem;">✏️ Editar Pedido</h3>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label
+                    style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px;">Nombre/Número
+                    de Mesa</label>
+                <input type="text" id="editMesa"
+                    style="width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;"
+                    maxlength="20">
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label
+                    style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px;">Productos
+                    del Pedido</label>
+                <div id="editProductsList"
+                    style="max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; background: #f7fafc;">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label
+                    style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px;">Agregar
+                    más productos (opcional)</label>
+                <div style="position: relative; margin-bottom: 10px;">
+                    <input type="text" id="editSearchProduct"
+                        style="width: 100%; padding: 10px 14px 10px 38px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;"
+                        placeholder="Buscar producto...">
+                    <span
+                        style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #a0aec0;">🔍</span>
+                </div>
+                <div id="editAvailableProducts"
+                    style="max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; background: #f7fafc;">
+                    <!-- Los productos aparecerán aquí automáticamente -->
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label
+                    style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px;">Notas</label>
+                <textarea id="editNotas"
+                    style="width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; resize: vertical; min-height: 80px;"
+                    maxlength="500"></textarea>
+            </div>
+
+            <div
+                style="background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+                <div
+                    style="display: flex; justify-content: space-between; font-size: 18px; font-weight: 700; color: #48bb78;">
+                    <span>Total:</span>
+                    <span id="editTotalDisplay">$0</span>
+                </div>
+            </div>
+
+            <div style="display: grid; gap: 0.75rem;">
+                <button onclick="guardarEdicionPedido()"
+                    style="padding: 1rem; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer;">
+                    ✅ Guardar Cambios
+                </button>
+                <button onclick="cerrarModalEditar()"
+                    style="padding: 0.75rem; background: #e2e8f0; color: #2d3748; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
 
 </body>
+
 </html>
