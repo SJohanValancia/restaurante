@@ -90,26 +90,12 @@ async function sendPushNotification(token, titulo, mensaje, data = {}) {
             timestamp: Date.now().toString(),
             click_action: '/seguimiento.html'
         },
-        // ✅ Android: Máxima prioridad para heads-up
+        // Android: Máxima prioridad para heads-up
         android: {
             priority: 'high',
             ttl: 60 * 1000, // 1 minuto TTL
-            // Sin notification aquí - todo a través de data
         },
-        // ✅ APNs (iOS): Alta prioridad
-        apns: {
-            payload: {
-                aps: {
-                    'content-available': 1,
-                    sound: 'default'
-                }
-            },
-            headers: {
-                'apns-priority': '10',
-                'apns-push-type': 'background'
-            }
-        },
-        // ✅ Web Push: Configuración de urgencia
+        // Web Push: Configuración de urgencia
         webpush: {
             headers: {
                 'Urgency': 'high',
