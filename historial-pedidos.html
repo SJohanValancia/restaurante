@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,14 +29,14 @@
             background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
             padding: 0;
             z-index: 1000;
-            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
         }
 
         .sidebar-header {
             padding: 1.5rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .sidebar-brand {
@@ -66,28 +67,28 @@
 
         .brand-text p {
             font-size: 11px;
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
             margin: 2px 0 0 0;
         }
 
-.sidebar-nav {
-    padding: 1rem 0;
-    max-height: calc(100vh - 250px);
-    overflow-y: auto;
-}
+        .sidebar-nav {
+            padding: 1rem 0;
+            max-height: calc(100vh - 250px);
+            overflow-y: auto;
+        }
 
-.sidebar-nav::-webkit-scrollbar {
-    width: 6px;
-}
+        .sidebar-nav::-webkit-scrollbar {
+            width: 6px;
+        }
 
-.sidebar-nav::-webkit-scrollbar-track {
-    background: rgba(255,255,255,0.05);
-}
+        .sidebar-nav::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
 
-.sidebar-nav::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.2);
-    border-radius: 3px;
-}
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
 
         .nav-section {
             margin-bottom: 1.5rem;
@@ -97,7 +98,7 @@
             padding: 0.5rem 1.5rem;
             font-size: 11px;
             font-weight: 700;
-            color: rgba(255,255,255,0.5);
+            color: rgba(255, 255, 255, 0.5);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -107,7 +108,7 @@
             align-items: center;
             gap: 12px;
             padding: 12px 1.5rem;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
             transition: all 0.2s;
             font-size: 14px;
@@ -116,7 +117,7 @@
         }
 
         .nav-item:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             color: white;
         }
 
@@ -147,8 +148,8 @@
             left: 0;
             right: 0;
             padding: 1.5rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .user-info {
@@ -179,7 +180,7 @@
 
         .user-details p {
             font-size: 11px;
-            color: rgba(255,255,255,0.6);
+            color: rgba(255, 255, 255, 0.6);
             margin: 2px 0 0 0;
         }
 
@@ -232,7 +233,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 999;
             display: none;
         }
@@ -287,7 +288,7 @@
 
         .stat-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
 
         .stat-header {
@@ -307,11 +308,25 @@
             font-size: 20px;
         }
 
-        .stat-icon.blue { background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); }
-        .stat-icon.green { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); }
-        .stat-icon.purple { background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%); }
-        .stat-icon.orange { background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); }
-        .stat-icon.red { background: linear-gradient(135deg, #fc8181 0%, #f56565 100%); }
+        .stat-icon.blue {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+        }
+
+        .stat-icon.green {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+
+        .stat-icon.purple {
+            background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+        }
+
+        .stat-icon.orange {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+        }
+
+        .stat-icon.red {
+            background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+        }
 
         .stat-label {
             font-size: 12px;
@@ -445,7 +460,7 @@
 
         .order-card:hover {
             border-color: #cbd5e0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
         .order-header {
@@ -504,14 +519,103 @@
             background: #c6f6d5;
             color: #22543d;
         }
-.status-entregado {
-    background: #c6f6d5;
-    color: #22543d;
-}
+
+        .status-entregado {
+            background: #c6f6d5;
+            color: #22543d;
+        }
 
         .status-cancelado {
             background: #fed7d7;
             color: #742a2a;
+        }
+
+        /* ESTILOS MANDAO */
+        .source-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-right: 8px;
+        }
+
+        .source-mandao {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        .mandao-icon {
+            color: #d97706;
+        }
+
+        .order-card.mandao-order {
+            border-left: 5px solid #f59e0b;
+        }
+
+        .notificacion-mandao-alert {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(245, 158, 11, 0.95);
+            color: white;
+            padding: 40px 60px;
+            border-radius: 24px;
+            z-index: 100000;
+            font-size: 32px;
+            font-weight: 900;
+            box-shadow: 0 0 100px rgba(245, 158, 11, 0.5);
+            border: 4px solid white;
+            text-align: center;
+            animation: shake 0.5s infinite, fadeInOut 3s forwards;
+            pointer-events: none;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            25% {
+                transform: translate(-52%, -48%) rotate(-2deg);
+            }
+
+            75% {
+                transform: translate(-48%, -52%) rotate(2deg);
+            }
+        }
+
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+
+            15% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+
+            25% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            85% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
         }
 
         .order-items {
@@ -676,283 +780,295 @@
             }
         }
 
-@keyframes slideInRight {
-    from {
-        transform: translateX(400px);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
 
-@keyframes slideOutRight {
-    from {
-        transform: translateX(0);
-        opacity: 1;
-    }
-    to {
-        transform: translateX(400px);
-        opacity: 0;
-    }
-}
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
 
 
-@keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.2); opacity: 0.8; }
-}
+        @keyframes pulse {
 
-/* FILTRO DE PLATOS */
-.filter-platos-container {
-    display: flex;
-    gap: 1rem;
-    align-items: flex-end;
-}
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
 
-.btn-cambiar-estado-global {
-    padding: 10px 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-}
+            50% {
+                transform: scale(1.2);
+                opacity: 0.8;
+            }
+        }
 
-.btn-cambiar-estado-global:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
+        /* FILTRO DE PLATOS */
+        .filter-platos-container {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+        }
 
-.btn-cambiar-estado-global:disabled {
-    background: #cbd5e0;
-    cursor: not-allowed;
-    transform: none;
-}
+        .btn-cambiar-estado-global {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
 
-/* CARD DE NOTAS */
-.notas-card {
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-}
+        .btn-cambiar-estado-global:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
 
-.notas-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 2px solid #e2e8f0;
-}
+        .btn-cambiar-estado-global:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+        }
 
-.notas-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: #1a202c;
-}
+        /* CARD DE NOTAS */
+        .notas-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
 
-.notas-count {
-    background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
-    color: white;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-}
+        .notas-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
 
-.notas-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    max-height: 300px;
-    overflow-y: auto;
-}
+        .notas-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a202c;
+        }
 
-.notas-list::-webkit-scrollbar {
-    width: 6px;
-}
+        .notas-count {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
 
-.notas-list::-webkit-scrollbar-track {
-    background: #f7fafc;
-    border-radius: 3px;
-}
+        .notas-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
 
-.notas-list::-webkit-scrollbar-thumb {
-    background: #cbd5e0;
-    border-radius: 3px;
-}
+        .notas-list::-webkit-scrollbar {
+            width: 6px;
+        }
 
-.nota-item {
-    background: #fff5e1;
-    border-left: 3px solid #f6ad55;
-    padding: 0.75rem 1rem;
-    border-radius: 6px;
-    font-size: 13px;
-    color: #744210;
-}
+        .notas-list::-webkit-scrollbar-track {
+            background: #f7fafc;
+            border-radius: 3px;
+        }
 
-.nota-mesa {
-    font-weight: 700;
-    color: #c05621;
-    margin-bottom: 4px;
-}
+        .notas-list::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
 
-.notas-empty {
-    text-align: center;
-    padding: 2rem;
-    color: #a0aec0;
-    font-style: italic;
-}
+        .nota-item {
+            background: #fff5e1;
+            border-left: 3px solid #f6ad55;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #744210;
+        }
 
-/* ==========================================
+        .nota-mesa {
+            font-weight: 700;
+            color: #c05621;
+            margin-bottom: 4px;
+        }
+
+        .notas-empty {
+            text-align: center;
+            padding: 2rem;
+            color: #a0aec0;
+            font-style: italic;
+        }
+
+        /* ==========================================
    ESTILOS DE IMPRESIÓN
    ========================================== */
 
-/* Ocultar el contenedor de impresión en pantalla */
-#print-container {
-    display: none;
-}
+        /* Ocultar el contenedor de impresión en pantalla */
+        #print-container {
+            display: none;
+        }
 
-/* Estilos para cuando se imprime */
-@media print {
-    /* Ocultar todo excepto el contenedor de impresión */
-    body > *:not(#print-container) {
-        display: none !important;
-    }
-    
-    #print-container {
-        display: block !important;
-    }
-    
-    /* Configuración de página */
-    @page {
-        size: 80mm auto;
-        margin: 0;
-    }
-    
-    body {
-        margin: 0;
-        padding: 0;
-        font-family: 'Courier New', monospace;
-        font-size: 12px;
-        line-height: 1.4;
-    }
-    
-    #print-container {
-        width: 80mm;
-        padding: 10mm;
-    }
-    
-    .print-header {
-        text-align: center;
-        margin-bottom: 15px;
-        padding-bottom: 10px;
-        border-bottom: 2px solid #000;
-    }
-    
-    .print-header h1 {
-        font-size: 18px;
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-    
-    .print-subtitle {
-        font-size: 10px;
-        color: #666;
-    }
-    
-    .print-info-section {
-        margin-bottom: 15px;
-        padding-bottom: 10px;
-        border-bottom: 1px dashed #000;
-    }
-    
-    .print-info-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 3px;
-        font-size: 11px;
-    }
-    
-    .print-info-label {
-        font-weight: bold;
-    }
-    
-    .print-metodo-pago {
-        text-align: center;
-        font-size: 12px;
-        font-weight: bold;
-        padding: 8px;
-        background: #f0f0f0;
-        border-radius: 5px;
-        margin: 10px 0;
-    }
-    
-    .print-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 15px;
-    }
-    
-    .print-table th {
-        background: #f0f0f0;
-        padding: 8px 4px;
-        text-align: left;
-        font-size: 11px;
-        font-weight: bold;
-        border-top: 1px solid #000;
-        border-bottom: 1px solid #000;
-    }
-    
-    .print-table td {
-        padding: 8px 4px;
-        font-size: 11px;
-        border-bottom: 1px dashed #ddd;
-    }
-    
-    .print-total-section {
-        margin-top: 15px;
-        padding-top: 10px;
-        border-top: 2px solid #000;
-    }
-    
-    .print-total-row {
-        display: flex;
-        justify-content: space-between;
-        font-size: 16px;
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-    
-    .print-footer {
-        text-align: center;
-        margin-top: 20px;
-        padding-top: 10px;
-        border-top: 1px dashed #000;
-        font-size: 11px;
-    }
-    
-    .print-footer p {
-        margin: 5px 0;
-    }
-}
+        /* Estilos para cuando se imprime */
+        @media print {
 
+            /* Ocultar todo excepto el contenedor de impresión */
+            body>*:not(#print-container) {
+                display: none !important;
+            }
+
+            #print-container {
+                display: block !important;
+            }
+
+            /* Configuración de página */
+            @page {
+                size: 80mm auto;
+                margin: 0;
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+                font-family: 'Courier New', monospace;
+                font-size: 12px;
+                line-height: 1.4;
+            }
+
+            #print-container {
+                width: 80mm;
+                padding: 10mm;
+            }
+
+            .print-header {
+                text-align: center;
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+                border-bottom: 2px solid #000;
+            }
+
+            .print-header h1 {
+                font-size: 18px;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+
+            .print-subtitle {
+                font-size: 10px;
+                color: #666;
+            }
+
+            .print-info-section {
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+                border-bottom: 1px dashed #000;
+            }
+
+            .print-info-row {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 3px;
+                font-size: 11px;
+            }
+
+            .print-info-label {
+                font-weight: bold;
+            }
+
+            .print-metodo-pago {
+                text-align: center;
+                font-size: 12px;
+                font-weight: bold;
+                padding: 8px;
+                background: #f0f0f0;
+                border-radius: 5px;
+                margin: 10px 0;
+            }
+
+            .print-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 15px;
+            }
+
+            .print-table th {
+                background: #f0f0f0;
+                padding: 8px 4px;
+                text-align: left;
+                font-size: 11px;
+                font-weight: bold;
+                border-top: 1px solid #000;
+                border-bottom: 1px solid #000;
+            }
+
+            .print-table td {
+                padding: 8px 4px;
+                font-size: 11px;
+                border-bottom: 1px dashed #ddd;
+            }
+
+            .print-total-section {
+                margin-top: 15px;
+                padding-top: 10px;
+                border-top: 2px solid #000;
+            }
+
+            .print-total-row {
+                display: flex;
+                justify-content: space-between;
+                font-size: 16px;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+
+            .print-footer {
+                text-align: center;
+                margin-top: 20px;
+                padding-top: 10px;
+                border-top: 1px dashed #000;
+                font-size: 11px;
+            }
+
+            .print-footer p {
+                margin: 5px 0;
+            }
+        }
     </style>
 </head>
+
 <body>
     <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">☰</button>
-    
+
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
 
     <aside class="sidebar" id="sidebar">
@@ -966,7 +1082,7 @@
             </a>
         </div>
 
-     <nav class="sidebar-nav">
+        <nav class="sidebar-nav">
             <div class="nav-section">
                 <div class="nav-section-title">Principal</div>
                 <a href="productos.html" class="nav-item">
@@ -1007,23 +1123,23 @@
                 </a>
             </div>
 
-    <!-- SOLO PARA ADMINISTRADORES -->
-    <div class="nav-section" id="adminSection" style="display: none;">
-        <div class="nav-section-title">Administración</div>
-        <a href="administrador.html" class="nav-item">
-            <span class="nav-icon">👥</span>
-            <span>Gestión de Meseros</span>
-        </a>
-        <a href="liquidacion.html" class="nav-item">
-            <span class="nav-icon">💵</span>
-            <span>Liquidación</span>
-        </a>
-        <a href="historial-liquidaciones.html" class="nav-item">
-            <span class="nav-icon">📋</span>
-            <span>Hist. Liquidaciones</span>
-        </a>
-    </div>
-</nav>
+            <!-- SOLO PARA ADMINISTRADORES -->
+            <div class="nav-section" id="adminSection" style="display: none;">
+                <div class="nav-section-title">Administración</div>
+                <a href="administrador.html" class="nav-item">
+                    <span class="nav-icon">👥</span>
+                    <span>Gestión de Meseros</span>
+                </a>
+                <a href="liquidacion.html" class="nav-item">
+                    <span class="nav-icon">💵</span>
+                    <span>Liquidación</span>
+                </a>
+                <a href="historial-liquidaciones.html" class="nav-item">
+                    <span class="nav-icon">📋</span>
+                    <span>Hist. Liquidaciones</span>
+                </a>
+            </div>
+        </nav>
 
         <div class="sidebar-footer">
             <div class="user-info">
@@ -1087,76 +1203,82 @@
             </div>
 
             <!-- Filtros -->
-           <!-- Filtros -->
-<div class="filters-card">
-    <div class="filters-header">
-        <h2 class="filters-title">🔍 Filtros de Búsqueda</h2>
-        <button class="btn-clear" onclick="clearFilters()">Limpiar Filtros</button>
-    </div>
-    <div class="filters-grid">
-        <div class="filter-group">
-            <label class="filter-label">Estado</label>
-            <select id="filterEstado" class="filter-select" onchange="applyFilters()">
-                <option value="">Todos los estados</option>
-                <option value="activos">📋 Activos (sin entregados)</option>
-                <option value="pendiente">Pendientes</option>
-                <option value="preparando">Preparando</option>
-                <option value="listo">Listos</option>
-                <option value="entregado">Pagado</option>
-                <option value="cancelado">Cancelados</option>
-            </select>
-        </div>
-        <div class="filter-group">
-            <label class="filter-label">Mesa</label>
-            <input type="text" id="filterMesa" class="filter-input" placeholder="Nombre/Número de mesa" maxlength="20" onchange="applyFilters()">
-        </div>
-        <div class="filter-group">
-            <label class="filter-label">Desde</label>
-            <input type="date" id="filterFechaDesde" class="filter-input" onchange="applyFilters()">
-        </div>
-        <div class="filter-group">
-            <label class="filter-label">Hasta</label>
-            <input type="date" id="filterFechaHasta" class="filter-input" onchange="applyFilters()">
-        </div>
-        <div class="filter-group">
-            <label class="filter-label">Buscar</label>
-            <input type="text" id="filterSearch" class="filter-input" placeholder="Producto, notas..." oninput="applyFilters()">
-        </div>
-    </div>
-    
-    <!-- NUEVO: Filtro por plato -->
-    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid #e2e8f0;">
-        <div class="filter-platos-container">
-            <div class="filter-group" style="flex: 1;">
-                <label class="filter-label">🍽️ Filtrar por Plato</label>
-                <select id="filterPlato" class="filter-select" onchange="applyFilters()">
-                    <option value="">Todos los platos</option>
-                </select>
-            </div>
-            <button 
-                id="btnCambiarEstadoGlobal" 
-                class="btn-cambiar-estado-global" 
-                onclick="cambiarEstadoGlobal()"
-                disabled
-            >
-                <span>⚡</span>
-                <span id="textoBotonGlobal">Cambiar Estado Global</span>
-            </button>
-        </div>
-    </div>
-</div>
+            <!-- Filtros -->
+            <div class="filters-card">
+                <div class="filters-header">
+                    <h2 class="filters-title">🔍 Filtros de Búsqueda</h2>
+                    <button class="btn-clear" onclick="clearFilters()">Limpiar Filtros</button>
+                </div>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label class="filter-label">Estado</label>
+                        <select id="filterEstado" class="filter-select" onchange="applyFilters()">
+                            <option value="">Todos los estados</option>
+                            <option value="activos">📋 Activos (sin entregados)</option>
+                            <option value="pendiente">Pendientes</option>
+                            <option value="preparando">Preparando</option>
+                            <option value="listo">Listos</option>
+                            <option value="entregado">Pagado</option>
+                            <option value="cancelado">Cancelados</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Origen</label>
+                        <select id="filterOrigen" class="filter-select" onchange="applyFilters()">
+                            <option value="">Todos los orígenes</option>
+                            <option value="local">🏠 Local</option>
+                            <option value="mandao">🚲 Mandao</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Mesa</label>
+                        <input type="text" id="filterMesa" class="filter-input" placeholder="Nombre/Número de mesa"
+                            maxlength="20" onchange="applyFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Desde</label>
+                        <input type="date" id="filterFechaDesde" class="filter-input" onchange="applyFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Hasta</label>
+                        <input type="date" id="filterFechaHasta" class="filter-input" onchange="applyFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Buscar</label>
+                        <input type="text" id="filterSearch" class="filter-input" placeholder="Producto, notas..."
+                            oninput="applyFilters()">
+                    </div>
+                </div>
 
-<!-- NUEVO: Card de Notas -->
-<div class="notas-card" id="notasCard" style="display: none;">
-    <div class="notas-header">
-        <span style="font-size: 24px;">📝</span>
-        <h3 class="notas-title">Notas de Pedidos</h3>
-        <span class="notas-count" id="notasCount">0</span>
-    </div>
-    <div class="notas-list" id="notasList">
-        <div class="notas-empty">No hay notas en los pedidos mostrados</div>
-    </div>
-</div>
+                <!-- NUEVO: Filtro por plato -->
+                <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid #e2e8f0;">
+                    <div class="filter-platos-container">
+                        <div class="filter-group" style="flex: 1;">
+                            <label class="filter-label">🍽️ Filtrar por Plato</label>
+                            <select id="filterPlato" class="filter-select" onchange="applyFilters()">
+                                <option value="">Todos los platos</option>
+                            </select>
+                        </div>
+                        <button id="btnCambiarEstadoGlobal" class="btn-cambiar-estado-global"
+                            onclick="cambiarEstadoGlobal()" disabled>
+                            <span>⚡</span>
+                            <span id="textoBotonGlobal">Cambiar Estado Global</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NUEVO: Card de Notas -->
+            <div class="notas-card" id="notasCard" style="display: none;">
+                <div class="notas-header">
+                    <span style="font-size: 24px;">📝</span>
+                    <h3 class="notas-title">Notas de Pedidos</h3>
+                    <span class="notas-count" id="notasCount">0</span>
+                </div>
+                <div class="notas-list" id="notasList">
+                    <div class="notas-empty">No hay notas en los pedidos mostrados</div>
+                </div>
+            </div>
 
             <!-- Lista de Pedidos -->
             <div class="orders-header">
@@ -1175,71 +1297,71 @@
         </div>
     </div>
 
-<script>
+    <script>
 
 
-// ========================
-// ACTIVACIÓN DE AUDIO PARA iOS
-// ========================
+        // ========================
+        // ACTIVACIÓN DE AUDIO PARA iOS
+        // ========================
 
-let audioContextReady = false;
-let audioContext = null;
-let audioUnlocked = false;
-let pedidoParaImprimir = null;
-let metodoPagoSeleccionado = null;
-let todosLosPlatos = new Set();
-let platoSeleccionado = null;
-let productosFiltrados = [];
+        let audioContextReady = false;
+        let audioContext = null;
+        let audioUnlocked = false;
+        let pedidoParaImprimir = null;
+        let metodoPagoSeleccionado = null;
+        let todosLosPlatos = new Set();
+        let platoSeleccionado = null;
+        let productosFiltrados = [];
 
-// Inicializar AudioContext
-function initAudioContext() {
-    if (!audioContextReady) {
-        try {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            audioContextReady = true;
-            console.log('🎵 AudioContext creado - Estado:', audioContext.state);
-        } catch (e) {
-            console.error('No se pudo crear AudioContext:', e);
+        // Inicializar AudioContext
+        function initAudioContext() {
+            if (!audioContextReady) {
+                try {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    audioContextReady = true;
+                    console.log('🎵 AudioContext creado - Estado:', audioContext.state);
+                } catch (e) {
+                    console.error('No se pudo crear AudioContext:', e);
+                }
+            }
         }
-    }
-}
 
-// Desbloquear audio en iOS (requiere interacción directa)
-async function unlockAudioIOS() {
-    if (audioUnlocked) return;
-    
-    initAudioContext();
-    
-    if (!audioContext) return;
-    
-    try {
-        // CRÍTICO: Reanudar el contexto PRIMERO
-        if (audioContext.state === 'suspended') {
-            await audioContext.resume();
-            console.log('▶️ AudioContext reanudado - Estado:', audioContext.state);
+        // Desbloquear audio en iOS (requiere interacción directa)
+        async function unlockAudioIOS() {
+            if (audioUnlocked) return;
+
+            initAudioContext();
+
+            if (!audioContext) return;
+
+            try {
+                // CRÍTICO: Reanudar el contexto PRIMERO
+                if (audioContext.state === 'suspended') {
+                    await audioContext.resume();
+                    console.log('▶️ AudioContext reanudado - Estado:', audioContext.state);
+                }
+
+                // Crear y reproducir un buffer silencioso
+                const buffer = audioContext.createBuffer(1, 1, 22050);
+                const source = audioContext.createBufferSource();
+                source.buffer = buffer;
+                source.connect(audioContext.destination);
+                source.start(0);
+
+                audioUnlocked = true;
+                console.log('🔊 Audio desbloqueado para iOS - Estado:', audioContext.state);
+
+                // Mostrar confirmación visual
+                mostrarMensajeAudioListo();
+            } catch (error) {
+                console.error('Error al desbloquear audio:', error);
+            }
         }
-        
-        // Crear y reproducir un buffer silencioso
-        const buffer = audioContext.createBuffer(1, 1, 22050);
-        const source = audioContext.createBufferSource();
-        source.buffer = buffer;
-        source.connect(audioContext.destination);
-        source.start(0);
-        
-        audioUnlocked = true;
-        console.log('🔊 Audio desbloqueado para iOS - Estado:', audioContext.state);
-        
-        // Mostrar confirmación visual
-        mostrarMensajeAudioListo();
-    } catch (error) {
-        console.error('Error al desbloquear audio:', error);
-    }
-}
 
-function mostrarMensajeAudioListo() {
-    const mensaje = document.createElement('div');
-    mensaje.innerHTML = '🔔 Notificaciones de audio activadas';
-    mensaje.style.cssText = `
+        function mostrarMensajeAudioListo() {
+            const mensaje = document.createElement('div');
+            mensaje.innerHTML = '🔔 Notificaciones de audio activadas';
+            mensaje.style.cssText = `
         position: fixed;
         bottom: 20px;
         right: 20px;
@@ -1253,360 +1375,383 @@ function mostrarMensajeAudioListo() {
         z-index: 10000;
         animation: slideInRight 0.3s ease-out;
     `;
-    document.body.appendChild(mensaje);
-    
-    setTimeout(() => {
-        mensaje.style.animation = 'slideOutRight 0.3s ease-out';
-        setTimeout(() => mensaje.remove(), 300);
-    }, 3000);
-}
+            document.body.appendChild(mensaje);
 
-// Activar con CUALQUIER interacción (múltiples eventos para asegurar)
-document.addEventListener('click', unlockAudioIOS);
-document.addEventListener('touchstart', unlockAudioIOS);
-document.addEventListener('touchend', unlockAudioIOS);
-document.addEventListener('keydown', unlockAudioIOS);
-
-// IMPORTANTE: También intentar reanudar antes de cada sonido
-async function ensureAudioReady() {
-    if (!audioContext) {
-        initAudioContext();
-    }
-    
-    if (audioContext && audioContext.state === 'suspended') {
-        try {
-            await audioContext.resume();
-            console.log('🔄 AudioContext reanudado automáticamente');
-        } catch (error) {
-            console.error('Error al reanudar:', error);
-        }
-    }
-}
-
-// Función mejorada para reproducir sonido "JC"
-async function playNotificationSound() {
-    // Asegurar que el audio esté listo
-    await ensureAudioReady();
-    
-    if (!audioContext || audioContext.state !== 'running') {
-        console.warn('⚠️ AudioContext no está listo. Estado:', audioContext?.state);
-        return;
-    }
-    
-    reproducirSonidoJC();
-}
-
-function reproducirSonidoJC() {
-    try {
-        const currentTime = audioContext.currentTime;
-        
-        // Crear osciladores para simular "JC"
-        function playTone(frequency, startTime, duration, type = 'sine', volume = 0.3) {
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.value = frequency;
-            oscillator.type = type;
-            
-            // Envolvente para suavizar el sonido
-            gainNode.gain.setValueAtTime(0, currentTime + startTime);
-            gainNode.gain.linearRampToValueAtTime(volume, currentTime + startTime + 0.05);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, currentTime + startTime + duration);
-            
-            oscillator.start(currentTime + startTime);
-            oscillator.stop(currentTime + startTime + duration);
-        }
-        
-        // Sonido "J" (sonido corto y agudo)
-        playTone(880, 0, 0.2, 'square', 0.4);
-        playTone(1320, 0, 0.2, 'sine', 0.3);
-        
-        // Sonido "C" (sonido más grave y resonante)
-        playTone(523, 0.25, 0.35, 'triangle', 0.4);
-        playTone(659, 0.25, 0.35, 'sine', 0.3);
-        
-        // Eco suave
-        playTone(440, 0.45, 0.25, 'sine', 0.2);
-        
-        console.log('🔊 Sonido "JC" reproducido - Estado:', audioContext.state);
-    } catch (error) {
-        console.error('❌ Error al reproducir sonido:', error);
-    }
-}
-
-
-// Función para sonido de edición
-async function reproducirSonidoEdicion() {
-    await ensureAudioReady();
-    
-    if (!audioContext || audioContext.state !== 'running') {
-        console.warn('⚠️ AudioContext no está listo para edición');
-        return;
-    }
-    
-    try {
-        const currentTime = audioContext.currentTime;
-        
-        function playTone(frequency, startTime, duration, type = 'sine', volume = 0.3) {
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.value = frequency;
-            oscillator.type = type;
-            
-            gainNode.gain.setValueAtTime(0, currentTime + startTime);
-            gainNode.gain.linearRampToValueAtTime(volume, currentTime + startTime + 0.05);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, currentTime + startTime + duration);
-            
-            oscillator.start(currentTime + startTime);
-            oscillator.stop(currentTime + startTime + duration);
-        }
-        
-        // Sonido de edición - tono ascendente suave
-        playTone(440, 0, 0.15, 'sine', 0.3);      // La
-        playTone(554, 0.15, 0.15, 'sine', 0.3);   // Do#
-        playTone(659, 0.3, 0.25, 'triangle', 0.4); // Mi
-        
-        console.log('🔊 Sonido de edición reproducido');
-    } catch (error) {
-        console.error('❌ Error al reproducir sonido de edición:', error);
-    }
-}
-
-const API_URL = 'https://restaurante-co77.onrender.com/api';
-    let currentUser = null;
-    let allOrders = [];
-    let filteredOrders = [];
-    let currentOrderIdForPayment = null;
-
-    window.addEventListener('DOMContentLoaded', async () => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            window.location.href = 'index.html';
-            return;
+            setTimeout(() => {
+                mensaje.style.animation = 'slideOutRight 0.3s ease-out';
+                setTimeout(() => mensaje.remove(), 300);
+            }, 3000);
         }
 
-        try {
-            const response = await fetch(`${API_URL}/auth/me`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+        // Activar con CUALQUIER interacción (múltiples eventos para asegurar)
+        document.addEventListener('click', unlockAudioIOS);
+        document.addEventListener('touchstart', unlockAudioIOS);
+        document.addEventListener('touchend', unlockAudioIOS);
+        document.addEventListener('keydown', unlockAudioIOS);
 
-            if (response.status === 401) {
-                console.warn('⚠️ Token expirado');
-                localStorage.removeItem('token');
+        // IMPORTANTE: También intentar reanudar antes de cada sonido
+        async function ensureAudioReady() {
+            if (!audioContext) {
+                initAudioContext();
+            }
+
+            if (audioContext && audioContext.state === 'suspended') {
+                try {
+                    await audioContext.resume();
+                    console.log('🔄 AudioContext reanudado automáticamente');
+                } catch (error) {
+                    console.error('Error al reanudar:', error);
+                }
+            }
+        }
+
+        // Función mejorada para reproducir sonido "JC"
+        async function playNotificationSound() {
+            // Asegurar que el audio esté listo
+            await ensureAudioReady();
+
+            if (!audioContext || audioContext.state !== 'running') {
+                console.warn('⚠️ AudioContext no está listo. Estado:', audioContext?.state);
+                return;
+            }
+
+            reproducirSonidoJC();
+        }
+
+        function reproducirSonidoJC() {
+            try {
+                const currentTime = audioContext.currentTime;
+
+                // Crear osciladores para simular "JC"
+                function playTone(frequency, startTime, duration, type = 'sine', volume = 0.3) {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+
+                    oscillator.frequency.value = frequency;
+                    oscillator.type = type;
+
+                    // Envolvente para suavizar el sonido
+                    gainNode.gain.setValueAtTime(0, currentTime + startTime);
+                    gainNode.gain.linearRampToValueAtTime(volume, currentTime + startTime + 0.05);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, currentTime + startTime + duration);
+
+                    oscillator.start(currentTime + startTime);
+                    oscillator.stop(currentTime + startTime + duration);
+                }
+
+                // Sonido "J" (sonido corto y agudo)
+                playTone(880, 0, 0.2, 'square', 0.4);
+                playTone(1320, 0, 0.2, 'sine', 0.3);
+
+                // Sonido "C" (sonido más grave y resonante)
+                playTone(523, 0.25, 0.35, 'triangle', 0.4);
+                playTone(659, 0.25, 0.35, 'sine', 0.3);
+
+                // Eco suave
+                playTone(440, 0.45, 0.25, 'sine', 0.2);
+
+                console.log('🔊 Sonido "JC" reproducido - Estado:', audioContext.state);
+            } catch (error) {
+                console.error('❌ Error al reproducir sonido:', error);
+            }
+        }
+
+
+        // Función para sonido de edición
+        async function reproducirSonidoEdicion() {
+            await ensureAudioReady();
+
+            if (!audioContext || audioContext.state !== 'running') {
+                console.warn('⚠️ AudioContext no está listo para edición');
+                return;
+            }
+
+            try {
+                const currentTime = audioContext.currentTime;
+
+                function playTone(frequency, startTime, duration, type = 'sine', volume = 0.3) {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+
+                    oscillator.frequency.value = frequency;
+                    oscillator.type = type;
+
+                    gainNode.gain.setValueAtTime(0, currentTime + startTime);
+                    gainNode.gain.linearRampToValueAtTime(volume, currentTime + startTime + 0.05);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, currentTime + startTime + duration);
+
+                    oscillator.start(currentTime + startTime);
+                    oscillator.stop(currentTime + startTime + duration);
+                }
+
+                // Sonido de edición - tono ascendente suave
+                playTone(440, 0, 0.15, 'sine', 0.3);      // La
+                playTone(554, 0.15, 0.15, 'sine', 0.3);   // Do#
+                playTone(659, 0.3, 0.25, 'triangle', 0.4); // Mi
+
+                console.log('🔊 Sonido de edición reproducido');
+            } catch (error) {
+                console.error('❌ Error al reproducir sonido de edición:', error);
+            }
+        }
+
+        const API_URL = 'https://restaurante-co77.onrender.com/api';
+        let currentUser = null;
+        let allOrders = [];
+        let filteredOrders = [];
+        let currentOrderIdForPayment = null;
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
                 window.location.href = 'index.html';
                 return;
             }
 
-            if (!response.ok) {
-                console.error('Error al cargar usuario');
-                alert('Error al cargar datos. Intente recargar.');
-                return;
-            }
-            
-            const data = await response.json();
-            currentUser = data.data;
-            
-            if (currentUser.id && !currentUser._id) {
-                currentUser._id = currentUser.id;
-            }
+            try {
+                const response = await fetch(`${API_URL}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
 
-            document.getElementById('sidebarUserName').textContent = currentUser.nombre;
-            document.getElementById('sidebarUserAvatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
+                if (response.status === 401) {
+                    console.warn('⚠️ Token expirado');
+                    localStorage.removeItem('token');
+                    window.location.href = 'index.html';
+                    return;
+                }
 
-            if (currentUser.rol === 'admin') {
-                document.getElementById('adminSection').style.display = 'block';
+                if (!response.ok) {
+                    console.error('Error al cargar usuario');
+                    alert('Error al cargar datos. Intente recargar.');
+                    return;
+                }
+
+                const data = await response.json();
+                currentUser = data.data;
+
+                if (currentUser.id && !currentUser._id) {
+                    currentUser._id = currentUser.id;
+                }
+
+                document.getElementById('sidebarUserName').textContent = currentUser.nombre;
+                document.getElementById('sidebarUserAvatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
+
+                if (currentUser.rol === 'admin') {
+                    document.getElementById('adminSection').style.display = 'block';
+                }
+
+                setDefaultDates();
+                await loadOrders();
+            } catch (error) {
+                console.error('❌ Error de red:', error);
+                alert('Error de conexión. Recargue la página.');
             }
-            
-            setDefaultDates();
-            await loadOrders();
-        } catch (error) {
-            console.error('❌ Error de red:', error);
-            alert('Error de conexión. Recargue la página.');
+        });
+
+        function setDefaultDates() {
+            document.getElementById('filterFechaHasta').value = '';
+            document.getElementById('filterFechaDesde').value = '';
+            console.log('📅 Filtros de fecha vacíos - Mostrando todos los pedidos');
         }
-    });
+        async function loadOrders() {
+            const token = localStorage.getItem('token');
 
-    function setDefaultDates() {
-        document.getElementById('filterFechaHasta').value = '';
-        document.getElementById('filterFechaDesde').value = '';
-        console.log('📅 Filtros de fecha vacíos - Mostrando todos los pedidos');
-    }
-async function loadOrders() {
-    const token = localStorage.getItem('token');
-    
-    // Mostrar indicador de carga
-    const grid = document.getElementById('ordersGrid');
-    grid.innerHTML = `
+            // Mostrar indicador de carga
+            const grid = document.getElementById('ordersGrid');
+            grid.innerHTML = `
         <div class="empty-state">
             <div class="empty-icon">⏳</div>
             <p>Cargando pedidos...</p>
         </div>
     `;
-    
-    try {
-        const response = await fetch(`${API_URL}/orders?userId=${currentUser._id}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
 
-        const data = await response.json();
-        
-if (data.success) {
-    allOrders = data.data;
-    console.log(`✅ ${allOrders.length} pedidos cargados`);
-    cargarTodosLosPlatos(); // ✅ NUEVO
-    applyFilters();
-}
-    } catch (error) {
-        console.error('Error al cargar pedidos:', error);
-        grid.innerHTML = `
+            try {
+                const response = await fetch(`${API_URL}/orders?userId=${currentUser._id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    allOrders = data.data;
+                    console.log(`✅ ${allOrders.length} pedidos cargados`);
+                    cargarTodosLosPlatos(); // ✅ NUEVO
+                    applyFilters();
+                }
+            } catch (error) {
+                console.error('Error al cargar pedidos:', error);
+                grid.innerHTML = `
             <div class="empty-state">
                 <div class="empty-icon">❌</div>
                 <p>Error al cargar pedidos. Por favor, recarga la página.</p>
             </div>
         `;
-    }
-}
-
-function applyFilters() {
-    const estado = document.getElementById('filterEstado').value;
-    const mesa = document.getElementById('filterMesa').value.trim(); 
-    const fechaDesde = document.getElementById('filterFechaDesde').value;
-    const fechaHasta = document.getElementById('filterFechaHasta').value;
-    const search = document.getElementById('filterSearch').value.toLowerCase();
-    const plato = document.getElementById('filterPlato').value;
-
-    // Guardar plato seleccionado
-    platoSeleccionado = plato;
-
-    // Filtrado optimizado
-    filteredOrders = allOrders.filter(order => {
-        // Filtro de estado especial: "activos" = todo menos entregados
-        if (estado === 'activos') {
-            if (order.estado === 'entregado') return false;
-        } else if (estado) {
-            if (order.estado !== estado) return false;
-        }
-        
-        // Filtro de mesa
-        if (mesa && order.mesa !== parseInt(mesa)) return false;
-
-        // Filtro de fecha
-        if (fechaDesde || fechaHasta) {
-            const orderDate = new Date(order.createdAt);
-            
-            if (fechaDesde) {
-                const desde = new Date(fechaDesde + 'T00:00:00');
-                if (orderDate < desde) return false;
-            }
-            
-            if (fechaHasta) {
-                const hasta = new Date(fechaHasta + 'T23:59:59.999');
-                if (orderDate > hasta) return false;
             }
         }
 
-        // Filtro de búsqueda
-        if (search) {
-            const notasMatch = order.notas?.toLowerCase().includes(search);
-            const productMatch = order.items.some(item => 
-                item.producto?.nombre?.toLowerCase().includes(search)
-            );
-            if (!notasMatch && !productMatch) return false;
+        function alertarNuevoPedidoMandao() {
+            const alert = document.createElement('div');
+            alert.className = 'notificacion-mandao-alert';
+            alert.innerHTML = `
+        <div style="font-size: 60px; margin-bottom: 10px;">🚲</div>
+        <div>¡TIENES UN MANDAO!</div>
+        <div style="font-size: 16px; margin-top: 10px; font-weight: normal;">Revisa la lista de pedidos</div>
+    `;
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 3000);
         }
 
-        // ✅ NUEVO: Filtro por plato
-        if (plato) {
-            const tieneElPlato = order.items.some(item => {
-                let nombre = 'Producto eliminado';
-                if (item.productoInfo) {
-                    nombre = item.productoInfo.nombre;
-                } else if (item.producto && item.producto.nombre) {
-                    nombre = item.producto.nombre;
-                } else if (item.nombreProducto) {
-                    nombre = item.nombreProducto;
+        function applyFilters() {
+            const estado = document.getElementById('filterEstado').value;
+            const origen = document.getElementById('filterOrigen').value;
+            const mesa = document.getElementById('filterMesa').value.trim();
+            const fechaDesde = document.getElementById('filterFechaDesde').value;
+            const fechaHasta = document.getElementById('filterFechaHasta').value;
+            const search = document.getElementById('filterSearch').value.toLowerCase();
+            const plato = document.getElementById('filterPlato').value;
+
+            // Guardar plato seleccionado
+            platoSeleccionado = plato;
+
+            // Filtrado optimizado
+            filteredOrders = allOrders.filter(order => {
+                // Filtro de origen
+                if (origen) {
+                    if (origen === 'mandao' && order.source !== 'mandao') return false;
+                    if (origen === 'local' && order.source === 'mandao') return false;
                 }
-                return nombre === plato;
+
+                // Filtro de estado especial: "activos" = todo menos entregados
+                if (estado === 'activos') {
+                    if (order.estado === 'entregado') return false;
+                } else if (estado) {
+                    if (order.estado !== estado) return false;
+                }
+
+                // Filtro de mesa
+                if (mesa && order.mesa !== parseInt(mesa)) return false;
+
+                // Filtro de fecha
+                if (fechaDesde || fechaHasta) {
+                    const orderDate = new Date(order.createdAt);
+
+                    if (fechaDesde) {
+                        const desde = new Date(fechaDesde + 'T00:00:00');
+                        if (orderDate < desde) return false;
+                    }
+
+                    if (fechaHasta) {
+                        const hasta = new Date(fechaHasta + 'T23:59:59.999');
+                        if (orderDate > hasta) return false;
+                    }
+                }
+
+                // Filtro de búsqueda
+                if (search) {
+                    const notasMatch = order.notas?.toLowerCase().includes(search);
+                    const productMatch = order.items.some(item =>
+                        item.producto?.nombre?.toLowerCase().includes(search)
+                    );
+                    if (!notasMatch && !productMatch) return false;
+                }
+
+                // ✅ NUEVO: Filtro por plato
+                if (plato) {
+                    const tieneElPlato = order.items.some(item => {
+                        let nombre = 'Producto eliminado';
+                        if (item.productoInfo) {
+                            nombre = item.productoInfo.nombre;
+                        } else if (item.producto && item.producto.nombre) {
+                            nombre = item.producto.nombre;
+                        } else if (item.nombreProducto) {
+                            nombre = item.nombreProducto;
+                        }
+                        return nombre === plato;
+                    });
+
+                    if (!tieneElPlato) return false;
+                }
+
+                return true;
             });
-            
-            if (!tieneElPlato) return false;
+
+            // ✅ Recopilar productos filtrados para el botón global
+            recopilarProductosFiltrados();
+
+            updateStatistics();
+            displayOrders();
+            mostrarNotas(); // ✅ NUEVO: Mostrar notas
+            actualizarBotonGlobal(); // ✅ NUEVO: Actualizar estado del botón
         }
 
-        return true;
-    });
+        function updateStatistics() {
+            const total = filteredOrders.length;
+            const pendientes = filteredOrders.filter(o => o.estado === 'pendiente').length;
+            const preparando = filteredOrders.filter(o => o.estado === 'preparando').length;
+            const completados = filteredOrders.filter(o => o.estado === 'entregado').length;
+            const cancelados = filteredOrders.filter(o => o.estado === 'cancelado').length;
 
-    // ✅ Recopilar productos filtrados para el botón global
-    recopilarProductosFiltrados();
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statPendientes').textContent = pendientes;
+            document.getElementById('statPreparando').textContent = preparando;
+            document.getElementById('statCompletados').textContent = completados;
+            document.getElementById('statCancelados').textContent = cancelados;
+            document.getElementById('orderCount').textContent = total;
+        }
 
-    updateStatistics();
-    displayOrders();
-    mostrarNotas(); // ✅ NUEVO: Mostrar notas
-    actualizarBotonGlobal(); // ✅ NUEVO: Actualizar estado del botón
-}
+        function displayOrders() {
+            const list = document.getElementById('ordersGrid');
 
-function updateStatistics() {
-    const total = filteredOrders.length;
-    const pendientes = filteredOrders.filter(o => o.estado === 'pendiente').length;
-    const preparando = filteredOrders.filter(o => o.estado === 'preparando').length;
-    const completados = filteredOrders.filter(o => o.estado === 'entregado').length;
-    const cancelados = filteredOrders.filter(o => o.estado === 'cancelado').length;
-
-    document.getElementById('statTotal').textContent = total;
-    document.getElementById('statPendientes').textContent = pendientes;
-    document.getElementById('statPreparando').textContent = preparando;
-    document.getElementById('statCompletados').textContent = completados;
-    document.getElementById('statCancelados').textContent = cancelados;
-    document.getElementById('orderCount').textContent = total;
-}
-
-function displayOrders() {
-    const list = document.getElementById('ordersGrid');
-    
-    if (filteredOrders.length === 0) {
-        list.innerHTML = `
+            if (filteredOrders.length === 0) {
+                list.innerHTML = `
             <div class="empty-state">
                 <div class="empty-icon">🔍</div>
                 <p>No se encontraron pedidos con los filtros seleccionados</p>
             </div>
         `;
-        return;
-    }
+                return;
+            }
 
-    const activos = filteredOrders.filter(o => !['entregado', 'cancelado'].includes(o.estado));
-    const cancelados = filteredOrders.filter(o => o.estado === 'cancelado');
-    const entregados = filteredOrders.filter(o => o.estado === 'entregado');
-    
-    activos.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-    cancelados.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-    entregados.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-    
-    const orderedOrders = [...activos, ...cancelados, ...entregados];
+            const activos = filteredOrders.filter(o => !['entregado', 'cancelado'].includes(o.estado));
+            const cancelados = filteredOrders.filter(o => o.estado === 'cancelado');
+            const entregados = filteredOrders.filter(o => o.estado === 'entregado');
 
-    const fragment = document.createDocumentFragment();
-    const tempDiv = document.createElement('div');
-    
-    tempDiv.innerHTML = orderedOrders.map(order => {
-        const fecha = new Date(order.createdAt);
-        const fechaStr = fecha.toLocaleDateString('es-CO', {
-            day: '2-digit',
-            month: 'long',
-            year: 'numeric'
-        });
-        const horaStr = fecha.toLocaleTimeString('es-CO', {
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-        
-        return `
-            <div class="order-card">
+            activos.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+            cancelados.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+            entregados.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+            const orderedOrders = [...activos, ...cancelados, ...entregados];
+
+            const fragment = document.createDocumentFragment();
+            const tempDiv = document.createElement('div');
+
+            tempDiv.innerHTML = orderedOrders.map(order => {
+                const isMandao = order.source === 'mandao';
+                const fecha = new Date(order.createdAt);
+                const fechaStr = fecha.toLocaleDateString('es-CO', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric'
+                });
+                const horaStr = fecha.toLocaleTimeString('es-CO', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                return `
+            <div class="order-card ${isMandao ? 'mandao-order' : ''}">
                 <div class="order-header">
                     <div class="order-info">
-                        <h3>Mesa ${order.mesa}</h3>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            ${isMandao ? '<span class="source-badge source-mandao"><span class="mandao-icon">🚲</span> MANDAO</span>' : ''}
+                            <h3>Mesa ${order.mesa}</h3>
+                        </div>
                         <div class="order-meta">
                             <div class="meta-row">
                                 <span class="meta-icon">📅</span>
@@ -1633,20 +1778,20 @@ function displayOrders() {
                 </div>
                 <div class="order-items">
                     ${order.items.map((item, itemIndex) => {
-                        let nombre = 'Producto eliminado';
-                        
-                        if (item.productoInfo) {
-                            nombre = item.productoInfo.nombre;
-                        } else if (item.producto && item.producto.nombre) {
-                            nombre = item.producto.nombre;
-                        } else if (item.nombreProducto) {
-                            nombre = item.nombreProducto;
-                        }
-                        
-                        // Agrupar por estado
-                        const grupos = item.estadosIndividuales || [{cantidad: item.cantidad, estado: 'pendiente'}];
-                        
-                        return grupos.map(grupo => `
+                    let nombre = 'Producto eliminado';
+
+                    if (item.productoInfo) {
+                        nombre = item.productoInfo.nombre;
+                    } else if (item.producto && item.producto.nombre) {
+                        nombre = item.producto.nombre;
+                    } else if (item.nombreProducto) {
+                        nombre = item.nombreProducto;
+                    }
+
+                    // Agrupar por estado
+                    const grupos = item.estadosIndividuales || [{ cantidad: item.cantidad, estado: 'pendiente' }];
+
+                    return grupos.map(grupo => `
                             <div class="order-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #f7fafc; border-radius: 8px; margin-bottom: 8px;">
                                 <div style="flex: 1;">
                                     <span class="item-name" style="font-weight: 600; color: #2d3748;">${nombre}</span>
@@ -1666,7 +1811,7 @@ function displayOrders() {
                                 </div>
                             </div>
                         `).join('');
-                    }).join('')}
+                }).join('')}
                 </div>
                 ${order.notas ? `
                 <div class="order-notes">
@@ -1680,243 +1825,252 @@ function displayOrders() {
                 ${getOrderActions(order)}
             </div>
         `;
-    }).join('');
-    
-    list.innerHTML = '';
-    list.appendChild(tempDiv);
-}
+            }).join('');
 
-
-function getOrderActions(order) {
-        let actions = '<div class="order-actions">';
-        
-        if (order.estado === 'pendiente') {
-            actions += `<button class="btn-action btn-preparar" onclick="updateOrderStatus('${order._id}', 'preparando')">👨‍🍳 Preparar</button>`;
-            actions += `<button class="btn-action btn-cancelar" onclick="cancelOrder('${order._id}')">❌ Cancelar</button>`;
+            list.innerHTML = '';
+            list.appendChild(tempDiv);
         }
-        
-        if (order.estado === 'preparando') {
-            actions += `<button class="btn-action btn-listo" onclick="updateOrderStatus('${order._id}', 'listo')">✅ Listo</button>`;
-            actions += `<button class="btn-action btn-cancelar" onclick="cancelOrder('${order._id}')">❌ Cancelar</button>`;
+
+
+        function getOrderActions(order) {
+            const isMandao = order.source === 'mandao';
+            let actions = '<div class="order-actions">';
+
+            if (order.estado === 'pendiente') {
+                if (isMandao) {
+                    actions += `<button class="btn-action" style="background: #f59e0b; color: white;" onclick="updateOrderStatus('${order._id}', 'preparando')">✅ Aceptar Mandao</button>`;
+                } else {
+                    actions += `<button class="btn-action btn-preparar" onclick="updateOrderStatus('${order._id}', 'preparando')">👨‍🍳 Preparar</button>`;
+                }
+                actions += `<button class="btn-action btn-cancelar" onclick="cancelOrder('${order._id}')">❌ Cancelar</button>`;
+            }
+
+            if (order.estado === 'preparando') {
+                if (isMandao) {
+                    actions += `<button class="btn-action" style="background: #10b981; color: white;" onclick="updateOrderStatus('${order._id}', 'listo')">👨‍🍳 Marcar Listo</button>`;
+                } else {
+                    actions += `<button class="btn-action btn-listo" onclick="updateOrderStatus('${order._id}', 'listo')">✅ Listo</button>`;
+                }
+                actions += `<button class="btn-action btn-cancelar" onclick="cancelOrder('${order._id}')">❌ Cancelar</button>`;
+            }
+
+            if (order.estado === 'listo') {
+                actions += `<button class="btn-action btn-entregar" onclick="updateOrderStatus('${order._id}', 'entregado')">🍽️ Pagar</button>`;
+                actions += `<button class="btn-action btn-cancelar" onclick="cancelOrder('${order._id}')">❌ Cancelar</button>`;
+            }
+
+            if (order.estado === 'entregado') {
+                actions += `<button class="btn-action btn-eliminar" onclick="deleteOrder('${order._id}')">🗑️ Eliminar</button>`;
+            }
+
+            if (order.estado === 'cancelado') {
+                actions += `<button class="btn-action btn-reabrir" onclick="updateOrderStatus('${order._id}', 'pendiente')">🔄 Reabrir</button>`;
+                actions += `<button class="btn-action btn-eliminar" onclick="deleteOrder('${order._id}')">🗑️ Eliminar</button>`;
+            }
+
+            actions += '</div>';
+            return actions;
         }
-        
-        if (order.estado === 'listo') {
-            actions += `<button class="btn-action btn-entregar" onclick="updateOrderStatus('${order._id}', 'entregado')">🍽️ Pagar</button>`;
-            actions += `<button class="btn-action btn-cancelar" onclick="cancelOrder('${order._id}')">❌ Cancelar</button>`;
+
+        // FUNCIONES DEL MODAL DE MÉTODO DE PAGO
+
+
+        async function updateOrderStatus(orderId, newStatus) {
+            console.log('🔄 updateOrderStatus llamado con:', { orderId, newStatus });
+
+            // Si el nuevo estado es "entregado", mostrar modal de método de pago
+            if (newStatus === 'entregado') {
+                currentOrderIdForPayment = orderId;
+                console.log('💾 Guardado orderId para pago:', currentOrderIdForPayment);
+                mostrarModalMetodoPago();
+                return;
+            }
+
+            // Para otros estados, proceder normalmente SIN metodoPago
+            await actualizarEstadoPedido(orderId, newStatus, null);
         }
-        
-        if (order.estado === 'entregado') {
-            actions += `<button class="btn-action btn-eliminar" onclick="deleteOrder('${order._id}')">🗑️ Eliminar</button>`;
+
+
+        function mostrarModalMetodoPago() {
+            console.log('🪟 Mostrando modal con orderId:', currentOrderIdForPayment);
+            const modal = document.getElementById('modalMetodoPago');
+            if (!modal) {
+                console.error('❌ Modal no encontrado en el DOM');
+                return;
+            }
+            modal.style.display = 'flex';
         }
-        
-        if (order.estado === 'cancelado') {
-            actions += `<button class="btn-action btn-reabrir" onclick="updateOrderStatus('${order._id}', 'pendiente')">🔄 Reabrir</button>`;
-            actions += `<button class="btn-action btn-eliminar" onclick="deleteOrder('${order._id}')">🗑️ Eliminar</button>`;
-        }
-        
-        actions += '</div>';
-        return actions;
-    }
 
-    // FUNCIONES DEL MODAL DE MÉTODO DE PAGO
-
-
-    async function updateOrderStatus(orderId, newStatus) {
-    console.log('🔄 updateOrderStatus llamado con:', { orderId, newStatus });
-    
-    // Si el nuevo estado es "entregado", mostrar modal de método de pago
-    if (newStatus === 'entregado') {
-        currentOrderIdForPayment = orderId;
-        console.log('💾 Guardado orderId para pago:', currentOrderIdForPayment);
-        mostrarModalMetodoPago();
-        return;
-    }
-    
-    // Para otros estados, proceder normalmente SIN metodoPago
-    await actualizarEstadoPedido(orderId, newStatus, null);
-}
-
-
-function mostrarModalMetodoPago() {
-    console.log('🪟 Mostrando modal con orderId:', currentOrderIdForPayment);
-    const modal = document.getElementById('modalMetodoPago');
-    if (!modal) {
-        console.error('❌ Modal no encontrado en el DOM');
-        return;
-    }
-    modal.style.display = 'flex';
-}
-
-function cerrarModalMetodoPago() {
-    console.log('🚪 Cerrando modal');
-    const modal = document.getElementById('modalMetodoPago');
-    modal.style.display = 'none';
-    currentOrderIdForPayment = null;
-}
-
-async function confirmarMetodoPago(metodoPago) {
-    console.log('✅ Método de pago confirmado:', metodoPago);
-    console.log('📦 Order ID actual:', currentOrderIdForPayment);
-    
-    if (!currentOrderIdForPayment) {
-        console.error('❌ No hay orderId guardado');
-        alert('Error: No se encontró el ID del pedido');
-        return;
-    }
-    
-    // Guardar el método de pago
-    metodoPagoSeleccionado = metodoPago;
-    
-    // Cerrar modal de método de pago
-    document.getElementById('modalMetodoPago').style.display = 'none';
-    
-    // Obtener los datos completos del pedido antes de preguntar por impresión
-    await obtenerDatosPedidoParaImprimir(currentOrderIdForPayment);
-    
-    // Mostrar modal de confirmación de impresión
-    document.getElementById('modalConfirmarImpresion').style.display = 'flex';
-}
-
-async function obtenerDatosPedidoParaImprimir(orderId) {
-    const token = localStorage.getItem('token');
-    
-    try {
-        const response = await fetch(`${API_URL}/orders/${orderId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            pedidoParaImprimir = data.data;
-            console.log('📋 Datos del pedido cargados para impresión:', pedidoParaImprimir);
-        }
-    } catch (error) {
-        console.error('Error al obtener datos del pedido:', error);
-    }
-}
-
-
-async function confirmarImpresion(imprimir) {
-    const modal = document.getElementById('modalConfirmarImpresion');
-    modal.style.display = 'none';
-    
-    if (imprimir && pedidoParaImprimir) {
-        // Mostrar modal de estado de impresión
-        mostrarEstadoImpresion('imprimiendo');
-        
-        try {
-            await imprimirFacturaPOS();
-            mostrarEstadoImpresion('exito');
-        } catch (error) {
-            console.error('Error al imprimir:', error);
-            mostrarEstadoImpresion('error');
-        }
-    }
-    
-    // Actualizar el pedido con el método de pago
-    const orderIdTemp = currentOrderIdForPayment;
-    currentOrderIdForPayment = null;
-    pedidoParaImprimir = null;
-    
-    await actualizarEstadoPedido(orderIdTemp, 'entregado', metodoPagoSeleccionado);
-}
-
-
-
-
-function mostrarEstadoImpresion(estado) {
-    const modal = document.getElementById('modalEstadoImpresion');
-    const spinner = document.getElementById('impresionSpinner');
-    const titulo = document.getElementById('impresionTitulo');
-    const mensaje = document.getElementById('impresionMensaje');
-    
-    if (estado === 'imprimiendo') {
-        modal.style.display = 'flex';
-        spinner.textContent = '🖨️';
-        spinner.style.animation = 'pulse 1s infinite';
-        titulo.textContent = 'Imprimiendo factura...';
-        mensaje.textContent = 'Por favor, espere';
-    } else if (estado === 'exito') {
-        spinner.textContent = '✅';
-        spinner.style.animation = 'none';
-        titulo.textContent = '¡Factura impresa!';
-        mensaje.textContent = 'La factura se ha impreso correctamente';
-        
-        setTimeout(() => {
+        function cerrarModalMetodoPago() {
+            console.log('🚪 Cerrando modal');
+            const modal = document.getElementById('modalMetodoPago');
             modal.style.display = 'none';
-        }, 2000);
-    } else if (estado === 'error') {
-        spinner.textContent = '❌';
-        spinner.style.animation = 'none';
-        titulo.textContent = 'Error al imprimir';
-        mensaje.textContent = 'No se pudo imprimir la factura. Verifique la impresora.';
-        
-        setTimeout(() => {
+            currentOrderIdForPayment = null;
+        }
+
+        async function confirmarMetodoPago(metodoPago) {
+            console.log('✅ Método de pago confirmado:', metodoPago);
+            console.log('📦 Order ID actual:', currentOrderIdForPayment);
+
+            if (!currentOrderIdForPayment) {
+                console.error('❌ No hay orderId guardado');
+                alert('Error: No se encontró el ID del pedido');
+                return;
+            }
+
+            // Guardar el método de pago
+            metodoPagoSeleccionado = metodoPago;
+
+            // Cerrar modal de método de pago
+            document.getElementById('modalMetodoPago').style.display = 'none';
+
+            // Obtener los datos completos del pedido antes de preguntar por impresión
+            await obtenerDatosPedidoParaImprimir(currentOrderIdForPayment);
+
+            // Mostrar modal de confirmación de impresión
+            document.getElementById('modalConfirmarImpresion').style.display = 'flex';
+        }
+
+        async function obtenerDatosPedidoParaImprimir(orderId) {
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch(`${API_URL}/orders/${orderId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    pedidoParaImprimir = data.data;
+                    console.log('📋 Datos del pedido cargados para impresión:', pedidoParaImprimir);
+                }
+            } catch (error) {
+                console.error('Error al obtener datos del pedido:', error);
+            }
+        }
+
+
+        async function confirmarImpresion(imprimir) {
+            const modal = document.getElementById('modalConfirmarImpresion');
             modal.style.display = 'none';
-        }, 3000);
-    }
-}
+
+            if (imprimir && pedidoParaImprimir) {
+                // Mostrar modal de estado de impresión
+                mostrarEstadoImpresion('imprimiendo');
+
+                try {
+                    await imprimirFacturaPOS();
+                    mostrarEstadoImpresion('exito');
+                } catch (error) {
+                    console.error('Error al imprimir:', error);
+                    mostrarEstadoImpresion('error');
+                }
+            }
+
+            // Actualizar el pedido con el método de pago
+            const orderIdTemp = currentOrderIdForPayment;
+            currentOrderIdForPayment = null;
+            pedidoParaImprimir = null;
+
+            await actualizarEstadoPedido(orderIdTemp, 'entregado', metodoPagoSeleccionado);
+        }
 
 
-async function imprimirFacturaPOS() {
-    if (!pedidoParaImprimir) {
-        throw new Error('No hay datos del pedido para imprimir');
-    }
-    
-    try {
-        // Crear elemento de impresión
-        crearElementoImpresion();
-        
-        // Esperar un momento para que se renderice
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
-        // Imprimir
-        window.print();
-        
-        // Remover después de imprimir o cancelar
-        window.onafterprint = () => {
+
+
+        function mostrarEstadoImpresion(estado) {
+            const modal = document.getElementById('modalEstadoImpresion');
+            const spinner = document.getElementById('impresionSpinner');
+            const titulo = document.getElementById('impresionTitulo');
+            const mensaje = document.getElementById('impresionMensaje');
+
+            if (estado === 'imprimiendo') {
+                modal.style.display = 'flex';
+                spinner.textContent = '🖨️';
+                spinner.style.animation = 'pulse 1s infinite';
+                titulo.textContent = 'Imprimiendo factura...';
+                mensaje.textContent = 'Por favor, espere';
+            } else if (estado === 'exito') {
+                spinner.textContent = '✅';
+                spinner.style.animation = 'none';
+                titulo.textContent = '¡Factura impresa!';
+                mensaje.textContent = 'La factura se ha impreso correctamente';
+
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 2000);
+            } else if (estado === 'error') {
+                spinner.textContent = '❌';
+                spinner.style.animation = 'none';
+                titulo.textContent = 'Error al imprimir';
+                mensaje.textContent = 'No se pudo imprimir la factura. Verifique la impresora.';
+
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+
+        async function imprimirFacturaPOS() {
+            if (!pedidoParaImprimir) {
+                throw new Error('No hay datos del pedido para imprimir');
+            }
+
+            try {
+                // Crear elemento de impresión
+                crearElementoImpresion();
+
+                // Esperar un momento para que se renderice
+                await new Promise(resolve => setTimeout(resolve, 300));
+
+                // Imprimir
+                window.print();
+
+                // Remover después de imprimir o cancelar
+                window.onafterprint = () => {
+                    removerElementoImpresion();
+                };
+
+                console.log('✅ Diálogo de impresión abierto');
+
+            } catch (error) {
+                console.error('Error al imprimir:', error);
+                removerElementoImpresion();
+                throw error;
+            }
+        }
+
+
+
+        function crearElementoImpresion() {
+            // Remover si ya existe
             removerElementoImpresion();
-        };
-        
-        console.log('✅ Diálogo de impresión abierto');
-        
-    } catch (error) {
-        console.error('Error al imprimir:', error);
-        removerElementoImpresion();
-        throw error;
-    }
-}
 
+            const fecha = new Date(pedidoParaImprimir.createdAt);
+            const fechaStr = fecha.toLocaleDateString('es-CO', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            const horaStr = fecha.toLocaleTimeString('es-CO', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
 
+            const metodoPagoTexto = metodoPagoSeleccionado === 'transferencia' ? 'TRANSFERENCIA' : 'EFECTIVO';
+            const nombreRestaurante = currentUser.nombreRestaurante || 'RESTAURANTE';
 
-function crearElementoImpresion() {
-    // Remover si ya existe
-    removerElementoImpresion();
-    
-    const fecha = new Date(pedidoParaImprimir.createdAt);
-    const fechaStr = fecha.toLocaleDateString('es-CO', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
-    const horaStr = fecha.toLocaleTimeString('es-CO', {
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-    
-    const metodoPagoTexto = metodoPagoSeleccionado === 'transferencia' ? 'TRANSFERENCIA' : 'EFECTIVO';
-    const nombreRestaurante = currentUser.nombreRestaurante || 'RESTAURANTE';
-    
-    // Generar filas de productos
-    const productosHTML = pedidoParaImprimir.items.map(item => {
-        const nombre = item.productoInfo ? item.productoInfo.nombre : 
-                      (item.nombreProducto || 'Producto');
-        const cantidad = item.cantidad;
-        const precio = item.precio;
-        const subtotal = cantidad * precio;
-        
-        return `
+            // Generar filas de productos
+            const productosHTML = pedidoParaImprimir.items.map(item => {
+                const nombre = item.productoInfo ? item.productoInfo.nombre :
+                    (item.nombreProducto || 'Producto');
+                const cantidad = item.cantidad;
+                const precio = item.precio;
+                const subtotal = cantidad * precio;
+
+                return `
             <tr>
                 <td>${nombre}</td>
                 <td style="text-align: center;">${cantidad}</td>
@@ -1924,12 +2078,12 @@ function crearElementoImpresion() {
                 <td style="text-align: right; font-weight: bold;">$${subtotal.toLocaleString('es-CO')}</td>
             </tr>
         `;
-    }).join('');
-    
-    // Crear contenedor de impresión
-    const printContainer = document.createElement('div');
-    printContainer.id = 'print-container';
-    printContainer.innerHTML = `
+            }).join('');
+
+            // Crear contenedor de impresión
+            const printContainer = document.createElement('div');
+            printContainer.id = 'print-container';
+            printContainer.innerHTML = `
         <div class="print-header">
             <h1>${nombreRestaurante}</h1>
             <div class="print-subtitle">FACTURA DE VENTA</div>
@@ -1984,281 +2138,281 @@ function crearElementoImpresion() {
             <p>Vuelva pronto</p>
         </div>
     `;
-    
-    document.body.appendChild(printContainer);
-}
 
-function removerElementoImpresion() {
-    const printContainer = document.getElementById('print-container');
-    if (printContainer) {
-        printContainer.remove();
-    }
-}
+            document.body.appendChild(printContainer);
+        }
 
-
-function generarComandosESCPOS() {
-    const ESC = 0x1B;
-    const GS = 0x1D;
-    const LF = 0x0A;
-    const comandos = [];
-    
-    // Inicializar impresora
-    comandos.push(ESC, 0x40);
-    
-    // Centrar texto
-    comandos.push(ESC, 0x61, 0x01);
-    
-    // Negrita ON
-    comandos.push(ESC, 0x45, 0x01);
-    
-    // Nombre del restaurante
-    const nombreRestaurante = currentUser.nombreRestaurante || 'RESTAURANTE';
-    agregarTexto(comandos, nombreRestaurante);
-    comandos.push(LF);
-    
-    // Negrita OFF
-    comandos.push(ESC, 0x45, 0x00);
-    
-    // Información adicional
-    agregarTexto(comandos, '================================');
-    comandos.push(LF);
-    agregarTexto(comandos, 'FACTURA DE VENTA');
-    comandos.push(LF);
-    agregarTexto(comandos, '================================');
-    comandos.push(LF, LF);
-    
-    // Alinear a la izquierda
-    comandos.push(ESC, 0x61, 0x00);
-    
-    // Fecha y hora
-    const fecha = new Date(pedidoParaImprimir.createdAt);
-    const fechaStr = fecha.toLocaleDateString('es-CO');
-    const horaStr = fecha.toLocaleTimeString('es-CO');
-    agregarTexto(comandos, `Fecha: ${fechaStr}`);
-    comandos.push(LF);
-    agregarTexto(comandos, `Hora: ${horaStr}`);
-    comandos.push(LF);
-    
-    // Mesa
-    agregarTexto(comandos, `Mesa: ${pedidoParaImprimir.mesa}`);
-    comandos.push(LF);
-    
-    // Método de pago
-    const metodoPagoTexto = metodoPagoSeleccionado === 'transferencia' ? 'TRANSFERENCIA' : 'EFECTIVO';
-    agregarTexto(comandos, `Metodo de pago: ${metodoPagoTexto}`);
-    comandos.push(LF, LF);
-    
-    // Línea separadora
-    agregarTexto(comandos, '--------------------------------');
-    comandos.push(LF);
-    
-    // Encabezado de productos
-    agregarTexto(comandos, 'PRODUCTO        CANT   PRECIO   TOTAL');
-    comandos.push(LF);
-    agregarTexto(comandos, '--------------------------------');
-    comandos.push(LF);
-    
-    // Lista de productos
-    pedidoParaImprimir.items.forEach(item => {
-        const nombre = item.productoInfo ? item.productoInfo.nombre : 
-                      (item.nombreProducto || 'Producto');
-        const cantidad = item.cantidad;
-        const precio = item.precio;
-        const subtotal = cantidad * precio;
-        
-        // Formatear línea de producto (limitando nombre a 15 caracteres)
-        const nombreCorto = nombre.substring(0, 15).padEnd(15);
-        const cantStr = String(cantidad).padStart(4);
-        const precioStr = formatearPrecio(precio).padStart(8);
-        const totalStr = formatearPrecio(subtotal).padStart(8);
-        
-        agregarTexto(comandos, `${nombreCorto} ${cantStr} ${precioStr} ${totalStr}`);
-        comandos.push(LF);
-    });
-    
-    // Línea separadora
-    agregarTexto(comandos, '--------------------------------');
-    comandos.push(LF);
-    
-    // Total
-    comandos.push(ESC, 0x45, 0x01); // Negrita ON
-    agregarTexto(comandos, `TOTAL: $${pedidoParaImprimir.total.toLocaleString('es-CO')}`);
-    comandos.push(LF);
-    comandos.push(ESC, 0x45, 0x00); // Negrita OFF
-    
-    comandos.push(LF, LF);
-    
-    // Centrar
-    comandos.push(ESC, 0x61, 0x01);
-    agregarTexto(comandos, 'Gracias por su compra!');
-    comandos.push(LF);
-    agregarTexto(comandos, 'Vuelva pronto');
-    comandos.push(LF, LF, LF);
-    
-    // Cortar papel
-    comandos.push(GS, 0x56, 0x00);
-    
-    return new Uint8Array(comandos);
-}
-
-function agregarTexto(comandos, texto) {
-    for (let i = 0; i < texto.length; i++) {
-        comandos.push(texto.charCodeAt(i));
-    }
-}
-
-function formatearPrecio(precio) {
-    return `$${precio.toLocaleString('es-CO')}`;
-}
-
-async function actualizarEstadoPedido(orderId, newStatus, metodoPago = null) {
-    const token = localStorage.getItem('token');
-
-    console.log('📤 Enviando petición:');
-    console.log('  - Order ID:', orderId);
-    console.log('  - Estado:', newStatus);
-    console.log('  - Método de pago:', metodoPago);
-
-    if (!orderId || orderId === 'null' || orderId === 'undefined') {
-        console.error('❌ Order ID inválido:', orderId);
-        alert('Error: ID de pedido inválido');
-        return;
-    }
-
-    // 🔒 BLOQUEAR TODOS LOS BOTONES DEL PEDIDO
-    const orderCard = document.querySelector(`[id*="${orderId}"]`)?.closest('.order-card');
-    if (orderCard) {
-        const botones = orderCard.querySelectorAll('.btn-action, button[onclick*="cambiarEstadoProducto"]');
-        botones.forEach(btn => {
-            btn.disabled = true;
-            btn.style.opacity = '0.5';
-            btn.style.cursor = 'not-allowed';
-            // Guardar el contenido original
-            btn.dataset.originalContent = btn.innerHTML;
-            // Mostrar spinner
-            if (btn.classList.contains('btn-action')) {
-                btn.innerHTML = '<span class="loading-spinner" style="display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite;"></span>';
+        function removerElementoImpresion() {
+            const printContainer = document.getElementById('print-container');
+            if (printContainer) {
+                printContainer.remove();
             }
-        });
-    }
-
-    try {
-        const body = { 
-            estado: newStatus
-        };
-        
-        // ✅ SOLO agregar actualizarTodosLosProductos si NO es cancelado
-        if (newStatus !== 'cancelado') {
-            body.actualizarTodosLosProductos = true;
-        }
-        
-        // SOLO agregar metodoPago si existe Y el estado es 'entregado'
-        if (metodoPago && newStatus === 'entregado') {
-            body.metodoPago = metodoPago;
         }
 
-        console.log('  - Body:', JSON.stringify(body, null, 2));
-        console.log('  - URL:', `${API_URL}/orders/${orderId}/estado`);
 
-        const response = await fetch(`${API_URL}/orders/${orderId}/estado`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(body)
-        });
+        function generarComandosESCPOS() {
+            const ESC = 0x1B;
+            const GS = 0x1D;
+            const LF = 0x0A;
+            const comandos = [];
 
-        console.log('📥 Respuesta del servidor:');
-        console.log('  - Status:', response.status);
-        console.log('  - Status Text:', response.statusText);
+            // Inicializar impresora
+            comandos.push(ESC, 0x40);
 
-        const data = await response.json();
-        console.log('  - Data:', data);
+            // Centrar texto
+            comandos.push(ESC, 0x61, 0x01);
 
-        if (data.success) {
-            console.log('✅ Pedido actualizado correctamente');
-            await loadOrders();
-        } else {
-            console.error('❌ Error del servidor:', data.message);
-            alert('Error: ' + data.message);
-            // 🔓 RESTAURAR BOTONES EN CASO DE ERROR
+            // Negrita ON
+            comandos.push(ESC, 0x45, 0x01);
+
+            // Nombre del restaurante
+            const nombreRestaurante = currentUser.nombreRestaurante || 'RESTAURANTE';
+            agregarTexto(comandos, nombreRestaurante);
+            comandos.push(LF);
+
+            // Negrita OFF
+            comandos.push(ESC, 0x45, 0x00);
+
+            // Información adicional
+            agregarTexto(comandos, '================================');
+            comandos.push(LF);
+            agregarTexto(comandos, 'FACTURA DE VENTA');
+            comandos.push(LF);
+            agregarTexto(comandos, '================================');
+            comandos.push(LF, LF);
+
+            // Alinear a la izquierda
+            comandos.push(ESC, 0x61, 0x00);
+
+            // Fecha y hora
+            const fecha = new Date(pedidoParaImprimir.createdAt);
+            const fechaStr = fecha.toLocaleDateString('es-CO');
+            const horaStr = fecha.toLocaleTimeString('es-CO');
+            agregarTexto(comandos, `Fecha: ${fechaStr}`);
+            comandos.push(LF);
+            agregarTexto(comandos, `Hora: ${horaStr}`);
+            comandos.push(LF);
+
+            // Mesa
+            agregarTexto(comandos, `Mesa: ${pedidoParaImprimir.mesa}`);
+            comandos.push(LF);
+
+            // Método de pago
+            const metodoPagoTexto = metodoPagoSeleccionado === 'transferencia' ? 'TRANSFERENCIA' : 'EFECTIVO';
+            agregarTexto(comandos, `Metodo de pago: ${metodoPagoTexto}`);
+            comandos.push(LF, LF);
+
+            // Línea separadora
+            agregarTexto(comandos, '--------------------------------');
+            comandos.push(LF);
+
+            // Encabezado de productos
+            agregarTexto(comandos, 'PRODUCTO        CANT   PRECIO   TOTAL');
+            comandos.push(LF);
+            agregarTexto(comandos, '--------------------------------');
+            comandos.push(LF);
+
+            // Lista de productos
+            pedidoParaImprimir.items.forEach(item => {
+                const nombre = item.productoInfo ? item.productoInfo.nombre :
+                    (item.nombreProducto || 'Producto');
+                const cantidad = item.cantidad;
+                const precio = item.precio;
+                const subtotal = cantidad * precio;
+
+                // Formatear línea de producto (limitando nombre a 15 caracteres)
+                const nombreCorto = nombre.substring(0, 15).padEnd(15);
+                const cantStr = String(cantidad).padStart(4);
+                const precioStr = formatearPrecio(precio).padStart(8);
+                const totalStr = formatearPrecio(subtotal).padStart(8);
+
+                agregarTexto(comandos, `${nombreCorto} ${cantStr} ${precioStr} ${totalStr}`);
+                comandos.push(LF);
+            });
+
+            // Línea separadora
+            agregarTexto(comandos, '--------------------------------');
+            comandos.push(LF);
+
+            // Total
+            comandos.push(ESC, 0x45, 0x01); // Negrita ON
+            agregarTexto(comandos, `TOTAL: $${pedidoParaImprimir.total.toLocaleString('es-CO')}`);
+            comandos.push(LF);
+            comandos.push(ESC, 0x45, 0x00); // Negrita OFF
+
+            comandos.push(LF, LF);
+
+            // Centrar
+            comandos.push(ESC, 0x61, 0x01);
+            agregarTexto(comandos, 'Gracias por su compra!');
+            comandos.push(LF);
+            agregarTexto(comandos, 'Vuelva pronto');
+            comandos.push(LF, LF, LF);
+
+            // Cortar papel
+            comandos.push(GS, 0x56, 0x00);
+
+            return new Uint8Array(comandos);
+        }
+
+        function agregarTexto(comandos, texto) {
+            for (let i = 0; i < texto.length; i++) {
+                comandos.push(texto.charCodeAt(i));
+            }
+        }
+
+        function formatearPrecio(precio) {
+            return `$${precio.toLocaleString('es-CO')}`;
+        }
+
+        async function actualizarEstadoPedido(orderId, newStatus, metodoPago = null) {
+            const token = localStorage.getItem('token');
+
+            console.log('📤 Enviando petición:');
+            console.log('  - Order ID:', orderId);
+            console.log('  - Estado:', newStatus);
+            console.log('  - Método de pago:', metodoPago);
+
+            if (!orderId || orderId === 'null' || orderId === 'undefined') {
+                console.error('❌ Order ID inválido:', orderId);
+                alert('Error: ID de pedido inválido');
+                return;
+            }
+
+            // 🔒 BLOQUEAR TODOS LOS BOTONES DEL PEDIDO
+            const orderCard = document.querySelector(`[id*="${orderId}"]`)?.closest('.order-card');
             if (orderCard) {
                 const botones = orderCard.querySelectorAll('.btn-action, button[onclick*="cambiarEstadoProducto"]');
                 botones.forEach(btn => {
-                    btn.disabled = false;
-                    btn.style.opacity = '1';
-                    btn.style.cursor = 'pointer';
-                    if (btn.dataset.originalContent) {
-                        btn.innerHTML = btn.dataset.originalContent;
+                    btn.disabled = true;
+                    btn.style.opacity = '0.5';
+                    btn.style.cursor = 'not-allowed';
+                    // Guardar el contenido original
+                    btn.dataset.originalContent = btn.innerHTML;
+                    // Mostrar spinner
+                    if (btn.classList.contains('btn-action')) {
+                        btn.innerHTML = '<span class="loading-spinner" style="display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite;"></span>';
                     }
                 });
             }
-        }
-    } catch (error) {
-        console.error('❌ Error en la petición:', error);
-        alert('Error al actualizar el estado: ' + error.message);
-        // 🔓 RESTAURAR BOTONES EN CASO DE ERROR
-        if (orderCard) {
-            const botones = orderCard.querySelectorAll('.btn-action, button[onclick*="cambiarEstadoProducto"]');
-            botones.forEach(btn => {
-                btn.disabled = false;
-                btn.style.opacity = '1';
-                btn.style.cursor = 'pointer';
-                if (btn.dataset.originalContent) {
-                    btn.innerHTML = btn.dataset.originalContent;
+
+            try {
+                const body = {
+                    estado: newStatus
+                };
+
+                // ✅ SOLO agregar actualizarTodosLosProductos si NO es cancelado
+                if (newStatus !== 'cancelado') {
+                    body.actualizarTodosLosProductos = true;
                 }
-            });
-        }
-    }
-}
 
-async function cancelOrder(orderId) {
-    if (!confirm('¿Está seguro de cancelar este pedido?')) return;
-    await actualizarEstadoPedido(orderId, 'cancelado', null);
-}
-    async function deleteOrder(orderId) {
-        if (!confirm('⚠️ ¿Está seguro de eliminar este pedido?\n\nEsta acción no se puede deshacer y el pedido se eliminará permanentemente del sistema.')) return;
-
-        const token = localStorage.getItem('token');
-
-        try {
-            const response = await fetch(`${API_URL}/orders/${orderId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
+                // SOLO agregar metodoPago si existe Y el estado es 'entregado'
+                if (metodoPago && newStatus === 'entregado') {
+                    body.metodoPago = metodoPago;
                 }
-            });
 
-            const data = await response.json();
+                console.log('  - Body:', JSON.stringify(body, null, 2));
+                console.log('  - URL:', `${API_URL}/orders/${orderId}/estado`);
 
-            if (data.success) {
-                alert('✅ Pedido eliminado exitosamente');
-                await loadOrders();
-            } else {
-                alert('Error: ' + data.message);
+                const response = await fetch(`${API_URL}/orders/${orderId}/estado`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                console.log('📥 Respuesta del servidor:');
+                console.log('  - Status:', response.status);
+                console.log('  - Status Text:', response.statusText);
+
+                const data = await response.json();
+                console.log('  - Data:', data);
+
+                if (data.success) {
+                    console.log('✅ Pedido actualizado correctamente');
+                    await loadOrders();
+                } else {
+                    console.error('❌ Error del servidor:', data.message);
+                    alert('Error: ' + data.message);
+                    // 🔓 RESTAURAR BOTONES EN CASO DE ERROR
+                    if (orderCard) {
+                        const botones = orderCard.querySelectorAll('.btn-action, button[onclick*="cambiarEstadoProducto"]');
+                        botones.forEach(btn => {
+                            btn.disabled = false;
+                            btn.style.opacity = '1';
+                            btn.style.cursor = 'pointer';
+                            if (btn.dataset.originalContent) {
+                                btn.innerHTML = btn.dataset.originalContent;
+                            }
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Error en la petición:', error);
+                alert('Error al actualizar el estado: ' + error.message);
+                // 🔓 RESTAURAR BOTONES EN CASO DE ERROR
+                if (orderCard) {
+                    const botones = orderCard.querySelectorAll('.btn-action, button[onclick*="cambiarEstadoProducto"]');
+                    botones.forEach(btn => {
+                        btn.disabled = false;
+                        btn.style.opacity = '1';
+                        btn.style.cursor = 'pointer';
+                        if (btn.dataset.originalContent) {
+                            btn.innerHTML = btn.dataset.originalContent;
+                        }
+                    });
+                }
             }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error al eliminar el pedido');
         }
-    }
 
-function clearFilters() {
-    document.getElementById('filterEstado').value = '';
-    document.getElementById('filterMesa').value = '';
-    document.getElementById('filterSearch').value = '';
-    document.getElementById('filterFechaDesde').value = '';
-    document.getElementById('filterFechaHasta').value = '';
-    document.getElementById('filterPlato').value = ''; // ✅ NUEVO
-    
-    platoSeleccionado = null; // ✅ NUEVO
-    
-    applyFilters();
-    
-    const notification = document.createElement('div');
-    notification.textContent = '✅ Filtros restablecidos';
-    notification.style.cssText = `
+        async function cancelOrder(orderId) {
+            if (!confirm('¿Está seguro de cancelar este pedido?')) return;
+            await actualizarEstadoPedido(orderId, 'cancelado', null);
+        }
+        async function deleteOrder(orderId) {
+            if (!confirm('⚠️ ¿Está seguro de eliminar este pedido?\n\nEsta acción no se puede deshacer y el pedido se eliminará permanentemente del sistema.')) return;
+
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch(`${API_URL}/orders/${orderId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ Pedido eliminado exitosamente');
+                    await loadOrders();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al eliminar el pedido');
+            }
+        }
+
+        function clearFilters() {
+            document.getElementById('filterEstado').value = '';
+            document.getElementById('filterMesa').value = '';
+            document.getElementById('filterSearch').value = '';
+            document.getElementById('filterFechaDesde').value = '';
+            document.getElementById('filterFechaHasta').value = '';
+            document.getElementById('filterPlato').value = ''; // ✅ NUEVO
+
+            platoSeleccionado = null; // ✅ NUEVO
+
+            applyFilters();
+
+            const notification = document.createElement('div');
+            notification.textContent = '✅ Filtros restablecidos';
+            notification.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
@@ -2272,88 +2426,88 @@ function clearFilters() {
         z-index: 10000;
         animation: slideInRight 0.3s ease-out;
     `;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.style.animation = 'slideOutRight 0.3s ease-out';
-        setTimeout(() => notification.remove(), 300);
-    }, 2000);
-}
-    function toggleMenu() {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        
-        sidebar.classList.toggle('active');
-        overlay.classList.toggle('active');
-    }
 
-    function logout() {
-        if (confirm('¿Cerrar sesión?')) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('usuario');
-            window.location.href = 'index.html';
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 2000);
         }
-    }
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
 
-    // ========================
-// SISTEMA DE TIEMPO REAL
-// ========================
-
-let lastOrderCount = 0;
-let isFirstLoad = true;
-let pollingInterval = null;
-
-// Función para crear sonido "JC" personalizado
-// Función para crear sonido "JC" personalizado
-function playNotificationSound() {
-    // Verificar que el audio esté desbloqueado
-    if (!audioContextReady || !audioContext) {
-        console.warn('⚠️ Audio no inicializado. Haz clic en la página primero.');
-        return;
-    }
-    
-    try {
-        // Crear osciladores para simular "JC"
-        function playTone(frequency, startTime, duration, type = 'sine') {
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.value = frequency;
-            oscillator.type = type;
-            
-            // Envolvente para suavizar el sonido
-            gainNode.gain.setValueAtTime(0, audioContext.currentTime + startTime);
-            gainNode.gain.linearRampToValueAtTime(0.4, audioContext.currentTime + startTime + 0.05);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + startTime + duration);
-            
-            oscillator.start(audioContext.currentTime + startTime);
-            oscillator.stop(audioContext.currentTime + startTime + duration);
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
         }
-        
-        // Sonido "J" (sonido corto y agudo)
-        playTone(880, 0, 0.2, 'square');      // J - principal
-        playTone(1320, 0, 0.2, 'sine');       // J - armónico
-        
-        // Sonido "C" (sonido más grave y resonante)
-        playTone(523, 0.25, 0.35, 'triangle');   // C - principal
-        playTone(659, 0.25, 0.35, 'sine');       // C - armónico
-        
-        // Eco suave para dar profundidad
-        playTone(440, 0.45, 0.25, 'sine');
-        
-        console.log('🔊 Sonido "JC" reproducido');
-    } catch (error) {
-        console.error('❌ Error al reproducir sonido:', error);
-    }
-}
-// Función para mostrar alerta de nuevo pedido
-function mostrarAlertaNuevoPedido(nuevoPedido) {
-    const alerta = document.createElement('div');
-    alerta.innerHTML = `
+
+        function logout() {
+            if (confirm('¿Cerrar sesión?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('usuario');
+                window.location.href = 'index.html';
+            }
+        }
+
+        // ========================
+        // SISTEMA DE TIEMPO REAL
+        // ========================
+
+        let lastOrderCount = 0;
+        let isFirstLoad = true;
+        let pollingInterval = null;
+
+        // Función para crear sonido "JC" personalizado
+        // Función para crear sonido "JC" personalizado
+        function playNotificationSound() {
+            // Verificar que el audio esté desbloqueado
+            if (!audioContextReady || !audioContext) {
+                console.warn('⚠️ Audio no inicializado. Haz clic en la página primero.');
+                return;
+            }
+
+            try {
+                // Crear osciladores para simular "JC"
+                function playTone(frequency, startTime, duration, type = 'sine') {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+
+                    oscillator.frequency.value = frequency;
+                    oscillator.type = type;
+
+                    // Envolvente para suavizar el sonido
+                    gainNode.gain.setValueAtTime(0, audioContext.currentTime + startTime);
+                    gainNode.gain.linearRampToValueAtTime(0.4, audioContext.currentTime + startTime + 0.05);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + startTime + duration);
+
+                    oscillator.start(audioContext.currentTime + startTime);
+                    oscillator.stop(audioContext.currentTime + startTime + duration);
+                }
+
+                // Sonido "J" (sonido corto y agudo)
+                playTone(880, 0, 0.2, 'square');      // J - principal
+                playTone(1320, 0, 0.2, 'sine');       // J - armónico
+
+                // Sonido "C" (sonido más grave y resonante)
+                playTone(523, 0.25, 0.35, 'triangle');   // C - principal
+                playTone(659, 0.25, 0.35, 'sine');       // C - armónico
+
+                // Eco suave para dar profundidad
+                playTone(440, 0.45, 0.25, 'sine');
+
+                console.log('🔊 Sonido "JC" reproducido');
+            } catch (error) {
+                console.error('❌ Error al reproducir sonido:', error);
+            }
+        }
+        // Función para mostrar alerta de nuevo pedido
+        function mostrarAlertaNuevoPedido(nuevoPedido) {
+            const alerta = document.createElement('div');
+            alerta.innerHTML = `
         <div style="display: flex; align-items: center; gap: 12px;">
             <span style="font-size: 32px; animation: bounce 0.6s ease-in-out infinite;">🔔</span>
             <div>
@@ -2362,7 +2516,7 @@ function mostrarAlertaNuevoPedido(nuevoPedido) {
             </div>
         </div>
     `;
-    alerta.style.cssText = `
+            alerta.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
@@ -2376,157 +2530,157 @@ function mostrarAlertaNuevoPedido(nuevoPedido) {
         animation: slideInRight 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         cursor: pointer;
     `;
-    
-    // Agregar animación de bounce para el icono
-    const style = document.createElement('style');
-    style.textContent = `
+
+            // Agregar animación de bounce para el icono
+            const style = document.createElement('style');
+            style.textContent = `
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
         }
     `;
-    document.head.appendChild(style);
-    
-    document.body.appendChild(alerta);
-    
-    // Reproducir sonido personalizado "JC"
-    playNotificationSound();
-    
-    // Remover después de 5 segundos
-    setTimeout(() => {
-        alerta.style.animation = 'slideOutRight 0.3s ease-out';
-        setTimeout(() => alerta.remove(), 300);
-    }, 5000);
-    
-    // Remover al hacer clic
-    alerta.addEventListener('click', () => {
-        alerta.style.animation = 'slideOutRight 0.3s ease-out';
-        setTimeout(() => alerta.remove(), 300);
-    });
-}
+            document.head.appendChild(style);
 
-// Función de polling automático
-async function autoRefreshOrders() {
-    const token = localStorage.getItem('token');
-    
-    try {
-        const response = await fetch(`${API_URL}/orders?userId=${currentUser._id}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+            document.body.appendChild(alerta);
 
-        const data = await response.json();
-        
-        if (data.success) {
-            const newOrders = data.data;
-            
-            if (!isFirstLoad) {
-                // Detectar nuevo pedido
-                if (newOrders.length > lastOrderCount) {
-                    const ultimoPedido = newOrders[0];
-                    mostrarAlertaNuevoPedido(ultimoPedido);
-                }
-                
-                // Detectar pedidos editados
-                if (allOrders && allOrders.length > 0) {
-                    newOrders.forEach(newOrder => {
-                        const oldOrder = allOrders.find(o => o._id === newOrder._id);
-                        if (oldOrder) {
-                            const cambios = detectarCambiosPedido(oldOrder, newOrder);
-                            if (cambios.length > 0) {
-                                mostrarAlertaPedidoEditado(newOrder, cambios);
-                            }
+            // Reproducir sonido personalizado "JC"
+            playNotificationSound();
+
+            // Remover después de 5 segundos
+            setTimeout(() => {
+                alerta.style.animation = 'slideOutRight 0.3s ease-out';
+                setTimeout(() => alerta.remove(), 300);
+            }, 5000);
+
+            // Remover al hacer clic
+            alerta.addEventListener('click', () => {
+                alerta.style.animation = 'slideOutRight 0.3s ease-out';
+                setTimeout(() => alerta.remove(), 300);
+            });
+        }
+
+        // Función de polling automático
+        async function autoRefreshOrders() {
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch(`${API_URL}/orders?userId=${currentUser._id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const newOrders = data.data;
+
+                    if (!isFirstLoad) {
+                        // Detectar nuevo pedido
+                        if (newOrders.length > lastOrderCount) {
+                            const ultimoPedido = newOrders[0];
+                            mostrarAlertaNuevoPedido(ultimoPedido);
                         }
-                    });
+
+                        // Detectar pedidos editados
+                        if (allOrders && allOrders.length > 0) {
+                            newOrders.forEach(newOrder => {
+                                const oldOrder = allOrders.find(o => o._id === newOrder._id);
+                                if (oldOrder) {
+                                    const cambios = detectarCambiosPedido(oldOrder, newOrder);
+                                    if (cambios.length > 0) {
+                                        mostrarAlertaPedidoEditado(newOrder, cambios);
+                                    }
+                                }
+                            });
+                        }
+                    }
+
+                    // Actualizar lista si hay cambios
+                    if (JSON.stringify(allOrders) !== JSON.stringify(newOrders)) {
+                        allOrders = newOrders;
+                        applyFilters();
+                    }
+
+                    lastOrderCount = newOrders.length;
+                    isFirstLoad = false;
+                }
+            } catch (error) {
+                console.error('Error en auto-refresh:', error);
+            }
+        }
+
+        function detectarCambiosPedido(oldOrder, newOrder) {
+            const cambios = [];
+
+            // Detectar cambio de mesa
+            if (oldOrder.mesa !== newOrder.mesa) {
+                cambios.push(`Mesa: ${oldOrder.mesa} → ${newOrder.mesa}`);
+            }
+
+            // Detectar cambio de notas
+            if ((oldOrder.notas || '') !== (newOrder.notas || '')) {
+                if (!oldOrder.notas && newOrder.notas) {
+                    cambios.push(`Se agregaron notas: "${newOrder.notas}"`);
+                } else if (oldOrder.notas && !newOrder.notas) {
+                    cambios.push(`Se eliminaron las notas`);
+                } else {
+                    cambios.push(`Notas modificadas`);
                 }
             }
-            
-            // Actualizar lista si hay cambios
-            if (JSON.stringify(allOrders) !== JSON.stringify(newOrders)) {
-                allOrders = newOrders;
-                applyFilters();
-            }
-            
-            lastOrderCount = newOrders.length;
-            isFirstLoad = false;
-        }
-    } catch (error) {
-        console.error('Error en auto-refresh:', error);
-    }
-}
 
-function detectarCambiosPedido(oldOrder, newOrder) {
-    const cambios = [];
-    
-    // Detectar cambio de mesa
-    if (oldOrder.mesa !== newOrder.mesa) {
-        cambios.push(`Mesa: ${oldOrder.mesa} → ${newOrder.mesa}`);
-    }
-    
-    // Detectar cambio de notas
-    if ((oldOrder.notas || '') !== (newOrder.notas || '')) {
-        if (!oldOrder.notas && newOrder.notas) {
-            cambios.push(`Se agregaron notas: "${newOrder.notas}"`);
-        } else if (oldOrder.notas && !newOrder.notas) {
-            cambios.push(`Se eliminaron las notas`);
-        } else {
-            cambios.push(`Notas modificadas`);
-        }
-    }
-    
-    // Detectar cambios en productos
-    const oldItemsMap = new Map();
-    oldOrder.items.forEach(item => {
-        const nombre = item.productoInfo?.nombre || item.nombreProducto || 'Producto';
-        oldItemsMap.set(nombre, item.cantidad);
-    });
-    
-    const newItemsMap = new Map();
-    newOrder.items.forEach(item => {
-        const nombre = item.productoInfo?.nombre || item.nombreProducto || 'Producto';
-        newItemsMap.set(nombre, item.cantidad);
-    });
-    
-    // Productos agregados
-    newItemsMap.forEach((cantidad, nombre) => {
-        if (!oldItemsMap.has(nombre)) {
-            cambios.push(`➕ ${nombre} (x${cantidad})`);
-        } else if (oldItemsMap.get(nombre) !== cantidad) {
-            const diff = cantidad - oldItemsMap.get(nombre);
-            if (diff > 0) {
-                cambios.push(`📈 ${nombre}: ${oldItemsMap.get(nombre)} → ${cantidad}`);
-            } else {
-                cambios.push(`📉 ${nombre}: ${oldItemsMap.get(nombre)} → ${cantidad}`);
-            }
-        }
-    });
-    
-    // Productos eliminados
-    oldItemsMap.forEach((cantidad, nombre) => {
-        if (!newItemsMap.has(nombre)) {
-            cambios.push(`➖ ${nombre} eliminado`);
-        }
-    });
-    
-    // Detectar cambio de total
-    if (oldOrder.total !== newOrder.total) {
-        cambios.push(`Total: $${oldOrder.total.toLocaleString('es-CO')} → $${newOrder.total.toLocaleString('es-CO')}`);
-    }
-    
-    return cambios;
-}
+            // Detectar cambios en productos
+            const oldItemsMap = new Map();
+            oldOrder.items.forEach(item => {
+                const nombre = item.productoInfo?.nombre || item.nombreProducto || 'Producto';
+                oldItemsMap.set(nombre, item.cantidad);
+            });
 
-function mostrarAlertaPedidoEditado(pedido, cambios) {
-    const alerta = document.createElement('div');
-    
-    const cambiosHTML = cambios.slice(0, 4).map(c => 
-        `<div style="font-size: 12px; opacity: 0.95; margin-top: 4px;">• ${c}</div>`
-    ).join('');
-    
-    const masCambios = cambios.length > 4 ? 
-        `<div style="font-size: 11px; opacity: 0.8; margin-top: 6px; font-style: italic;">+${cambios.length - 4} cambio(s) más</div>` 
-        : '';
-    
-    alerta.innerHTML = `
+            const newItemsMap = new Map();
+            newOrder.items.forEach(item => {
+                const nombre = item.productoInfo?.nombre || item.nombreProducto || 'Producto';
+                newItemsMap.set(nombre, item.cantidad);
+            });
+
+            // Productos agregados
+            newItemsMap.forEach((cantidad, nombre) => {
+                if (!oldItemsMap.has(nombre)) {
+                    cambios.push(`➕ ${nombre} (x${cantidad})`);
+                } else if (oldItemsMap.get(nombre) !== cantidad) {
+                    const diff = cantidad - oldItemsMap.get(nombre);
+                    if (diff > 0) {
+                        cambios.push(`📈 ${nombre}: ${oldItemsMap.get(nombre)} → ${cantidad}`);
+                    } else {
+                        cambios.push(`📉 ${nombre}: ${oldItemsMap.get(nombre)} → ${cantidad}`);
+                    }
+                }
+            });
+
+            // Productos eliminados
+            oldItemsMap.forEach((cantidad, nombre) => {
+                if (!newItemsMap.has(nombre)) {
+                    cambios.push(`➖ ${nombre} eliminado`);
+                }
+            });
+
+            // Detectar cambio de total
+            if (oldOrder.total !== newOrder.total) {
+                cambios.push(`Total: $${oldOrder.total.toLocaleString('es-CO')} → $${newOrder.total.toLocaleString('es-CO')}`);
+            }
+
+            return cambios;
+        }
+
+        function mostrarAlertaPedidoEditado(pedido, cambios) {
+            const alerta = document.createElement('div');
+
+            const cambiosHTML = cambios.slice(0, 4).map(c =>
+                `<div style="font-size: 12px; opacity: 0.95; margin-top: 4px;">• ${c}</div>`
+            ).join('');
+
+            const masCambios = cambios.length > 4 ?
+                `<div style="font-size: 11px; opacity: 0.8; margin-top: 6px; font-style: italic;">+${cambios.length - 4} cambio(s) más</div>`
+                : '';
+
+            alerta.innerHTML = `
         <div style="display: flex; align-items: flex-start; gap: 12px;">
             <span style="font-size: 32px; animation: bounce 0.6s ease-in-out infinite;">✏️</span>
             <div style="flex: 1;">
@@ -2538,7 +2692,7 @@ function mostrarAlertaPedidoEditado(pedido, cambios) {
             </div>
         </div>
     `;
-    alerta.style.cssText = `
+            alerta.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
@@ -2553,83 +2707,83 @@ function mostrarAlertaPedidoEditado(pedido, cambios) {
         cursor: pointer;
         max-width: 400px;
     `;
-    
-    document.body.appendChild(alerta);
-    
-    // Reproducir sonido de edición
-    if (audioContext && audioUnlocked) {
-        if (audioContext.state === 'suspended') {
-            audioContext.resume().then(() => {
-                reproducirSonidoEdicion();
+
+            document.body.appendChild(alerta);
+
+            // Reproducir sonido de edición
+            if (audioContext && audioUnlocked) {
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume().then(() => {
+                        reproducirSonidoEdicion();
+                    });
+                } else {
+                    reproducirSonidoEdicion();
+                }
+            }
+
+            // Remover después de 7 segundos
+            setTimeout(() => {
+                alerta.style.animation = 'slideOutRight 0.3s ease-out';
+                setTimeout(() => alerta.remove(), 300);
+            }, 7000);
+
+            // Remover al hacer clic
+            alerta.addEventListener('click', () => {
+                alerta.style.animation = 'slideOutRight 0.3s ease-out';
+                setTimeout(() => alerta.remove(), 300);
             });
-        } else {
-            reproducirSonidoEdicion();
         }
-    }
-    
-    // Remover después de 7 segundos
-    setTimeout(() => {
-        alerta.style.animation = 'slideOutRight 0.3s ease-out';
-        setTimeout(() => alerta.remove(), 300);
-    }, 7000);
-    
-    // Remover al hacer clic
-    alerta.addEventListener('click', () => {
-        alerta.style.animation = 'slideOutRight 0.3s ease-out';
-        setTimeout(() => alerta.remove(), 300);
-    });
-}
 
-// Iniciar polling cuando se carga la página
-const waitForUserInterval = setInterval(() => {
-    if (currentUser && currentUser._id) {
-        clearInterval(waitForUserInterval);
-        
-        // Iniciar actualización automática cada 3 segundos
-        pollingInterval = setInterval(autoRefreshOrders, 3000);
-        
-        console.log('✅ Sistema de tiempo real activado con sonido "JC"');
-    }
-}, 100);
+        // Iniciar polling cuando se carga la página
+        const waitForUserInterval = setInterval(() => {
+            if (currentUser && currentUser._id) {
+                clearInterval(waitForUserInterval);
 
-// Limpiar interval al salir
-window.addEventListener('beforeunload', () => {
-    if (pollingInterval) {
-        clearInterval(pollingInterval);
-    }
-});
+                // Iniciar actualización automática cada 3 segundos
+                pollingInterval = setInterval(autoRefreshOrders, 3000);
 
-// ============================================
-// SISTEMA DE ESTADOS INDIVIDUALES POR PRODUCTO
-// ============================================
+                console.log('✅ Sistema de tiempo real activado con sonido "JC"');
+            }
+        }, 100);
 
-let modalEstadoProductoData = null;
+        // Limpiar interval al salir
+        window.addEventListener('beforeunload', () => {
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+            }
+        });
 
-function cambiarEstadoProducto(orderId, itemIndex, cantidadTotal, estadoActual) {
-    modalEstadoProductoData = { orderId, itemIndex, cantidadTotal, estadoActual };
-    
-    // Determinar siguiente estado
-    const siguienteEstado = obtenerSiguienteEstado(estadoActual);
-    
-    if (cantidadTotal === 1) {
-        // Si es solo 1, cambiar directamente
-        actualizarEstadoProducto(orderId, itemIndex, 1, siguienteEstado);
-    } else {
-        // Mostrar modal para seleccionar cantidad
-        mostrarModalCantidadProducto(cantidadTotal, siguienteEstado);
-    }
-}
+        // ============================================
+        // SISTEMA DE ESTADOS INDIVIDUALES POR PRODUCTO
+        // ============================================
 
-function obtenerSiguienteEstado(estadoActual) {
-    const flujo = ['pendiente', 'preparando', 'listo', 'entregado'];
-    const index = flujo.indexOf(estadoActual);
-    return flujo[index + 1] || 'entregado';
-}
+        let modalEstadoProductoData = null;
 
-function mostrarModalCantidadProducto(cantidadTotal, siguienteEstado) {
-    const modal = document.createElement('div');
-    modal.id = 'modalCantidadProducto';
-    modal.style.cssText = `
+        function cambiarEstadoProducto(orderId, itemIndex, cantidadTotal, estadoActual) {
+            modalEstadoProductoData = { orderId, itemIndex, cantidadTotal, estadoActual };
+
+            // Determinar siguiente estado
+            const siguienteEstado = obtenerSiguienteEstado(estadoActual);
+
+            if (cantidadTotal === 1) {
+                // Si es solo 1, cambiar directamente
+                actualizarEstadoProducto(orderId, itemIndex, 1, siguienteEstado);
+            } else {
+                // Mostrar modal para seleccionar cantidad
+                mostrarModalCantidadProducto(cantidadTotal, siguienteEstado);
+            }
+        }
+
+        function obtenerSiguienteEstado(estadoActual) {
+            const flujo = ['pendiente', 'preparando', 'listo', 'entregado'];
+            const index = flujo.indexOf(estadoActual);
+            return flujo[index + 1] || 'entregado';
+        }
+
+        function mostrarModalCantidadProducto(cantidadTotal, siguienteEstado) {
+            const modal = document.createElement('div');
+            modal.id = 'modalCantidadProducto';
+            modal.style.cssText = `
         position: fixed;
         top: 0;
         left: 0;
@@ -2642,14 +2796,14 @@ function mostrarModalCantidadProducto(cantidadTotal, siguienteEstado) {
         justify-content: center;
         animation: fadeIn 0.2s ease;
     `;
-    
-    const emojiEstado = {
-        'preparando': '👨‍🍳',
-        'listo': '✅',
-        'entregado': '🎉'
-    }[siguienteEstado];
-    
-    modal.innerHTML = `
+
+            const emojiEstado = {
+                'preparando': '👨‍🍳',
+                'listo': '✅',
+                'entregado': '🎉'
+            }[siguienteEstado];
+
+            modal.innerHTML = `
         <div style="background: white; border-radius: 16px; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: slideUp 0.3s ease;">
             <h3 style="font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 1rem; text-align: center;">
                 ${emojiEstado} Cambiar a ${siguienteEstado}
@@ -2681,116 +2835,116 @@ function mostrarModalCantidadProducto(cantidadTotal, siguienteEstado) {
             </div>
         </div>
     `;
-    
-    document.body.appendChild(modal);
-}
 
-function ajustarCantidadModal(delta) {
-    const display = document.getElementById('cantidadSeleccionada');
-    let cantidad = parseInt(display.textContent);
-    cantidad = Math.max(1, Math.min(modalEstadoProductoData.cantidadTotal, cantidad + delta));
-    display.textContent = cantidad;
-}
+            document.body.appendChild(modal);
+        }
 
-function cerrarModalCantidadProducto() {
-    const modal = document.getElementById('modalCantidadProducto');
-    if (modal) {
-        modal.style.animation = 'fadeOut 0.2s ease';
-        setTimeout(() => modal.remove(), 200);
-    }
-    modalEstadoProductoData = null;
-}
+        function ajustarCantidadModal(delta) {
+            const display = document.getElementById('cantidadSeleccionada');
+            let cantidad = parseInt(display.textContent);
+            cantidad = Math.max(1, Math.min(modalEstadoProductoData.cantidadTotal, cantidad + delta));
+            display.textContent = cantidad;
+        }
 
-async function confirmarCambioEstadoProducto(nuevoEstado) {
-    const cantidad = parseInt(document.getElementById('cantidadSeleccionada').textContent);
-    
-    // Guardar los datos ANTES de cerrar el modal
-    const { orderId, itemIndex } = modalEstadoProductoData;
-    
-    cerrarModalCantidadProducto();
-    
-    await actualizarEstadoProducto(
-        orderId,
-        itemIndex,
-        cantidad,
-        nuevoEstado
-    );
-}
-
-async function actualizarEstadoProducto(orderId, itemIndex, cantidadCambiar, nuevoEstado) {
-    const token = localStorage.getItem('token');
-    
-    // 🔒 BLOQUEAR EL BOTÓN ESPECÍFICO
-    const orderCard = document.querySelector(`[id*="${orderId}"]`)?.closest('.order-card');
-    let botonClickeado = null;
-    
-    if (orderCard) {
-        const botones = orderCard.querySelectorAll('button[onclick*="cambiarEstadoProducto"]');
-        botones.forEach(btn => {
-            if (btn.onclick && btn.onclick.toString().includes(`'${orderId}'`) && 
-                btn.onclick.toString().includes(`${itemIndex}`)) {
-                botonClickeado = btn;
-                btn.disabled = true;
-                btn.style.opacity = '0.5';
-                btn.style.cursor = 'not-allowed';
-                btn.innerHTML = '⏳';
+        function cerrarModalCantidadProducto() {
+            const modal = document.getElementById('modalCantidadProducto');
+            if (modal) {
+                modal.style.animation = 'fadeOut 0.2s ease';
+                setTimeout(() => modal.remove(), 200);
             }
-        });
-    }
-    
-    try {
-        const response = await fetch(`${API_URL}/orders/${orderId}/item/${itemIndex}/estado`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                cantidadCambiar,
+            modalEstadoProductoData = null;
+        }
+
+        async function confirmarCambioEstadoProducto(nuevoEstado) {
+            const cantidad = parseInt(document.getElementById('cantidadSeleccionada').textContent);
+
+            // Guardar los datos ANTES de cerrar el modal
+            const { orderId, itemIndex } = modalEstadoProductoData;
+
+            cerrarModalCantidadProducto();
+
+            await actualizarEstadoProducto(
+                orderId,
+                itemIndex,
+                cantidad,
                 nuevoEstado
-            })
-        });
+            );
+        }
 
-        const data = await response.json();
+        async function actualizarEstadoProducto(orderId, itemIndex, cantidadCambiar, nuevoEstado) {
+            const token = localStorage.getItem('token');
 
-        if (data.success) {
-            // Si todos los productos están entregados, preguntar método de pago
-            if (data.todosEntregados) {
-                currentOrderIdForPayment = orderId;
-                mostrarModalMetodoPago();
-            } else {
-                await loadOrders();
+            // 🔒 BLOQUEAR EL BOTÓN ESPECÍFICO
+            const orderCard = document.querySelector(`[id*="${orderId}"]`)?.closest('.order-card');
+            let botonClickeado = null;
+
+            if (orderCard) {
+                const botones = orderCard.querySelectorAll('button[onclick*="cambiarEstadoProducto"]');
+                botones.forEach(btn => {
+                    if (btn.onclick && btn.onclick.toString().includes(`'${orderId}'`) &&
+                        btn.onclick.toString().includes(`${itemIndex}`)) {
+                        botonClickeado = btn;
+                        btn.disabled = true;
+                        btn.style.opacity = '0.5';
+                        btn.style.cursor = 'not-allowed';
+                        btn.innerHTML = '⏳';
+                    }
+                });
             }
-            
-            // Animación de éxito
-            mostrarNotificacionExito(`Producto marcado como ${nuevoEstado}`);
-        } else {
-            alert('Error: ' + data.message);
-            // 🔓 RESTAURAR BOTÓN EN CASO DE ERROR
-            if (botonClickeado) {
-                botonClickeado.disabled = false;
-                botonClickeado.style.opacity = '1';
-                botonClickeado.style.cursor = 'pointer';
-                botonClickeado.innerHTML = '▶️';
+
+            try {
+                const response = await fetch(`${API_URL}/orders/${orderId}/item/${itemIndex}/estado`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        cantidadCambiar,
+                        nuevoEstado
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Si todos los productos están entregados, preguntar método de pago
+                    if (data.todosEntregados) {
+                        currentOrderIdForPayment = orderId;
+                        mostrarModalMetodoPago();
+                    } else {
+                        await loadOrders();
+                    }
+
+                    // Animación de éxito
+                    mostrarNotificacionExito(`Producto marcado como ${nuevoEstado}`);
+                } else {
+                    alert('Error: ' + data.message);
+                    // 🔓 RESTAURAR BOTÓN EN CASO DE ERROR
+                    if (botonClickeado) {
+                        botonClickeado.disabled = false;
+                        botonClickeado.style.opacity = '1';
+                        botonClickeado.style.cursor = 'pointer';
+                        botonClickeado.innerHTML = '▶️';
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al actualizar el estado del producto');
+                // 🔓 RESTAURAR BOTÓN EN CASO DE ERROR
+                if (botonClickeado) {
+                    botonClickeado.disabled = false;
+                    botonClickeado.style.opacity = '1';
+                    botonClickeado.style.cursor = 'pointer';
+                    botonClickeado.innerHTML = '▶️';
+                }
             }
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error al actualizar el estado del producto');
-        // 🔓 RESTAURAR BOTÓN EN CASO DE ERROR
-        if (botonClickeado) {
-            botonClickeado.disabled = false;
-            botonClickeado.style.opacity = '1';
-            botonClickeado.style.cursor = 'pointer';
-            botonClickeado.innerHTML = '▶️';
-        }
-    }
-}
 
-function mostrarNotificacionExito(mensaje) {
-    const notif = document.createElement('div');
-    notif.textContent = mensaje;
-    notif.style.cssText = `
+        function mostrarNotificacionExito(mensaje) {
+            const notif = document.createElement('div');
+            notif.textContent = mensaje;
+            notif.style.cssText = `
         position: fixed;
         top: 80px;
         right: 20px;
@@ -2804,17 +2958,17 @@ function mostrarNotificacionExito(mensaje) {
         z-index: 10000;
         animation: slideInRight 0.3s ease-out;
     `;
-    document.body.appendChild(notif);
-    
-    setTimeout(() => {
-        notif.style.animation = 'slideOutRight 0.3s ease-out';
-        setTimeout(() => notif.remove(), 300);
-    }, 2500);
-}
+            document.body.appendChild(notif);
 
-// Agregar estilos de animación
-const style = document.createElement('style');
-style.textContent = `
+            setTimeout(() => {
+                notif.style.animation = 'slideOutRight 0.3s ease-out';
+                setTimeout(() => notif.remove(), 300);
+            }, 2500);
+        }
+
+        // Agregar estilos de animación
+        const style = document.createElement('style');
+        style.textContent = `
     @keyframes fadeIn {
         from { opacity: 0; }
         to { opacity: 1; }
@@ -2828,326 +2982,326 @@ style.textContent = `
         to { transform: translateY(0); opacity: 1; }
     }
 `;
-document.head.appendChild(style);
+        document.head.appendChild(style);
 
-function reproducirSonidoEdicion() {
-    try {
-        const currentTime = audioContext.currentTime;
-        
-        function playTone(frequency, startTime, duration, type = 'sine', volume = 0.3) {
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.value = frequency;
-            oscillator.type = type;
-            
-            gainNode.gain.setValueAtTime(0, currentTime + startTime);
-            gainNode.gain.linearRampToValueAtTime(volume, currentTime + startTime + 0.05);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, currentTime + startTime + duration);
-            
-            oscillator.start(currentTime + startTime);
-            oscillator.stop(currentTime + startTime + duration);
+        function reproducirSonidoEdicion() {
+            try {
+                const currentTime = audioContext.currentTime;
+
+                function playTone(frequency, startTime, duration, type = 'sine', volume = 0.3) {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+
+                    oscillator.frequency.value = frequency;
+                    oscillator.type = type;
+
+                    gainNode.gain.setValueAtTime(0, currentTime + startTime);
+                    gainNode.gain.linearRampToValueAtTime(volume, currentTime + startTime + 0.05);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, currentTime + startTime + duration);
+
+                    oscillator.start(currentTime + startTime);
+                    oscillator.stop(currentTime + startTime + duration);
+                }
+
+                // Sonido de edición - tono ascendente suave
+                playTone(440, 0, 0.15, 'sine', 0.3);      // La
+                playTone(554, 0.15, 0.15, 'sine', 0.3);   // Do#
+                playTone(659, 0.3, 0.25, 'triangle', 0.4); // Mi
+
+                console.log('🔊 Sonido de edición reproducido');
+            } catch (error) {
+                console.error('❌ Error al reproducir sonido:', error);
+            }
         }
-        
-        // Sonido de edición - tono ascendente suave
-        playTone(440, 0, 0.15, 'sine', 0.3);      // La
-        playTone(554, 0.15, 0.15, 'sine', 0.3);   // Do#
-        playTone(659, 0.3, 0.25, 'triangle', 0.4); // Mi
-        
-        console.log('🔊 Sonido de edición reproducido');
-    } catch (error) {
-        console.error('❌ Error al reproducir sonido:', error);
-    }
-}
 
-// ✅ FUNCIÓN PARA CARGAR TODOS LOS PLATOS
-// ✅ FUNCIÓN PARA CARGAR TODOS LOS PLATOS (SOLO DE PEDIDOS ACTIVOS)
-function cargarTodosLosPlatos() {
-    todosLosPlatos = new Set();
-    
-    // ✅ FILTRAR SOLO PEDIDOS ACTIVOS (NO ENTREGADOS)
-    const pedidosActivos = allOrders.filter(order => order.estado !== 'entregado');
-    
-    pedidosActivos.forEach(order => {
-        order.items.forEach(item => {
-            let nombre = 'Producto eliminado';
-            
-            if (item.productoInfo) {
-                nombre = item.productoInfo.nombre;
-            } else if (item.producto && item.producto.nombre) {
-                nombre = item.producto.nombre;
-            } else if (item.nombreProducto) {
-                nombre = item.nombreProducto;
-            }
-            
-            if (nombre !== 'Producto eliminado') {
-                todosLosPlatos.add(nombre);
-            }
-        });
-    });
-    
-    // Actualizar el select
-    const selectPlato = document.getElementById('filterPlato');
-    const platoActual = selectPlato.value;
-    
-    selectPlato.innerHTML = '<option value="">Todos los platos</option>';
-    
-    // ✅ Si no hay platos activos, mostrar mensaje
-    if (todosLosPlatos.size === 0) {
-        const option = document.createElement('option');
-        option.value = '';
-        option.textContent = 'No hay platos en pedidos activos';
-        option.disabled = true;
-        selectPlato.appendChild(option);
-    } else {
-        Array.from(todosLosPlatos).sort().forEach(plato => {
-            const option = document.createElement('option');
-            option.value = plato;
-            option.textContent = plato;
-            selectPlato.appendChild(option);
-        });
-    }
-    
-    // Restaurar selección si existía y sigue siendo válida
-    if (platoActual && todosLosPlatos.has(platoActual)) {
-        selectPlato.value = platoActual;
-    } else if (platoActual && !todosLosPlatos.has(platoActual)) {
-        // Si el plato seleccionado ya no está disponible, limpiar filtro
-        selectPlato.value = '';
-        platoSeleccionado = null;
-        // Re-aplicar filtros sin el plato
-        applyFilters();
-    }
-}
-// ✅ FUNCIÓN PARA RECOPILAR PRODUCTOS FILTRADOS
-function recopilarProductosFiltrados() {
-    productosFiltrados = [];
-    
-    if (!platoSeleccionado) {
-        return;
-    }
-    
-    filteredOrders.forEach(order => {
-        order.items.forEach((item, itemIndex) => {
-            let nombre = 'Producto eliminado';
-            
-            if (item.productoInfo) {
-                nombre = item.productoInfo.nombre;
-            } else if (item.producto && item.producto.nombre) {
-                nombre = item.producto.nombre;
-            } else if (item.nombreProducto) {
-                nombre = item.nombreProducto;
-            }
-            
-            if (nombre === platoSeleccionado) {
-                // Agregar cada grupo de estados individuales
-                (item.estadosIndividuales || []).forEach(grupo => {
-                    productosFiltrados.push({
-                        orderId: order._id,
-                        itemIndex: itemIndex,
-                        cantidad: grupo.cantidad,
-                        estado: grupo.estado,
-                        nombreProducto: nombre
-                    });
+        // ✅ FUNCIÓN PARA CARGAR TODOS LOS PLATOS
+        // ✅ FUNCIÓN PARA CARGAR TODOS LOS PLATOS (SOLO DE PEDIDOS ACTIVOS)
+        function cargarTodosLosPlatos() {
+            todosLosPlatos = new Set();
+
+            // ✅ FILTRAR SOLO PEDIDOS ACTIVOS (NO ENTREGADOS)
+            const pedidosActivos = allOrders.filter(order => order.estado !== 'entregado');
+
+            pedidosActivos.forEach(order => {
+                order.items.forEach(item => {
+                    let nombre = 'Producto eliminado';
+
+                    if (item.productoInfo) {
+                        nombre = item.productoInfo.nombre;
+                    } else if (item.producto && item.producto.nombre) {
+                        nombre = item.producto.nombre;
+                    } else if (item.nombreProducto) {
+                        nombre = item.nombreProducto;
+                    }
+
+                    if (nombre !== 'Producto eliminado') {
+                        todosLosPlatos.add(nombre);
+                    }
+                });
+            });
+
+            // Actualizar el select
+            const selectPlato = document.getElementById('filterPlato');
+            const platoActual = selectPlato.value;
+
+            selectPlato.innerHTML = '<option value="">Todos los platos</option>';
+
+            // ✅ Si no hay platos activos, mostrar mensaje
+            if (todosLosPlatos.size === 0) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'No hay platos en pedidos activos';
+                option.disabled = true;
+                selectPlato.appendChild(option);
+            } else {
+                Array.from(todosLosPlatos).sort().forEach(plato => {
+                    const option = document.createElement('option');
+                    option.value = plato;
+                    option.textContent = plato;
+                    selectPlato.appendChild(option);
                 });
             }
-        });
-    });
-}
 
-// ✅ FUNCIÓN PARA ACTUALIZAR EL BOTÓN GLOBAL
-function actualizarBotonGlobal() {
-    const btn = document.getElementById('btnCambiarEstadoGlobal');
-    const texto = document.getElementById('textoBotonGlobal');
-    
-    if (!platoSeleccionado || productosFiltrados.length === 0) {
-        btn.disabled = true;
-        texto.textContent = 'Cambiar Estado Global';
-        return;
-    }
-    
-    // Determinar el estado predominante
-    const estadosCount = {};
-    productosFiltrados.forEach(p => {
-        estadosCount[p.estado] = (estadosCount[p.estado] || 0) + 1;
-    });
-    
-    // Encontrar el estado más común
-    let estadoPredominante = 'pendiente';
-    let maxCount = 0;
-    
-    for (const [estado, count] of Object.entries(estadosCount)) {
-        if (count > maxCount && estado !== 'entregado') {
-            estadoPredominante = estado;
-            maxCount = count;
+            // Restaurar selección si existía y sigue siendo válida
+            if (platoActual && todosLosPlatos.has(platoActual)) {
+                selectPlato.value = platoActual;
+            } else if (platoActual && !todosLosPlatos.has(platoActual)) {
+                // Si el plato seleccionado ya no está disponible, limpiar filtro
+                selectPlato.value = '';
+                platoSeleccionado = null;
+                // Re-aplicar filtros sin el plato
+                applyFilters();
+            }
         }
-    }
-    
-    // Si todos están entregados, deshabilitar
-    if (estadoPredominante === 'entregado' || maxCount === 0) {
-        btn.disabled = true;
-        texto.textContent = 'Cambiar Estado Global';
-        return;
-    }
-    
-    // Determinar siguiente estado
-    const siguienteEstado = obtenerSiguienteEstado(estadoPredominante);
-    const emojiEstado = {
-        'preparando': '👨‍🍳',
-        'listo': '✅',
-        'entregado': '🎉'
-    }[siguienteEstado] || '▶️';
-    
-    btn.disabled = false;
-    texto.textContent = `${emojiEstado} Cambiar a ${siguienteEstado} (${productosFiltrados.length})`;
-}
+        // ✅ FUNCIÓN PARA RECOPILAR PRODUCTOS FILTRADOS
+        function recopilarProductosFiltrados() {
+            productosFiltrados = [];
 
-// ✅ FUNCIÓN PARA CAMBIAR ESTADO GLOBAL
-async function cambiarEstadoGlobal() {
-    if (!platoSeleccionado || productosFiltrados.length === 0) {
-        alert('⚠️ No hay productos filtrados para cambiar de estado');
-        return;
-    }
-    
-    // Determinar el estado predominante
-    const estadosCount = {};
-    productosFiltrados.forEach(p => {
-        estadosCount[p.estado] = (estadosCount[p.estado] || 0) + 1;
-    });
-    
-    let estadoPredominante = 'pendiente';
-    let maxCount = 0;
-    
-    for (const [estado, count] of Object.entries(estadosCount)) {
-        if (count > maxCount && estado !== 'entregado') {
-            estadoPredominante = estado;
-            maxCount = count;
-        }
-    }
-    
-    const siguienteEstado = obtenerSiguienteEstado(estadoPredominante);
-    
-    const confirmacion = confirm(
-        `🔄 ¿Cambiar el estado de ${productosFiltrados.length} unidades de "${platoSeleccionado}" a "${siguienteEstado}"?\n\n` +
-        `Esta acción afectará a múltiples pedidos.`
-    );
-    
-    if (!confirmacion) return;
-    
-    // Deshabilitar botón
-    const btn = document.getElementById('btnCambiarEstadoGlobal');
-    btn.disabled = true;
-    btn.innerHTML = '<span>⏳</span><span>Actualizando...</span>';
-    
-    try {
-        // Agrupar por pedido para hacer menos peticiones
-        const cambiosPorPedido = {};
-        
-        productosFiltrados.forEach(p => {
-            if (p.estado !== 'entregado') {
-                if (!cambiosPorPedido[p.orderId]) {
-                    cambiosPorPedido[p.orderId] = [];
-                }
-                cambiosPorPedido[p.orderId].push({
-                    itemIndex: p.itemIndex,
-                    cantidad: p.cantidad,
-                    estado: p.estado
+            if (!platoSeleccionado) {
+                return;
+            }
+
+            filteredOrders.forEach(order => {
+                order.items.forEach((item, itemIndex) => {
+                    let nombre = 'Producto eliminado';
+
+                    if (item.productoInfo) {
+                        nombre = item.productoInfo.nombre;
+                    } else if (item.producto && item.producto.nombre) {
+                        nombre = item.producto.nombre;
+                    } else if (item.nombreProducto) {
+                        nombre = item.nombreProducto;
+                    }
+
+                    if (nombre === platoSeleccionado) {
+                        // Agregar cada grupo de estados individuales
+                        (item.estadosIndividuales || []).forEach(grupo => {
+                            productosFiltrados.push({
+                                orderId: order._id,
+                                itemIndex: itemIndex,
+                                cantidad: grupo.cantidad,
+                                estado: grupo.estado,
+                                nombreProducto: nombre
+                            });
+                        });
+                    }
                 });
-            }
-        });
-        
-        // Ejecutar cambios
-        let exitosos = 0;
-        let fallidos = 0;
-        
-        for (const [orderId, cambios] of Object.entries(cambiosPorPedido)) {
-            for (const cambio of cambios) {
-                try {
-                    await actualizarEstadoProducto(
-                        orderId,
-                        cambio.itemIndex,
-                        cambio.cantidad,
-                        siguienteEstado
-                    );
-                    exitosos++;
-                } catch (error) {
-                    console.error('Error al actualizar:', error);
-                    fallidos++;
-                }
-            }
-        }
-        
-        // Recargar pedidos
-        await loadOrders();
-        
-        // Mostrar resultado
-        if (fallidos === 0) {
-            mostrarNotificacionExito(`✅ ${exitosos} productos actualizados a "${siguienteEstado}"`);
-        } else {
-            alert(`⚠️ Proceso completado:\n✅ ${exitosos} actualizados\n❌ ${fallidos} fallidos`);
-        }
-        
-    } catch (error) {
-        console.error('Error en cambio global:', error);
-        alert('❌ Error al cambiar estados: ' + error.message);
-    } finally {
-        actualizarBotonGlobal();
-    }
-}
-
-// ✅ FUNCIÓN PARA MOSTRAR NOTAS
-// ✅ FUNCIÓN PARA MOSTRAR NOTAS (SOLO PEDIDOS ACTIVOS)
-function mostrarNotas() {
-    const notasCard = document.getElementById('notasCard');
-    const notasList = document.getElementById('notasList');
-    const notasCount = document.getElementById('notasCount');
-    
-    // ✅ SOLO recopilar notas de pedidos ACTIVOS (no entregados/pagados)
-    const notas = [];
-    
-    filteredOrders.forEach(order => {
-        // ✅ Excluir pedidos entregados/pagados
-        if (order.estado === 'entregado') {
-            return; // Saltar este pedido
-        }
-        
-        if (order.notas && order.notas.trim() !== '') {
-            notas.push({
-                mesa: order.mesa,
-                nota: order.notas,
-                fecha: new Date(order.createdAt),
-                estado: order.estado // Para mostrar el estado
             });
         }
-    });
-    
-    if (notas.length === 0) {
-        notasCard.style.display = 'none';
-        return;
-    }
-    
-    // Mostrar card
-    notasCard.style.display = 'block';
-    notasCount.textContent = notas.length;
-    
-    // Ordenar por fecha (más reciente primero)
-    notas.sort((a, b) => b.fecha - a.fecha);
-    
-    // Generar HTML con badge de estado
-    notasList.innerHTML = notas.map(n => {
-        const badgeColor = {
-            'pendiente': '#ed8936',
-            'preparando': '#4299e1',
-            'listo': '#48bb78',
-            'cancelado': '#fc8181'
-        }[n.estado] || '#718096';
-        
-        const estadoTexto = n.estado.charAt(0).toUpperCase() + n.estado.slice(1);
-        
-        return `
+
+        // ✅ FUNCIÓN PARA ACTUALIZAR EL BOTÓN GLOBAL
+        function actualizarBotonGlobal() {
+            const btn = document.getElementById('btnCambiarEstadoGlobal');
+            const texto = document.getElementById('textoBotonGlobal');
+
+            if (!platoSeleccionado || productosFiltrados.length === 0) {
+                btn.disabled = true;
+                texto.textContent = 'Cambiar Estado Global';
+                return;
+            }
+
+            // Determinar el estado predominante
+            const estadosCount = {};
+            productosFiltrados.forEach(p => {
+                estadosCount[p.estado] = (estadosCount[p.estado] || 0) + 1;
+            });
+
+            // Encontrar el estado más común
+            let estadoPredominante = 'pendiente';
+            let maxCount = 0;
+
+            for (const [estado, count] of Object.entries(estadosCount)) {
+                if (count > maxCount && estado !== 'entregado') {
+                    estadoPredominante = estado;
+                    maxCount = count;
+                }
+            }
+
+            // Si todos están entregados, deshabilitar
+            if (estadoPredominante === 'entregado' || maxCount === 0) {
+                btn.disabled = true;
+                texto.textContent = 'Cambiar Estado Global';
+                return;
+            }
+
+            // Determinar siguiente estado
+            const siguienteEstado = obtenerSiguienteEstado(estadoPredominante);
+            const emojiEstado = {
+                'preparando': '👨‍🍳',
+                'listo': '✅',
+                'entregado': '🎉'
+            }[siguienteEstado] || '▶️';
+
+            btn.disabled = false;
+            texto.textContent = `${emojiEstado} Cambiar a ${siguienteEstado} (${productosFiltrados.length})`;
+        }
+
+        // ✅ FUNCIÓN PARA CAMBIAR ESTADO GLOBAL
+        async function cambiarEstadoGlobal() {
+            if (!platoSeleccionado || productosFiltrados.length === 0) {
+                alert('⚠️ No hay productos filtrados para cambiar de estado');
+                return;
+            }
+
+            // Determinar el estado predominante
+            const estadosCount = {};
+            productosFiltrados.forEach(p => {
+                estadosCount[p.estado] = (estadosCount[p.estado] || 0) + 1;
+            });
+
+            let estadoPredominante = 'pendiente';
+            let maxCount = 0;
+
+            for (const [estado, count] of Object.entries(estadosCount)) {
+                if (count > maxCount && estado !== 'entregado') {
+                    estadoPredominante = estado;
+                    maxCount = count;
+                }
+            }
+
+            const siguienteEstado = obtenerSiguienteEstado(estadoPredominante);
+
+            const confirmacion = confirm(
+                `🔄 ¿Cambiar el estado de ${productosFiltrados.length} unidades de "${platoSeleccionado}" a "${siguienteEstado}"?\n\n` +
+                `Esta acción afectará a múltiples pedidos.`
+            );
+
+            if (!confirmacion) return;
+
+            // Deshabilitar botón
+            const btn = document.getElementById('btnCambiarEstadoGlobal');
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳</span><span>Actualizando...</span>';
+
+            try {
+                // Agrupar por pedido para hacer menos peticiones
+                const cambiosPorPedido = {};
+
+                productosFiltrados.forEach(p => {
+                    if (p.estado !== 'entregado') {
+                        if (!cambiosPorPedido[p.orderId]) {
+                            cambiosPorPedido[p.orderId] = [];
+                        }
+                        cambiosPorPedido[p.orderId].push({
+                            itemIndex: p.itemIndex,
+                            cantidad: p.cantidad,
+                            estado: p.estado
+                        });
+                    }
+                });
+
+                // Ejecutar cambios
+                let exitosos = 0;
+                let fallidos = 0;
+
+                for (const [orderId, cambios] of Object.entries(cambiosPorPedido)) {
+                    for (const cambio of cambios) {
+                        try {
+                            await actualizarEstadoProducto(
+                                orderId,
+                                cambio.itemIndex,
+                                cambio.cantidad,
+                                siguienteEstado
+                            );
+                            exitosos++;
+                        } catch (error) {
+                            console.error('Error al actualizar:', error);
+                            fallidos++;
+                        }
+                    }
+                }
+
+                // Recargar pedidos
+                await loadOrders();
+
+                // Mostrar resultado
+                if (fallidos === 0) {
+                    mostrarNotificacionExito(`✅ ${exitosos} productos actualizados a "${siguienteEstado}"`);
+                } else {
+                    alert(`⚠️ Proceso completado:\n✅ ${exitosos} actualizados\n❌ ${fallidos} fallidos`);
+                }
+
+            } catch (error) {
+                console.error('Error en cambio global:', error);
+                alert('❌ Error al cambiar estados: ' + error.message);
+            } finally {
+                actualizarBotonGlobal();
+            }
+        }
+
+        // ✅ FUNCIÓN PARA MOSTRAR NOTAS
+        // ✅ FUNCIÓN PARA MOSTRAR NOTAS (SOLO PEDIDOS ACTIVOS)
+        function mostrarNotas() {
+            const notasCard = document.getElementById('notasCard');
+            const notasList = document.getElementById('notasList');
+            const notasCount = document.getElementById('notasCount');
+
+            // ✅ SOLO recopilar notas de pedidos ACTIVOS (no entregados/pagados)
+            const notas = [];
+
+            filteredOrders.forEach(order => {
+                // ✅ Excluir pedidos entregados/pagados
+                if (order.estado === 'entregado') {
+                    return; // Saltar este pedido
+                }
+
+                if (order.notas && order.notas.trim() !== '') {
+                    notas.push({
+                        mesa: order.mesa,
+                        nota: order.notas,
+                        fecha: new Date(order.createdAt),
+                        estado: order.estado // Para mostrar el estado
+                    });
+                }
+            });
+
+            if (notas.length === 0) {
+                notasCard.style.display = 'none';
+                return;
+            }
+
+            // Mostrar card
+            notasCard.style.display = 'block';
+            notasCount.textContent = notas.length;
+
+            // Ordenar por fecha (más reciente primero)
+            notas.sort((a, b) => b.fecha - a.fecha);
+
+            // Generar HTML con badge de estado
+            notasList.innerHTML = notas.map(n => {
+                const badgeColor = {
+                    'pendiente': '#ed8936',
+                    'preparando': '#4299e1',
+                    'listo': '#48bb78',
+                    'cancelado': '#fc8181'
+                }[n.estado] || '#718096';
+
+                const estadoTexto = n.estado.charAt(0).toUpperCase() + n.estado.slice(1);
+
+                return `
             <div class="nota-item">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                     <div class="nota-mesa">Mesa ${n.mesa}</div>
@@ -3158,64 +3312,81 @@ function mostrarNotas() {
                 <div>📝 ${n.nota}</div>
             </div>
         `;
-    }).join('');
-}
+            }).join('');
+        }
 
-</script>
+    </script>
 
-<!-- Modal para método de pago -->
-<div id="modalMetodoPago" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center;">
-    <div style="background: white; border-radius: 16px; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-        <h3 style="font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 1rem; text-align: center;">💳 Método de Pago</h3>
-        <p style="font-size: 14px; color: #718096; text-align: center; margin-bottom: 1.5rem;">Selecciona cómo se realizó el pago:</p>
-        
-        <div style="display: grid; gap: 1rem; margin-bottom: 1.5rem;">
-            <button onclick="confirmarMetodoPago('efectivo')" style="padding: 1rem; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                <span style="font-size: 24px;">💵</span>
-                <span>Efectivo</span>
-            </button>
-            
-            <button onclick="confirmarMetodoPago('transferencia')" style="padding: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                <span style="font-size: 24px;">📱</span>
-                <span>Transferencia</span>
-            </button>
-        </div>
-        
-        <button onclick="cerrarModalMetodoPago()" style="width: 100%; padding: 0.75rem; background: #e2e8f0; color: #2d3748; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">
-            Cancelar
-        </button>
-    </div>
-</div>
+    <!-- Modal para método de pago -->
+    <div id="modalMetodoPago"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center;">
+        <div
+            style="background: white; border-radius: 16px; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <h3 style="font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 1rem; text-align: center;">💳
+                Método de Pago</h3>
+            <p style="font-size: 14px; color: #718096; text-align: center; margin-bottom: 1.5rem;">Selecciona cómo se
+                realizó el pago:</p>
 
-<!-- Modal para confirmar impresión de factura -->
-<div id="modalConfirmarImpresion" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10001; align-items: center; justify-content: center;">
-    <div style="background: white; border-radius: 16px; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-        <h3 style="font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 1rem; text-align: center;">🖨️ Imprimir Factura</h3>
-        <p style="font-size: 14px; color: #718096; text-align: center; margin-bottom: 1.5rem;">¿Deseas imprimir la factura en la impresora POS?</p>
-        
-        <div style="display: grid; gap: 1rem;">
-            <button onclick="confirmarImpresion(true)" style="padding: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                <span style="font-size: 24px;">🖨️</span>
-                <span>Sí, imprimir</span>
-            </button>
-            
-            <button onclick="confirmarImpresion(false)" style="padding: 1rem; background: #e2e8f0; color: #2d3748; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
-                No imprimir
+            <div style="display: grid; gap: 1rem; margin-bottom: 1.5rem;">
+                <button onclick="confirmarMetodoPago('efectivo')"
+                    style="padding: 1rem; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <span style="font-size: 24px;">💵</span>
+                    <span>Efectivo</span>
+                </button>
+
+                <button onclick="confirmarMetodoPago('transferencia')"
+                    style="padding: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <span style="font-size: 24px;">📱</span>
+                    <span>Transferencia</span>
+                </button>
+            </div>
+
+            <button onclick="cerrarModalMetodoPago()"
+                style="width: 100%; padding: 0.75rem; background: #e2e8f0; color: #2d3748; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                Cancelar
             </button>
         </div>
     </div>
-</div>
 
-<!-- Modal de estado de impresión -->
-<div id="modalEstadoImpresion" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 10002; align-items: center; justify-content: center;">
-    <div style="background: white; border-radius: 16px; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center;">
-        <div id="impresionSpinner" style="font-size: 48px; margin-bottom: 1rem;">⏳</div>
-        <h3 id="impresionTitulo" style="font-size: 18px; font-weight: 700; color: #1a202c; margin-bottom: 0.5rem;">Imprimiendo factura...</h3>
-        <p id="impresionMensaje" style="font-size: 14px; color: #718096;">Por favor, espere</p>
+    <!-- Modal para confirmar impresión de factura -->
+    <div id="modalConfirmarImpresion"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10001; align-items: center; justify-content: center;">
+        <div
+            style="background: white; border-radius: 16px; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <h3 style="font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 1rem; text-align: center;">🖨️
+                Imprimir Factura</h3>
+            <p style="font-size: 14px; color: #718096; text-align: center; margin-bottom: 1.5rem;">¿Deseas imprimir la
+                factura en la impresora POS?</p>
+
+            <div style="display: grid; gap: 1rem;">
+                <button onclick="confirmarImpresion(true)"
+                    style="padding: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <span style="font-size: 24px;">🖨️</span>
+                    <span>Sí, imprimir</span>
+                </button>
+
+                <button onclick="confirmarImpresion(false)"
+                    style="padding: 1rem; background: #e2e8f0; color: #2d3748; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                    No imprimir
+                </button>
+            </div>
+        </div>
     </div>
-</div>
+
+    <!-- Modal de estado de impresión -->
+    <div id="modalEstadoImpresion"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 10002; align-items: center; justify-content: center;">
+        <div
+            style="background: white; border-radius: 16px; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center;">
+            <div id="impresionSpinner" style="font-size: 48px; margin-bottom: 1rem;">⏳</div>
+            <h3 id="impresionTitulo" style="font-size: 18px; font-weight: 700; color: #1a202c; margin-bottom: 0.5rem;">
+                Imprimiendo factura...</h3>
+            <p id="impresionMensaje" style="font-size: 14px; color: #718096;">Por favor, espere</p>
+        </div>
+    </div>
 
 
 
 </body>
+
 </html>

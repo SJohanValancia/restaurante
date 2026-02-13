@@ -1,5 +1,5 @@
 // URL del servidor de Mandao (ajustar según entorno)
-const MANDAO_API_URL = 'https://mandao-server.onrender.com/api';
+const MANDAO_API_URL = 'https://mandao.onrender.com/api';
 
 /**
  * Notifica a Mandao que el estado de un pedido ha cambiado en JC-RT
@@ -24,11 +24,19 @@ async function notifyMandaoStatusChange(mandaoOrderId, status) {
             })
         });
 
-        const data = await response.json();
-        if (response.ok && data.success) {
-            console.log(`✅ Mandao notificado correctamente.`);
+        const contentType = response.headers.get('content-type');
+        let data;
+
+        if (contentType && contentType.includes('application/json')) {
+            data = await response.json();
+            if (response.ok && data.success) {
+                console.log(`✅ Mandao notificado correctamente.`);
+            } else {
+                console.error(`⚠️ Error al notificar a Mandao (JSON):`, data.message || response.statusText);
+            }
         } else {
-            console.error(`⚠️ Error al notificar a Mandao:`, data.message || response.statusText);
+            const text = await response.text();
+            console.error(`⚠️ Mandao respondió con formato no JSON (${response.status} ${response.statusText}):`, text.substring(0, 100));
         }
     } catch (error) {
         console.error('❌ Error de conexión al notificar a Mandao:', error.message);

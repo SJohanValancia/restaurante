@@ -1990,15 +1990,23 @@
         function getOrderActions(order) {
             if (order.estado === 'entregado' || order.estado === 'cancelado') return '';
 
-
+            const isMandao = order.source === 'mandao';
             let actions = '<div class="order-actions">';
 
             if (order.estado === 'pendiente') {
-                actions += `<button class="btn-action btn-preparar" onclick="updateOrderStatus('${order._id}', 'preparando')">👨‍🍳 Preparar</button>`;
+                if (isMandao) {
+                    actions += `<button class="btn-action" style="background: #f59e0b; color: white;" onclick="updateOrderStatus('${order._id}', 'preparando')">✅ Aceptar Mandao</button>`;
+                } else {
+                    actions += `<button class="btn-action btn-preparar" onclick="updateOrderStatus('${order._id}', 'preparando')">👨‍🍳 Preparar</button>`;
+                }
             }
 
             if (order.estado === 'preparando') {
-                actions += `<button class="btn-action btn-listo" onclick="updateOrderStatus('${order._id}', 'listo')">✅ Listo</button>`;
+                if (isMandao) {
+                    actions += `<button class="btn-action" style="background: #10b981; color: white;" onclick="updateOrderStatus('${order._id}', 'listo')">👨‍🍳 Marcar Listo</button>`;
+                } else {
+                    actions += `<button class="btn-action btn-listo" onclick="updateOrderStatus('${order._id}', 'listo')">✅ Listo</button>`;
+                }
             }
 
             if (order.estado === 'listo') {
