@@ -125,29 +125,11 @@ router.get('/products', async (req, res) => {
         const alimentos = await Alimento.find({ userId });
 
         const results = products.map(product => {
-            // 1. Buscar alimentos vinculados a este producto
-            const alimentosVinculados = alimentos.filter(a =>
-                a.productos && a.productos.some(p => p.productoId.toString() === product._id.toString())
-            );
-
-            let disponiblePorStock = true;
-
-            if (alimentosVinculados.length > 0) {
-                // Producto compuesto: Verificar stock de todos sus ingredientes
-                disponiblePorStock = alimentosVinculados.every(alimento => {
-                    const config = alimento.productos.find(p => p.productoId.toString() === product._id.toString());
-                    return alimento.stock >= (config.cantidadRequerida || 1);
-                });
-            } else {
-                // Producto simple: Usar campo disponible del modelo Product
-                disponiblePorStock = product.disponible;
-            }
-
             return {
                 jcrtId: product._id,
                 nombre: product.nombre,
                 precio: product.precio,
-                disponible: disponiblePorStock && product.disponible // Combinar ambos estados
+                disponible: product.disponible // Ahora es 100% manual por el negocio
             };
         });
 
