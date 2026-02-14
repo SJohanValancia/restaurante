@@ -623,14 +623,10 @@
 
                         // Mensaje especial de bienvenida para nuevos usuarios de Mandao
                         if (data.welcomeMessage) {
-                            const nombre = data.usuario.nombre || 'Usuario';
-                            // Usamos un alert distinto o modificamos el mensaje
-                            msg = `¡Bienvenido ${nombre} a JC-RT! 🚀<br>Te brindamos un <strong>mes gratis de prueba</strong> para que ensayes este programa.`;
-                            showAlert(msg, 'success');
-
-                            setTimeout(() => {
-                                redirectUser(data.usuario);
-                            }, 6000);
+                            // Guardar flag para mostrar bienvenida en el dashboard
+                            localStorage.setItem('welcome_mandao', 'true');
+                            // Redirección inmediata
+                            redirectUser(data.usuario);
                         } else {
                             showAlert(msg, 'success');
                             setTimeout(() => {

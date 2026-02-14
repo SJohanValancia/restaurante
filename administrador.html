@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -114,14 +115,14 @@
             background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
             padding: 0;
             z-index: 1000;
-            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
         }
 
         .sidebar-header {
             padding: 1.5rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .sidebar-brand {
@@ -152,7 +153,7 @@
 
         .brand-text p {
             font-size: 11px;
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
             margin: 2px 0 0 0;
         }
 
@@ -167,11 +168,11 @@
         }
 
         .sidebar-nav::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .sidebar-nav::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             border-radius: 3px;
         }
 
@@ -179,7 +180,7 @@
             padding: 0.5rem 1.5rem;
             font-size: 11px;
             font-weight: 700;
-            color: rgba(255,255,255,0.5);
+            color: rgba(255, 255, 255, 0.5);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -189,7 +190,7 @@
             align-items: center;
             gap: 12px;
             padding: 12px 1.5rem;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
             transition: all 0.2s;
             font-size: 14px;
@@ -198,7 +199,7 @@
         }
 
         .nav-item:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             color: white;
         }
 
@@ -229,8 +230,8 @@
             left: 0;
             right: 0;
             padding: 1.5rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .user-info {
@@ -261,7 +262,7 @@
 
         .user-details p {
             font-size: 11px;
-            color: rgba(255,255,255,0.6);
+            color: rgba(255, 255, 255, 0.6);
             margin: 2px 0 0 0;
         }
 
@@ -402,6 +403,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -547,7 +549,7 @@
 
         .mesero-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .mesero-card-content {
@@ -671,6 +673,7 @@
                 opacity: 0;
                 transform: translateY(-10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -703,7 +706,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.7);
             z-index: 2000;
             align-items: center;
             justify-content: center;
@@ -811,7 +814,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* RESPONSIVE */
@@ -922,193 +927,200 @@
             }
         }
 
-         /* ESTILOS PARA EL ENLACE DE MÁS PROGRAMAS */
-.menu-link {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 1.5rem;
-    color: rgba(255,255,255,0.8);
-    text-decoration: none;
-    transition: all 0.3s ease;
-    font-size: 14px;
-    font-weight: 600;
-    position: relative;
-    margin: 0.5rem 1rem;
-    border-radius: 10px;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
-    border: 2px solid rgba(102, 126, 234, 0.3);
-    overflow: hidden;
-}
+        /* ESTILOS PARA EL ENLACE DE MÁS PROGRAMAS */
+        .menu-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 600;
+            position: relative;
+            margin: 0.5rem 1rem;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            overflow: hidden;
+        }
 
-.menu-link::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transition: left 0.5s ease;
-}
+        .menu-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
 
-.menu-link:hover::before {
-    left: 100%;
-}
+        .menu-link:hover::before {
+            left: 100%;
+        }
 
-.menu-link:hover {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    transform: translateX(5px);
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-    border-color: transparent;
-}
+        .menu-link:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            border-color: transparent;
+        }
 
-.menu-link:active {
-    transform: translateX(5px) scale(0.98);
-}
+        .menu-link:active {
+            transform: translateX(5px) scale(0.98);
+        }
 
-/* Animación de pulso para llamar la atención */
-@keyframes pulse {
-    0%, 100% {
-        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
-    }
-    50% {
-        box-shadow: 0 0 0 8px rgba(102, 126, 234, 0);
-    }
-}
+        /* Animación de pulso para llamar la atención */
+        @keyframes pulse {
 
-.menu-link {
-    animation: pulse 2s infinite;
-}
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+            }
 
-.menu-link:hover {
-    animation: none;
-}
-    
-/* Banner de notificación de vencimiento */
-.notification-banner {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 9999;
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    color: white;
-    padding: 20px;
-    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
-    animation: slideDownBanner 0.5s ease-out;
-    display: none;
-}
+            50% {
+                box-shadow: 0 0 0 8px rgba(102, 126, 234, 0);
+            }
+        }
 
-.notification-banner.show {
-    display: block;
-}
+        .menu-link {
+            animation: pulse 2s infinite;
+        }
 
-@keyframes slideDownBanner {
-    from {
-        transform: translateY(-100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
+        .menu-link:hover {
+            animation: none;
+        }
 
-.notification-content {
-    max-width: 1400px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-}
+        /* Banner de notificación de vencimiento */
+        .notification-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+            animation: slideDownBanner 0.5s ease-out;
+            display: none;
+        }
 
-.notification-text {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
+        .notification-banner.show {
+            display: block;
+        }
 
-.notification-icon {
-    font-size: 2.5rem;
-    animation: pulse-icon 2s ease-in-out infinite;
-}
+        @keyframes slideDownBanner {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
 
-@keyframes pulse-icon {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.1);
-    }
-}
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
 
-.notification-message {
-    flex: 1;
-}
+        .notification-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
 
-.notification-message h3 {
-    font-size: 1.3rem;
-    font-weight: 700;
-    margin-bottom: 5px;
-}
+        .notification-text {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
 
-.notification-message p {
-    font-size: 1rem;
-    opacity: 0.95;
-}
+        .notification-icon {
+            font-size: 2.5rem;
+            animation: pulse-icon 2s ease-in-out infinite;
+        }
 
-.btn-renovar {
-    background: white;
-    color: #d97706;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    white-space: nowrap;
-}
+        @keyframes pulse-icon {
 
-.btn-renovar:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-}
+            0%,
+            100% {
+                transform: scale(1);
+            }
 
-/* Ajustar el contenido para que no quede debajo del banner */
-body.has-notification {
-    padding-top: 100px;
-}
+            50% {
+                transform: scale(1.1);
+            }
+        }
 
-@media (max-width: 768px) {
-    .notification-content {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .notification-text {
-        flex-direction: column;
-    }
-    
-    .notification-message h3 {
-        font-size: 1.1rem;
-    }
-    
-    .notification-message p {
-        font-size: 0.9rem;
-    }
-    
-    .btn-renovar {
-        width: 100%;
-    }
-}
+        .notification-message {
+            flex: 1;
+        }
 
+        .notification-message h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .notification-message p {
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+
+        .btn-renovar {
+            background: white;
+            color: #d97706;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            white-space: nowrap;
+        }
+
+        .btn-renovar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Ajustar el contenido para que no quede debajo del banner */
+        body.has-notification {
+            padding-top: 100px;
+        }
+
+        @media (max-width: 768px) {
+            .notification-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .notification-text {
+                flex-direction: column;
+            }
+
+            .notification-message h3 {
+                font-size: 1.1rem;
+            }
+
+            .notification-message p {
+                font-size: 0.9rem;
+            }
+
+            .btn-renovar {
+                width: 100%;
+            }
+        }
     </style>
 </head>
+
 <body>
     <!-- Banner de Notificación -->
     <div id="notificationBanner" class="notification-banner">
@@ -1117,10 +1129,12 @@ body.has-notification {
                 <div class="notification-icon">⚠️</div>
                 <div class="notification-message">
                     <h3>¡Atención! Tu licencia está por vencer</h3>
-                    <p id="notificationText">Su licencia vence en X días. Por favor renueve su mensualidad para seguir utilizando JC-RT</p>
+                    <p id="notificationText">Su licencia vence en X días. Por favor renueve su mensualidad para seguir
+                        utilizando JC-RT</p>
                 </div>
             </div>
-            <a href="https://wa.me/573128540908?text=Hola,%20necesito%20renovar%20mi%20licencia%20de%20JC-RT" target="_blank">
+            <a href="https://wa.me/573128540908?text=Hola,%20necesito%20renovar%20mi%20licencia%20de%20JC-RT"
+                target="_blank">
                 <button class="btn-renovar">
                     📱 Renovar Ahora
                 </button>
@@ -1151,11 +1165,12 @@ body.has-notification {
             </a>
         </div>
 
-     <nav class="sidebar-nav">
+        <nav class="sidebar-nav">
             <div class="nav-section">
 
-                                <div class="nav-section-title">mas programs de JC</div>
-                                <a href="https://jc-portafolio1.netlify.app" class="menu-link" target="_blank"> 📱 Mas programas de JC</a>
+                <div class="nav-section-title">mas programs de JC</div>
+                <a href="https://jc-portafolio1.netlify.app" class="menu-link" target="_blank"> 📱 Mas programas de
+                    JC</a>
 
 
                 <div class="nav-section-title">Principal</div>
@@ -1196,7 +1211,7 @@ body.has-notification {
                     <span>Inventario Alimentos</span>
                 </a>
             </div>
-            
+
             <div class="nav-section-title">Administración</div>
             <a href="administrador.html" class="nav-item active">
                 <span class="nav-icon">👥</span>
@@ -1241,14 +1256,8 @@ body.has-notification {
                     <h2>🔍 Buscar Usuario por ID</h2>
                 </div>
                 <form class="search-form" id="searchForm">
-                    <input 
-                        type="text" 
-                        class="search-input" 
-                        id="userIdInput"
-                        placeholder="Ingrese el ID de MongoDB (24 caracteres)"
-                        pattern="[a-fA-F0-9]{24}"
-                        required
-                    >
+                    <input type="text" class="search-input" id="userIdInput"
+                        placeholder="Ingrese el ID de MongoDB (24 caracteres)" pattern="[a-fA-F0-9]{24}" required>
                     <button type="submit" class="btn-search" id="searchBtn">
                         <span>🔍</span>
                         <span>Buscar</span>
@@ -1322,7 +1331,7 @@ body.has-notification {
                         <input type="checkbox" id="perm_eliminarProductos" class="permission-checkbox">
                         <label for="perm_eliminarProductos" class="permission-label">Eliminar Productos</label>
                     </div>
-                    
+
                     <!-- PEDIDOS -->
                     <div class="permission-item">
                         <input type="checkbox" id="perm_verPedidos" class="permission-checkbox">
@@ -1340,7 +1349,7 @@ body.has-notification {
                         <input type="checkbox" id="perm_cancelarPedidos" class="permission-checkbox">
                         <label for="perm_cancelarPedidos" class="permission-label">Cancelar Pedidos</label>
                     </div>
-                    
+
                     <!-- GASTOS -->
                     <div class="permission-item">
                         <input type="checkbox" id="perm_verGastos" class="permission-checkbox">
@@ -1358,7 +1367,7 @@ body.has-notification {
                         <input type="checkbox" id="perm_eliminarGastos" class="permission-checkbox">
                         <label for="perm_eliminarGastos" class="permission-label">Eliminar Gastos</label>
                     </div>
-                    
+
                     <!-- OTROS -->
                     <div class="permission-item">
                         <input type="checkbox" id="perm_verReportes" class="permission-checkbox">
@@ -1392,7 +1401,7 @@ body.has-notification {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
             const menuToggle = document.getElementById('menuToggle');
-            
+
             sidebar.classList.toggle('active');
             overlay.classList.toggle('active');
             menuToggle.classList.toggle('active');
@@ -1444,7 +1453,7 @@ body.has-notification {
                 }
 
                 document.getElementById('sidebarUserName').textContent = currentUser.nombre;
-                document.getElementById('sidebarUserAvatar').textContent = 
+                document.getElementById('sidebarUserAvatar').textContent =
                     currentUser.nombre.charAt(0).toUpperCase();
 
                 await cargarMeseros();
@@ -1458,7 +1467,7 @@ body.has-notification {
             const alert = document.getElementById('alert');
             alert.innerHTML = `<span>${getAlertIcon(type)}</span><span>${message}</span>`;
             alert.className = `alert alert-${type} show`;
-            
+
             setTimeout(() => {
                 alert.classList.remove('show');
             }, 5000);
@@ -1475,10 +1484,10 @@ body.has-notification {
 
         document.getElementById('searchForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const userId = document.getElementById('userIdInput').value.trim();
             const searchBtn = document.getElementById('searchBtn');
-            
+
             if (userId.length !== 24) {
                 showAlert('El ID debe tener 24 caracteres', 'error');
                 return;
@@ -1513,14 +1522,14 @@ body.has-notification {
         });
 
         function mostrarUsuario(user) {
-            document.getElementById('userAvatar').textContent = 
+            document.getElementById('userAvatar').textContent =
                 user.nombre.charAt(0).toUpperCase();
             document.getElementById('userName').textContent = user.nombre;
             document.getElementById('userEmail').textContent = `📧 ${user.email}`;
-            document.getElementById('userRestaurant').textContent = 
+            document.getElementById('userRestaurant').textContent =
                 `🏪 ${user.nombreRestaurante}${user.sede ? ' - ' + user.sede : ''}`;
             document.getElementById('userRole').textContent = user.rol;
-            
+
             document.getElementById('resultCard').classList.add('show');
         }
 
@@ -1528,7 +1537,7 @@ body.has-notification {
             if (!currentSearchedUser) return;
 
             const token = localStorage.getItem('token');
-            
+
             try {
                 const response = await fetch(`${API_URL}/admin-meseros/agregar`, {
                     method: 'POST',
@@ -1559,14 +1568,14 @@ body.has-notification {
         async function cargarMeseros() {
             const token = localStorage.getItem('token');
             const container = document.getElementById('meserosList');
-            
+
             container.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-icon">⏳</div>
                     <p class="empty-text">Cargando meseros...</p>
                 </div>
             `;
-            
+
             try {
                 const response = await fetch(`${API_URL}/admin-meseros/meseros/${currentUser._id}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -1599,7 +1608,7 @@ body.has-notification {
 
         function mostrarMeseros(meseros) {
             const container = document.getElementById('meserosList');
-            
+
             if (meseros.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
@@ -1634,25 +1643,25 @@ body.has-notification {
                     </div>
                 `;
             }).join('');
-            
+
             container.innerHTML = html;
         }
 
         async function editMeseroPermisos(relacionId, meseroId) {
             currentRelacionId = relacionId;
-            
+
             const token = localStorage.getItem('token');
-            
+
             try {
                 const response = await fetch(`${API_URL}/admin-meseros/meseros/${currentUser._id}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 const data = await response.json();
-                
+
                 if (data.success) {
                     const mesero = data.data.find(m => m.relacionId === relacionId);
-                    
+
                     if (mesero && mesero.permisos) {
                         document.getElementById('perm_verProductos').checked = mesero.permisos.verProductos ?? true;
                         document.getElementById('perm_crearProductos').checked = mesero.permisos.crearProductos || false;
@@ -1673,7 +1682,7 @@ body.has-notification {
             } catch (error) {
                 console.error('Error al cargar permisos:', error);
             }
-            
+
             document.getElementById('permissionsModal').classList.add('active');
         }
 
@@ -1689,7 +1698,7 @@ body.has-notification {
 
         document.getElementById('permissionsForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             if (!currentRelacionId) {
                 showAlert('No hay mesero seleccionado', 'error');
                 return;
@@ -1713,7 +1722,7 @@ body.has-notification {
             };
 
             const token = localStorage.getItem('token');
-            
+
             try {
                 const response = await fetch(`${API_URL}/admin-meseros/permisos/${currentRelacionId}`, {
                     method: 'PUT',
@@ -1745,7 +1754,7 @@ body.has-notification {
             }
 
             const token = localStorage.getItem('token');
-            
+
             try {
                 const response = await fetch(`${API_URL}/admin-meseros/${relacionId}`, {
                     method: 'DELETE',
@@ -1768,7 +1777,7 @@ body.has-notification {
 
         function confirmDelete() {
             if (!currentSearchedUser) return;
-            
+
             if (confirm(`¿Eliminar a ${currentSearchedUser.nombre}?`)) {
                 showAlert('Función de eliminación directa no disponible. Usa "Inspeccionar" para agregar primero.', 'info');
             }
@@ -1783,84 +1792,142 @@ body.has-notification {
         }
 
         // Verificar fecha de vencimiento
-// Verificar fecha de vencimiento
-async function verificarFechaVencimiento() {
-    try {
-        // Esperar a que currentUser esté cargado
-        if (!currentUser) {
-            console.log('Esperando a que currentUser se cargue...');
-            setTimeout(verificarFechaVencimiento, 1000);
-            return;
-        }
+        // Verificar fecha de vencimiento
+        async function verificarFechaVencimiento() {
+            try {
+                // Esperar a que currentUser esté cargado
+                if (!currentUser) {
+                    console.log('Esperando a que currentUser se cargue...');
+                    setTimeout(verificarFechaVencimiento, 1000);
+                    return;
+                }
 
-        const token = localStorage.getItem('token');
-        const response = await fetch(`${API_URL}/auth/verify`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_URL}/auth/verify`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
 
-        if (!response.ok) return;
+                if (!response.ok) return;
 
-        const data = await response.json();
-        const usuario = data.usuario;
+                const data = await response.json();
+                const usuario = data.usuario;
 
-        console.log('Verificando fecha de pago:', usuario.fechaPago);
+                console.log('Verificando fecha de pago:', usuario.fechaPago);
 
-        if (usuario.fechaPago) {
-            const fechaPago = new Date(usuario.fechaPago);
-            const hoy = new Date();
-            // Reiniciar horas para comparación correcta de días
-            fechaPago.setHours(0, 0, 0, 0);
-            hoy.setHours(0, 0, 0, 0);
-            
-            const diferenciaDias = Math.ceil((fechaPago - hoy) / (1000 * 60 * 60 * 24));
+                if (usuario.fechaPago) {
+                    const fechaPago = new Date(usuario.fechaPago);
+                    const hoy = new Date();
+                    // Reiniciar horas para comparación correcta de días
+                    fechaPago.setHours(0, 0, 0, 0);
+                    hoy.setHours(0, 0, 0, 0);
 
-            console.log('Días restantes:', diferenciaDias);
+                    const diferenciaDias = Math.ceil((fechaPago - hoy) / (1000 * 60 * 60 * 24));
 
-            // Mostrar notificación si faltan 5 días o menos
-            if (diferenciaDias <= 5 && diferenciaDias >= 0) {
-                const banner = document.getElementById('notificationBanner');
-                const texto = document.getElementById('notificationText');
-                
-                texto.textContent = `Su licencia vence en ${diferenciaDias} día${diferenciaDias !== 1 ? 's' : ''}. Por favor renueve su mensualidad para seguir utilizando JC-RT`;
-                
-                banner.classList.add('show');
-                document.body.classList.add('has-notification');
-                
-                console.log('✅ Banner de advertencia mostrado');
-            } else if (diferenciaDias < 0) {
-                // Licencia vencida
-                const banner = document.getElementById('notificationBanner');
-                const texto = document.getElementById('notificationText');
-                
-                banner.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
-                texto.textContent = `¡Su licencia ha vencido! Por favor renueve su mensualidad para seguir utilizando JC-RT`;
-                
-                banner.classList.add('show');
-                document.body.classList.add('has-notification');
-                
-                console.log('❌ Banner de vencimiento mostrado');
-            } else {
-                console.log(`ℹ️ Licencia válida por ${diferenciaDias} días más`);
+                    console.log('Días restantes:', diferenciaDias);
+
+                    // Mostrar notificación si faltan 5 días o menos
+                    if (diferenciaDias <= 5 && diferenciaDias >= 0) {
+                        const banner = document.getElementById('notificationBanner');
+                        const texto = document.getElementById('notificationText');
+
+                        texto.textContent = `Su licencia vence en ${diferenciaDias} día${diferenciaDias !== 1 ? 's' : ''}. Por favor renueve su mensualidad para seguir utilizando JC-RT`;
+
+                        banner.classList.add('show');
+                        document.body.classList.add('has-notification');
+
+                        console.log('✅ Banner de advertencia mostrado');
+                    } else if (diferenciaDias < 0) {
+                        // Licencia vencida
+                        const banner = document.getElementById('notificationBanner');
+                        const texto = document.getElementById('notificationText');
+
+                        banner.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                        texto.textContent = `¡Su licencia ha vencido! Por favor renueve su mensualidad para seguir utilizando JC-RT`;
+
+                        banner.classList.add('show');
+                        document.body.classList.add('has-notification');
+
+                        console.log('❌ Banner de vencimiento mostrado');
+                    } else {
+                        console.log(`ℹ️ Licencia válida por ${diferenciaDias} días más`);
+                    }
+                } else {
+                    console.log('ℹ️ No hay fecha de pago asignada');
+                }
+            } catch (error) {
+                console.error('Error al verificar fecha de vencimiento:', error);
             }
-        } else {
-            console.log('ℹ️ No hay fecha de pago asignada');
         }
-    } catch (error) {
-        console.error('Error al verificar fecha de vencimiento:', error);
-    }
-}
 
-// Ejecutar después de que se cargue el usuario
-setTimeout(verificarFechaVencimiento, 2000);
+        // Ejecutar después de que se cargue el usuario
+        setTimeout(verificarFechaVencimiento, 2000);
 
-// Verificar cada hora
-setInterval(verificarFechaVencimiento, 3600000);
-// Ejecutar al cargar la página
-verificarFechaVencimiento();
+        // Verificar cada hora
+        setInterval(verificarFechaVencimiento, 3600000);
+        // Ejecutar al cargar la página
+        verificarFechaVencimiento();
 
-// Verificar cada hora
-setInterval(verificarFechaVencimiento, 3600000);
+        // Verificar cada hora
+        setInterval(verificarFechaVencimiento, 3600000);
 
+    </script>
+    <!-- Scripts for Mandao Welcome -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('welcome_mandao')) {
+                localStorage.removeItem('welcome_mandao');
+
+                // 1. Efecto de Confeti (Explosión)
+                const duration = 3000;
+                const end = Date.now() + duration;
+
+                (function frame() {
+                    confetti({
+                        particleCount: 7,
+                        angle: 60,
+                        spread: 55,
+                        origin: { x: 0 },
+                        colors: ['#667eea', '#764ba2', '#ffffff']
+                    });
+                    confetti({
+                        particleCount: 7,
+                        angle: 120,
+                        spread: 55,
+                        origin: { x: 1 },
+                        colors: ['#667eea', '#764ba2', '#ffffff']
+                    });
+
+                    if (Date.now() < end) {
+                        requestAnimationFrame(frame);
+                    }
+                }());
+
+                // 2. Modal Bonito
+                const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+                const nombre = usuario.nombre || 'Usuario';
+
+                Swal.fire({
+                    title: `<strong>¡Bienvenido ${nombre}! 🚀</strong>`,
+                    html: `
+                        <div style="font-size: 1.1em; line-height: 1.6;">
+                            <p>¡Qué alegría tenerte aquí!</p>
+                            <p>Tu cuenta ha sido creada exitosamente con los datos de <strong>${usuario.nombreRestaurante || 'Tu Restaurante'}</strong>.</p>
+                            <div style="margin-top: 20px; padding: 15px; background: #f0fdf4; border-radius: 10px; border: 1px solid #bbf7d0;">
+                                <span style="font-size: 24px;">🎁</span>
+                                <p style="color: #166534; font-weight: bold; margin-top: 5px;">¡Disfruta de 1 MES GRATIS de prueba!</p>
+                            </div>
+                        </div>
+                    `,
+                    icon: 'success',
+                    showConfirmButton: true,
+                    confirmButtonText: '¡A trabajar!',
+                    confirmButtonColor: '#667eea',
+                    backdrop: `rgba(0,0,0,0.4)`
+                });
+            }
+        });
     </script>
 </body>
 

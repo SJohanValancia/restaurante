@@ -165,7 +165,7 @@ router.post('/login-mandao', async (req, res) => {
         nombre: nombreUsuario,
         email: email.toLowerCase(),
         password: await require('bcryptjs').hash(password, 10), // Guardamos la misma pass (hash) para que funcione el login tradicional también
-        nombreRestaurante: mandaoUser.nombreRestaurante || 'Restaurante Mandao',
+        nombreRestaurante: mandaoUser.nombreRestaurante || mandaoUser.restaurantName || 'Restaurante Mandao',
         sede: mandaoUser.sede || 'Principal',
         rol: 'admin', // Probablemente sea dueño si viene de Mandao
         activo: true,
