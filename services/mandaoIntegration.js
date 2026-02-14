@@ -16,7 +16,7 @@ async function loginToMandao(email, password) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ usuario: email, password })
         });
 
         const data = await response.json();
