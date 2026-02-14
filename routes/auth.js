@@ -195,7 +195,9 @@ router.post('/login-mandao', async (req, res) => {
 
   } catch (error) {
     console.error('Error en /login-mandao:', error);
-    res.status(500).json({ success: false, message: error.message || 'Error interno' });
+    const errorMessage = error.message || 'Error interno';
+    const statusCode = errorMessage.includes('Mandao') ? 503 : 500;
+    res.status(statusCode).json({ success: false, message: errorMessage, detail: error.stack });
   }
 });
 
