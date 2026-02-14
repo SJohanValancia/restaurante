@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,14 +29,14 @@
             background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
             padding: 0;
             z-index: 1000;
-            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
         }
 
         .sidebar-header {
             padding: 1.5rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .sidebar-brand {
@@ -66,28 +67,28 @@
 
         .brand-text p {
             font-size: 11px;
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
             margin: 2px 0 0 0;
         }
 
-.sidebar-nav {
-    padding: 1rem 0;
-    max-height: calc(100vh - 250px);
-    overflow-y: auto;
-}
+        .sidebar-nav {
+            padding: 1rem 0;
+            max-height: calc(100vh - 250px);
+            overflow-y: auto;
+        }
 
-.sidebar-nav::-webkit-scrollbar {
-    width: 6px;
-}
+        .sidebar-nav::-webkit-scrollbar {
+            width: 6px;
+        }
 
-.sidebar-nav::-webkit-scrollbar-track {
-    background: rgba(255,255,255,0.05);
-}
+        .sidebar-nav::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
 
-.sidebar-nav::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.2);
-    border-radius: 3px;
-}
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
 
         .nav-section {
             margin-bottom: 1.5rem;
@@ -97,7 +98,7 @@
             padding: 0.5rem 1.5rem;
             font-size: 11px;
             font-weight: 700;
-            color: rgba(255,255,255,0.5);
+            color: rgba(255, 255, 255, 0.5);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -107,7 +108,7 @@
             align-items: center;
             gap: 12px;
             padding: 12px 1.5rem;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
             transition: all 0.2s;
             font-size: 14px;
@@ -116,7 +117,7 @@
         }
 
         .nav-item:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             color: white;
         }
 
@@ -147,8 +148,8 @@
             left: 0;
             right: 0;
             padding: 1.5rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .user-info {
@@ -179,7 +180,7 @@
 
         .user-details p {
             font-size: 11px;
-            color: rgba(255,255,255,0.6);
+            color: rgba(255, 255, 255, 0.6);
             margin: 2px 0 0 0;
         }
 
@@ -231,7 +232,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 999;
             display: none;
         }
@@ -335,7 +336,7 @@
 
         .stat-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
 
         .stat-icon {
@@ -459,14 +460,14 @@
             justify-content: space-between;
             align-items: center;
             padding: 1rem 0;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .resumen-row:last-child {
             border-bottom: none;
             padding-top: 1.5rem;
             margin-top: 0.5rem;
-            border-top: 2px solid rgba(255,255,255,0.3);
+            border-top: 2px solid rgba(255, 255, 255, 0.3);
         }
 
         .resumen-label {
@@ -504,7 +505,7 @@
 
         .btn-liquidar:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
 
         /* Modal */
@@ -515,7 +516,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.7);
             z-index: 2000;
             align-items: center;
             justify-content: center;
@@ -706,229 +707,241 @@
         }
 
         /* Animación de éxito */
-.success-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
-    z-index: 9999;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    animation: fadeIn 0.3s ease;
-}
+        .success-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
 
-.success-overlay.active {
-    display: flex;
-}
+        .success-overlay.active {
+            display: flex;
+        }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
 
-.success-message {
-    background: white;
-    border-radius: 20px;
-    padding: 3rem 2.5rem;
-    text-align: center;
-    max-width: 450px;
-    width: 90%;
-    transform: scale(0.7);
-    opacity: 0;
-    animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.2s forwards;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-}
+            to {
+                opacity: 1;
+            }
+        }
 
-@keyframes popIn {
-    0% {
-        transform: scale(0.7);
-        opacity: 0;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
+        .success-message {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem 2.5rem;
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            transform: scale(0.7);
+            opacity: 0;
+            animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.2s forwards;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
 
-.success-icon-wrapper {
-    margin: 0 auto 1.5rem;
-    width: 100px;
-    height: 100px;
-    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    animation: scaleIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.4s both;
-}
+        @keyframes popIn {
+            0% {
+                transform: scale(0.7);
+                opacity: 0;
+            }
 
-@keyframes scaleIn {
-    0% {
-        transform: scale(0);
-    }
-    100% {
-        transform: scale(1);
-    }
-}
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
 
-.success-icon-wrapper::before {
-    content: '';
-    position: absolute;
-    width: 120px;
-    height: 120px;
-    border: 3px solid #48bb78;
-    border-radius: 50%;
-    opacity: 0;
-    animation: ripple 1s ease-out 0.6s;
-}
+        .success-icon-wrapper {
+            margin: 0 auto 1.5rem;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: scaleIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.4s both;
+        }
 
-@keyframes ripple {
-    0% {
-        transform: scale(0.8);
-        opacity: 1;
-    }
-    100% {
-        transform: scale(1.5);
-        opacity: 0;
-    }
-}
+        @keyframes scaleIn {
+            0% {
+                transform: scale(0);
+            }
 
-.success-checkmark {
-    font-size: 50px;
-    animation: checkmarkPop 0.3s ease 0.7s both;
-}
+            100% {
+                transform: scale(1);
+            }
+        }
 
-@keyframes checkmarkPop {
-    0% {
-        transform: scale(0);
-    }
-    50% {
-        transform: scale(1.2);
-    }
-    100% {
-        transform: scale(1);
-    }
-}
+        .success-icon-wrapper::before {
+            content: '';
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border: 3px solid #48bb78;
+            border-radius: 50%;
+            opacity: 0;
+            animation: ripple 1s ease-out 0.6s;
+        }
 
-.success-title {
-    font-size: 28px;
-    font-weight: 800;
-    color: #1a202c;
-    margin-bottom: 0.5rem;
-    animation: slideUp 0.4s ease 0.8s both;
-}
+        @keyframes ripple {
+            0% {
+                transform: scale(0.8);
+                opacity: 1;
+            }
 
-.success-subtitle {
-    font-size: 16px;
-    color: #718096;
-    margin-bottom: 1.5rem;
-    animation: slideUp 0.4s ease 0.9s both;
-}
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
 
-@keyframes slideUp {
-    0% {
-        transform: translateY(20px);
-        opacity: 0;
-    }
-    100% {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
+        .success-checkmark {
+            font-size: 50px;
+            animation: checkmarkPop 0.3s ease 0.7s both;
+        }
 
-.success-details {
-    background: #f7fafc;
-    border-radius: 12px;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-    animation: slideUp 0.4s ease 1s both;
-}
+        @keyframes checkmarkPop {
+            0% {
+                transform: scale(0);
+            }
 
-.success-detail-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #e2e8f0;
-}
+            50% {
+                transform: scale(1.2);
+            }
 
-.success-detail-row:last-child {
-    border-bottom: none;
-    padding-top: 0.75rem;
-    margin-top: 0.25rem;
-    border-top: 2px solid #e2e8f0;
-}
+            100% {
+                transform: scale(1);
+            }
+        }
 
-.success-detail-label {
-    font-size: 13px;
-    color: #718096;
-    font-weight: 600;
-}
+        .success-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1a202c;
+            margin-bottom: 0.5rem;
+            animation: slideUp 0.4s ease 0.8s both;
+        }
 
-.success-detail-value {
-    font-size: 14px;
-    color: #1a202c;
-    font-weight: 700;
-}
+        .success-subtitle {
+            font-size: 16px;
+            color: #718096;
+            margin-bottom: 1.5rem;
+            animation: slideUp 0.4s ease 0.9s both;
+        }
 
-.success-detail-row:last-child .success-detail-label {
-    font-size: 15px;
-    color: #2d3748;
-}
+        @keyframes slideUp {
+            0% {
+                transform: translateY(20px);
+                opacity: 0;
+            }
 
-.success-detail-row:last-child .success-detail-value {
-    font-size: 18px;
-    color: #48bb78;
-}
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
 
-.loading-dots {
-    display: inline-flex;
-    gap: 4px;
-    margin-left: 4px;
-}
+        .success-details {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            animation: slideUp 0.4s ease 1s both;
+        }
 
-.loading-dots span {
-    width: 6px;
-    height: 6px;
-    background: #718096;
-    border-radius: 50%;
-    animation: dotPulse 1.4s infinite ease-in-out;
-}
+        .success-detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
 
-.loading-dots span:nth-child(1) {
-    animation-delay: 0s;
-}
+        .success-detail-row:last-child {
+            border-bottom: none;
+            padding-top: 0.75rem;
+            margin-top: 0.25rem;
+            border-top: 2px solid #e2e8f0;
+        }
 
-.loading-dots span:nth-child(2) {
-    animation-delay: 0.2s;
-}
+        .success-detail-label {
+            font-size: 13px;
+            color: #718096;
+            font-weight: 600;
+        }
 
-.loading-dots span:nth-child(3) {
-    animation-delay: 0.4s;
-}
+        .success-detail-value {
+            font-size: 14px;
+            color: #1a202c;
+            font-weight: 700;
+        }
 
-@keyframes dotPulse {
-    0%, 80%, 100% {
-        transform: scale(0.8);
-        opacity: 0.5;
-    }
-    40% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
+        .success-detail-row:last-child .success-detail-label {
+            font-size: 15px;
+            color: #2d3748;
+        }
+
+        .success-detail-row:last-child .success-detail-value {
+            font-size: 18px;
+            color: #48bb78;
+        }
+
+        .loading-dots {
+            display: inline-flex;
+            gap: 4px;
+            margin-left: 4px;
+        }
+
+        .loading-dots span {
+            width: 6px;
+            height: 6px;
+            background: #718096;
+            border-radius: 50%;
+            animation: dotPulse 1.4s infinite ease-in-out;
+        }
+
+        .loading-dots span:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .loading-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes dotPulse {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
+
 <body>
     <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">☰</button>
-    
+
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
 
     <aside class="sidebar" id="sidebar">
@@ -942,56 +955,60 @@
             </a>
         </div>
 
-<nav class="sidebar-nav">
-    <div class="nav-section">
-        <div class="nav-section-title">Principal</div>
-        <a href="productos.html" class="nav-item">
-            <span class="nav-icon">📦</span>
-            <span>Platos</span>
-        </a>
-        <a href="pedidos.html" class="nav-item">
-            <span class="nav-icon">🍽️</span>
-            <span>Pedidos</span>
-        </a>
-        <a href="gastos.html" class="nav-item">
-            <span class="nav-icon">🧾</span>
-            <span>Gastos</span>
-        </a>
-        <a href="qr-generator.html" class="nav-item">
-            <span class="nav-icon">📱</span>
-            <span>QR Generador</span>
-        </a>
-        <a href="reportes.html" class="nav-item">
-            <span class="nav-icon">📊</span>
-            <span>Reportes</span>
-        </a>
-        <a href="historial-pedidos.html" class="nav-item">
-            <span class="nav-icon">📜</span>
-            <span>Historial</span>
-        </a>
-        <a href="catalogo-productos.html" class="nav-item">
-            <span class="nav-icon">📜📦</span>
-            <span>Todos los platos</span>
-        </a>
-    </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Principal</div>
+                <a href="productos.html" class="nav-item">
+                    <span class="nav-icon">📦</span>
+                    <span>Platos</span>
+                </a>
+                <a href="pedidos.html" class="nav-item">
+                    <span class="nav-icon">🍽️</span>
+                    <span>Pedidos</span>
+                </a>
+                <a href="gastos.html" class="nav-item">
+                    <span class="nav-icon">🧾</span>
+                    <span>Gastos</span>
+                </a>
+                <a href="qr-generator.html" class="nav-item">
+                    <span class="nav-icon">📱</span>
+                    <span>QR Generador</span>
+                </a>
+                <a href="reportes.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>Reportes</span>
+                </a>
+                <a href="historial-pedidos.html" class="nav-item">
+                    <span class="nav-icon">📜</span>
+                    <span>Historial</span>
+                </a>
+                <a href="catalogo-productos.html" class="nav-item">
+                    <span class="nav-icon">📜📦</span>
+                    <span>Todos los platos</span>
+                </a>
+            </div>
 
-    <!-- SOLO PARA ADMINISTRADORES -->
-    <div class="nav-section" id="adminSection" style="display: none;">
-        <div class="nav-section-title">Administración</div>
-        <a href="administrador.html" class="nav-item">
-            <span class="nav-icon">👥</span>
-            <span>Gestión de Meseros</span>
-        </a>
-        <a href="liquidacion.html" class="nav-item active">
-            <span class="nav-icon">💵</span>
-            <span>Liquidación</span>
-        </a>
-        <a href="historial-liquidaciones.html" class="nav-item">
-            <span class="nav-icon">📋</span>
-            <span>Hist. Liquidaciones</span>
-        </a>
-    </div>
-</nav>
+            <!-- SOLO PARA ADMINISTRADORES -->
+            <div class="nav-section" id="adminSection" style="display: none;">
+                <div class="nav-section-title">Administración</div>
+                <a href="administrador.html" class="nav-item">
+                    <span class="nav-icon">👥</span>
+                    <span>Gestión de Meseros</span>
+                </a>
+                <a href="liquidacion.html" class="nav-item active">
+                    <span class="nav-icon">💵</span>
+                    <span>Liquidación</span>
+                </a>
+                <a href="historial-liquidaciones.html" class="nav-item">
+                    <span class="nav-icon">📋</span>
+                    <span>Hist. Liquidaciones</span>
+                </a>
+                <a href="solicitudes.html" class="nav-item">
+                    <span class="nav-icon">👤✅</span>
+                    <span>Aceptación de Empleados</span>
+                </a>
+            </div>
+        </nav>
 
         <div class="sidebar-footer">
             <div class="user-info">
@@ -1021,51 +1038,51 @@
                 </button>
             </div>
 
-    <div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-icon blue">💵</div>
-        <div class="stat-label">Caja Inicial</div>
-        <div class="stat-value" id="cajaInicial">$0</div>
-        <div class="stat-detail">De la última liquidación</div>
-    </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">💵</div>
+                    <div class="stat-label">Caja Inicial</div>
+                    <div class="stat-value" id="cajaInicial">$0</div>
+                    <div class="stat-detail">De la última liquidación</div>
+                </div>
 
-    <div class="stat-card">
-        <div class="stat-icon green">📈</div>
-        <div class="stat-label">Total Ingresos</div>
-        <div class="stat-value" id="totalIngresos">$0</div>
-        <div class="stat-detail" id="cantidadPedidos">0 pedidos</div>
-    </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">📈</div>
+                    <div class="stat-label">Total Ingresos</div>
+                    <div class="stat-value" id="totalIngresos">$0</div>
+                    <div class="stat-detail" id="cantidadPedidos">0 pedidos</div>
+                </div>
 
-    <div class="stat-card">
-        <div class="stat-icon red">📉</div>
-        <div class="stat-label">Total Egresos</div>
-        <div class="stat-value" id="totalEgresos">$0</div>
-        <div class="stat-detail" id="cantidadGastos">0 gastos</div>
-    </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">📉</div>
+                    <div class="stat-label">Total Egresos</div>
+                    <div class="stat-value" id="totalEgresos">$0</div>
+                    <div class="stat-detail" id="cantidadGastos">0 gastos</div>
+                </div>
 
-    <div class="stat-card">
-        <div class="stat-icon purple">💰</div>
-        <div class="stat-label">Movimientos de Caja</div>
-        <div class="stat-value" id="totalMovimientos">$0</div>
-        <div class="stat-detail" id="cantidadMovimientos">0 movimientos</div>
-    </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple">💰</div>
+                    <div class="stat-label">Movimientos de Caja</div>
+                    <div class="stat-value" id="totalMovimientos">$0</div>
+                    <div class="stat-detail" id="cantidadMovimientos">0 movimientos</div>
+                </div>
 
-    <!-- NUEVA TARJETA PARA TRANSFERENCIAS -->
-    <div class="stat-card">
-        <div class="stat-icon green">📱</div>
-        <div class="stat-label">Pagos Transferencia</div>
-        <div class="stat-value" id="totalTransferencias">$0</div>
-        <div class="stat-detail" id="cantidadTransferencias">0 pedidos</div>
-    </div>
+                <!-- NUEVA TARJETA PARA TRANSFERENCIAS -->
+                <div class="stat-card">
+                    <div class="stat-icon green">📱</div>
+                    <div class="stat-label">Pagos Transferencia</div>
+                    <div class="stat-value" id="totalTransferencias">$0</div>
+                    <div class="stat-detail" id="cantidadTransferencias">0 pedidos</div>
+                </div>
 
-    <div class="stat-card">
-    <div class="stat-icon red">💳</div>
-    <div class="stat-label">Gastos Transferencia</div>
-    <div class="stat-value" id="totalGastosTransferencia">$0</div>
-    <div class="stat-detail" id="cantidadGastosTransferencia">0 gastos</div>
-</div>
+                <div class="stat-card">
+                    <div class="stat-icon red">💳</div>
+                    <div class="stat-label">Gastos Transferencia</div>
+                    <div class="stat-value" id="totalGastosTransferencia">$0</div>
+                    <div class="stat-detail" id="cantidadGastosTransferencia">0 gastos</div>
+                </div>
 
-</div>
+            </div>
 
             <div class="card">
                 <div class="card-header">
@@ -1138,14 +1155,14 @@
                 </div>
 
                 <div class="resumen-row">
-    <span class="resumen-label">📱 Transferencias:</span>
-    <span class="resumen-value" id="resumenTransferencias">$0</span>
-</div>
+                    <span class="resumen-label">📱 Transferencias:</span>
+                    <span class="resumen-value" id="resumenTransferencias">$0</span>
+                </div>
 
-<div class="resumen-row">
-    <span class="resumen-label">💳 Gastos Transferencia:</span>
-    <span class="resumen-value" id="resumenGastosTransferencia">$0</span>
-</div>
+                <div class="resumen-row">
+                    <span class="resumen-label">💳 Gastos Transferencia:</span>
+                    <span class="resumen-value" id="resumenGastosTransferencia">$0</span>
+                </div>
 
                 <button class="btn-liquidar" onclick="realizarLiquidacion()">
                     ✅ Realizar Liquidación del Día
@@ -1160,33 +1177,33 @@
             <div class="modal-header">
                 <h2>💰 Control de Caja</h2>
             </div>
-         <form onsubmit="agregarMovimiento(event)">
-    <div class="form-group">
-        <label class="form-label">Tipo de Movimiento</label>
-        <select id="tipoMovimiento" class="form-select" required>
-            <option value="">Seleccionar...</option>
-            <option value="ingreso">💵 Ingreso</option>
-            <option value="retiro">💸 Retiro</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label class="form-label">Monto</label>
-        <input type="number" id="montoMovimiento" class="form-input" 
-               placeholder="0" min="0" step="0.01" required>
-    </div>
-    <div class="form-group">
-        <label class="form-label">Motivo (opcional)</label>
-        <textarea id="motivoMovimiento" class="form-textarea" 
-                  placeholder="Descripción del movimiento..."></textarea>
-    </div>
-    <div class="modal-buttons">
-        <button type="button" class="btn-modal btn-modal-secondary" 
-                onclick="closeControlCajaModal()">Cancelar</button>
-        <button type="submit" class="btn-modal btn-modal-primary">
-            Agregar Movimiento
-        </button>
-    </div>
-</form>
+            <form onsubmit="agregarMovimiento(event)">
+                <div class="form-group">
+                    <label class="form-label">Tipo de Movimiento</label>
+                    <select id="tipoMovimiento" class="form-select" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="ingreso">💵 Ingreso</option>
+                        <option value="retiro">💸 Retiro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Monto</label>
+                    <input type="number" id="montoMovimiento" class="form-input" placeholder="0" min="0" step="0.01"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Motivo (opcional)</label>
+                    <textarea id="motivoMovimiento" class="form-textarea"
+                        placeholder="Descripción del movimiento..."></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-modal btn-modal-secondary"
+                        onclick="closeControlCajaModal()">Cancelar</button>
+                    <button type="submit" class="btn-modal btn-modal-primary">
+                        Agregar Movimiento
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -1199,12 +1216,12 @@
             <form onsubmit="confirmarLiquidacion(event)">
                 <div class="form-group">
                     <label class="form-label">Observaciones (opcional)</label>
-                    <textarea id="observaciones" class="form-textarea" 
-                              placeholder="Agregar notas o comentarios sobre la liquidación..."></textarea>
+                    <textarea id="observaciones" class="form-textarea"
+                        placeholder="Agregar notas o comentarios sobre la liquidación..."></textarea>
                 </div>
                 <div class="modal-buttons">
-                    <button type="button" class="btn-modal btn-modal-secondary" 
-                            onclick="closeObservacionesModal()">Cancelar</button>
+                    <button type="button" class="btn-modal btn-modal-secondary"
+                        onclick="closeObservacionesModal()">Cancelar</button>
                     <button type="submit" class="btn-modal btn-modal-primary">
                         ✅ Confirmar Liquidación
                     </button>
@@ -1214,21 +1231,21 @@
     </div>
 
     <!-- Overlay de éxito -->
-<div class="success-overlay" id="successOverlay">
-    <div class="success-message">
-        <div class="success-icon-wrapper">
-            <div class="success-checkmark">✓</div>
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-message">
+            <div class="success-icon-wrapper">
+                <div class="success-checkmark">✓</div>
+            </div>
+            <h2 class="success-title">¡Liquidación Exitosa!</h2>
+            <p class="success-subtitle">La liquidación del día se ha completado correctamente</p>
+            <div class="success-details" id="successDetails">
+                <!-- Se llenará dinámicamente -->
+            </div>
+            <p class="success-subtitle">
+                Recargando página<span class="loading-dots"><span></span><span></span><span></span></span>
+            </p>
         </div>
-        <h2 class="success-title">¡Liquidación Exitosa!</h2>
-        <p class="success-subtitle">La liquidación del día se ha completado correctamente</p>
-        <div class="success-details" id="successDetails">
-            <!-- Se llenará dinámicamente -->
-        </div>
-        <p class="success-subtitle">
-            Recargando página<span class="loading-dots"><span></span><span></span><span></span></span>
-        </p>
     </div>
-</div>
 
     <script>
         const API_URL = 'https://restaurante-co77.onrender.com/api';
@@ -1254,18 +1271,18 @@
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
-if (response.status === 401) {
-    console.warn('⚠️ Token expirado');
-    localStorage.removeItem('token');
-    window.location.href = 'index.html';
-    return;
-}
+                if (response.status === 401) {
+                    console.warn('⚠️ Token expirado');
+                    localStorage.removeItem('token');
+                    window.location.href = 'index.html';
+                    return;
+                }
 
-if (!response.ok) {
-    console.error('Error al cargar usuario');
-    alert('Error al cargar datos. Intente recargar.');
-    return;
-}
+                if (!response.ok) {
+                    console.error('Error al cargar usuario');
+                    alert('Error al cargar datos. Intente recargar.');
+                    return;
+                }
                 const data = await response.json();
                 currentUser = data.data;
 
@@ -1274,19 +1291,19 @@ if (!response.ok) {
                 }
 
                 document.getElementById('sidebarUserName').textContent = currentUser.nombre;
-                document.getElementById('sidebarUserAvatar').textContent = 
+                document.getElementById('sidebarUserAvatar').textContent =
                     currentUser.nombre.charAt(0).toUpperCase();
 
-                    // MOSTRAR SECCIÓN DE ADMIN SOLO SI ES ADMINISTRADOR
-if (currentUser.rol === 'admin') {
-    document.getElementById('adminSection').style.display = 'block';
-}
+                // MOSTRAR SECCIÓN DE ADMIN SOLO SI ES ADMINISTRADOR
+                if (currentUser.rol === 'admin') {
+                    document.getElementById('adminSection').style.display = 'block';
+                }
 
                 await cargarDatos();
             } catch (error) {
-    console.error('❌ Error de red:', error);
-    alert('Error de conexión. Recargue la página.');
-}
+                console.error('❌ Error de red:', error);
+                alert('Error de conexión. Recargue la página.');
+            }
         });
 
         async function cargarDatos() {
@@ -1310,7 +1327,7 @@ if (currentUser.rol === 'admin') {
                     cajaInicialValue = 0;
                 }
 
-                document.getElementById('cajaInicial').textContent = 
+                document.getElementById('cajaInicial').textContent =
                     `${cajaInicialValue.toLocaleString('es-CO')}`;
             } catch (error) {
                 console.error('Error al cargar última liquidación:', error);
@@ -1318,87 +1335,87 @@ if (currentUser.rol === 'admin') {
             }
         }
 
-async function cargarDatosPendientes() {
-    const token = localStorage.getItem('token');
-    try {
-        const response = await fetch(
-            `${API_URL}/liquidaciones/pendientes?userId=${currentUser._id}`,
-            { headers: { 'Authorization': `Bearer ${token}` } }
-        );
-        const data = await response.json();
+        async function cargarDatosPendientes() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(
+                    `${API_URL}/liquidaciones/pendientes?userId=${currentUser._id}`,
+                    { headers: { 'Authorization': `Bearer ${token}` } }
+                );
+                const data = await response.json();
 
-        if (data.success) {
-            datosPendientes = data.data;
-            
-            // Calcular transferencias de PEDIDOS
-            const pedidosTransferencia = datosPendientes.pedidos.filter(p => 
-                p.estado !== 'cancelado' && p.metodoPago === 'transferencia'
-            );
-            const totalTransferencias = pedidosTransferencia.reduce((sum, p) => sum + p.total, 0);
-            
-            // Actualizar UI de transferencias de pedidos
-            const elemTransferencias = document.getElementById('totalTransferencias');
-            const elemCantTransferencias = document.getElementById('cantidadTransferencias');
-            
-            if (elemTransferencias) {
-                elemTransferencias.textContent = `$${totalTransferencias.toLocaleString('es-CO')}`;
-            }
-            if (elemCantTransferencias) {
-                elemCantTransferencias.textContent = `${pedidosTransferencia.length} pedidos`;
-            }
-            
-            // Calcular transferencias de GASTOS
-            let totalGastosTransferencia = 0;
-            let cantidadGastosTransferencia = 0;
-            
-            datosPendientes.gastos.forEach(registro => {
-                registro.gastos.forEach(gasto => {
-                    if (gasto.metodoPago === 'transferencia') {
-                        totalGastosTransferencia += gasto.monto;
-                        cantidadGastosTransferencia++;
+                if (data.success) {
+                    datosPendientes = data.data;
+
+                    // Calcular transferencias de PEDIDOS
+                    const pedidosTransferencia = datosPendientes.pedidos.filter(p =>
+                        p.estado !== 'cancelado' && p.metodoPago === 'transferencia'
+                    );
+                    const totalTransferencias = pedidosTransferencia.reduce((sum, p) => sum + p.total, 0);
+
+                    // Actualizar UI de transferencias de pedidos
+                    const elemTransferencias = document.getElementById('totalTransferencias');
+                    const elemCantTransferencias = document.getElementById('cantidadTransferencias');
+
+                    if (elemTransferencias) {
+                        elemTransferencias.textContent = `$${totalTransferencias.toLocaleString('es-CO')}`;
                     }
-                });
-            });
-            
-            // Actualizar UI de transferencias de gastos
-            const elemGastosTransf = document.getElementById('totalGastosTransferencia');
-            const elemCantGastosTransf = document.getElementById('cantidadGastosTransferencia');
-            
-            if (elemGastosTransf) {
-                elemGastosTransf.textContent = `$${totalGastosTransferencia.toLocaleString('es-CO')}`;
+                    if (elemCantTransferencias) {
+                        elemCantTransferencias.textContent = `${pedidosTransferencia.length} pedidos`;
+                    }
+
+                    // Calcular transferencias de GASTOS
+                    let totalGastosTransferencia = 0;
+                    let cantidadGastosTransferencia = 0;
+
+                    datosPendientes.gastos.forEach(registro => {
+                        registro.gastos.forEach(gasto => {
+                            if (gasto.metodoPago === 'transferencia') {
+                                totalGastosTransferencia += gasto.monto;
+                                cantidadGastosTransferencia++;
+                            }
+                        });
+                    });
+
+                    // Actualizar UI de transferencias de gastos
+                    const elemGastosTransf = document.getElementById('totalGastosTransferencia');
+                    const elemCantGastosTransf = document.getElementById('cantidadGastosTransferencia');
+
+                    if (elemGastosTransf) {
+                        elemGastosTransf.textContent = `$${totalGastosTransferencia.toLocaleString('es-CO')}`;
+                    }
+                    if (elemCantGastosTransf) {
+                        elemCantGastosTransf.textContent = `${cantidadGastosTransferencia} gastos`;
+                    }
+
+                    mostrarPedidos();
+                    mostrarGastos();
+                }
+            } catch (error) {
+                console.error('Error al cargar datos pendientes:', error);
             }
-            if (elemCantGastosTransf) {
-                elemCantGastosTransf.textContent = `${cantidadGastosTransferencia} gastos`;
-            }
-            
-            mostrarPedidos();
-            mostrarGastos();
         }
-    } catch (error) {
-        console.error('Error al cargar datos pendientes:', error);
-    }
-}
-function mostrarPedidos() {
-    const lista = document.getElementById('listaPedidos');
-    
-    if (datosPendientes.pedidos.length === 0) {
-        lista.innerHTML = `
+        function mostrarPedidos() {
+            const lista = document.getElementById('listaPedidos');
+
+            if (datosPendientes.pedidos.length === 0) {
+                lista.innerHTML = `
             <div class="empty-state">
                 <div class="empty-icon">📋</div>
                 <p>No hay pedidos pendientes de liquidar</p>
             </div>
         `;
-        return;
-    }
+                return;
+            }
 
-    lista.innerHTML = datosPendientes.pedidos.map(pedido => `
+            lista.innerHTML = datosPendientes.pedidos.map(pedido => `
         <div class="item-row">
             <div class="item-info">
                 <h4>
                     Pedido #${pedido._id.slice(-6).toUpperCase()} - Mesa ${pedido.mesa}
-                    ${pedido.metodoPago === 'transferencia' ? 
-                        '<span style="display: inline-block; margin-left: 8px; padding: 4px 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 6px; font-size: 11px; font-weight: 700;">📱 TRANSFERENCIA</span>' 
-                        : ''}
+                    ${pedido.metodoPago === 'transferencia' ?
+                    '<span style="display: inline-block; margin-left: 8px; padding: 4px 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 6px; font-size: 11px; font-weight: 700;">📱 TRANSFERENCIA</span>'
+                    : ''}
                 </h4>
                 <p>${new Date(pedido.createdAt).toLocaleString('es-CO')} | 
                    ${pedido.items.length} producto(s)${pedido.metodoPago ? ` | ${pedido.metodoPago === 'transferencia' ? '📱 Transferencia' : '💵 Efectivo'}` : ''}</p>
@@ -1406,26 +1423,26 @@ function mostrarPedidos() {
             <div class="item-value">$${pedido.total.toLocaleString('es-CO')}</div>
         </div>
     `).join('');
-}
-function mostrarGastos() {
-    const lista = document.getElementById('listaGastos');
-    
-    if (datosPendientes.gastos.length === 0) {
-        lista.innerHTML = `
+        }
+        function mostrarGastos() {
+            const lista = document.getElementById('listaGastos');
+
+            if (datosPendientes.gastos.length === 0) {
+                lista.innerHTML = `
             <div class="empty-state">
                 <div class="empty-icon">💸</div>
                 <p>No hay gastos pendientes de liquidar</p>
             </div>
         `;
-        return;
-    }
+                return;
+            }
 
-    lista.innerHTML = datosPendientes.gastos.map(registro => {
-        // Contar gastos por método de pago
-        const gastosEfectivo = registro.gastos.filter(g => g.metodoPago === 'efectivo').length;
-        const gastosTransferencia = registro.gastos.filter(g => g.metodoPago === 'transferencia').length;
-        
-        return `
+            lista.innerHTML = datosPendientes.gastos.map(registro => {
+                // Contar gastos por método de pago
+                const gastosEfectivo = registro.gastos.filter(g => g.metodoPago === 'efectivo').length;
+                const gastosTransferencia = registro.gastos.filter(g => g.metodoPago === 'transferencia').length;
+
+                return `
         <div class="item-row">
             <div class="item-info">
                 <h4>${new Date(registro.fecha).toLocaleDateString('es-CO')}</h4>
@@ -1437,9 +1454,9 @@ function mostrarGastos() {
                         <div style="font-size: 12px; color: #4a5568; padding: 4px 0; display: flex; justify-content: space-between; align-items: center;">
                             <span>
                                 • ${gasto.descripcion}
-                                ${gasto.metodoPago === 'transferencia' ? 
-                                    '<span style="display: inline-block; margin-left: 6px; padding: 2px 6px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 4px; font-size: 10px; font-weight: 700;">💳 TRANSF</span>' 
-                                    : ''}
+                                ${gasto.metodoPago === 'transferencia' ?
+                        '<span style="display: inline-block; margin-left: 6px; padding: 2px 6px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 4px; font-size: 10px; font-weight: 700;">💳 TRANSF</span>'
+                        : ''}
                             </span>
                             <span style="font-weight: 600; color: #2d3748;">$${gasto.monto.toLocaleString('es-CO')}</span>
                         </div>
@@ -1449,75 +1466,75 @@ function mostrarGastos() {
             <div class="item-value">$${registro.total.toLocaleString('es-CO')}</div>
         </div>
     `;
-    }).join('');
-}
+            }).join('');
+        }
         function toggleDetails(tipo) {
             const lista = document.getElementById(tipo === 'pedidos' ? 'listaPedidos' : 'listaGastos');
             const icon = document.getElementById(tipo === 'pedidos' ? 'iconPedidos' : 'iconGastos');
-            
+
             lista.classList.toggle('active');
             icon.textContent = lista.classList.contains('active') ? '▼' : '▶';
         }
 
-function actualizarResumen() {
-    const totalIngresos = datosPendientes.totalPedidos;
-    const totalEgresos = datosPendientes.totalGastos;
-    const totalMovimientos = movimientosCaja.reduce((sum, mov) => {
-        return mov.tipo === 'ingreso' ? sum + mov.monto : sum - mov.monto;
-    }, 0);
-    
-    // Calcular transferencias de PEDIDOS
-    const pedidosTransferencia = datosPendientes.pedidos.filter(p => 
-        p.estado !== 'cancelado' && p.metodoPago === 'transferencia'
-    );
-    const totalTransferencias = pedidosTransferencia.reduce((sum, p) => sum + p.total, 0);
-    
-    // Calcular transferencias de GASTOS
-    let totalGastosTransferencia = 0;
-    datosPendientes.gastos.forEach(registro => {
-        registro.gastos.forEach(gasto => {
-            if (gasto.metodoPago === 'transferencia') {
-                totalGastosTransferencia += gasto.monto;
-            }
-        });
-    });
-    
-    const cajaFinal = cajaInicialValue + totalIngresos - totalEgresos + totalMovimientos;
+        function actualizarResumen() {
+            const totalIngresos = datosPendientes.totalPedidos;
+            const totalEgresos = datosPendientes.totalGastos;
+            const totalMovimientos = movimientosCaja.reduce((sum, mov) => {
+                return mov.tipo === 'ingreso' ? sum + mov.monto : sum - mov.monto;
+            }, 0);
 
-    // Actualizar tarjetas
-    document.getElementById('totalIngresos').textContent = 
-        `$${totalIngresos.toLocaleString('es-CO')}`;
-    document.getElementById('cantidadPedidos').textContent = 
-        `${datosPendientes.pedidos.length} pedidos`;
-    
-    document.getElementById('totalEgresos').textContent = 
-        `$${totalEgresos.toLocaleString('es-CO')}`;
-    document.getElementById('cantidadGastos').textContent = 
-        `${datosPendientes.gastos.length} gastos`;
-    
-    document.getElementById('totalMovimientos').textContent = 
-        `$${totalMovimientos.toLocaleString('es-CO')}`;
-    document.getElementById('cantidadMovimientos').textContent = 
-        `${movimientosCaja.length} movimientos`;
+            // Calcular transferencias de PEDIDOS
+            const pedidosTransferencia = datosPendientes.pedidos.filter(p =>
+                p.estado !== 'cancelado' && p.metodoPago === 'transferencia'
+            );
+            const totalTransferencias = pedidosTransferencia.reduce((sum, p) => sum + p.total, 0);
 
-    // Actualizar resumen final
-    document.getElementById('resumenCajaInicial').textContent = 
-        `$${cajaInicialValue.toLocaleString('es-CO')}`;
-    document.getElementById('resumenIngresos').textContent = 
-        `$${totalIngresos.toLocaleString('es-CO')}`;
-    document.getElementById('resumenEgresos').textContent = 
-        `$${totalEgresos.toLocaleString('es-CO')}`;
-    document.getElementById('resumenMovimientos').textContent = 
-        `$${totalMovimientos.toLocaleString('es-CO')}`;
-    document.getElementById('resumenTransferencias').textContent = 
-        `$${totalTransferencias.toLocaleString('es-CO')}`;
-    document.getElementById('resumenGastosTransferencia').textContent = 
-        `$${totalGastosTransferencia.toLocaleString('es-CO')}`;
-    document.getElementById('cajaFinal').textContent = 
-        `$${cajaFinal.toLocaleString('es-CO')}`;
-}
+            // Calcular transferencias de GASTOS
+            let totalGastosTransferencia = 0;
+            datosPendientes.gastos.forEach(registro => {
+                registro.gastos.forEach(gasto => {
+                    if (gasto.metodoPago === 'transferencia') {
+                        totalGastosTransferencia += gasto.monto;
+                    }
+                });
+            });
 
-function openControlCajaModal() {
+            const cajaFinal = cajaInicialValue + totalIngresos - totalEgresos + totalMovimientos;
+
+            // Actualizar tarjetas
+            document.getElementById('totalIngresos').textContent =
+                `$${totalIngresos.toLocaleString('es-CO')}`;
+            document.getElementById('cantidadPedidos').textContent =
+                `${datosPendientes.pedidos.length} pedidos`;
+
+            document.getElementById('totalEgresos').textContent =
+                `$${totalEgresos.toLocaleString('es-CO')}`;
+            document.getElementById('cantidadGastos').textContent =
+                `${datosPendientes.gastos.length} gastos`;
+
+            document.getElementById('totalMovimientos').textContent =
+                `$${totalMovimientos.toLocaleString('es-CO')}`;
+            document.getElementById('cantidadMovimientos').textContent =
+                `${movimientosCaja.length} movimientos`;
+
+            // Actualizar resumen final
+            document.getElementById('resumenCajaInicial').textContent =
+                `$${cajaInicialValue.toLocaleString('es-CO')}`;
+            document.getElementById('resumenIngresos').textContent =
+                `$${totalIngresos.toLocaleString('es-CO')}`;
+            document.getElementById('resumenEgresos').textContent =
+                `$${totalEgresos.toLocaleString('es-CO')}`;
+            document.getElementById('resumenMovimientos').textContent =
+                `$${totalMovimientos.toLocaleString('es-CO')}`;
+            document.getElementById('resumenTransferencias').textContent =
+                `$${totalTransferencias.toLocaleString('es-CO')}`;
+            document.getElementById('resumenGastosTransferencia').textContent =
+                `$${totalGastosTransferencia.toLocaleString('es-CO')}`;
+            document.getElementById('cajaFinal').textContent =
+                `$${cajaFinal.toLocaleString('es-CO')}`;
+        }
+
+        function openControlCajaModal() {
             document.getElementById('modalControlCaja').classList.add('active');
         }
 
@@ -1529,39 +1546,39 @@ function openControlCajaModal() {
         }
 
         function agregarMovimiento(event) {
-    event.preventDefault();
-    
-    const tipo = document.getElementById('tipoMovimiento').value;
-    const monto = parseFloat(document.getElementById('montoMovimiento').value);
-    const motivo = document.getElementById('motivoMovimiento').value || 'Sin descripción';
+            event.preventDefault();
 
-    movimientosCaja.push({
-        tipo,
-        monto,
-        motivo,
-        fecha: new Date()
-    });
+            const tipo = document.getElementById('tipoMovimiento').value;
+            const monto = parseFloat(document.getElementById('montoMovimiento').value);
+            const motivo = document.getElementById('motivoMovimiento').value || 'Sin descripción';
 
-    mostrarMovimientos();
-    actualizarResumen();
-    closeControlCajaModal();
-}
+            movimientosCaja.push({
+                tipo,
+                monto,
+                motivo,
+                fecha: new Date()
+            });
+
+            mostrarMovimientos();
+            actualizarResumen();
+            closeControlCajaModal();
+        }
 
 
-function mostrarMovimientos() {
-    const lista = document.getElementById('listaMovimientos');
-    
-    if (movimientosCaja.length === 0) {
-        lista.innerHTML = `
+        function mostrarMovimientos() {
+            const lista = document.getElementById('listaMovimientos');
+
+            if (movimientosCaja.length === 0) {
+                lista.innerHTML = `
             <div class="empty-state">
                 <div class="empty-icon">💰</div>
                 <p>No hay movimientos de caja registrados</p>
             </div>
         `;
-        return;
-    }
+                return;
+            }
 
-    lista.innerHTML = movimientosCaja.map((mov, index) => `
+            lista.innerHTML = movimientosCaja.map((mov, index) => `
         <div class="movimiento-item ${mov.tipo}">
             <div class="movimiento-info">
                 <h4>${mov.tipo === 'ingreso' ? '💵 Ingreso' : '💸 Retiro'}: ${mov.motivo || 'Sin descripción'}</h4>
@@ -1572,149 +1589,149 @@ function mostrarMovimientos() {
             </div>
         </div>
     `).join('');
-}
+        }
 
-function realizarLiquidacion() {
-    // ELIMINAR LA VALIDACIÓN - permitir liquidar siempre
-    document.getElementById('modalObservaciones').classList.add('active');
-}
+        function realizarLiquidacion() {
+            // ELIMINAR LA VALIDACIÓN - permitir liquidar siempre
+            document.getElementById('modalObservaciones').classList.add('active');
+        }
 
         function closeObservacionesModal() {
             document.getElementById('modalObservaciones').classList.remove('active');
             document.getElementById('observaciones').value = '';
         }
 
-async function confirmarLiquidacion(event) {
-    event.preventDefault();
+        async function confirmarLiquidacion(event) {
+            event.preventDefault();
 
-    const observaciones = (document.getElementById('observaciones') && document.getElementById('observaciones').value) || '';
-    const token = localStorage.getItem('token');
+            const observaciones = (document.getElementById('observaciones') && document.getElementById('observaciones').value) || '';
+            const token = localStorage.getItem('token');
 
-    const cajaInicialNum = Number(typeof cajaInicialValue !== 'undefined' ? cajaInicialValue : 0);
+            const cajaInicialNum = Number(typeof cajaInicialValue !== 'undefined' ? cajaInicialValue : 0);
 
-    const totalIngresos = Number(
-        (typeof datosPendientes !== 'undefined' && (datosPendientes.totalPedidos ?? datosPendientes.totalIngresos)) || 0
-    );
-    const totalEgresos = Number(
-        (typeof datosPendientes !== 'undefined' && (datosPendientes.totalGastos ?? datosPendientes.totalEgresos)) || 0
-    );
+            const totalIngresos = Number(
+                (typeof datosPendientes !== 'undefined' && (datosPendientes.totalPedidos ?? datosPendientes.totalIngresos)) || 0
+            );
+            const totalEgresos = Number(
+                (typeof datosPendientes !== 'undefined' && (datosPendientes.totalGastos ?? datosPendientes.totalEgresos)) || 0
+            );
 
-    const totalMovimientos = Array.isArray(movimientosCaja)
-        ? movimientosCaja.reduce((sum, mov) => {
-            const monto = Number(mov?.monto ?? mov?.amount ?? 0);
-            return (mov?.tipo === 'ingreso' ? sum + monto : sum - monto);
-        }, 0)
-        : 0;
+            const totalMovimientos = Array.isArray(movimientosCaja)
+                ? movimientosCaja.reduce((sum, mov) => {
+                    const monto = Number(mov?.monto ?? mov?.amount ?? 0);
+                    return (mov?.tipo === 'ingreso' ? sum + monto : sum - monto);
+                }, 0)
+                : 0;
 
-    const cajaFinalCalc = Number(cajaInicialNum + totalIngresos - totalEgresos + totalMovimientos);
+            const cajaFinalCalc = Number(cajaInicialNum + totalIngresos - totalEgresos + totalMovimientos);
 
-    const pedidosArray = (datosPendientes && Array.isArray(datosPendientes.pedidos) ? datosPendientes.pedidos : [])
-        .map(p => {
-            if (!p) return null;
-            if (typeof p === 'string') return { _id: p };
-            if (p._id) return p;
-            if (p.id) return { _id: p.id };
-            return p;
-        })
-        .filter(Boolean);
+            const pedidosArray = (datosPendientes && Array.isArray(datosPendientes.pedidos) ? datosPendientes.pedidos : [])
+                .map(p => {
+                    if (!p) return null;
+                    if (typeof p === 'string') return { _id: p };
+                    if (p._id) return p;
+                    if (p.id) return { _id: p.id };
+                    return p;
+                })
+                .filter(Boolean);
 
-    const gastosArray = (datosPendientes && Array.isArray(datosPendientes.gastos) ? datosPendientes.gastos : [])
-        .map(g => {
-            if (!g) return null;
-            if (typeof g === 'string') return { _id: g };
-            if (g._id) return g;
-            if (g.id) return { _id: g.id };
-            return g;
-        })
-        .filter(Boolean);
+            const gastosArray = (datosPendientes && Array.isArray(datosPendientes.gastos) ? datosPendientes.gastos : [])
+                .map(g => {
+                    if (!g) return null;
+                    if (typeof g === 'string') return { _id: g };
+                    if (g._id) return g;
+                    if (g.id) return { _id: g.id };
+                    return g;
+                })
+                .filter(Boolean);
 
-    const liquidacionData = {
-        fecha: new Date().toISOString(),
-        cajaInicial: Number(cajaInicialNum || 0),
-        ingresos: {
-            totalPedidos: Number(totalIngresos || 0),
-            pedidos: pedidosArray
-        },
-        egresos: {
-            totalGastos: Number(totalEgresos || 0),
-            gastos: gastosArray
-        },
-        movimientosCaja: Array.isArray(movimientosCaja) ? movimientosCaja : [],
-        observaciones: observaciones || '',
-        userId: (typeof currentUser !== 'undefined' && (currentUser?._id || currentUser?.id)) || null,
-        cajaFinal: Number.isFinite(cajaFinalCalc) ? cajaFinalCalc : 0
-    };
+            const liquidacionData = {
+                fecha: new Date().toISOString(),
+                cajaInicial: Number(cajaInicialNum || 0),
+                ingresos: {
+                    totalPedidos: Number(totalIngresos || 0),
+                    pedidos: pedidosArray
+                },
+                egresos: {
+                    totalGastos: Number(totalEgresos || 0),
+                    gastos: gastosArray
+                },
+                movimientosCaja: Array.isArray(movimientosCaja) ? movimientosCaja : [],
+                observaciones: observaciones || '',
+                userId: (typeof currentUser !== 'undefined' && (currentUser?._id || currentUser?.id)) || null,
+                cajaFinal: Number.isFinite(cajaFinalCalc) ? cajaFinalCalc : 0
+            };
 
-    console.log('Enviando liquidación payload:', liquidacionData);
-    
-    if (!liquidacionData.userId) {
-        console.error('Error: userId indefinido');
-        alert('Error: usuario no identificado. Vuelve a iniciar sesión.');
-        return;
-    }
+            console.log('Enviando liquidación payload:', liquidacionData);
 
-    try {
-        const response = await fetch(`${API_URL}/liquidaciones`, {
-            method: 'POST',
-            headers: {
-                'Authorization': token ? `Bearer ${token}` : '',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(liquidacionData)
-        });
-
-        if (!response.ok) {
-            let errText = '';
-            try {
-                const errJson = await response.json();
-                errText = errJson.message || JSON.stringify(errJson);
-            } catch (e) {
-                errText = await response.text();
+            if (!liquidacionData.userId) {
+                console.error('Error: userId indefinido');
+                alert('Error: usuario no identificado. Vuelve a iniciar sesión.');
+                return;
             }
-            console.error('Error al realizar liquidación:', response.status, errText);
-            alert(`Error ${response.status}: ${errText || 'Bad request'}`);
-            return;
+
+            try {
+                const response = await fetch(`${API_URL}/liquidaciones`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': token ? `Bearer ${token}` : '',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(liquidacionData)
+                });
+
+                if (!response.ok) {
+                    let errText = '';
+                    try {
+                        const errJson = await response.json();
+                        errText = errJson.message || JSON.stringify(errJson);
+                    } catch (e) {
+                        errText = await response.text();
+                    }
+                    console.error('Error al realizar liquidación:', response.status, errText);
+                    alert(`Error ${response.status}: ${errText || 'Bad request'}`);
+                    return;
+                }
+
+                let data = null;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    console.warn('Respuesta no-JSON del servidor');
+                }
+
+                if (data && (data.success === true || response.status === 201)) {
+                    // Cerrar modal de observaciones
+                    closeObservacionesModal();
+
+                    // Mostrar animación de éxito
+                    mostrarExito({
+                        cajaInicial: cajaInicialNum,
+                        ingresos: totalIngresos,
+                        egresos: totalEgresos,
+                        movimientos: totalMovimientos,
+                        cajaFinal: cajaFinalCalc
+                    });
+
+                    // Recargar después de 3 segundos
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 3000);
+                } else {
+                    console.error('Respuesta inesperada:', data);
+                    alert('Error al realizar la liquidación: ' + (data?.message || 'Error desconocido'));
+                }
+            } catch (error) {
+                console.error('Error al realizar liquidación:', error);
+                alert('Error de red o problema en el servidor.');
+            }
         }
 
-        let data = null;
-        try {
-            data = await response.json();
-        } catch (e) {
-            console.warn('Respuesta no-JSON del servidor');
-        }
+        function mostrarExito(datos) {
+            const overlay = document.getElementById('successOverlay');
+            const details = document.getElementById('successDetails');
 
-        if (data && (data.success === true || response.status === 201)) {
-            // Cerrar modal de observaciones
-            closeObservacionesModal();
-            
-            // Mostrar animación de éxito
-            mostrarExito({
-                cajaInicial: cajaInicialNum,
-                ingresos: totalIngresos,
-                egresos: totalEgresos,
-                movimientos: totalMovimientos,
-                cajaFinal: cajaFinalCalc
-            });
-            
-            // Recargar después de 3 segundos
-            setTimeout(() => {
-                window.location.reload();
-            }, 3000);
-        } else {
-            console.error('Respuesta inesperada:', data);
-            alert('Error al realizar la liquidación: ' + (data?.message || 'Error desconocido'));
-        }
-    } catch (error) {
-        console.error('Error al realizar liquidación:', error);
-        alert('Error de red o problema en el servidor.');
-    }
-}
-
-function mostrarExito(datos) {
-    const overlay = document.getElementById('successOverlay');
-    const details = document.getElementById('successDetails');
-    
-    details.innerHTML = `
+            details.innerHTML = `
         <div class="success-detail-row">
             <span class="success-detail-label">Caja Inicial:</span>
             <span class="success-detail-value">$${datos.cajaInicial.toLocaleString('es-CO')}</span>
@@ -1736,9 +1753,9 @@ function mostrarExito(datos) {
             <span class="success-detail-value">$${datos.cajaFinal.toLocaleString('es-CO')}</span>
         </div>
     `;
-    
-    overlay.classList.add('active');
-}
+
+            overlay.classList.add('active');
+        }
         function toggleMenu() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
@@ -1755,4 +1772,5 @@ function mostrarExito(datos) {
         }
     </script>
 </body>
+
 </html>

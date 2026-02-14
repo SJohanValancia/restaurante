@@ -1225,6 +1225,10 @@
                 <span class="nav-icon">📋</span>
                 <span>Hist. Liquidaciones</span>
             </a>
+            <a href="solicitudes.html" class="nav-item">
+                <span class="nav-icon">👤✅</span>
+                <span>Aceptación de Empleados</span>
+            </a>
         </nav>
 
         <div class="sidebar-footer">
@@ -1929,99 +1933,6 @@
             }
         });
     </script>
-    <script>
-        // --- SISTEMA DE NOTIFICACIONES DE SOLICITUDES (POLLING) ---
-        async function verificarSolicitudesPendientes() {
-            try {
-                const token = localStorage.getItem('token');
-                if (!token) return;
-
-                const response = await fetch('/api/auth/solicitudes', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success && data.solicitudes.length > 0) {
-                        // Mostrar solo la primera para no saturar
-                        const solicitud = data.solicitudes[0];
-
-                        // Verificar si ya mostramos esta solicitud recientemente para no ser molestos
-                        const lastShownId = sessionStorage.getItem('last_request_shown');
-                        if (lastShownId === solicitud._id) return;
-
-                        Swal.fire({
-                            title: '🔔 Nueva Solicitud de Ingreso',
-                            html: `
-                                <div style="text-align: left;">
-                                    <p><strong>Usuario:</strong> ${solicitud.nombre}</p>
-                                    <p><strong>Email:</strong> ${solicitud.email}</p>
-                                    <p><strong>Rol:</strong> ${solicitud.rol}</p>
-                                    <p>Quiere unirse a tu equipo.</p>
-                                </div>
-                            `,
-                            icon: 'info',
-                            showCancelButton: true,
-                            confirmButtonText: '✅ Aprobar',
-                            cancelButtonText: '❌ Rechazar',
-                            confirmButtonColor: '#10b981',
-                            cancelButtonColor: '#ef4444'
-                        }).then(async (result) => {
-                            if (result.isConfirmed) {
-                                gestionSolicitud(solicitud._id, 'aprobar');
-                            } else if (result.dismiss === Swal.DismissReason.cancel) {
-                                gestionSolicitud(solicitud._id, 'rechazar');
-                            } else {
-                                // Si cierra sin responder, marcamos para no mostrar inmediatamente
-                                sessionStorage.setItem('last_request_shown', solicitud._id);
-                            }
-                        });
-                    }
-                }
-            } catch (error) {
-                console.error('Error verificando solicitudes:', error);
-            }
-        }
-
-        async function gestionSolicitud(userId, accion) {
-            try {
-                const token = localStorage.getItem('token');
-                const response = await fetch('/api/auth/gestionar-solicitud', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ userId, accion })
-                });
-
-                const data = await response.json();
-                if (data.success) {
-                    Swal.fire({
-                        title: accion === 'aprobar' ? '¡Aprobado!' : 'Rechazado',
-                        text: data.message,
-                        icon: 'success',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-                    // Limpiar session storage para permitir nuevas notificaciones
-                    sessionStorage.removeItem('last_request_shown');
-                } else {
-                    Swal.fire('Error', data.message, 'error');
-                }
-            } catch (error) {
-                console.error('Error gestionando:', error);
-                Swal.fire('Error', 'No se pudo procesar la solicitud', 'error');
-            }
-        }
-
-        // Verificar cada 30 segundos
-        setInterval(verificarSolicitudesPendientes, 30000);
-        // Verificar también al cargar (con un pequeño delay)
-        setTimeout(verificarSolicitudesPendientes, 5000);
-    </script>
 </body>
-
-
 
 </html>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,7 +29,7 @@
             background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
             padding: 0;
             z-index: 1000;
-            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
         }
 
@@ -38,8 +39,8 @@
 
         .sidebar-header {
             padding: 1.5rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .sidebar-brand {
@@ -70,7 +71,7 @@
 
         .brand-text p {
             font-size: 11px;
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
             margin: 2px 0 0 0;
         }
 
@@ -85,11 +86,11 @@
         }
 
         .sidebar-nav::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .sidebar-nav::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             border-radius: 3px;
         }
 
@@ -101,7 +102,7 @@
             padding: 0.5rem 1.5rem;
             font-size: 11px;
             font-weight: 700;
-            color: rgba(255,255,255,0.5);
+            color: rgba(255, 255, 255, 0.5);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -111,7 +112,7 @@
             align-items: center;
             gap: 12px;
             padding: 12px 1.5rem;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
             transition: all 0.2s;
             font-size: 14px;
@@ -120,7 +121,7 @@
         }
 
         .nav-item:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             color: white;
         }
 
@@ -151,8 +152,8 @@
             left: 0;
             right: 0;
             padding: 1.5rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .user-info {
@@ -183,7 +184,7 @@
 
         .user-details p {
             font-size: 11px;
-            color: rgba(255,255,255,0.6);
+            color: rgba(255, 255, 255, 0.6);
             margin: 2px 0 0 0;
         }
 
@@ -241,7 +242,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 999;
             display: none;
         }
@@ -295,7 +296,7 @@
 
 
         .card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .card-header {
@@ -328,7 +329,9 @@
             margin-bottom: 6px;
         }
 
-        .form-input, .form-select, .form-textarea {
+        .form-input,
+        .form-select,
+        .form-textarea {
             width: 100%;
             padding: 10px 14px;
             border: 1px solid #e2e8f0;
@@ -338,7 +341,9 @@
             font-family: inherit;
         }
 
-        .form-input:focus, .form-select:focus, .form-textarea:focus {
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
@@ -354,74 +359,78 @@
             position: relative;
         }
 
-      /* SELECT CON BÚSQUEDA */
-.select-search-wrapper {
-    position: relative;
-}
+        /* SELECT CON BÚSQUEDA */
+        .select-search-wrapper {
+            position: relative;
+        }
 
-.producto-list {
-    max-height: 350px; /* ✅ Aumentado de 200px a 350px */
-    overflow-y: auto;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    display: none;
-    position: absolute;
-    background: white;
-    width: 100%;
-    z-index: 1000;
-    margin-top: 4px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.15); /* ✅ Sombra más pronunciada */
-    animation: fadeIn 0.2s ease;
-}
+        .producto-list {
+            max-height: 350px;
+            /* ✅ Aumentado de 200px a 350px */
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            display: none;
+            position: absolute;
+            background: white;
+            width: 100%;
+            z-index: 1000;
+            margin-top: 4px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            /* ✅ Sombra más pronunciada */
+            animation: fadeIn 0.2s ease;
+        }
 
-.producto-list.show {
-    display: block;
-}
+        .producto-list.show {
+            display: block;
+        }
 
-.producto-list::-webkit-scrollbar {
-    width: 10px; /* ✅ Aumentado de 8px a 10px */
-}
+        .producto-list::-webkit-scrollbar {
+            width: 10px;
+            /* ✅ Aumentado de 8px a 10px */
+        }
 
-.producto-list::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 5px;
-}
+        .producto-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 5px;
+        }
 
-.producto-list::-webkit-scrollbar-thumb {
-    background: #667eea;
-    border-radius: 5px;
-}
+        .producto-list::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 5px;
+        }
 
-.producto-list::-webkit-scrollbar-thumb:hover {
-    background: #5568d3;
-}
+        .producto-list::-webkit-scrollbar-thumb:hover {
+            background: #5568d3;
+        }
 
-.producto-option {
-    padding: 16px; /* ✅ Aumentado de 12px a 16px */
-    cursor: pointer;
-    transition: all 0.2s;
-    border-bottom: 1px solid #f7fafc;
-}
+        .producto-option {
+            padding: 16px;
+            /* ✅ Aumentado de 12px a 16px */
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid #f7fafc;
+        }
 
-.producto-option:last-child {
-    border-bottom: none;
-}
+        .producto-option:last-child {
+            border-bottom: none;
+        }
 
-.producto-option:hover {
-    background: #f7fafc;
-    transform: translateX(4px);
-}
+        .producto-option:hover {
+            background: #f7fafc;
+            transform: translateX(4px);
+        }
 
-.selected-producto-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 8px;
-    margin-top: 8px;
-    font-size: 14px;
-    animation: fadeIn 0.3s ease;
-}
+        .selected-producto-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-size: 14px;
+            animation: fadeIn 0.3s ease;
+        }
 
         .producto-option {
             padding: 12px;
@@ -507,7 +516,7 @@
         }
 
         .alimento-card:hover {
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
             transform: translateY(-4px);
             border-color: #667eea;
         }
@@ -588,7 +597,8 @@
             margin-top: 1rem;
         }
 
-        .btn-edit, .btn-delete {
+        .btn-edit,
+        .btn-delete {
             padding: 10px;
             border: none;
             border-radius: 8px;
@@ -654,6 +664,7 @@
                 opacity: 0;
                 transform: translateY(10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -665,6 +676,7 @@
                 opacity: 0;
                 transform: translateY(-20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -719,80 +731,82 @@
         }
 
         /* SELECT CON BÚSQUEDA */
-.select-search-wrapper {
-    position: relative;
-}
+        .select-search-wrapper {
+            position: relative;
+        }
 
-.producto-list {
-    max-height: 500px; /* ✅ */
-    overflow-y: auto;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    display: none;
-    position: absolute;
-    background: white;
-    width: 100%;
-    z-index: 1000;
-    margin-top: 4px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-    animation: fadeIn 0.2s ease;
-}
+        .producto-list {
+            max-height: 500px;
+            /* ✅ */
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            display: none;
+            position: absolute;
+            background: white;
+            width: 100%;
+            z-index: 1000;
+            margin-top: 4px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            animation: fadeIn 0.2s ease;
+        }
 
-.producto-list.show {
-    display: block;
-}
+        .producto-list.show {
+            display: block;
+        }
 
-.producto-list::-webkit-scrollbar {
-    width: 10px;
-}
+        .producto-list::-webkit-scrollbar {
+            width: 10px;
+        }
 
-.producto-list::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 5px;
-}
+        .producto-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 5px;
+        }
 
-.producto-list::-webkit-scrollbar-thumb {
-    background: #667eea;
-    border-radius: 5px;
-}
+        .producto-list::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 5px;
+        }
 
-.producto-list::-webkit-scrollbar-thumb:hover {
-    background: #5568d3;
-}
+        .producto-list::-webkit-scrollbar-thumb:hover {
+            background: #5568d3;
+        }
 
-.producto-option {
-    padding: 16px; /* ✅ */
-    cursor: pointer;
-    transition: all 0.2s;
-    border-bottom: 1px solid #f7fafc;
-}
+        .producto-option {
+            padding: 16px;
+            /* ✅ */
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid #f7fafc;
+        }
 
-.producto-option:last-child {
-    border-bottom: none;
-}
+        .producto-option:last-child {
+            border-bottom: none;
+        }
 
-.producto-option:hover {
-    background: #f7fafc;
-    transform: translateX(4px);
-}
+        .producto-option:hover {
+            background: #f7fafc;
+            transform: translateX(4px);
+        }
 
-.selected-producto-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 8px;
-    margin-top: 8px;
-    font-size: 14px;
-    animation: fadeIn 0.3s ease;
-}
-
+        .selected-producto-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-size: 14px;
+            animation: fadeIn 0.3s ease;
+        }
     </style>
 </head>
+
 <body>
     <!-- Menú Toggle -->
     <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">☰</button>
-    
+
     <!-- Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
 
@@ -808,7 +822,7 @@
             </a>
         </div>
 
-       <nav class="sidebar-nav">
+        <nav class="sidebar-nav">
             <div class="nav-section">
                 <div class="nav-section-title">Principal</div>
                 <a href="productos.html" class="nav-item">
@@ -839,7 +853,7 @@
                     <span class="nav-icon">📜📦</span>
                     <span>Inventario</span>
                 </a>
-                <a href="alimentos.html" class="nav-item active" >
+                <a href="alimentos.html" class="nav-item active">
                     <span class="nav-icon">🥘</span>
                     <span>Alimentos</span>
                 </a>
@@ -863,6 +877,10 @@
                 <a href="historial-liquidaciones.html" class="nav-item">
                     <span class="nav-icon">📋</span>
                     <span>Hist. Liquidaciones</span>
+                </a>
+                <a href="solicitudes.html" class="nav-item">
+                    <span class="nav-icon">👤✅</span>
+                    <span>Aceptación de Empleados</span>
                 </a>
             </div>
         </nav>
@@ -897,40 +915,47 @@
                         <h2 id="formTitle">➕ Agregar Alimento</h2>
                     </div>
                     <div class="card-body">
-                       <form id="alimentoForm">
-    <input type="hidden" id="alimentoId">
-    
-    <div class="form-group">
-        <label class="form-label" for="nombre">Nombre del Alimento *</label>
-        <input type="text" id="nombre" class="form-input" placeholder="Ej: Carne molida, Patacón, Arroz" required>
-    </div>
+                        <form id="alimentoForm">
+                            <input type="hidden" id="alimentoId">
 
-    <div style="display: none;" class="form-group">
-    <label class="form-label" for="valor">Valor Unitario (COP) <small style="color: #a0aec0;">(Opcional)</small></label>
-    <input type="number" id="valor" class="form-input" min="0" step="0.01" placeholder="Precio por unidad">
-</div>
+                            <div class="form-group">
+                                <label class="form-label" for="nombre">Nombre del Alimento *</label>
+                                <input type="text" id="nombre" class="form-input"
+                                    placeholder="Ej: Carne molida, Patacón, Arroz" required>
+                            </div>
 
-    <div class="form-group">
-        <label class="form-label" for="stock">Stock Disponible *</label>
-        <input type="number" id="stock" class="form-input" min="0" placeholder="Cantidad en inventario" required>
-    </div>
+                            <div style="display: none;" class="form-group">
+                                <label class="form-label" for="valor">Valor Unitario (COP) <small
+                                        style="color: #a0aec0;">(Opcional)</small></label>
+                                <input type="number" id="valor" class="form-input" min="0" step="0.01"
+                                    placeholder="Precio por unidad">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="stock">Stock Disponible *</label>
+                                <input type="number" id="stock" class="form-input" min="0"
+                                    placeholder="Cantidad en inventario" required>
+                            </div>
 
 
-    <div class="form-group">
-        <label class="form-label">Productos donde se usa *</label>
-        <p style="font-size: 13px; color: #718096; margin-bottom: 10px;">
-            Busca y selecciona los platos que usan este alimento. Ajusta la cantidad necesaria para cada uno.
-        </p>
-        <div class="select-search-wrapper">
-            <input type="text" class="form-input" id="productoSearch" placeholder="🔍 Buscar producto para agregar...">
-            <div class="producto-list" id="productoList"></div>
-            <div id="selectedProducto" style="margin-top: 12px;"></div>
-        </div>
-    </div>
+                            <div class="form-group">
+                                <label class="form-label">Productos donde se usa *</label>
+                                <p style="font-size: 13px; color: #718096; margin-bottom: 10px;">
+                                    Busca y selecciona los platos que usan este alimento. Ajusta la cantidad necesaria
+                                    para cada uno.
+                                </p>
+                                <div class="select-search-wrapper">
+                                    <input type="text" class="form-input" id="productoSearch"
+                                        placeholder="🔍 Buscar producto para agregar...">
+                                    <div class="producto-list" id="productoList"></div>
+                                    <div id="selectedProducto" style="margin-top: 12px;"></div>
+                                </div>
+                            </div>
 
-    <button type="submit" class="btn-primary">💾 Guardar Alimento</button>
-    <button type="button" class="btn-secondary" id="btnCancelar" style="display: none;">✖ Cancelar</button>
-</form>
+                            <button type="submit" class="btn-primary">💾 Guardar Alimento</button>
+                            <button type="button" class="btn-secondary" id="btnCancelar" style="display: none;">✖
+                                Cancelar</button>
+                        </form>
                     </div>
                 </div>
 
@@ -952,139 +977,139 @@
     </div>
 
     <script>
-   const API_URL = 'https://restaurante-co77.onrender.com/api';
-let currentUser = null;
-let productos = [];
-let productosSeleccionados = [];
+        const API_URL = 'https://restaurante-co77.onrender.com/api';
+        let currentUser = null;
+        let productos = [];
+        let productosSeleccionados = [];
 
-// CARGA INICIAL
-window.addEventListener('DOMContentLoaded', async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-        window.location.href = 'index.html';
-        return;
-    }
+        // CARGA INICIAL
+        window.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
 
-    try {
-        const response = await fetch(`${API_URL}/auth/me`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            try {
+                const response = await fetch(`${API_URL}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.status === 401) {
+                    console.warn('⚠️ Token expirado');
+                    localStorage.removeItem('token');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                if (!response.ok) {
+                    console.error('Error al cargar usuario');
+                    alert('Error al cargar datos. Intente recargar.');
+                    return;
+                }
+
+                const data = await response.json();
+                currentUser = data.data;
+
+                if (currentUser.id && !currentUser._id) {
+                    currentUser._id = currentUser.id;
+                }
+
+                if (!currentUser || !currentUser._id) {
+                    throw new Error('Datos de usuario incompletos');
+                }
+
+                console.log('✅ Usuario cargado:', currentUser);
+
+                document.getElementById('sidebarUserName').textContent = currentUser.nombre;
+                document.getElementById('sidebarUserAvatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
+                document.getElementById('sidebarUserRole').textContent = currentUser.rol === 'admin' ? 'Administrador' : 'Usuario';
+
+                if (currentUser.rol === 'admin') {
+                    document.getElementById('adminSection').style.display = 'block';
+                }
+
+                await cargarProductos();
+                await cargarAlimentos();
+            } catch (error) {
+                console.error('❌ Error de red:', error);
+                alert('Error de conexión. Recargue la página.');
+            }
         });
 
-        if (response.status === 401) {
-            console.warn('⚠️ Token expirado');
-            localStorage.removeItem('token');
-            window.location.href = 'index.html';
-            return;
+        // CARGAR PRODUCTOS
+        async function cargarProductos() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_URL}/products`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    productos = result.data;
+                    console.log('✅ Productos cargados:', productos.length);
+                }
+            } catch (error) {
+                console.error('Error al cargar productos:', error);
+            }
         }
 
-        if (!response.ok) {
-            console.error('Error al cargar usuario');
-            alert('Error al cargar datos. Intente recargar.');
-            return;
-        }
+        // MOSTRAR PRODUCTOS EN LISTA DE BÚSQUEDA
+        function mostrarProductos(productosAMostrar) {
+            const productoList = document.getElementById('productoList');
+            productoList.innerHTML = '';
 
-        const data = await response.json();
-        currentUser = data.data;
-        
-        if (currentUser.id && !currentUser._id) {
-            currentUser._id = currentUser.id;
-        }
-        
-        if (!currentUser || !currentUser._id) {
-            throw new Error('Datos de usuario incompletos');
-        }
-        
-        console.log('✅ Usuario cargado:', currentUser);
-        
-        document.getElementById('sidebarUserName').textContent = currentUser.nombre;
-        document.getElementById('sidebarUserAvatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
-        document.getElementById('sidebarUserRole').textContent = currentUser.rol === 'admin' ? 'Administrador' : 'Usuario';
-        
-        if (currentUser.rol === 'admin') {
-            document.getElementById('adminSection').style.display = 'block';
-        }
-        
-        await cargarProductos();
-        await cargarAlimentos();
-    } catch (error) {
-        console.error('❌ Error de red:', error);
-        alert('Error de conexión. Recargue la página.');
-    }
-});
+            if (productosAMostrar.length === 0) {
+                productoList.innerHTML = '<div class="producto-option" style="color: #718096; text-align: center; padding: 1rem;">No se encontraron productos</div>';
+                return;
+            }
 
-// CARGAR PRODUCTOS
-async function cargarProductos() {
-    const token = localStorage.getItem('token');
-    try {
-        const response = await fetch(`${API_URL}/products`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        const result = await response.json();
-        if (result.success) {
-            productos = result.data;
-            console.log('✅ Productos cargados:', productos.length);
-        }
-    } catch (error) {
-        console.error('Error al cargar productos:', error);
-    }
-}
-
-// MOSTRAR PRODUCTOS EN LISTA DE BÚSQUEDA
-function mostrarProductos(productosAMostrar) {
-    const productoList = document.getElementById('productoList');
-    productoList.innerHTML = '';
-
-    if (productosAMostrar.length === 0) {
-        productoList.innerHTML = '<div class="producto-option" style="color: #718096; text-align: center; padding: 1rem;">No se encontraron productos</div>';
-        return;
-    }
-
-    productosAMostrar.forEach(producto => {
-        const div = document.createElement('div');
-        div.className = 'producto-option';
-        div.innerHTML = `
+            productosAMostrar.forEach(producto => {
+                const div = document.createElement('div');
+                div.className = 'producto-option';
+                div.innerHTML = `
             <strong style="color: #1a202c;">${producto.nombre}</strong><br>
             <small style="color: #718096;">${producto.categoria} - $${producto.precio.toLocaleString('es-CO')}</small>
         `;
-        div.addEventListener('click', () => agregarProductoSeleccionado(producto));
-        productoList.appendChild(div);
-    });
-}
+                div.addEventListener('click', () => agregarProductoSeleccionado(producto));
+                productoList.appendChild(div);
+            });
+        }
 
 
 
-// AGREGAR PRODUCTO A LA LISTA SELECCIONADA
-function agregarProductoSeleccionado(producto) {
-    const yaExiste = productosSeleccionados.find(p => p.productoId === producto._id);
-    if (yaExiste) {
-        alert('⚠️ Este producto ya está en la lista');
-        return;
-    }
+        // AGREGAR PRODUCTO A LA LISTA SELECCIONADA
+        function agregarProductoSeleccionado(producto) {
+            const yaExiste = productosSeleccionados.find(p => p.productoId === producto._id);
+            if (yaExiste) {
+                alert('⚠️ Este producto ya está en la lista');
+                return;
+            }
 
-    productosSeleccionados.push({
-        productoId: producto._id,
-        nombre: producto.nombre,
-        categoria: producto.categoria,
-        cantidadRequerida: 1
-    });
+            productosSeleccionados.push({
+                productoId: producto._id,
+                nombre: producto.nombre,
+                categoria: producto.categoria,
+                cantidadRequerida: 1
+            });
 
-    document.getElementById('productoSearch').value = '';
-    document.getElementById('productoList').classList.remove('show');
-    
-    actualizarListaProductosSeleccionados();
-}
+            document.getElementById('productoSearch').value = '';
+            document.getElementById('productoList').classList.remove('show');
 
-// ACTUALIZAR VISTA DE PRODUCTOS SELECCIONADOS
-function actualizarListaProductosSeleccionados() {
-    const container = document.getElementById('selectedProducto');
-    
-    if (productosSeleccionados.length === 0) {
-        container.innerHTML = '<p style="color: #a0aec0; font-size: 14px; text-align: center; padding: 1rem; background: #f7fafc; border-radius: 8px; border: 1px dashed #cbd5e0;">No hay productos seleccionados</p>';
-        return;
-    }
+            actualizarListaProductosSeleccionados();
+        }
 
-    container.innerHTML = productosSeleccionados.map((prod, index) => `
+        // ACTUALIZAR VISTA DE PRODUCTOS SELECCIONADOS
+        function actualizarListaProductosSeleccionados() {
+            const container = document.getElementById('selectedProducto');
+
+            if (productosSeleccionados.length === 0) {
+                container.innerHTML = '<p style="color: #a0aec0; font-size: 14px; text-align: center; padding: 1rem; background: #f7fafc; border-radius: 8px; border: 1px dashed #cbd5e0;">No hay productos seleccionados</p>';
+                return;
+            }
+
+            container.innerHTML = productosSeleccionados.map((prod, index) => `
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3); transition: all 0.2s;">
             <div style="flex: 1;">
                 <div style="font-weight: 700; font-size: 15px; margin-bottom: 2px;">${prod.nombre}</div>
@@ -1115,98 +1140,98 @@ function actualizarListaProductosSeleccionados() {
             </div>
         </div>
     `).join('');
-}
+        }
 
-// CAMBIAR CANTIDAD REQUERIDA
-function cambiarCantidad(index, delta) {
-    productosSeleccionados[index].cantidadRequerida += delta;
-    
-    if (productosSeleccionados[index].cantidadRequerida < 1) {
-        productosSeleccionados[index].cantidadRequerida = 1;
-    }
-    
-    actualizarListaProductosSeleccionados();
-}
+        // CAMBIAR CANTIDAD REQUERIDA
+        function cambiarCantidad(index, delta) {
+            productosSeleccionados[index].cantidadRequerida += delta;
 
-// ELIMINAR PRODUCTO SELECCIONADO
-function eliminarProductoSeleccionado(index) {
-    if (confirm('¿Quitar este producto de la lista?')) {
-        productosSeleccionados.splice(index, 1);
-        actualizarListaProductosSeleccionados();
-    }
-}
+            if (productosSeleccionados[index].cantidadRequerida < 1) {
+                productosSeleccionados[index].cantidadRequerida = 1;
+            }
 
-// BUSCAR PRODUCTOS
-document.getElementById('productoSearch').addEventListener('input', (e) => {
-    const busqueda = e.target.value.toLowerCase();
-    const productosFiltrados = productos.filter(p => 
-        p.nombre.toLowerCase().includes(busqueda) ||
-        p.categoria.toLowerCase().includes(busqueda)
-    );
-    mostrarProductos(productosFiltrados);
-    document.getElementById('productoList').classList.add('show');
-});
+            actualizarListaProductosSeleccionados();
+        }
 
-// MOSTRAR/OCULTAR LISTA
-document.getElementById('productoSearch').addEventListener('focus', () => {
-    document.getElementById('productoList').classList.add('show');
-    mostrarProductos(productos);
-});
+        // ELIMINAR PRODUCTO SELECCIONADO
+        function eliminarProductoSeleccionado(index) {
+            if (confirm('¿Quitar este producto de la lista?')) {
+                productosSeleccionados.splice(index, 1);
+                actualizarListaProductosSeleccionados();
+            }
+        }
 
-// OCULTAR LISTA AL HACER CLIC FUERA
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('.select-search-wrapper')) {
-        document.getElementById('productoList').classList.remove('show');
-    }
-});
-
-// CARGAR ALIMENTOS
-async function cargarAlimentos() {
-    const token = localStorage.getItem('token');
-    try {
-        const response = await fetch(`${API_URL}/alimentos`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+        // BUSCAR PRODUCTOS
+        document.getElementById('productoSearch').addEventListener('input', (e) => {
+            const busqueda = e.target.value.toLowerCase();
+            const productosFiltrados = productos.filter(p =>
+                p.nombre.toLowerCase().includes(busqueda) ||
+                p.categoria.toLowerCase().includes(busqueda)
+            );
+            mostrarProductos(productosFiltrados);
+            document.getElementById('productoList').classList.add('show');
         });
 
-        const result = await response.json();
-        if (result.success) {
-            mostrarAlimentos(result.data);
-        }
-    } catch (error) {
-        console.error('Error al cargar alimentos:', error);
-        document.getElementById('alimentosGrid').innerHTML = `
+        // MOSTRAR/OCULTAR LISTA
+        document.getElementById('productoSearch').addEventListener('focus', () => {
+            document.getElementById('productoList').classList.add('show');
+            mostrarProductos(productos);
+        });
+
+        // OCULTAR LISTA AL HACER CLIC FUERA
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.select-search-wrapper')) {
+                document.getElementById('productoList').classList.remove('show');
+            }
+        });
+
+        // CARGAR ALIMENTOS
+        async function cargarAlimentos() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_URL}/alimentos`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    mostrarAlimentos(result.data);
+                }
+            } catch (error) {
+                console.error('Error al cargar alimentos:', error);
+                document.getElementById('alimentosGrid').innerHTML = `
             <div class="empty-state">
                 <div class="empty-icon">⚠️</div>
                 <p style="font-size: 1.2rem; font-weight: 600;">Error al cargar alimentos</p>
                 <p>Por favor, recargue la página</p>
             </div>
         `;
-    }
-}
+            }
+        }
 
-// MOSTRAR ALIMENTOS
-// MOSTRAR ALIMENTOS
-function mostrarAlimentos(alimentos) {
-    const grid = document.getElementById('alimentosGrid');
-    
-    if (alimentos.length === 0) {
-        grid.innerHTML = `
+        // MOSTRAR ALIMENTOS
+        // MOSTRAR ALIMENTOS
+        function mostrarAlimentos(alimentos) {
+            const grid = document.getElementById('alimentosGrid');
+
+            if (alimentos.length === 0) {
+                grid.innerHTML = `
             <div class="empty-state">
                 <div class="empty-icon">🥘</div>
                 <p style="font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem;">No hay alimentos registrados</p>
                 <p>Comienza agregando tu primer alimento</p>
             </div>
         `;
-        return;
-    }
+                return;
+            }
 
-    grid.innerHTML = alimentos.map(alimento => {
-        const totalProductos = alimento.productos?.length || 0;
-        const costoTotalPorPlato = alimento.productos?.reduce((sum, prod) => {
-            return sum + (alimento.valor * prod.cantidadRequerida);
-        }, 0) || 0;
+            grid.innerHTML = alimentos.map(alimento => {
+                const totalProductos = alimento.productos?.length || 0;
+                const costoTotalPorPlato = alimento.productos?.reduce((sum, prod) => {
+                    return sum + (alimento.valor * prod.cantidadRequerida);
+                }, 0) || 0;
 
-        return `
+                return `
         <div class="alimento-card">
             <div class="alimento-header">
                 <h3 class="alimento-title">${alimento.nombre}</h3>
@@ -1237,7 +1262,7 @@ function mostrarAlimentos(alimentos) {
                     const productoNombre = prod.productoId?.nombre || 'Producto no disponible';
                     const productoCategoria = prod.productoId?.categoria || '';
                     const costoPlato = alimento.valor * prod.cantidadRequerida;
-                    
+
                     return `
                     <div style="margin-top: 8px; padding: 10px; background: white; border-radius: 8px; border-left: 3px solid #4299e1; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
                         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 6px;">
@@ -1264,194 +1289,195 @@ function mostrarAlimentos(alimentos) {
             </div>
         </div>
     `}).join('');
-}
-
-// ENVIAR FORMULARIO
-document.getElementById('alimentoForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    if (productosSeleccionados.length === 0) {
-        alert('⚠️ Debe seleccionar al menos un producto donde se usa este alimento');
-        document.getElementById('productoSearch').focus();
-        return;
-    }
-
-    const nombre = document.getElementById('nombre').value.trim();
-    const stock = document.getElementById('stock').value;
-    const valor = document.getElementById('valor').value;
-
-if (!nombre || stock === '') {
-    alert('⚠️ Por favor complete todos los campos obligatorios');
-    return;
-}
-
-const alimentoData = {
-    nombre: nombre,
-    stock: parseInt(stock),
-    valor: valor ? parseFloat(valor) : 0,
-    productos: productosSeleccionados.map(p => ({
-        productoId: p.productoId,
-        cantidadRequerida: p.cantidadRequerida
-    }))
-};
-
-    console.log('📤 Enviando datos:', alimentoData);
-
-    const alimentoId = document.getElementById('alimentoId').value;
-    const url = alimentoId ? `${API_URL}/alimentos/${alimentoId}` : `${API_URL}/alimentos`;
-    const method = alimentoId ? 'PUT' : 'POST';
-
-    try {
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify(alimentoData)
-        });
-
-        const result = await response.json();
-        
-        console.log('📥 Respuesta del servidor:', result);
-
-        if (result.success) {
-            alert('✅ ' + result.message);
-            limpiarFormulario();
-            await cargarAlimentos();
-        } else {
-            alert('❌ ' + (result.message || result.error || 'Error al guardar el alimento'));
         }
-    } catch (error) {
-        console.error('❌ Error completo:', error);
-        alert('❌ Error de conexión al guardar el alimento');
-    }
-});
 
-// EDITAR ALIMENTO
-// EDITAR ALIMENTO
-async function editarAlimento(id) {
-    const token = localStorage.getItem('token');
+        // ENVIAR FORMULARIO
+        document.getElementById('alimentoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-    try {
-        const response = await fetch(`${API_URL}/alimentos/${id}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            if (productosSeleccionados.length === 0) {
+                alert('⚠️ Debe seleccionar al menos un producto donde se usa este alimento');
+                document.getElementById('productoSearch').focus();
+                return;
+            }
+
+            const nombre = document.getElementById('nombre').value.trim();
+            const stock = document.getElementById('stock').value;
+            const valor = document.getElementById('valor').value;
+
+            if (!nombre || stock === '') {
+                alert('⚠️ Por favor complete todos los campos obligatorios');
+                return;
+            }
+
+            const alimentoData = {
+                nombre: nombre,
+                stock: parseInt(stock),
+                valor: valor ? parseFloat(valor) : 0,
+                productos: productosSeleccionados.map(p => ({
+                    productoId: p.productoId,
+                    cantidadRequerida: p.cantidadRequerida
+                }))
+            };
+
+            console.log('📤 Enviando datos:', alimentoData);
+
+            const alimentoId = document.getElementById('alimentoId').value;
+            const url = alimentoId ? `${API_URL}/alimentos/${alimentoId}` : `${API_URL}/alimentos`;
+            const method = alimentoId ? 'PUT' : 'POST';
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(alimentoData)
+                });
+
+                const result = await response.json();
+
+                console.log('📥 Respuesta del servidor:', result);
+
+                if (result.success) {
+                    alert('✅ ' + result.message);
+                    limpiarFormulario();
+                    await cargarAlimentos();
+                } else {
+                    alert('❌ ' + (result.message || result.error || 'Error al guardar el alimento'));
+                }
+            } catch (error) {
+                console.error('❌ Error completo:', error);
+                alert('❌ Error de conexión al guardar el alimento');
+            }
         });
 
-        const result = await response.json();
-        if (result.success) {
-            const alimento = result.data;
-            
-            document.getElementById('alimentoId').value = alimento._id;
-            document.getElementById('nombre').value = alimento.nombre;
-            document.getElementById('stock').value = alimento.stock;
-            document.getElementById('valor').value = alimento.valor;
-            
-            // ✅ CORREGIDO: Extraer solo el ID del producto
-            productosSeleccionados = alimento.productos.map(prod => {
-                // Manejar tanto si productoId es objeto o string
-                const prodId = typeof prod.productoId === 'object' 
-                    ? prod.productoId._id 
-                    : prod.productoId;
-                
-                const prodNombre = typeof prod.productoId === 'object' 
-                    ? prod.productoId.nombre 
-                    : 'Producto';
-                
-                const prodCategoria = typeof prod.productoId === 'object' 
-                    ? prod.productoId.categoria 
-                    : '';
-                
-                return {
-                    productoId: prodId,
-                    nombre: prodNombre,
-                    categoria: prodCategoria,
-                    cantidadRequerida: prod.cantidadRequerida
-                };
-            });
-            
+        // EDITAR ALIMENTO
+        // EDITAR ALIMENTO
+        async function editarAlimento(id) {
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch(`${API_URL}/alimentos/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    const alimento = result.data;
+
+                    document.getElementById('alimentoId').value = alimento._id;
+                    document.getElementById('nombre').value = alimento.nombre;
+                    document.getElementById('stock').value = alimento.stock;
+                    document.getElementById('valor').value = alimento.valor;
+
+                    // ✅ CORREGIDO: Extraer solo el ID del producto
+                    productosSeleccionados = alimento.productos.map(prod => {
+                        // Manejar tanto si productoId es objeto o string
+                        const prodId = typeof prod.productoId === 'object'
+                            ? prod.productoId._id
+                            : prod.productoId;
+
+                        const prodNombre = typeof prod.productoId === 'object'
+                            ? prod.productoId.nombre
+                            : 'Producto';
+
+                        const prodCategoria = typeof prod.productoId === 'object'
+                            ? prod.productoId.categoria
+                            : '';
+
+                        return {
+                            productoId: prodId,
+                            nombre: prodNombre,
+                            categoria: prodCategoria,
+                            cantidadRequerida: prod.cantidadRequerida
+                        };
+                    });
+
+                    actualizarListaProductosSeleccionados();
+
+                    document.getElementById('formTitle').textContent = '✏️ Editar Alimento';
+                    document.getElementById('btnCancelar').style.display = 'block';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al cargar el alimento');
+            }
+        }
+
+        // ELIMINAR ALIMENTO
+        async function eliminarAlimento(id, nombre) {
+            if (!confirm(`¿Eliminar "${nombre}"?\n\nEsta acción no se puede deshacer.`)) {
+                return;
+            }
+
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch(`${API_URL}/alimentos/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('✅ ' + result.message);
+                    await cargarAlimentos();
+                } else {
+                    alert('❌ ' + (result.message || 'Error al eliminar el alimento'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al eliminar el alimento');
+            }
+        }
+
+        // LIMPIAR FORMULARIO
+        function limpiarFormulario() {
+            document.getElementById('alimentoForm').reset();
+            document.getElementById('alimentoId').value = '';
+            productosSeleccionados = [];
             actualizarListaProductosSeleccionados();
-
-            document.getElementById('formTitle').textContent = '✏️ Editar Alimento';
-            document.getElementById('btnCancelar').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('formTitle').textContent = '➕ Agregar Alimento';
+            document.getElementById('btnCancelar').style.display = 'none';
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('❌ Error al cargar el alimento');
-    }
-}
 
-// ELIMINAR ALIMENTO
-async function eliminarAlimento(id, nombre) {
-    if (!confirm(`¿Eliminar "${nombre}"?\n\nEsta acción no se puede deshacer.`)) {
-        return;
-    }
+        // BOTÓN CANCELAR
+        document.getElementById('btnCancelar').addEventListener('click', limpiarFormulario);
 
-    const token = localStorage.getItem('token');
+        // MENU TOGGLE
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const contentWrapper = document.getElementById('contentWrapper');
 
-    try {
-        const response = await fetch(`${API_URL}/alimentos/${id}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+
+            if (window.innerWidth > 1024) {
+                sidebar.classList.toggle('collapsed');
+                contentWrapper.classList.toggle('expanded');
+            }
+        }
+
+        // LOGOUT
+        function logout() {
+            if (confirm('¿Cerrar sesión?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('usuario');
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Cerrar menú móvil al cambiar tamaño
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 1024) {
+                document.getElementById('sidebarOverlay').classList.remove('active');
+            }
         });
-
-        const result = await response.json();
-        if (result.success) {
-            alert('✅ ' + result.message);
-            await cargarAlimentos();
-        } else {
-            alert('❌ ' + (result.message || 'Error al eliminar el alimento'));
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('❌ Error al eliminar el alimento');
-    }
-}
-
-// LIMPIAR FORMULARIO
-function limpiarFormulario() {
-    document.getElementById('alimentoForm').reset();
-    document.getElementById('alimentoId').value = '';
-    productosSeleccionados = [];
-    actualizarListaProductosSeleccionados();
-    document.getElementById('formTitle').textContent = '➕ Agregar Alimento';
-    document.getElementById('btnCancelar').style.display = 'none';
-}
-
-// BOTÓN CANCELAR
-document.getElementById('btnCancelar').addEventListener('click', limpiarFormulario);
-
-// MENU TOGGLE
-function toggleMenu() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-    const contentWrapper = document.getElementById('contentWrapper');
-    
-    sidebar.classList.toggle('active');
-    overlay.classList.toggle('active');
-    
-    if (window.innerWidth > 1024) {
-        sidebar.classList.toggle('collapsed');
-        contentWrapper.classList.toggle('expanded');
-    }
-}
-
-// LOGOUT
-function logout() {
-    if (confirm('¿Cerrar sesión?')) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('usuario');
-        window.location.href = 'index.html';
-    }
-}
-
-// Cerrar menú móvil al cambiar tamaño
-window.addEventListener('resize', () => {
-    if (window.innerWidth > 1024) {
-        document.getElementById('sidebarOverlay').classList.remove('active');
-    }
-});
     </script>
 </body>
+
 </html>

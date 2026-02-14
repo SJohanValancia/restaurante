@@ -382,9 +382,13 @@ router.post('/login', async (req, res) => {
     // Verificar si el usuario está activo
     // Verificar si el usuario está activo
     if (!usuario.activo) {
+      const mensaje = usuario.solicitudPendiente
+        ? 'Tu solicitud está pendiente de aprobación por el administrador.'
+        : 'Usuario inactivo. Contacte al administrador.';
+
       return res.status(401).json({
         success: false,
-        message: 'Usuario inactivo. Contacte al administrador'
+        message: mensaje
       });
     }
 

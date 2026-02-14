@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aceptación de Empleados - JC-RT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            color: #1a202c;
+        }
+
+        /* SIDEBAR & NAV (Copiado de administrador.html para consistencia) */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
+            z-index: 1000;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-section-title {
+            padding: 1.5rem 1.5rem 0.5rem;
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.2) 0%, transparent 100%);
+            color: white;
+            border-left: 3px solid #667eea;
+        }
+
+        .content-wrapper {
+            margin-left: 280px;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        /* TABLA / LISTA DE SOLICITUDES */
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .solicitud-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem;
+            border-bottom: 1px solid #edf2f7;
+            transition: background 0.2s;
+        }
+
+        .solicitud-item:hover {
+            background: #f8fafc;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .details h4 {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .details p {
+            font-size: 13px;
+            color: #718096;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-approve {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: #059669;
+        }
+
+        .btn-reject {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-reject:hover {
+            background: #dc2626;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #a0aec0;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .content-wrapper {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="administrador.html" class="sidebar-brand">
+                <div style="font-size: 24px;">🛡️</div>
+                <div style="margin-left: 10px;">
+                    <h2 style="color: white; font-size: 18px;">Admin Panel</h2>
+                </div>
+            </a>
+        </div>
+        <nav>
+            <div class="nav-section-title">Principal</div>
+            <a href="productos.html" class="nav-item"><span>📦</span> Plato</a>
+            <a href="pedidos.html" class="nav-item"><span>🍽️</span> Pedidos</a>
+            <a href="gastos.html" class="nav-item"><span>🧾</span> Gastos</a>
+            <a href="reportes.html" class="nav-item"><span>📊</span> Reportes</a>
+
+            <div class="nav-section-title">Administración</div>
+            <a href="administrador.html" class="nav-item">
+                <span>👥</span> Gestión de Meseros
+            </a>
+            <a href="liquidacion.html" class="nav-item">
+                <span>💵</span> Liquidación
+            </a>
+            <a href="historial-liquidaciones.html" class="nav-item">
+                <span>📋</span> Hist. Liquidaciones
+            </a>
+            <a href="solicitudes.html" class="nav-item active">
+                <span>👤✅</span> Aceptación de Empleados
+            </a>
+        </nav>
+    </aside>
+
+    <div class="content-wrapper">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">👤 Aceptación de Empleados</h1>
+                <p style="color: #718096;">Nuevas solicitudes de ingreso a tu restaurante</p>
+            </div>
+
+            <div id="solicitudesList" class="card">
+                <div class="empty-state">
+                    <div class="empty-icon">⏳</div>
+                    <p>Cargando solicitudes...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const API_URL = 'https://restaurante-co77.onrender.com/api/auth';
+        // const API_URL = 'http://localhost:3000/api/auth';
+
+        async function cargarSolicitudes() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_URL}/solicitudes`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+
+                const container = document.getElementById('solicitudesList');
+                if (data.success && data.solicitudes.length > 0) {
+                    container.innerHTML = data.solicitudes.map(s => `
+                        <div class="solicitud-item" id="solicitud-${s._id}">
+                            <div class="user-info">
+                                <div class="avatar">${s.nombre.charAt(0).toUpperCase()}</div>
+                                <div class="details">
+                                    <h4>${s.nombre}</h4>
+                                    <p>${s.email} • <strong>Rol: ${s.rol}</strong></p>
+                                    <p style="font-size: 11px;">Solicitado el: ${new Date(s.createdAt).toLocaleDateString()}</p>
+                                </div>
+                            </div>
+                            <div class="actions">
+                                <button class="btn btn-approve" onclick="gestionar('${s._id}', 'aprobar')">✅ Aprobar</button>
+                                <button class="btn btn-reject" onclick="gestionar('${s._id}', 'rechazar')">❌ Rechazar</button>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">✅</div>
+                            <p>No tienes solicitudes pendientes.</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById('solicitudesList').innerHTML = '<p style="padding: 2rem; color: red;">Error al cargar datos.</p>';
+            }
+        }
+
+        async function gestionar(userId, accion) {
+            const confirmar = await Swal.fire({
+                title: '¿Estás seguro?',
+                text: accion === 'aprobar' ? 'El usuario tendrá acceso al sistema.' : 'La cuenta será eliminada permanentemente.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, ' + accion,
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (!confirmar.isConfirmed) return;
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_URL}/gestionar-solicitud`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ userId, accion })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    Swal.fire('¡Éxito!', data.message, 'success');
+                    cargarSolicitudes(); // Recargar lista
+                } else {
+                    Swal.fire('Error', data.message, 'error');
+                }
+            } catch (error) {
+                Swal.fire('Error', 'Hubo un problema al procesar la solicitud', 'error');
+            }
+        }
+
+        // Cargar al inicio
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            if (!token) window.location.href = 'index.html';
+            cargarSolicitudes();
+        });
+    </script>
+</body>
+
+</html>

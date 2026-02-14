@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,14 +30,14 @@
             background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
             padding: 0;
             z-index: 1000;
-            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
         }
 
         .sidebar-header {
             padding: 1.5rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .sidebar-brand {
@@ -67,28 +68,28 @@
 
         .brand-text p {
             font-size: 11px;
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
             margin: 2px 0 0 0;
         }
 
-.sidebar-nav {
-    padding: 1rem 0;
-    max-height: calc(100vh - 250px);
-    overflow-y: auto;
-}
+        .sidebar-nav {
+            padding: 1rem 0;
+            max-height: calc(100vh - 250px);
+            overflow-y: auto;
+        }
 
-.sidebar-nav::-webkit-scrollbar {
-    width: 6px;
-}
+        .sidebar-nav::-webkit-scrollbar {
+            width: 6px;
+        }
 
-.sidebar-nav::-webkit-scrollbar-track {
-    background: rgba(255,255,255,0.05);
-}
+        .sidebar-nav::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
 
-.sidebar-nav::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.2);
-    border-radius: 3px;
-}
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
 
         .nav-section {
             margin-bottom: 1.5rem;
@@ -98,7 +99,7 @@
             padding: 0.5rem 1.5rem;
             font-size: 11px;
             font-weight: 700;
-            color: rgba(255,255,255,0.5);
+            color: rgba(255, 255, 255, 0.5);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -108,7 +109,7 @@
             align-items: center;
             gap: 12px;
             padding: 12px 1.5rem;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
             transition: all 0.2s;
             font-size: 14px;
@@ -117,7 +118,7 @@
         }
 
         .nav-item:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             color: white;
         }
 
@@ -148,8 +149,8 @@
             left: 0;
             right: 0;
             padding: 1.5rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .user-info {
@@ -180,7 +181,7 @@
 
         .user-details p {
             font-size: 11px;
-            color: rgba(255,255,255,0.6);
+            color: rgba(255, 255, 255, 0.6);
             margin: 2px 0 0 0;
         }
 
@@ -232,7 +233,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 999;
             display: none;
         }
@@ -344,7 +345,7 @@
 
         .stat-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
 
         .stat-icon {
@@ -402,7 +403,7 @@
         }
 
         .liquidacion-card:hover {
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
 
         .liquidacion-header {
@@ -436,7 +437,7 @@
         }
 
         .liquidacion-id {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             padding: 8px 16px;
             border-radius: 8px;
             font-size: 12px;
@@ -588,7 +589,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.7);
             z-index: 2000;
             align-items: center;
             justify-content: center;
@@ -707,14 +708,12 @@
                 grid-template-columns: 1fr;
             }
         }
-
-        
-
     </style>
 </head>
+
 <body>
     <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">☰</button>
-    
+
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
 
     <aside class="sidebar" id="sidebar">
@@ -728,7 +727,7 @@
             </a>
         </div>
 
-     <nav class="sidebar-nav">
+        <nav class="sidebar-nav">
             <div class="nav-section">
                 <div class="nav-section-title">Principal</div>
                 <a href="productos.html" class="nav-item">
@@ -768,23 +767,27 @@
                     <span>Inventario Alimentos</span>
                 </a>
             </div>
-    <!-- SOLO PARA ADMINISTRADORES -->
-    <div class="nav-section" id="adminSection" style="display: none;">
-        <div class="nav-section-title">Administración</div>
-        <a href="administrador.html" class="nav-item">
-            <span class="nav-icon">👥</span>
-            <span>Gestión de Meseros</span>
-        </a>
-        <a href="liquidacion.html" class="nav-item">
-            <span class="nav-icon">💵</span>
-            <span>Liquidación</span>
-        </a>
-        <a href="historial-liquidaciones.html" class="nav-item active">
-            <span class="nav-icon">📋</span>
-            <span>Hist. Liquidaciones</span>
-        </a>
-    </div>
-</nav>
+            <!-- SOLO PARA ADMINISTRADORES -->
+            <div class="nav-section" id="adminSection" style="display: none;">
+                <div class="nav-section-title">Administración</div>
+                <a href="administrador.html" class="nav-item">
+                    <span class="nav-icon">👥</span>
+                    <span>Gestión de Meseros</span>
+                </a>
+                <a href="liquidacion.html" class="nav-item">
+                    <span class="nav-icon">💵</span>
+                    <span>Liquidación</span>
+                </a>
+                <a href="historial-liquidaciones.html" class="nav-item active">
+                    <span class="nav-icon">📋</span>
+                    <span>Hist. Liquidaciones</span>
+                </a>
+                <a href="solicitudes.html" class="nav-item">
+                    <span class="nav-icon">👤✅</span>
+                    <span>Aceptación de Empleados</span>
+                </a>
+            </div>
+        </nav>
 
         <div class="sidebar-footer">
             <div class="user-info">
@@ -818,100 +821,109 @@
                         <label class="filter-label">Fecha Fin</label>
                         <input type="date" id="fechaFin" class="filter-input">
                     </div>
-<div class="filter-group">
-    <button class="btn-filter" onclick="aplicarFiltros()">
-        🔍 Buscar
-    </button>
-</div>
-<div class="filter-group">
-    <button class="btn-filter" onclick="descargarExcel()" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">
-        📊 Descargar Excel
-    </button>
-</div>
+                    <div class="filter-group">
+                        <button class="btn-filter" onclick="aplicarFiltros()">
+                            🔍 Buscar
+                        </button>
+                    </div>
+                    <div class="filter-group">
+                        <button class="btn-filter" onclick="descargarExcel()"
+                            style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">
+                            📊 Descargar Excel
+                        </button>
+                    </div>
                 </div>
             </div>
 
-<div class="stats-summary" id="statsContainer" style="display: none;">
-    <div class="stat-card">
-        <div class="stat-icon purple">📋</div>
-        <div class="stat-label">Total Liquidaciones</div>
-        <div class="stat-value" id="totalLiquidaciones">0</div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-icon green">💵</div>
-        <div class="stat-label">Total Ingresos</div>
-        <div class="stat-value" id="totalIngresos">$0</div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-icon red">💸</div>
-        <div class="stat-label">Total Egresos</div>
-        <div class="stat-value" id="totalEgresos">$0</div>
-    </div>
+            <div class="stats-summary" id="statsContainer" style="display: none;">
+                <div class="stat-card">
+                    <div class="stat-icon purple">📋</div>
+                    <div class="stat-label">Total Liquidaciones</div>
+                    <div class="stat-value" id="totalLiquidaciones">0</div>
+                </div>
 
-        <div class="stat-card">
-        <div class="stat-icon red" style="background: linear-gradient(135deg, #fc8181 0%, #c53030 100%);">💵</div>
-        <div class="stat-label">Gastos en Efectivo</div>
-        <div class="stat-value" id="totalGastosEfectivo">$0</div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-icon blue">💰</div>
-        <div class="stat-label">Promedio Ingresos</div>
-        <div class="stat-value" id="promedioIngresos">$0</div>
-    </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">💵</div>
+                    <div class="stat-label">Total Ingresos</div>
+                    <div class="stat-value" id="totalIngresos">$0</div>
+                </div>
 
-    <div class="stat-card">
-        <div class="stat-icon green" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">📱</div>
-        <div class="stat-label">Pagos Transferencia</div>
-        <div class="stat-value" id="totalTransferencias">$0</div>
-    </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">💸</div>
+                    <div class="stat-label">Total Egresos</div>
+                    <div class="stat-value" id="totalEgresos">$0</div>
+                </div>
 
-    <div class="stat-card">
-        <div class="stat-icon red" style="background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);">💳</div>
-        <div class="stat-label">Gastos Transferencia</div>
-        <div class="stat-value" id="totalGastosTransferencias">$0</div>
-    </div>
+                <div class="stat-card">
+                    <div class="stat-icon red" style="background: linear-gradient(135deg, #fc8181 0%, #c53030 100%);">💵
+                    </div>
+                    <div class="stat-label">Gastos en Efectivo</div>
+                    <div class="stat-value" id="totalGastosEfectivo">$0</div>
+                </div>
 
-    <!-- NUEVAS TARJETAS DE MOVIMIENTOS -->
-    <div class="stat-card">
-        <div class="stat-icon green" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">💵</div>
-        <div class="stat-label">Total Aportes</div>
-        <div class="stat-value" id="totalAportes">$0</div>
-    </div>
+                <div class="stat-card">
+                    <div class="stat-icon blue">💰</div>
+                    <div class="stat-label">Promedio Ingresos</div>
+                    <div class="stat-value" id="promedioIngresos">$0</div>
+                </div>
 
-    <div class="stat-card">
-        <div class="stat-icon red" style="background: linear-gradient(135deg, #f56565 0%, #c53030 100%);">💸</div>
-        <div class="stat-label">Total Retiros</div>
-        <div class="stat-value" id="totalRetiros">$0</div>
-    </div>
+                <div class="stat-card">
+                    <div class="stat-icon green" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        📱</div>
+                    <div class="stat-label">Pagos Transferencia</div>
+                    <div class="stat-value" id="totalTransferencias">$0</div>
+                </div>
 
-    <div class="stat-card">
-        <div class="stat-icon purple" style="background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);">🔄</div>
-        <div class="stat-label">Total Movimientos</div>
-        <div class="stat-value" id="totalMovimientos">$0</div>
-    </div>
+                <div class="stat-card">
+                    <div class="stat-icon red" style="background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);">💳
+                    </div>
+                    <div class="stat-label">Gastos Transferencia</div>
+                    <div class="stat-value" id="totalGastosTransferencias">$0</div>
+                </div>
 
-    <div class="stat-card">
-        <div class="stat-icon green" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">💰</div>
-        <div class="stat-label">Caja Final Total</div>
-        <div class="stat-value" id="cajaFinalTotal">$0</div>
-    </div>
+                <!-- NUEVAS TARJETAS DE MOVIMIENTOS -->
+                <div class="stat-card">
+                    <div class="stat-icon green" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">
+                        💵</div>
+                    <div class="stat-label">Total Aportes</div>
+                    <div class="stat-value" id="totalAportes">$0</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon red" style="background: linear-gradient(135deg, #f56565 0%, #c53030 100%);">💸
+                    </div>
+                    <div class="stat-label">Total Retiros</div>
+                    <div class="stat-value" id="totalRetiros">$0</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon purple"
+                        style="background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);">🔄</div>
+                    <div class="stat-label">Total Movimientos</div>
+                    <div class="stat-value" id="totalMovimientos">$0</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon green" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">
+                        💰</div>
+                    <div class="stat-label">Caja Final Total</div>
+                    <div class="stat-value" id="cajaFinalTotal">$0</div>
+                </div>
 
 
-    <div class="stat-card">
-    <div class="stat-icon green" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">💵</div>
-    <div class="stat-label">Caja Efectivo</div>
-    <div class="stat-value" id="cajaEfectivo">$0</div>
-</div>
+                <div class="stat-card">
+                    <div class="stat-icon green" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">
+                        💵</div>
+                    <div class="stat-label">Caja Efectivo</div>
+                    <div class="stat-value" id="cajaEfectivo">$0</div>
+                </div>
 
-    <div class="stat-card">
-        <div class="stat-icon blue">💳</div>
-        <div class="stat-label">Caja Transferencias</div>
-        <div class="stat-value" id="cajaTransferencias">$0</div>
-    </div>
-</div>
+                <div class="stat-card">
+                    <div class="stat-icon blue">💳</div>
+                    <div class="stat-label">Caja Transferencias</div>
+                    <div class="stat-value" id="cajaTransferencias">$0</div>
+                </div>
+            </div>
 
             <div id="liquidacionesContainer">
                 <div class="loading">Cargando liquidaciones...</div>
@@ -949,18 +961,18 @@
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
-if (response.status === 401) {
-    console.warn('⚠️ Token expirado');
-    localStorage.removeItem('token');
-    window.location.href = 'index.html';
-    return;
-}
+                if (response.status === 401) {
+                    console.warn('⚠️ Token expirado');
+                    localStorage.removeItem('token');
+                    window.location.href = 'index.html';
+                    return;
+                }
 
-if (!response.ok) {
-    console.error('Error al cargar usuario');
-    alert('Error al cargar datos. Intente recargar.');
-    return;
-}
+                if (!response.ok) {
+                    console.error('Error al cargar usuario');
+                    alert('Error al cargar datos. Intente recargar.');
+                    return;
+                }
                 const data = await response.json();
                 currentUser = data.data;
 
@@ -969,28 +981,28 @@ if (!response.ok) {
                 }
 
                 document.getElementById('sidebarUserName').textContent = currentUser.nombre;
-                document.getElementById('sidebarUserAvatar').textContent = 
+                document.getElementById('sidebarUserAvatar').textContent =
                     currentUser.nombre.charAt(0).toUpperCase();
 
-                    // MOSTRAR SECCIÓN DE ADMIN SOLO SI ES ADMINISTRADOR
-if (currentUser.rol === 'admin') {
-    document.getElementById('adminSection').style.display = 'block';
-}
+                // MOSTRAR SECCIÓN DE ADMIN SOLO SI ES ADMINISTRADOR
+                if (currentUser.rol === 'admin') {
+                    document.getElementById('adminSection').style.display = 'block';
+                }
 
                 await cargarLiquidaciones();
             } catch (error) {
-    console.error('❌ Error de red:', error);
-    alert('Error de conexión. Recargue la página.');
-}
+                console.error('❌ Error de red:', error);
+                alert('Error de conexión. Recargue la página.');
+            }
         });
 
         async function cargarLiquidaciones(fechaInicio = null, fechaFin = null) {
             const token = localStorage.getItem('token');
             const container = document.getElementById('liquidacionesContainer');
-            
+
             try {
                 let url = `${API_URL}/liquidaciones?userId=${currentUser._id}`;
-                
+
                 if (fechaInicio && fechaFin) {
                     url += `&startDate=${fechaInicio}&endDate=${fechaFin}`;
                 }
@@ -1026,73 +1038,73 @@ if (currentUser.rol === 'admin') {
             }
         }
 
-async function cargarEstadisticas(fechaInicio = null, fechaFin = null) {
-    const token = localStorage.getItem('token');
-    
-    try {
-        let url = `${API_URL}/liquidaciones/stats/resumen?userId=${currentUser._id}`;
-        
-        if (fechaInicio && fechaFin) {
-            url += `&startDate=${fechaInicio}&endDate=${fechaFin}`;
+        async function cargarEstadisticas(fechaInicio = null, fechaFin = null) {
+            const token = localStorage.getItem('token');
+
+            try {
+                let url = `${API_URL}/liquidaciones/stats/resumen?userId=${currentUser._id}`;
+
+                if (fechaInicio && fechaFin) {
+                    url += `&startDate=${fechaInicio}&endDate=${fechaFin}`;
+                }
+
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const stats = data.data;
+
+                    document.getElementById('statsContainer').style.display = 'grid';
+                    document.getElementById('totalLiquidaciones').textContent = stats.totalLiquidaciones || 0;
+                    document.getElementById('totalIngresos').textContent =
+                        `$${(stats.totalIngresos || 0).toLocaleString('es-CO')}`;
+                    document.getElementById('totalEgresos').textContent =
+                        `$${(stats.totalEgresos || 0).toLocaleString('es-CO')}`;
+
+                    // ✅ NUEVA LÍNEA: MOSTRAR GASTOS EN EFECTIVO
+                    document.getElementById('totalGastosEfectivo').textContent =
+                        `$${(stats.totalGastosEfectivo || 0).toLocaleString('es-CO')}`;
+
+                    document.getElementById('promedioIngresos').textContent =
+                        `$${Math.round(stats.promedioIngresosPorDia || 0).toLocaleString('es-CO')}`;
+
+                    // Transferencias
+                    document.getElementById('totalTransferencias').textContent =
+                        `$${(stats.totalTransferenciasIngresos || 0).toLocaleString('es-CO')}`;
+                    document.getElementById('totalGastosTransferencias').textContent =
+                        `$${(stats.totalTransferenciasGastos || 0).toLocaleString('es-CO')}`;
+                    document.getElementById('cajaTransferencias').textContent =
+                        `$${(stats.cajaTransferencias || 0).toLocaleString('es-CO')}`;
+
+                    // Calcular caja efectivo correctamente
+                    const ingresosEfectivo = (stats.totalIngresos || 0) - (stats.totalTransferenciasIngresos || 0);
+                    const cajaEfectivo = ingresosEfectivo - (stats.totalGastosEfectivo || 0);
+
+                    document.getElementById('cajaEfectivo').textContent =
+                        `$${cajaEfectivo.toLocaleString('es-CO')}`;
+
+                    // Movimientos
+                    document.getElementById('totalAportes').textContent =
+                        `$${(stats.totalAportes || 0).toLocaleString('es-CO')}`;
+                    document.getElementById('totalRetiros').textContent =
+                        `$${(stats.totalRetiros || 0).toLocaleString('es-CO')}`;
+                    document.getElementById('totalMovimientos').textContent =
+                        `$${(stats.totalMovimientos || 0).toLocaleString('es-CO')}`;
+
+                    // Caja Final Total
+                    document.getElementById('cajaFinalTotal').textContent =
+                        `$${(stats.cajaFinalTotal || 0).toLocaleString('es-CO')}`;
+                }
+            } catch (error) {
+                console.error('Error al cargar estadísticas:', error);
+                document.getElementById('statsContainer').style.display = 'none';
+            }
         }
 
-        const response = await fetch(url, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            const stats = data.data;
-            
-            document.getElementById('statsContainer').style.display = 'grid';
-            document.getElementById('totalLiquidaciones').textContent = stats.totalLiquidaciones || 0;
-            document.getElementById('totalIngresos').textContent = 
-                `$${(stats.totalIngresos || 0).toLocaleString('es-CO')}`;
-            document.getElementById('totalEgresos').textContent = 
-                `$${(stats.totalEgresos || 0).toLocaleString('es-CO')}`;
-            
-            // ✅ NUEVA LÍNEA: MOSTRAR GASTOS EN EFECTIVO
-            document.getElementById('totalGastosEfectivo').textContent = 
-                `$${(stats.totalGastosEfectivo || 0).toLocaleString('es-CO')}`;
-            
-            document.getElementById('promedioIngresos').textContent = 
-                `$${Math.round(stats.promedioIngresosPorDia || 0).toLocaleString('es-CO')}`;
-            
-            // Transferencias
-            document.getElementById('totalTransferencias').textContent = 
-                `$${(stats.totalTransferenciasIngresos || 0).toLocaleString('es-CO')}`;
-            document.getElementById('totalGastosTransferencias').textContent = 
-                `$${(stats.totalTransferenciasGastos || 0).toLocaleString('es-CO')}`;
-            document.getElementById('cajaTransferencias').textContent = 
-                `$${(stats.cajaTransferencias || 0).toLocaleString('es-CO')}`;
-
-            // Calcular caja efectivo correctamente
-            const ingresosEfectivo = (stats.totalIngresos || 0) - (stats.totalTransferenciasIngresos || 0);
-            const cajaEfectivo = ingresosEfectivo - (stats.totalGastosEfectivo || 0);
-
-            document.getElementById('cajaEfectivo').textContent = 
-                `$${cajaEfectivo.toLocaleString('es-CO')}`;
-            
-            // Movimientos
-            document.getElementById('totalAportes').textContent = 
-                `$${(stats.totalAportes || 0).toLocaleString('es-CO')}`;
-            document.getElementById('totalRetiros').textContent = 
-                `$${(stats.totalRetiros || 0).toLocaleString('es-CO')}`;
-            document.getElementById('totalMovimientos').textContent = 
-                `$${(stats.totalMovimientos || 0).toLocaleString('es-CO')}`;
-            
-            // Caja Final Total
-            document.getElementById('cajaFinalTotal').textContent = 
-                `$${(stats.cajaFinalTotal || 0).toLocaleString('es-CO')}`;
-        }
-    } catch (error) {
-        console.error('Error al cargar estadísticas:', error);
-        document.getElementById('statsContainer').style.display = 'none';
-    }
-}
-
-function mostrarLiquidaciones() {
+        function mostrarLiquidaciones() {
             const container = document.getElementById('liquidacionesContainer');
 
             if (liquidaciones.length === 0) {
@@ -1113,48 +1125,48 @@ function mostrarLiquidaciones() {
             `;
         }
 
-function crearTarjetaLiquidacion(liquidacion) {
-    const fecha = new Date(liquidacion.fecha);
-    const fechaFormato = fecha.toLocaleDateString('es-CO', { 
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-    const horaFormato = fecha.toLocaleTimeString('es-CO', {
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+        function crearTarjetaLiquidacion(liquidacion) {
+            const fecha = new Date(liquidacion.fecha);
+            const fechaFormato = fecha.toLocaleDateString('es-CO', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            const horaFormato = fecha.toLocaleTimeString('es-CO', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
 
-    // Calcular transferencias de esta liquidación
-    let transferenciasPedidos = 0;
-    let transferenciasGastos = 0;
-    
-    if (liquidacion.ingresos && liquidacion.ingresos.pedidos) {
-        liquidacion.ingresos.pedidos.forEach(pedido => {
-            if (pedido && pedido.metodoPago === 'transferencia') {
-                transferenciasPedidos += pedido.total;
-            }
-        });
-    }
-    
-    if (liquidacion.egresos && liquidacion.egresos.gastos) {
-        liquidacion.egresos.gastos.forEach(registro => {
-            if (registro && registro.gastos) {
-                registro.gastos.forEach(gasto => {
-                    if (gasto.metodoPago === 'transferencia') {
-                        transferenciasGastos += gasto.monto;
+            // Calcular transferencias de esta liquidación
+            let transferenciasPedidos = 0;
+            let transferenciasGastos = 0;
+
+            if (liquidacion.ingresos && liquidacion.ingresos.pedidos) {
+                liquidacion.ingresos.pedidos.forEach(pedido => {
+                    if (pedido && pedido.metodoPago === 'transferencia') {
+                        transferenciasPedidos += pedido.total;
                     }
                 });
             }
-        });
-    }
-    
-    const cajaTransferencias = transferenciasPedidos - transferenciasGastos;
-    const ingresosEfectivo = liquidacion.ingresos.totalPedidos - transferenciasPedidos;
-const gastosEfectivo = liquidacion.egresos.totalGastos - transferenciasGastos;
-const cajaEfectivoLiq = ingresosEfectivo - gastosEfectivo;
 
-    return `
+            if (liquidacion.egresos && liquidacion.egresos.gastos) {
+                liquidacion.egresos.gastos.forEach(registro => {
+                    if (registro && registro.gastos) {
+                        registro.gastos.forEach(gasto => {
+                            if (gasto.metodoPago === 'transferencia') {
+                                transferenciasGastos += gasto.monto;
+                            }
+                        });
+                    }
+                });
+            }
+
+            const cajaTransferencias = transferenciasPedidos - transferenciasGastos;
+            const ingresosEfectivo = liquidacion.ingresos.totalPedidos - transferenciasPedidos;
+            const gastosEfectivo = liquidacion.egresos.totalGastos - transferenciasGastos;
+            const cajaEfectivoLiq = ingresosEfectivo - gastosEfectivo;
+
+            return `
         <div class="liquidacion-card">
             <div class="liquidacion-header">
                 <div class="liquidacion-fecha">
@@ -1230,11 +1242,11 @@ const cajaEfectivoLiq = ingresosEfectivo - gastosEfectivo;
             </div>
         </div>
     `;
-}
+        }
 
         async function verDetalle(liquidacionId) {
             const token = localStorage.getItem('token');
-            
+
             try {
                 const response = await fetch(`${API_URL}/liquidaciones/${liquidacionId}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -1253,46 +1265,46 @@ const cajaEfectivoLiq = ingresosEfectivo - gastosEfectivo;
             }
         }
 
-function mostrarModalDetalle(liquidacion) {
-    const fecha = new Date(liquidacion.fecha);
-    const fechaFormato = fecha.toLocaleDateString('es-CO', { 
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+        function mostrarModalDetalle(liquidacion) {
+            const fecha = new Date(liquidacion.fecha);
+            const fechaFormato = fecha.toLocaleDateString('es-CO', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
 
-    // Calcular transferencias
-    let transferenciasPedidos = 0;
-    let transferenciasGastos = 0;
-    
-    if (liquidacion.ingresos && liquidacion.ingresos.pedidos) {
-        liquidacion.ingresos.pedidos.forEach(pedido => {
-            if (pedido && pedido.metodoPago === 'transferencia') {
-                transferenciasPedidos += pedido.total;
-            }
-        });
-    }
-    
-    if (liquidacion.egresos && liquidacion.egresos.gastos) {
-        liquidacion.egresos.gastos.forEach(registro => {
-            if (registro && registro.gastos) {
-                registro.gastos.forEach(gasto => {
-                    if (gasto.metodoPago === 'transferencia') {
-                        transferenciasGastos += gasto.monto;
+            // Calcular transferencias
+            let transferenciasPedidos = 0;
+            let transferenciasGastos = 0;
+
+            if (liquidacion.ingresos && liquidacion.ingresos.pedidos) {
+                liquidacion.ingresos.pedidos.forEach(pedido => {
+                    if (pedido && pedido.metodoPago === 'transferencia') {
+                        transferenciasPedidos += pedido.total;
                     }
                 });
             }
-        });
-    }
-    
-    const cajaTransferencias = transferenciasPedidos - transferenciasGastos;
-    const ingresosEfectivoModal = liquidacion.ingresos.totalPedidos - transferenciasPedidos;
-const gastosEfectivoModal = liquidacion.egresos.totalGastos - transferenciasGastos;
-const cajaEfectivoModal = ingresosEfectivoModal - gastosEfectivoModal;
 
-    const content = `
+            if (liquidacion.egresos && liquidacion.egresos.gastos) {
+                liquidacion.egresos.gastos.forEach(registro => {
+                    if (registro && registro.gastos) {
+                        registro.gastos.forEach(gasto => {
+                            if (gasto.metodoPago === 'transferencia') {
+                                transferenciasGastos += gasto.monto;
+                            }
+                        });
+                    }
+                });
+            }
+
+            const cajaTransferencias = transferenciasPedidos - transferenciasGastos;
+            const ingresosEfectivoModal = liquidacion.ingresos.totalPedidos - transferenciasPedidos;
+            const gastosEfectivoModal = liquidacion.egresos.totalGastos - transferenciasGastos;
+            const cajaEfectivoModal = ingresosEfectivoModal - gastosEfectivoModal;
+
+            const content = `
         <div class="detalle-section">
             <h3 style="font-size: 18px; color: #667eea; margin-bottom: 1rem;">
                 📅 ${fechaFormato}
@@ -1484,119 +1496,119 @@ const cajaEfectivoModal = ingresosEfectivoModal - gastosEfectivoModal;
         }
 
         // Cerrar modal al hacer clic fuera
-        document.getElementById('modalDetalle').addEventListener('click', function(e) {
+        document.getElementById('modalDetalle').addEventListener('click', function (e) {
             if (e.target === this) {
                 cerrarModal();
             }
         });
 
         async function descargarExcel() {
-    if (liquidaciones.length === 0) {
-        alert('No hay liquidaciones para descargar');
-        return;
-    }
-
-    const token = localStorage.getItem('token');
-    
-    try {
-        // Preparar datos para Excel
-        const datosExcel = [];
-        
-        for (const liq of liquidaciones) {
-            // Calcular transferencias
-            let transferenciasPedidos = 0;
-            let transferenciasGastos = 0;
-            let gastosEfectivo = 0;
-            
-            if (liq.ingresos && liq.ingresos.pedidos) {
-                liq.ingresos.pedidos.forEach(pedido => {
-                    if (pedido && pedido.metodoPago === 'transferencia') {
-                        transferenciasPedidos += pedido.total;
-                    }
-                });
+            if (liquidaciones.length === 0) {
+                alert('No hay liquidaciones para descargar');
+                return;
             }
-            
-            if (liq.egresos && liq.egresos.gastos) {
-                liq.egresos.gastos.forEach(registro => {
-                    if (registro && registro.gastos) {
-                        registro.gastos.forEach(gasto => {
-                            if (gasto.metodoPago === 'transferencia') {
-                                transferenciasGastos += gasto.monto;
-                            } else {
-                                gastosEfectivo += gasto.monto;
+
+            const token = localStorage.getItem('token');
+
+            try {
+                // Preparar datos para Excel
+                const datosExcel = [];
+
+                for (const liq of liquidaciones) {
+                    // Calcular transferencias
+                    let transferenciasPedidos = 0;
+                    let transferenciasGastos = 0;
+                    let gastosEfectivo = 0;
+
+                    if (liq.ingresos && liq.ingresos.pedidos) {
+                        liq.ingresos.pedidos.forEach(pedido => {
+                            if (pedido && pedido.metodoPago === 'transferencia') {
+                                transferenciasPedidos += pedido.total;
                             }
                         });
                     }
-                });
+
+                    if (liq.egresos && liq.egresos.gastos) {
+                        liq.egresos.gastos.forEach(registro => {
+                            if (registro && registro.gastos) {
+                                registro.gastos.forEach(gasto => {
+                                    if (gasto.metodoPago === 'transferencia') {
+                                        transferenciasGastos += gasto.monto;
+                                    } else {
+                                        gastosEfectivo += gasto.monto;
+                                    }
+                                });
+                            }
+                        });
+                    }
+
+                    const cajaTransferencias = transferenciasPedidos - transferenciasGastos;
+                    const ingresosEfectivo = liq.ingresos.totalPedidos - transferenciasPedidos;
+                    const cajaEfectivo = ingresosEfectivo - gastosEfectivo;
+
+                    const fecha = new Date(liq.fecha);
+
+                    datosExcel.push({
+                        'ID': liq._id.slice(-8).toUpperCase(),
+                        'Fecha': fecha.toLocaleDateString('es-CO'),
+                        'Hora': fecha.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }),
+                        'Caja Inicial': liq.cajaInicial,
+                        'Total Ingresos': liq.ingresos.totalPedidos,
+                        'Total Egresos': liq.egresos.totalGastos,
+                        'Gastos Efectivo': gastosEfectivo,
+                        'Movimientos': liq.totalMovimientos,
+                        'Pagos Transferencia': transferenciasPedidos,
+                        'Gastos Transferencia': transferenciasGastos,
+                        'Caja Final': liq.cajaFinal,
+                        'Caja Efectivo': cajaEfectivo,
+                        'Caja Transferencias': cajaTransferencias,
+                        'Cantidad Pedidos': liq.ingresos.pedidos ? liq.ingresos.pedidos.length : 0,
+                        'Cantidad Gastos': liq.egresos.gastos ? liq.egresos.gastos.length : 0,
+                        'Observaciones': liq.observaciones || ''
+                    });
+                }
+
+                // Crear libro de Excel
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.json_to_sheet(datosExcel);
+
+                // Ajustar ancho de columnas
+                const wscols = [
+                    { wch: 10 },  // ID
+                    { wch: 12 },  // Fecha
+                    { wch: 8 },   // Hora
+                    { wch: 15 },  // Caja Inicial
+                    { wch: 15 },  // Total Ingresos
+                    { wch: 15 },  // Total Egresos
+                    { wch: 15 },  // Gastos Efectivo
+                    { wch: 15 },  // Movimientos
+                    { wch: 18 },  // Pagos Transferencia
+                    { wch: 18 },  // Gastos Transferencia
+                    { wch: 15 },  // Caja Final
+                    { wch: 15 },  // Caja Efectivo
+                    { wch: 18 },  // Caja Transferencias
+                    { wch: 15 },  // Cantidad Pedidos
+                    { wch: 15 },  // Cantidad Gastos
+                    { wch: 30 }   // Observaciones
+                ];
+                ws['!cols'] = wscols;
+
+                // Agregar hoja al libro
+                XLSX.utils.book_append_sheet(wb, ws, "Liquidaciones");
+
+                // Generar nombre de archivo con fecha
+                const nombreArchivo = `Liquidaciones_${new Date().toISOString().split('T')[0]}.xlsx`;
+
+                // Descargar archivo
+                XLSX.writeFile(wb, nombreArchivo);
+
+                alert('✅ Excel descargado correctamente');
+
+            } catch (error) {
+                console.error('Error al generar Excel:', error);
+                alert('❌ Error al generar el archivo Excel');
             }
-            
-            const cajaTransferencias = transferenciasPedidos - transferenciasGastos;
-            const ingresosEfectivo = liq.ingresos.totalPedidos - transferenciasPedidos;
-            const cajaEfectivo = ingresosEfectivo - gastosEfectivo;
-            
-            const fecha = new Date(liq.fecha);
-            
-            datosExcel.push({
-                'ID': liq._id.slice(-8).toUpperCase(),
-                'Fecha': fecha.toLocaleDateString('es-CO'),
-                'Hora': fecha.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }),
-                'Caja Inicial': liq.cajaInicial,
-                'Total Ingresos': liq.ingresos.totalPedidos,
-                'Total Egresos': liq.egresos.totalGastos,
-                'Gastos Efectivo': gastosEfectivo,
-                'Movimientos': liq.totalMovimientos,
-                'Pagos Transferencia': transferenciasPedidos,
-                'Gastos Transferencia': transferenciasGastos,
-                'Caja Final': liq.cajaFinal,
-                'Caja Efectivo': cajaEfectivo,
-                'Caja Transferencias': cajaTransferencias,
-                'Cantidad Pedidos': liq.ingresos.pedidos ? liq.ingresos.pedidos.length : 0,
-                'Cantidad Gastos': liq.egresos.gastos ? liq.egresos.gastos.length : 0,
-                'Observaciones': liq.observaciones || ''
-            });
         }
-        
-        // Crear libro de Excel
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.json_to_sheet(datosExcel);
-        
-        // Ajustar ancho de columnas
-        const wscols = [
-            { wch: 10 },  // ID
-            { wch: 12 },  // Fecha
-            { wch: 8 },   // Hora
-            { wch: 15 },  // Caja Inicial
-            { wch: 15 },  // Total Ingresos
-            { wch: 15 },  // Total Egresos
-            { wch: 15 },  // Gastos Efectivo
-            { wch: 15 },  // Movimientos
-            { wch: 18 },  // Pagos Transferencia
-            { wch: 18 },  // Gastos Transferencia
-            { wch: 15 },  // Caja Final
-            { wch: 15 },  // Caja Efectivo
-            { wch: 18 },  // Caja Transferencias
-            { wch: 15 },  // Cantidad Pedidos
-            { wch: 15 },  // Cantidad Gastos
-            { wch: 30 }   // Observaciones
-        ];
-        ws['!cols'] = wscols;
-        
-        // Agregar hoja al libro
-        XLSX.utils.book_append_sheet(wb, ws, "Liquidaciones");
-        
-        // Generar nombre de archivo con fecha
-        const nombreArchivo = `Liquidaciones_${new Date().toISOString().split('T')[0]}.xlsx`;
-        
-        // Descargar archivo
-        XLSX.writeFile(wb, nombreArchivo);
-        
-        alert('✅ Excel descargado correctamente');
-        
-    } catch (error) {
-        console.error('Error al generar Excel:', error);
-        alert('❌ Error al generar el archivo Excel');
-    }
-}
 
     </script>
 </body>

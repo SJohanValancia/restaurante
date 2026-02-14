@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,14 +29,14 @@
             background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
             padding: 0;
             z-index: 1000;
-            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
         }
 
         .sidebar-header {
             padding: 1.5rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .sidebar-brand {
@@ -66,27 +67,28 @@
 
         .brand-text p {
             font-size: 11px;
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
             margin: 2px 0 0 0;
         }
-.sidebar-nav {
-    padding: 1rem 0;
-    max-height: calc(100vh - 250px);
-    overflow-y: auto;
-}
 
-.sidebar-nav::-webkit-scrollbar {
-    width: 6px;
-}
+        .sidebar-nav {
+            padding: 1rem 0;
+            max-height: calc(100vh - 250px);
+            overflow-y: auto;
+        }
 
-.sidebar-nav::-webkit-scrollbar-track {
-    background: rgba(255,255,255,0.05);
-}
+        .sidebar-nav::-webkit-scrollbar {
+            width: 6px;
+        }
 
-.sidebar-nav::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.2);
-    border-radius: 3px;
-}
+        .sidebar-nav::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
 
         .nav-section {
             margin-bottom: 1.5rem;
@@ -96,7 +98,7 @@
             padding: 0.5rem 1.5rem;
             font-size: 11px;
             font-weight: 700;
-            color: rgba(255,255,255,0.5);
+            color: rgba(255, 255, 255, 0.5);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -106,7 +108,7 @@
             align-items: center;
             gap: 12px;
             padding: 12px 1.5rem;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
             transition: all 0.2s;
             font-size: 14px;
@@ -115,7 +117,7 @@
         }
 
         .nav-item:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             color: white;
         }
 
@@ -146,8 +148,8 @@
             left: 0;
             right: 0;
             padding: 1.5rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .user-info {
@@ -178,7 +180,7 @@
 
         .user-details p {
             font-size: 11px;
-            color: rgba(255,255,255,0.6);
+            color: rgba(255, 255, 255, 0.6);
             margin: 2px 0 0 0;
         }
 
@@ -231,7 +233,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 999;
             display: none;
         }
@@ -366,7 +368,7 @@
 
         .stat-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
 
         .stat-icon {
@@ -476,10 +478,10 @@
             color: #22543d;
         }
 
-.status-entregado {
-    background: #c6f6d5;
-    color: #22543d;
-}
+        .status-entregado {
+            background: #c6f6d5;
+            color: #22543d;
+        }
 
         .status-cancelado {
             background: #fed7d7;
@@ -574,270 +576,270 @@
             border-radius: 8px;
         }
 
-@media (max-width: 1024px) {
-    .sidebar {
-        transform: translateX(-280px);
-    }
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-280px);
+            }
 
-    .sidebar.active {
-        transform: translateX(0);
-    }
+            .sidebar.active {
+                transform: translateX(0);
+            }
 
-    .menu-toggle {
-        display: flex;
-    }
+            .menu-toggle {
+                display: flex;
+            }
 
-    .content-wrapper {
-        margin-left: 0;
-    }
+            .content-wrapper {
+                margin-left: 0;
+            }
 
-    .container {
-        padding: 5rem 1rem 2rem 1rem;
-    }
+            .container {
+                padding: 5rem 1rem 2rem 1rem;
+            }
 
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
-    }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
 
-    .filters-section {
-        grid-template-columns: 1fr;
-    }
+            .filters-section {
+                grid-template-columns: 1fr;
+            }
 
-    .orders-cards-grid {
-        grid-template-columns: 1fr;
-    }
+            .orders-cards-grid {
+                grid-template-columns: 1fr;
+            }
 
-    .period-selector {
-        flex-wrap: wrap;
-    }
+            .period-selector {
+                flex-wrap: wrap;
+            }
 
-    .period-btn {
-        flex: 1 1 calc(50% - 4px);
-        min-width: 120px;
-    }
+            .period-btn {
+                flex: 1 1 calc(50% - 4px);
+                min-width: 120px;
+            }
 
-    .export-buttons {
-        flex-wrap: wrap;
-    }
+            .export-buttons {
+                flex-wrap: wrap;
+            }
 
-    .btn-export {
-        flex: 1 1 calc(50% - 5px);
-    }
+            .btn-export {
+                flex: 1 1 calc(50% - 5px);
+            }
 
-    .orders-table {
-        display: block;
-        overflow-x: auto;
-    }
+            .orders-table {
+                display: block;
+                overflow-x: auto;
+            }
 
-    .order-card-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.75rem;
-    }
+            .order-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
 
-    .order-info-row {
-        flex-direction: column;
-        gap: 0.75rem;
-    }
+            .order-info-row {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
 
-    .order-info-row > div {
-        text-align: left !important;
-    }
-}
+            .order-info-row>div {
+                text-align: left !important;
+            }
+        }
 
-@media (max-width: 640px) {
-    .container {
-        padding: 5rem 0.5rem 1rem 0.5rem;
-    }
+        @media (max-width: 640px) {
+            .container {
+                padding: 5rem 0.5rem 1rem 0.5rem;
+            }
 
-    .page-title {
-        font-size: 24px;
-    }
+            .page-title {
+                font-size: 24px;
+            }
 
-    .page-subtitle {
-        font-size: 14px;
-    }
+            .page-subtitle {
+                font-size: 14px;
+            }
 
-    .card {
-        border-radius: 8px;
-        margin-bottom: 1rem;
-    }
+            .card {
+                border-radius: 8px;
+                margin-bottom: 1rem;
+            }
 
-    .card-header,
-    .card-body {
-        padding: 1rem;
-    }
+            .card-header,
+            .card-body {
+                padding: 1rem;
+            }
 
-    .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
 
-    .stat-card {
-        padding: 1.25rem;
-    }
+            .stat-card {
+                padding: 1.25rem;
+            }
 
-    .stat-value {
-        font-size: 24px;
-    }
+            .stat-value {
+                font-size: 24px;
+            }
 
-    .stat-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
-    }
+            .stat-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
 
-    .period-selector {
-        gap: 6px;
-    }
+            .period-selector {
+                gap: 6px;
+            }
 
-    .period-btn {
-        padding: 6px 10px;
-        font-size: 12px;
-        flex: 1 1 calc(50% - 3px);
-    }
+            .period-btn {
+                padding: 6px 10px;
+                font-size: 12px;
+                flex: 1 1 calc(50% - 3px);
+            }
 
-    .filter-group {
-        margin-bottom: 0.5rem;
-    }
+            .filter-group {
+                margin-bottom: 0.5rem;
+            }
 
-    .btn-filter,
-    .btn-clear-filters {
-        padding: 10px 16px;
-        font-size: 13px;
-    }
+            .btn-filter,
+            .btn-clear-filters {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
 
-    .product-rank-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-        padding: 1rem;
-    }
+            .product-rank-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+                padding: 1rem;
+            }
 
-    .product-rank-info {
-        width: 100%;
-    }
+            .product-rank-info {
+                width: 100%;
+            }
 
-    .product-stats {
-        width: 100%;
-        text-align: left;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
+            .product-stats {
+                width: 100%;
+                text-align: left;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
 
-    .rank-number {
-        width: 35px;
-        height: 35px;
-        font-size: 14px;
-    }
+            .rank-number {
+                width: 35px;
+                height: 35px;
+                font-size: 14px;
+            }
 
-    .order-card {
-        border-radius: 8px;
-    }
+            .order-card {
+                border-radius: 8px;
+            }
 
-    .order-card-header {
-        padding: 1rem;
-    }
+            .order-card-header {
+                padding: 1rem;
+            }
 
-    .order-number {
-        font-size: 16px;
-    }
+            .order-number {
+                font-size: 16px;
+            }
 
-    .order-time {
-        font-size: 11px;
-    }
+            .order-time {
+                font-size: 11px;
+            }
 
-    .order-card-body {
-        padding: 1rem;
-    }
+            .order-card-body {
+                padding: 1rem;
+            }
 
-    .order-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-        padding: 0.75rem;
-    }
+            .order-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+                padding: 0.75rem;
+            }
 
-    .order-item > div:last-child {
-        width: 100%;
-        justify-content: space-between;
-    }
+            .order-item>div:last-child {
+                width: 100%;
+                justify-content: space-between;
+            }
 
-    .order-item-price {
-        text-align: right;
-    }
+            .order-item-price {
+                text-align: right;
+            }
 
-    .order-card-footer {
-        padding: 1rem;
-    }
+            .order-card-footer {
+                padding: 1rem;
+            }
 
-    .order-total-value {
-        font-size: 20px;
-    }
+            .order-total-value {
+                font-size: 20px;
+            }
 
-    .orders-table {
-        font-size: 12px;
-    }
+            .orders-table {
+                font-size: 12px;
+            }
 
-    .orders-table th,
-    .orders-table td {
-        padding: 8px;
-        font-size: 12px;
-    }
+            .orders-table th,
+            .orders-table td {
+                padding: 8px;
+                font-size: 12px;
+            }
 
-    .status-badge {
-        font-size: 10px;
-        padding: 3px 8px;
-    }
+            .status-badge {
+                font-size: 10px;
+                padding: 3px 8px;
+            }
 
-    .export-buttons {
-        gap: 8px;
-    }
+            .export-buttons {
+                gap: 8px;
+            }
 
-    .btn-export {
-        padding: 8px 12px;
-        font-size: 12px;
-        flex: 1;
-    }
+            .btn-export {
+                padding: 8px 12px;
+                font-size: 12px;
+                flex: 1;
+            }
 
-    .empty-icon {
-        font-size: 36px;
-    }
+            .empty-icon {
+                font-size: 36px;
+            }
 
-    .empty-state p {
-        font-size: 14px;
-    }
-}
+            .empty-state p {
+                font-size: 14px;
+            }
+        }
 
-@media (max-width: 380px) {
-    .page-title {
-        font-size: 20px;
-    }
+        @media (max-width: 380px) {
+            .page-title {
+                font-size: 20px;
+            }
 
-    .stat-value {
-        font-size: 20px;
-    }
+            .stat-value {
+                font-size: 20px;
+            }
 
-    .order-number {
-        font-size: 14px;
-    }
+            .order-number {
+                font-size: 14px;
+            }
 
-    .order-total-value {
-        font-size: 18px;
-    }
+            .order-total-value {
+                font-size: 18px;
+            }
 
-    .product-quantity {
-        font-size: 16px;
-    }
+            .product-quantity {
+                font-size: 16px;
+            }
 
-    .filter-input,
-    .filter-select {
-        font-size: 13px;
-        padding: 8px 12px;
-    }
-}
+            .filter-input,
+            .filter-select {
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+        }
 
         .export-buttons {
             display: flex;
@@ -906,7 +908,7 @@
 
         .order-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
             border-color: #667eea;
         }
 
@@ -1029,52 +1031,54 @@
             color: #667eea;
         }
 
-.btn-clear-filters {
-    padding: 10px 20px;
-    background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    align-self: flex-end;
-}
+        .btn-clear-filters {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            align-self: flex-end;
+        }
 
-.btn-clear-filters:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(252, 129, 129, 0.4);
-    background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
-}
+        .btn-clear-filters:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(252, 129, 129, 0.4);
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+        }
 
-@keyframes slideInRight {
-    from {
-        transform: translateX(400px);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
 
-@keyframes slideOutRight {
-    from {
-        transform: translateX(0);
-        opacity: 1;
-    }
-    to {
-        transform: translateX(400px);
-        opacity: 0;
-    }
-}
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
 
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
+
 <body>
     <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">☰</button>
-    
+
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
 
     <aside class="sidebar" id="sidebar">
@@ -1088,7 +1092,7 @@
             </a>
         </div>
 
-<nav class="sidebar-nav">
+        <nav class="sidebar-nav">
             <div class="nav-section">
                 <div class="nav-section-title">Principal</div>
                 <a href="productos.html" class="nav-item">
@@ -1129,23 +1133,27 @@
                 </a>
             </div>
 
-    <!-- SOLO PARA ADMINISTRADORES -->
-    <div class="nav-section" id="adminSection" style="display: none;">
-        <div class="nav-section-title">Administración</div>
-        <a href="administrador.html" class="nav-item">
-            <span class="nav-icon">👥</span>
-            <span>Gestión de Meseros</span>
-        </a>
-        <a href="liquidacion.html" class="nav-item">
-            <span class="nav-icon">💵</span>
-            <span>Liquidación</span>
-        </a>
-        <a href="historial-liquidaciones.html" class="nav-item">
-            <span class="nav-icon">📋</span>
-            <span>Hist. Liquidaciones</span>
-        </a>
-    </div>
-</nav>
+            <!-- SOLO PARA ADMINISTRADORES -->
+            <div class="nav-section" id="adminSection" style="display: none;">
+                <div class="nav-section-title">Administración</div>
+                <a href="administrador.html" class="nav-item">
+                    <span class="nav-icon">👥</span>
+                    <span>Gestión de Meseros</span>
+                </a>
+                <a href="liquidacion.html" class="nav-item">
+                    <span class="nav-icon">💵</span>
+                    <span>Liquidación</span>
+                </a>
+                <a href="historial-liquidaciones.html" class="nav-item">
+                    <span class="nav-icon">📋</span>
+                    <span>Hist. Liquidaciones</span>
+                </a>
+                <a href="solicitudes.html" class="nav-item">
+                    <span class="nav-icon">👤✅</span>
+                    <span>Aceptación de Empleados</span>
+                </a>
+            </div>
+        </nav>
 
         <div class="sidebar-footer">
             <div class="user-info">
@@ -1207,10 +1215,12 @@
                                 <option value="">Todos los productos</option>
                             </select>
                         </div>
-<div class="filter-group" style="display: flex; gap: 8px;">
-    <button class="btn-filter" onclick="applyFilters()" style="flex: 1;">Aplicar Filtros</button>
-    <button class="btn-clear-filters" onclick="clearFilters()" style="flex: 1;">🗑️ Limpiar</button>
-</div>
+                        <div class="filter-group" style="display: flex; gap: 8px;">
+                            <button class="btn-filter" onclick="applyFilters()" style="flex: 1;">Aplicar
+                                Filtros</button>
+                            <button class="btn-clear-filters" onclick="clearFilters()" style="flex: 1;">🗑️
+                                Limpiar</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1245,13 +1255,14 @@
                 </div>
 
                 <div class="stat-card">
-    <div class="stat-header">
-        <div class="stat-icon purple" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">📱</div>
-    </div>
-    <div class="stat-label">Pagos con Transferencia</div>
-    <div class="stat-value" id="totalTransferencias">$0</div>
-    <div class="stat-change" id="changeTransferencias">0 pedidos</div>
-</div>
+                    <div class="stat-header">
+                        <div class="stat-icon purple"
+                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">📱</div>
+                    </div>
+                    <div class="stat-label">Pagos con Transferencia</div>
+                    <div class="stat-value" id="totalTransferencias">$0</div>
+                    <div class="stat-change" id="changeTransferencias">0 pedidos</div>
+                </div>
 
             </div>
 
@@ -1320,135 +1331,135 @@
         </div>
     </div>
 
-<script>
-    const API_URL = 'https://restaurante-co77.onrender.com/api';
-    let currentUser = null;
-    let allOrders = [];
-    let filteredOrders = [];
-    let allProducts = [];
-    let currentPeriod = 'hoy';
+    <script>
+        const API_URL = 'https://restaurante-co77.onrender.com/api';
+        let currentUser = null;
+        let allOrders = [];
+        let filteredOrders = [];
+        let allProducts = [];
+        let currentPeriod = 'hoy';
 
-    window.addEventListener('DOMContentLoaded', async () => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            window.location.href = 'index.html';
-            return;
-        }
-
-        try {
-            const response = await fetch(`${API_URL}/auth/me`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-if (response.status === 401) {
-    console.warn('⚠️ Token expirado');
-    localStorage.removeItem('token');
-    window.location.href = 'index.html';
-    return;
-}
-
-if (!response.ok) {
-    console.error('Error al cargar usuario');
-    alert('Error al cargar datos. Intente recargar.');
-    return;
-}
-            const data = await response.json();
-            currentUser = data.data;
-
-            if (currentUser.id && !currentUser._id) {
-                currentUser._id = currentUser.id;
+        window.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
             }
 
-            document.getElementById('sidebarUserName').textContent = currentUser.nombre;
-            document.getElementById('sidebarUserAvatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
+            try {
+                const response = await fetch(`${API_URL}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
 
-            setDefaultDates();
-            await loadProducts();
-            await loadOrders();
-        } catch (error) {
-    console.error('❌ Error de red:', error);
-    alert('Error de conexión. Recargue la página.');
-}
-    });
+                if (response.status === 401) {
+                    console.warn('⚠️ Token expirado');
+                    localStorage.removeItem('token');
+                    window.location.href = 'index.html';
+                    return;
+                }
 
-function setDefaultDates() {
-    // Dejar los campos de fecha vacíos por defecto
-    document.getElementById('fechaHasta').value = '';
-    document.getElementById('fechaDesde').value = '';
-    
-    console.log('📅 Filtros de fecha vacíos - Mostrando todos los pedidos');
-}
+                if (!response.ok) {
+                    console.error('Error al cargar usuario');
+                    alert('Error al cargar datos. Intente recargar.');
+                    return;
+                }
+                const data = await response.json();
+                currentUser = data.data;
 
-    function selectPeriod(period) {
-        currentPeriod = period;
+                if (currentUser.id && !currentUser._id) {
+                    currentUser._id = currentUser.id;
+                }
 
-        // Actualizar botones activos
-        document.querySelectorAll('.period-btn').forEach(btn => {
-            btn.classList.remove('active');
+                document.getElementById('sidebarUserName').textContent = currentUser.nombre;
+                document.getElementById('sidebarUserAvatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
+
+                setDefaultDates();
+                await loadProducts();
+                await loadOrders();
+            } catch (error) {
+                console.error('❌ Error de red:', error);
+                alert('Error de conexión. Recargue la página.');
+            }
         });
-        event.target.classList.add('active');
 
-        const today = new Date();
-        const todayStr = today.toISOString().split('T')[0];
-        
-        document.getElementById('fechaHasta').value = todayStr;
+        function setDefaultDates() {
+            // Dejar los campos de fecha vacíos por defecto
+            document.getElementById('fechaHasta').value = '';
+            document.getElementById('fechaDesde').value = '';
 
-        switch (period) {
-            case 'hoy':
-                document.getElementById('fechaDesde').value = todayStr;
-                break;
-            case 'semana':
-                const semana = new Date(today);
-                semana.setDate(semana.getDate() - 7);
-                document.getElementById('fechaDesde').value = semana.toISOString().split('T')[0];
-                break;
-            case 'mes':
-                const mes = new Date(today);
-                mes.setMonth(mes.getMonth() - 1);
-                document.getElementById('fechaDesde').value = mes.toISOString().split('T')[0];
-                break;
-            case 'custom':
-                // No hacer nada, dejar que el usuario seleccione
-                return;
+            console.log('📅 Filtros de fecha vacíos - Mostrando todos los pedidos');
         }
 
-        if (period !== 'custom') {
+        function selectPeriod(period) {
+            currentPeriod = period;
+
+            // Actualizar botones activos
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
+
+            document.getElementById('fechaHasta').value = todayStr;
+
+            switch (period) {
+                case 'hoy':
+                    document.getElementById('fechaDesde').value = todayStr;
+                    break;
+                case 'semana':
+                    const semana = new Date(today);
+                    semana.setDate(semana.getDate() - 7);
+                    document.getElementById('fechaDesde').value = semana.toISOString().split('T')[0];
+                    break;
+                case 'mes':
+                    const mes = new Date(today);
+                    mes.setMonth(mes.getMonth() - 1);
+                    document.getElementById('fechaDesde').value = mes.toISOString().split('T')[0];
+                    break;
+                case 'custom':
+                    // No hacer nada, dejar que el usuario seleccione
+                    return;
+            }
+
+            if (period !== 'custom') {
+                applyFilters();
+            }
+        }
+
+        function clearFilters() {
+            // Restablecer período a "hoy"
+            currentPeriod = 'hoy';
+
+            // Actualizar botones de período
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent === 'Hoy') {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Restablecer fechas a hoy
+            // Limpiar fechas (dejar vacías)
+            document.getElementById('fechaDesde').value = '';
+            document.getElementById('fechaHasta').value = '';
+
+            // Limpiar select de estado
+            document.getElementById('filterEstado').value = '';
+
+            // Limpiar select de producto
+            document.getElementById('filterProducto').value = '';
+
+            console.log('🧹 Filtros limpiados - Mostrando todos los pedidos');
+
+            // Aplicar filtros con los valores por defecto
             applyFilters();
-        }
-    }
 
-    function clearFilters() {
-    // Restablecer período a "hoy"
-    currentPeriod = 'hoy';
-    
-    // Actualizar botones de período
-    document.querySelectorAll('.period-btn').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.textContent === 'Hoy') {
-            btn.classList.add('active');
-        }
-    });
-    
-    // Restablecer fechas a hoy
-// Limpiar fechas (dejar vacías)
-document.getElementById('fechaDesde').value = '';
-document.getElementById('fechaHasta').value = '';
-    
-    // Limpiar select de estado
-    document.getElementById('filterEstado').value = '';
-    
-    // Limpiar select de producto
-    document.getElementById('filterProducto').value = '';
-    
-    console.log('🧹 Filtros limpiados - Mostrando todos los pedidos');
-    
-    // Aplicar filtros con los valores por defecto
-    applyFilters();
-    
-    // Mostrar notificación visual (opcional)
-    const notification = document.createElement('div');
-    notification.textContent = '✅ Filtros restablecidos';
-    notification.style.cssText = `
+            // Mostrar notificación visual (opcional)
+            const notification = document.createElement('div');
+            notification.textContent = '✅ Filtros restablecidos';
+            notification.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
@@ -1462,151 +1473,151 @@ document.getElementById('fechaHasta').value = '';
         z-index: 10000;
         animation: slideInRight 0.3s ease-out;
     `;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.style.animation = 'slideOutRight 0.3s ease-out';
-        setTimeout(() => notification.remove(), 300);
-    }, 2000);
-}
 
-    async function loadProducts() {
-        const token = localStorage.getItem('token');
-        try {
-            const response = await fetch(`${API_URL}/products?userId=${currentUser._id}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const data = await response.json();
+            document.body.appendChild(notification);
 
-            if (data.success) {
-                allProducts = data.data;
-                const select = document.getElementById('filterProducto');
-                select.innerHTML = '<option value="">Todos los productos</option>' +
-                    allProducts.map(p => `<option value="${p._id}">${p.nombre}</option>`).join('');
-            }
-        } catch (error) {
-            console.error('Error al cargar productos:', error);
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 2000);
         }
-    }
 
-    async function loadOrders() {
-        const token = localStorage.getItem('token');
-        try {
-            console.log('🔍 Cargando pedidos para userId:', currentUser._id);
-            
-            const response = await fetch(`${API_URL}/orders?userId=${currentUser._id}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const data = await response.json();
-
-            console.log('📦 Respuesta del servidor:', data);
-
-            if (data.success) {
-                allOrders = data.data;
-                console.log(`✅ Total de pedidos cargados: ${allOrders.length}`);
-                
-                // Mostrar fechas de los pedidos para debug
-                allOrders.forEach((order, index) => {
-                    console.log(`Pedido ${index + 1}: Mesa ${order.mesa}, Fecha: ${new Date(order.createdAt).toLocaleString('es-CO')}, Estado: ${order.estado}`);
+        async function loadProducts() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_URL}/products?userId=${currentUser._id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
-                
-                applyFilters();
+                const data = await response.json();
+
+                if (data.success) {
+                    allProducts = data.data;
+                    const select = document.getElementById('filterProducto');
+                    select.innerHTML = '<option value="">Todos los productos</option>' +
+                        allProducts.map(p => `<option value="${p._id}">${p.nombre}</option>`).join('');
+                }
+            } catch (error) {
+                console.error('Error al cargar productos:', error);
             }
-        } catch (error) {
-            console.error('❌ Error al cargar pedidos:', error);
         }
-    }
 
-function applyFilters() {
-    const fechaDesdeValue = document.getElementById('fechaDesde').value;
-    const fechaHastaValue = document.getElementById('fechaHasta').value;
-    
-    console.log('🔎 Aplicando filtros:');
-    console.log('  - Fecha desde:', fechaDesdeValue || 'Sin filtro');
-    console.log('  - Fecha hasta:', fechaHastaValue || 'Sin filtro');
-    
-    // Crear fechas solo si existen valores
-    let fechaDesde = null;
-    let fechaHasta = null;
-    
-    if (fechaDesdeValue) {
-        fechaDesde = new Date(fechaDesdeValue + 'T00:00:00');
-    }
-    
-    if (fechaHastaValue) {
-        fechaHasta = new Date(fechaHastaValue + 'T23:59:59.999');
-    }
-        
-        const estado = document.getElementById('filterEstado').value;
-        const producto = document.getElementById('filterProducto').value;
+        async function loadOrders() {
+            const token = localStorage.getItem('token');
+            try {
+                console.log('🔍 Cargando pedidos para userId:', currentUser._id);
 
-        console.log('  - Estado:', estado || 'Todos');
-        console.log('  - Producto:', producto || 'Todos');
+                const response = await fetch(`${API_URL}/orders?userId=${currentUser._id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
 
-        filteredOrders = allOrders.filter(order => {
-            const orderDate = new Date(order.createdAt);
-            // Si no hay fechas, mostrar todos los pedidos
-let dateMatch = true;
+                console.log('📦 Respuesta del servidor:', data);
 
-if (fechaDesde && fechaHasta) {
-    // Si ambas fechas están definidas
-    dateMatch = orderDate >= fechaDesde && orderDate <= fechaHasta;
-} else if (fechaDesde) {
-    // Solo fecha desde
-    dateMatch = orderDate >= fechaDesde;
-} else if (fechaHasta) {
-    // Solo fecha hasta
-    dateMatch = orderDate <= fechaHasta;
-}
-            const estadoMatch = !estado || order.estado === estado;
+                if (data.success) {
+                    allOrders = data.data;
+                    console.log(`✅ Total de pedidos cargados: ${allOrders.length}`);
 
-            let productoMatch = !producto;
-            if (producto) {
-                productoMatch = order.items.some(item => item.producto._id === producto);
+                    // Mostrar fechas de los pedidos para debug
+                    allOrders.forEach((order, index) => {
+                        console.log(`Pedido ${index + 1}: Mesa ${order.mesa}, Fecha: ${new Date(order.createdAt).toLocaleString('es-CO')}, Estado: ${order.estado}`);
+                    });
+
+                    applyFilters();
+                }
+            } catch (error) {
+                console.error('❌ Error al cargar pedidos:', error);
+            }
+        }
+
+        function applyFilters() {
+            const fechaDesdeValue = document.getElementById('fechaDesde').value;
+            const fechaHastaValue = document.getElementById('fechaHasta').value;
+
+            console.log('🔎 Aplicando filtros:');
+            console.log('  - Fecha desde:', fechaDesdeValue || 'Sin filtro');
+            console.log('  - Fecha hasta:', fechaHastaValue || 'Sin filtro');
+
+            // Crear fechas solo si existen valores
+            let fechaDesde = null;
+            let fechaHasta = null;
+
+            if (fechaDesdeValue) {
+                fechaDesde = new Date(fechaDesdeValue + 'T00:00:00');
             }
 
-            // Debug para cada pedido
-            if (!dateMatch) {
-                console.log(`❌ Pedido excluido por fecha: Mesa ${order.mesa}, Fecha: ${orderDate.toLocaleString('es-CO')}`);
+            if (fechaHastaValue) {
+                fechaHasta = new Date(fechaHastaValue + 'T23:59:59.999');
             }
 
-            return dateMatch && estadoMatch && productoMatch;
-        });
+            const estado = document.getElementById('filterEstado').value;
+            const producto = document.getElementById('filterProducto').value;
 
-        console.log(`✅ Pedidos filtrados: ${filteredOrders.length} de ${allOrders.length}`);
+            console.log('  - Estado:', estado || 'Todos');
+            console.log('  - Producto:', producto || 'Todos');
 
-        updateStatistics();
-        updateProductsRanking();
-        displayOrders();
-        displayOrdersCards();
-    }
+            filteredOrders = allOrders.filter(order => {
+                const orderDate = new Date(order.createdAt);
+                // Si no hay fechas, mostrar todos los pedidos
+                let dateMatch = true;
 
-function displayOrdersCards() {
-    const container = document.getElementById('ordersCards');
+                if (fechaDesde && fechaHasta) {
+                    // Si ambas fechas están definidas
+                    dateMatch = orderDate >= fechaDesde && orderDate <= fechaHasta;
+                } else if (fechaDesde) {
+                    // Solo fecha desde
+                    dateMatch = orderDate >= fechaDesde;
+                } else if (fechaHasta) {
+                    // Solo fecha hasta
+                    dateMatch = orderDate <= fechaHasta;
+                }
+                const estadoMatch = !estado || order.estado === estado;
 
-    if (filteredOrders.length === 0) {
-        container.innerHTML = `
+                let productoMatch = !producto;
+                if (producto) {
+                    productoMatch = order.items.some(item => item.producto._id === producto);
+                }
+
+                // Debug para cada pedido
+                if (!dateMatch) {
+                    console.log(`❌ Pedido excluido por fecha: Mesa ${order.mesa}, Fecha: ${orderDate.toLocaleString('es-CO')}`);
+                }
+
+                return dateMatch && estadoMatch && productoMatch;
+            });
+
+            console.log(`✅ Pedidos filtrados: ${filteredOrders.length} de ${allOrders.length}`);
+
+            updateStatistics();
+            updateProductsRanking();
+            displayOrders();
+            displayOrdersCards();
+        }
+
+        function displayOrdersCards() {
+            const container = document.getElementById('ordersCards');
+
+            if (filteredOrders.length === 0) {
+                container.innerHTML = `
             <div class="empty-state">
                 <div class="empty-icon">📋</div>
                 <p>No hay pedidos para mostrar en este período</p>
             </div>
         `;
-        return;
-    }
+                return;
+            }
 
-    container.innerHTML = filteredOrders.map(order => `
+            container.innerHTML = filteredOrders.map(order => `
         <div class="order-card">
             <div class="order-card-header">
                 <div>
                     <div class="order-number">#${order._id.slice(-6).toUpperCase()}</div>
                     <div class="order-time">${new Date(order.createdAt).toLocaleString('es-CO', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    })}</div>
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })}</div>
                 </div>
                 <span class="status-badge status-${order.estado}">${order.estado === 'entregado' ? 'pagado' : order.estado}</span>
 
@@ -1635,22 +1646,22 @@ function displayOrdersCards() {
                 <div class="order-items-list">
                     <div class="order-items-title">🍽️ Detalle del Pedido:</div>
                     ${order.items ? order.items.map(item => {
-                        // Manejo seguro de productos eliminados
-                        let nombre = 'Producto eliminado';
-                        let categoria = 'Sin categoría';
-                        
-                        if (item.productoInfo) {
-                            nombre = item.productoInfo.nombre;
-                            categoria = item.productoInfo.categoria;
-                        } else if (item.producto && item.producto.nombre) {
-                            nombre = item.producto.nombre;
-                            categoria = item.producto.categoria || 'Sin categoría';
-                        } else if (item.nombreProducto) {
-                            nombre = item.nombreProducto;
-                            categoria = item.categoriaProducto || 'Sin categoría';
-                        }
-                        
-                        return `
+                // Manejo seguro de productos eliminados
+                let nombre = 'Producto eliminado';
+                let categoria = 'Sin categoría';
+
+                if (item.productoInfo) {
+                    nombre = item.productoInfo.nombre;
+                    categoria = item.productoInfo.categoria;
+                } else if (item.producto && item.producto.nombre) {
+                    nombre = item.producto.nombre;
+                    categoria = item.producto.categoria || 'Sin categoría';
+                } else if (item.nombreProducto) {
+                    nombre = item.nombreProducto;
+                    categoria = item.categoriaProducto || 'Sin categoría';
+                }
+
+                return `
                             <div class="order-item">
                                 <div class="order-item-info">
                                     <div class="order-item-name">${nombre}</div>
@@ -1662,7 +1673,7 @@ function displayOrdersCards() {
                                 </div>
                             </div>
                         `;
-                    }).join('') : '<p>Sin items</p>'}
+            }).join('') : '<p>Sin items</p>'}
                 </div>
                 
                 ${order.notas ? `
@@ -1679,122 +1690,122 @@ function displayOrdersCards() {
             </div>
         </div>
     `).join('');
-}
+        }
 
-function updateStatistics() {
-    const totalPedidos = filteredOrders.length;
-    const totalIngresos = filteredOrders
-        .filter(o => o.estado !== 'cancelado')
-        .reduce((sum, order) => sum + order.total, 0);
+        function updateStatistics() {
+            const totalPedidos = filteredOrders.length;
+            const totalIngresos = filteredOrders
+                .filter(o => o.estado !== 'cancelado')
+                .reduce((sum, order) => sum + order.total, 0);
 
-    const totalProductos = filteredOrders
-        .filter(o => o.estado !== 'cancelado')
-        .reduce((sum, order) => {
-            return sum + order.items.reduce((itemSum, item) => itemSum + item.cantidad, 0);
-        }, 0);
+            const totalProductos = filteredOrders
+                .filter(o => o.estado !== 'cancelado')
+                .reduce((sum, order) => {
+                    return sum + order.items.reduce((itemSum, item) => itemSum + item.cantidad, 0);
+                }, 0);
 
-    const ticketPromedio = totalPedidos > 0 ? totalIngresos / totalPedidos : 0;
+            const ticketPromedio = totalPedidos > 0 ? totalIngresos / totalPedidos : 0;
 
-    // Calcular total de transferencias
-    const pedidosTransferencia = filteredOrders.filter(o => o.estado !== 'cancelado' && o.metodoPago === 'transferencia');
-    const totalTransferencias = pedidosTransferencia.reduce((sum, order) => sum + order.total, 0);
+            // Calcular total de transferencias
+            const pedidosTransferencia = filteredOrders.filter(o => o.estado !== 'cancelado' && o.metodoPago === 'transferencia');
+            const totalTransferencias = pedidosTransferencia.reduce((sum, order) => sum + order.total, 0);
 
-    document.getElementById('totalPedidos').textContent = totalPedidos;
-    document.getElementById('totalIngresos').textContent = `$${totalIngresos.toLocaleString('es-CO')}`;
-    document.getElementById('totalProductos').textContent = totalProductos;
-    document.getElementById('ticketPromedio').textContent = `$${Math.round(ticketPromedio).toLocaleString('es-CO')}`;
-    document.getElementById('totalTransferencias').textContent = `$${totalTransferencias.toLocaleString('es-CO')}`;
-    document.getElementById('changeTransferencias').textContent = `${pedidosTransferencia.length} pedidos`;
+            document.getElementById('totalPedidos').textContent = totalPedidos;
+            document.getElementById('totalIngresos').textContent = `$${totalIngresos.toLocaleString('es-CO')}`;
+            document.getElementById('totalProductos').textContent = totalProductos;
+            document.getElementById('ticketPromedio').textContent = `$${Math.round(ticketPromedio).toLocaleString('es-CO')}`;
+            document.getElementById('totalTransferencias').textContent = `$${totalTransferencias.toLocaleString('es-CO')}`;
+            document.getElementById('changeTransferencias').textContent = `${pedidosTransferencia.length} pedidos`;
 
 
-        // Calcular cambios vs período anterior
-        const fechaDesde = new Date(document.getElementById('fechaDesde').value + 'T00:00:00');
-        const fechaHasta = new Date(document.getElementById('fechaHasta').value + 'T23:59:59.999');
-        const periodDays = Math.ceil((fechaHasta - fechaDesde) / (1000 * 60 * 60 * 24)) + 1;
+            // Calcular cambios vs período anterior
+            const fechaDesde = new Date(document.getElementById('fechaDesde').value + 'T00:00:00');
+            const fechaHasta = new Date(document.getElementById('fechaHasta').value + 'T23:59:59.999');
+            const periodDays = Math.ceil((fechaHasta - fechaDesde) / (1000 * 60 * 60 * 24)) + 1;
 
-        const previousStart = new Date(fechaDesde);
-        previousStart.setDate(previousStart.getDate() - periodDays);
-        const previousEnd = new Date(fechaDesde);
-        previousEnd.setDate(previousEnd.getDate() - 1);
+            const previousStart = new Date(fechaDesde);
+            previousStart.setDate(previousStart.getDate() - periodDays);
+            const previousEnd = new Date(fechaDesde);
+            previousEnd.setDate(previousEnd.getDate() - 1);
 
-        const previousOrders = allOrders.filter(order => {
-            const orderDate = new Date(order.createdAt);
-            return orderDate >= previousStart && orderDate <= previousEnd;
-        });
+            const previousOrders = allOrders.filter(order => {
+                const orderDate = new Date(order.createdAt);
+                return orderDate >= previousStart && orderDate <= previousEnd;
+            });
 
-        const previousTotal = previousOrders.filter(o => o.estado !== 'cancelado')
-            .reduce((sum, order) => sum + order.total, 0);
+            const previousTotal = previousOrders.filter(o => o.estado !== 'cancelado')
+                .reduce((sum, order) => sum + order.total, 0);
 
-        const changeIngresos = previousTotal > 0 ?
-            ((totalIngresos - previousTotal) / previousTotal * 100).toFixed(1) : 0;
-        const changePedidos = previousOrders.length > 0 ?
-            ((totalPedidos - previousOrders.length) / previousOrders.length * 100).toFixed(1) : 0;
+            const changeIngresos = previousTotal > 0 ?
+                ((totalIngresos - previousTotal) / previousTotal * 100).toFixed(1) : 0;
+            const changePedidos = previousOrders.length > 0 ?
+                ((totalPedidos - previousOrders.length) / previousOrders.length * 100).toFixed(1) : 0;
 
-        document.getElementById('changeIngresos').textContent =
-            `${changeIngresos >= 0 ? '+' : ''}${changeIngresos}% vs período anterior`;
-        document.getElementById('changeIngresos').className =
-            `stat-change ${changeIngresos >= 0 ? 'positive' : 'negative'}`;
+            document.getElementById('changeIngresos').textContent =
+                `${changeIngresos >= 0 ? '+' : ''}${changeIngresos}% vs período anterior`;
+            document.getElementById('changeIngresos').className =
+                `stat-change ${changeIngresos >= 0 ? 'positive' : 'negative'}`;
 
-        document.getElementById('changePedidos').textContent =
-            `${changePedidos >= 0 ? '+' : ''}${changePedidos}% vs período anterior`;
-        document.getElementById('changePedidos').className =
-            `stat-change ${changePedidos >= 0 ? 'positive' : 'negative'}`;
-    }
+            document.getElementById('changePedidos').textContent =
+                `${changePedidos >= 0 ? '+' : ''}${changePedidos}% vs período anterior`;
+            document.getElementById('changePedidos').className =
+                `stat-change ${changePedidos >= 0 ? 'positive' : 'negative'}`;
+        }
 
-function updateProductsRanking() {
-    const productStats = {};
+        function updateProductsRanking() {
+            const productStats = {};
 
-    filteredOrders.filter(o => o.estado !== 'cancelado').forEach(order => {
-        order.items.forEach(item => {
-            // Manejo seguro de productos
-            let productId, nombre, categoria;
-            
-            if (item.productoInfo) {
-                productId = item.producto || item._id;
-                nombre = item.productoInfo.nombre;
-                categoria = item.productoInfo.categoria;
-            } else if (item.producto && item.producto._id) {
-                productId = item.producto._id;
-                nombre = item.producto.nombre;
-                categoria = item.producto.categoria;
-            } else if (item.nombreProducto) {
-                productId = item.nombreProducto;
-                nombre = item.nombreProducto;
-                categoria = item.categoriaProducto || 'Sin categoría';
-            } else {
-                return; // Skip items sin información válida
-            }
-            
-            if (!productStats[productId]) {
-                productStats[productId] = {
-                    nombre: nombre,
-                    categoria: categoria,
-                    cantidad: 0,
-                    ingresos: 0
-                };
-            }
-            productStats[productId].cantidad += item.cantidad;
-            productStats[productId].ingresos += item.cantidad * item.precio;
-        });
-    });
+            filteredOrders.filter(o => o.estado !== 'cancelado').forEach(order => {
+                order.items.forEach(item => {
+                    // Manejo seguro de productos
+                    let productId, nombre, categoria;
 
-    const ranking = Object.values(productStats)
-        .sort((a, b) => b.cantidad - a.cantidad)
-        .slice(0, 10);
+                    if (item.productoInfo) {
+                        productId = item.producto || item._id;
+                        nombre = item.productoInfo.nombre;
+                        categoria = item.productoInfo.categoria;
+                    } else if (item.producto && item.producto._id) {
+                        productId = item.producto._id;
+                        nombre = item.producto.nombre;
+                        categoria = item.producto.categoria;
+                    } else if (item.nombreProducto) {
+                        productId = item.nombreProducto;
+                        nombre = item.nombreProducto;
+                        categoria = item.categoriaProducto || 'Sin categoría';
+                    } else {
+                        return; // Skip items sin información válida
+                    }
 
-    const container = document.getElementById('productsRanking');
+                    if (!productStats[productId]) {
+                        productStats[productId] = {
+                            nombre: nombre,
+                            categoria: categoria,
+                            cantidad: 0,
+                            ingresos: 0
+                        };
+                    }
+                    productStats[productId].cantidad += item.cantidad;
+                    productStats[productId].ingresos += item.cantidad * item.precio;
+                });
+            });
 
-    if (ranking.length === 0) {
-        container.innerHTML = `
+            const ranking = Object.values(productStats)
+                .sort((a, b) => b.cantidad - a.cantidad)
+                .slice(0, 10);
+
+            const container = document.getElementById('productsRanking');
+
+            if (ranking.length === 0) {
+                container.innerHTML = `
             <div class="empty-state">
                 <div class="empty-icon">📊</div>
                 <p>No hay datos para mostrar</p>
             </div>
         `;
-        return;
-    }
+                return;
+            }
 
-    container.innerHTML = ranking.map((product, index) => `
+            container.innerHTML = ranking.map((product, index) => `
         <div class="product-rank-item">
             <div class="product-rank-info">
                 <div class="rank-number">${index + 1}</div>
@@ -1809,12 +1820,12 @@ function updateProductsRanking() {
             </div>
         </div>
     `).join('');
-}
-    function displayOrders() {
-        const tbody = document.getElementById('ordersTableBody');
+        }
+        function displayOrders() {
+            const tbody = document.getElementById('ordersTableBody');
 
-        if (filteredOrders.length === 0) {
-            tbody.innerHTML = `
+            if (filteredOrders.length === 0) {
+                tbody.innerHTML = `
                 <tr>
                     <td colspan="6">
                         <div class="empty-state">
@@ -1824,18 +1835,18 @@ function updateProductsRanking() {
                     </td>
                 </tr>
             `;
-            return;
-        }
+                return;
+            }
 
-        tbody.innerHTML = filteredOrders.map(order => `
+            tbody.innerHTML = filteredOrders.map(order => `
             <tr>
                 <td>${new Date(order.createdAt).toLocaleDateString('es-CO', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                })}</td>
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })}</td>
                 <td>#${order._id.slice(-6).toUpperCase()}</td>
                 <td>Mesa ${order.mesa}</td>
                 <td>${order.items.length} producto(s)</td>
@@ -1843,59 +1854,60 @@ function updateProductsRanking() {
                 <td style="font-weight: 700;">$${order.total.toLocaleString('es-CO')}</td>
             </tr>
         `).join('');
-    }
-
-    function exportToCSV() {
-        if (filteredOrders.length === 0) {
-            alert('No hay datos para exportar');
-            return;
         }
 
-        let csv = 'Fecha,Pedido,Mesa,Estado,Productos,Cantidad,Total\n';
+        function exportToCSV() {
+            if (filteredOrders.length === 0) {
+                alert('No hay datos para exportar');
+                return;
+            }
 
-        filteredOrders.forEach(order => {
-            const fecha = new Date(order.createdAt).toLocaleString('es-CO');
-            const pedido = `#${order._id.slice(-6).toUpperCase()}`;
-            const productos = order.items.map(item =>
-                `${item.producto.nombre} (x${item.cantidad})`
-            ).join(' | ');
-            const cantidadTotal = order.items.reduce((sum, item) => sum + item.cantidad, 0);
+            let csv = 'Fecha,Pedido,Mesa,Estado,Productos,Cantidad,Total\n';
 
-            csv += `"${fecha}","${pedido}",${order.mesa},"${order.estado}","${productos}",${cantidadTotal},${order.total}\n`;
-        });
+            filteredOrders.forEach(order => {
+                const fecha = new Date(order.createdAt).toLocaleString('es-CO');
+                const pedido = `#${order._id.slice(-6).toUpperCase()}`;
+                const productos = order.items.map(item =>
+                    `${item.producto.nombre} (x${item.cantidad})`
+                ).join(' | ');
+                const cantidadTotal = order.items.reduce((sum, item) => sum + item.cantidad, 0);
 
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
+                csv += `"${fecha}","${pedido}",${order.mesa},"${order.estado}","${productos}",${cantidadTotal},${order.total}\n`;
+            });
 
-        link.setAttribute('href', url);
-        link.setAttribute('download', `reporte_pedidos_${new Date().getTime()}.csv`);
-        link.style.visibility = 'hidden';
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
 
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
+            link.setAttribute('href', url);
+            link.setAttribute('download', `reporte_pedidos_${new Date().getTime()}.csv`);
+            link.style.visibility = 'hidden';
 
-    function printReport() {
-        window.print();
-    }
-
-    function toggleMenu() {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-
-        sidebar.classList.toggle('active');
-        overlay.classList.toggle('active');
-    }
-
-    function logout() {
-        if (confirm('¿Cerrar sesión?')) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('usuario');
-            window.location.href = 'index.html';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
-    }
-</script>
+
+        function printReport() {
+            window.print();
+        }
+
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function logout() {
+            if (confirm('¿Cerrar sesión?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('usuario');
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
 </body>
+
 </html>
