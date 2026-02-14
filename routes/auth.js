@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User'); 
+const User = require('../models/User');
+const Product = require('../models/Product');
+const Alimento = require('../models/Alimento');
 const jwt = require('jsonwebtoken');
+const { loginToMandao, getMandaoProducts, getMandaoAlimentos } = require('../services/mandaoIntegration');
 
 // Generar JWT Token
 const generarToken = (userId) => {
@@ -12,11 +15,196 @@ const generarToken = (userId) => {
   );
 };
 
+// --- FUNCIÓN DE SINCRONIZACIÓN AUTOMÁTICA ---
+async function syncMandaoData(jcrtUserId, mandaoToken) {
+  try {
+    console.log(`🔄 Iniciando sincronización de datos para usuario ${jcrtUserId}...`);
+
+    // 1. Obtener datos de Mandao
+    const [mandaoProducts, mandaoAlimentos] = await Promise.all([
+      getMandaoProducts(mandaoToken),
+      getMandaoAlimentos(mandaoToken)
+    ]);
+
+    console.log(`📦 Recuperados: ${mandaoProducts.length} productos, ${mandaoAlimentos.length} alimentos.`);
+
+    // 2. Sincronizar Productos
+    const productMap = new Map(); // Mapa para vincular ID Mandao -> ID JCRT (si fuera necesario, aquí usaremos nombre como clave simple)
+
+    for (const mProduct of mandaoProducts) {
+      // Buscar si el producto ya existe por nombre (para no duplicar)
+      let product = await Product.findOne({
+        userId: jcrtUserId,
+        nombre: mProduct.nombre // Asumiendo que el nombre es único por usuario
+      });
+
+      if (!product) {
+        // Crear nuevo producto
+        product = await Product.create({
+          userId: jcrtUserId,
+          nombre: mProduct.nombre,
+          precio: mProduct.precio,
+          categoria: mProduct.categoria || 'General',
+          descripcion: mProduct.descripcion || '',
+          disponible: true
+        });
+        console.log(`   ✨ Producto creado: ${product.nombre}`);
+      } else {
+        // Actualizar precio si cambió (opcional, o dejarlo como está en JC-RT)
+        // product.precio = mProduct.precio;
+        // await product.save();
+        console.log(`   ⏩ Producto existente: ${product.nombre}`);
+      }
+
+      // Guardar referencia para los alimentos
+      productMap.set(mProduct._id, product._id);
+      // NOTA: mProduct._id es el ID en Mandao. Si Mandao envía el ID en el objeto json, úsalo.
+      // Si el endpoint de productos devuelve {_id, nombre...}, esto funciona.
+    }
+
+    // 3. Sincronizar Alimentos (Ingredientes)
+    for (const mAlimento of mandaoAlimentos) {
+      let alimento = await Alimento.findOne({
+        userId: jcrtUserId,
+        nombre: mAlimento.nombre
+      });
+
+      if (!alimento) {
+        // Si el alimento tiene productos vinculados en Mandao, intentar vincularlos aquí
+        // Esto es complejo si los IDs no coinciden. 
+        // Estrategia simple: Importar el alimento como ingrediente base sin vinculos complejos por ahora, 
+        // O intentar vincular por nombre de producto si Mandao envía nombres de productos en el array.
+
+        // Supongamos que mAlimento.productos es un array de { productoId, cantidadRequerida }
+        // Necesitamos mapear esos productoId de Mandao a los nuevos productoId de JC-RT que acabamos de crear/encontrar.
+
+        const productosVinculados = [];
+        if (mAlimento.productos && Array.isArray(mAlimento.productos)) {
+          for (const pLink of mAlimento.productos) {
+            const jcrtProdId = productMap.get(pLink.productoId);
+            if (jcrtProdId) {
+              productosVinculados.push({
+                productoId: jcrtProdId,
+                cantidadRequerida: pLink.cantidadRequerida
+              });
+            }
+          }
+        }
+
+        alimento = await Alimento.create({
+          userId: jcrtUserId,
+          nombre: mAlimento.nombre,
+          stock: mAlimento.stock || 0,
+          valor: mAlimento.costo || mAlimento.valor || 0, // Mandao podría usar 'costo'
+          productos: productosVinculados
+        });
+        console.log(`   🥕 Alimento creado: ${alimento.nombre} con ${productosVinculados.length} vinculos`);
+      } else {
+        console.log(`   ⏩ Alimento existente: ${alimento.nombre}`);
+      }
+    }
+
+    console.log('✅ Sincronización completada con éxito.');
+
+  } catch (error) {
+    console.error('❌ Error en sincronización de datos:', error);
+    // No lanzamos error para no interrumpir el login, solo logueamos
+  }
+}
+
+
+// Login con Mandao
+router.post('/login-mandao', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: 'Faltan credenciales' });
+    }
+
+    // 1. Autenticar con Mandao
+    const mandaoAuth = await loginToMandao(email, password);
+
+    // Asumimos que mandaoAuth devuelve { success: true, token, usuario: { email, nombre, nombreRestaurante... } }
+    // Si la estructura es diferente, ajustar aquí.
+
+    if (!mandaoAuth.success || !mandaoAuth.token) {
+      return res.status(401).json({ success: false, message: 'Credenciales de Mandao inválidas' });
+    }
+
+    const mandaoUser = mandaoAuth.usuario || mandaoAuth.user; // Ajustar según respuesta real
+    if (!mandaoUser) {
+      return res.status(500).json({ success: false, message: 'Error recuperando datos de usuario de Mandao' });
+    }
+
+    // 2. Buscar o Crear Usuario en JC-RT
+    let user = await User.findOne({ email: email.toLowerCase() });
+    let isNewUser = false;
+
+    if (!user) {
+      isNewUser = true;
+
+      // Fecha de pago = Hoy + 30 días (Prueba Gratis)
+      const fechaPago = new Date();
+      fechaPago.setDate(fechaPago.getDate() + 30);
+
+      user = await User.create({
+        nombre: mandaoUser.nombre,
+        email: email.toLowerCase(),
+        password: await require('bcryptjs').hash(password, 10), // Guardamos la misma pass (hash) para que funcione el login tradicional también
+        nombreRestaurante: mandaoUser.nombreRestaurante || 'Restaurante Mandao',
+        sede: mandaoUser.sede || 'Principal',
+        rol: 'admin', // Probablemente sea dueño si viene de Mandao
+        activo: true,
+        fechaPago: fechaPago,
+        fechaUltimoPago: new Date()
+      });
+
+      console.log(`🎉 Nuevo usuario creado desde Mandao: ${user.email}`);
+    }
+
+    // Verificar bloqueos
+    if (!user.activo) return res.status(401).json({ success: false, message: 'Usuario inactivo' });
+    if (user.bloqueado) return res.status(403).json({ success: false, message: 'Cuenta suspendida', bloqueado: true, motivo: user.motivoBloqueo });
+
+    // Actualizar último acceso
+    user.ultimoAcceso = new Date();
+    await user.save();
+
+    // 3. Sincronizar datos (Asíncrono - no bloqueamos la respuesta, o sí?)
+    // Para la primera vez, mejor esperar un poco o hacerlo asíncrino. 
+    // Como es "importar", el usuario espera ver sus datos. Vamos a iniciarlo y no esperar (fire and forget)
+    // O mejor, si es nuevo, esperamos para asegurar que al entrar vea algo.
+    if (isNewUser) {
+      await syncMandaoData(user._id, mandaoAuth.token);
+    } else {
+      // Si ya existe, sincronizamos en segundo plano para actualizar
+      syncMandaoData(user._id, mandaoAuth.token).catch(err => console.error(err));
+    }
+
+    // 4. Generar Token JC-RT
+    const token = generarToken(user._id);
+
+    res.json({
+      success: true,
+      message: 'Login con Mandao exitoso',
+      token,
+      usuario: user.obtenerDatosPublicos(),
+      welcomeMessage: isNewUser // Flag para mostrar el mensaje de bienvenida en el frontend
+    });
+
+  } catch (error) {
+    console.error('Error en /login-mandao:', error);
+    res.status(500).json({ success: false, message: error.message || 'Error interno' });
+  }
+});
+
+
 // Registro de usuario
 router.post('/register', async (req, res) => {
   try {
     console.log('Solicitud de registro recibida:', req.body);
-    
+
     const { nombre, email, password, rol, nombreRestaurante, sede } = req.body;
 
     // Validar que todos los campos obligatorios estén presentes
@@ -92,14 +280,14 @@ router.post('/register', async (req, res) => {
 
   } catch (error) {
     console.error('Error en registro:', error);
-    
+
     if (error.code === 11000) {
       return res.status(400).json({
         success: false,
         message: 'El usuario ya está registrado'
       });
     }
-    
+
     res.status(500).json({
       success: false,
       message: 'Error al registrar usuario',
@@ -112,7 +300,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     console.log('Solicitud de login recibida:', req.body.email);
-    
+
     const { email, password } = req.body;
 
     // Validar campos
@@ -125,7 +313,7 @@ router.post('/login', async (req, res) => {
 
     // Buscar usuario e incluir password
     const usuario = await User.findOne({ email: email.toLowerCase() }).select('+password');
-    
+
     if (!usuario) {
       return res.status(401).json({
         success: false,
@@ -134,27 +322,27 @@ router.post('/login', async (req, res) => {
     }
 
     // Verificar si el usuario está activo
-// Verificar si el usuario está activo
-if (!usuario.activo) {
-  return res.status(401).json({
-    success: false,
-    message: 'Usuario inactivo. Contacte al administrador'
-  });
-}
+    // Verificar si el usuario está activo
+    if (!usuario.activo) {
+      return res.status(401).json({
+        success: false,
+        message: 'Usuario inactivo. Contacte al administrador'
+      });
+    }
 
-// Verificar si el usuario está bloqueado
-if (usuario.bloqueado) {
-  return res.status(403).json({
-    success: false,
-    message: 'Cuenta suspendida',
-    bloqueado: true,
-    motivoBloqueo: usuario.motivoBloqueo || 'Su cuenta ha sido suspendida. Para más información contacte al equipo de soporte al número 3128540908'
-  });
-}
+    // Verificar si el usuario está bloqueado
+    if (usuario.bloqueado) {
+      return res.status(403).json({
+        success: false,
+        message: 'Cuenta suspendida',
+        bloqueado: true,
+        motivoBloqueo: usuario.motivoBloqueo || 'Su cuenta ha sido suspendida. Para más información contacte al equipo de soporte al número 3128540908'
+      });
+    }
 
     // Verificar password
     const passwordCorrecto = await usuario.compararPassword(password);
-    
+
     if (!passwordCorrecto) {
       return res.status(401).json({
         success: false,
@@ -360,7 +548,7 @@ router.patch('/superadmin/toggle-bloqueo/:userId', async (req, res) => {
 
     // Cambiar estado de bloqueo
     const nuevoEstado = !usuario.bloqueado;
-    
+
     // Actualizar todos los usuarios del mismo restaurante
     await User.updateMany(
       { nombreRestaurante: usuario.nombreRestaurante },
@@ -491,24 +679,24 @@ router.patch('/superadmin/confirmar-pago/:userId', async (req, res) => {
     // Calcular nueva fecha
     let nuevaFecha;
     const fechaActual = usuario.fechaPago ? new Date(usuario.fechaPago) : new Date();
-    
+
     // Si la fecha actual es anterior a hoy, usar hoy como base, si no, usar la fecha actual (para extender desde la fecha de vencimiento)
     // El usuario pidió: "que no le aparezca ese mensaje hasta la proxima fecha de pago"
     // Lo lógico es sumar 1 mes a la fecha existente si es futura, o 1 mes a hoy si ya pasó.
     // PERO la lógica más robusta para suscripciones es: si no está vencido, sumar al vencimiento. Si está vencido, sumar a hoy.
-    
+
     const hoy = new Date();
     // Resetear horas para comparar solo fechas
-    hoy.setHours(0,0,0,0);
-    
+    hoy.setHours(0, 0, 0, 0);
+
     if (fechaActual < hoy) {
-        // Si ya venció, la nueva fecha es 1 mes desde hoy
-        nuevaFecha = new Date();
+      // Si ya venció, la nueva fecha es 1 mes desde hoy
+      nuevaFecha = new Date();
     } else {
-        // Si no ha vencido, extender 1 mes desde la fecha actual
-        nuevaFecha = new Date(fechaActual);
+      // Si no ha vencido, extender 1 mes desde la fecha actual
+      nuevaFecha = new Date(fechaActual);
     }
-    
+
     nuevaFecha.setMonth(nuevaFecha.getMonth() + 1);
 
     // Actualizar todos los usuarios del mismo restaurante
