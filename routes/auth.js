@@ -260,41 +260,80 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    // Verificar si el usuario ya existe
-    const usuarioExistente = await User.findOne({ email: email.toLowerCase() });
-    if (usuarioExistente) {
-      return res.status(400).json({
-        success: false,
-        message: 'El usuario ya está registrado'
-      });
-    }
-
-    // Calcular fecha de pago (30 días de prueba gratis para TODOS)
-    const fechaPago = new Date();
-    fechaPago.setDate(fechaPago.getDate() + 30);
-
-    // Crear nuevo usuario
-    const usuario = await User.create({
-      nombre,
-      email: email.toLowerCase(),
-      password,
+    // Verificar si ya existe un ADMINISTRADOR para este restaurante
+    // Esto determina si el restaurante ya "existe" y tiene dueño
+    const adminExistente = await User.findOne({
       nombreRestaurante: nombreRestaurante.trim(),
-      sede: sede ? sede.trim() : '',
-      rol: rol || 'mesero',
-      fechaPago: fechaPago, // 30 días gratis
-      fechaUltimoPago: new Date()
+      rol: 'admin'
     });
 
-    // Generar token
-    const token = generarToken(usuario._id);
+    let usuarioNuevo;
+    let mensajeRespuesta = 'Usuario registrado exitosamente';
+    let token = null;
 
-    console.log('Usuario registrado exitosamente:', usuario.email);
+    if (adminExistente) {
+      // El restaurante YA existe
+      // Cualquier rol (incluso otro admin) entra como PENDIENTE de aprobación, esperando visto bueno de un admin existente.
+
+      usuarioNuevo = await User.create({
+        nombre,
+        email: email.toLowerCase(),
+        password,
+        nombreRestaurante: nombreRestaurante.trim(),
+        sede: sede ? sede.trim() : '',
+        rol: rol, // Puede ser admin, mesero, cajero
+        activo: false, // Inactivo hasta aprobación
+        solicitudPendiente: true, // Marcar como solicitud
+        fechaPago: adminExistente.fechaPago, // Heredar fecha de pago del restaurante
+        fechaUltimoPago: adminExistente.fechaUltimoPago
+      });
+
+      mensajeRespuesta = 'Solicitud enviada a los administradores del restaurante. Espera su aprobación para ingresar.';
+      console.log(`Solicitud de ingreso creada (${rol}): ${email} para ${nombreRestaurante}`);
+
+      // No generamos token porque no puede entrar aún
+      return res.status(201).json({
+        success: true,
+        message: mensajeRespuesta,
+        requiereAprobacion: true
+      });
+
+    } else {
+      // El restaurante NO existe (o al menos no tiene admin) -> Crear Nuevo Restaurante (Admin)
+      if (rol !== 'admin') {
+        // Si intenta ser mesero de un restaurante que no existe... 
+        // Opción A: Error. Opción B: Permitir pero advertir.
+        // Vamos a asumir que si se registra primero, es el admin. O forzamos a que el primero sea admin.
+        // Por ahora, permitimos crear, pero el "dueño" real debería ser admin.
+      }
+
+      // Calcular fecha de pago (30 días de prueba gratis)
+      const fechaPago = new Date();
+      fechaPago.setDate(fechaPago.getDate() + 30);
+
+      usuarioNuevo = await User.create({
+        nombre,
+        email: email.toLowerCase(),
+        password,
+        nombreRestaurante: nombreRestaurante.trim(),
+        sede: sede ? sede.trim() : '',
+        rol: rol || 'admin', // Si no existe, el primero debería ser admin idealmente
+        activo: true,
+        solicitudPendiente: false,
+        fechaPago: fechaPago,
+        fechaUltimoPago: new Date()
+      });
+
+      token = generarToken(usuarioNuevo._id);
+    }
+
+    console.log('Usuario registrado:', usuarioNuevo.email);
 
     res.status(201).json({
       success: true,
-      message: 'Usuario registrado exitosamente',
+      message: mensajeRespuesta,
       token,
-      usuario: usuario.obtenerDatosPublicos()
+      usuario: usuarioNuevo.obtenerDatosPublicos()
     });
 
   } catch (error) {
@@ -760,6 +799,77 @@ router.patch('/superadmin/confirmar-pago/:userId', async (req, res) => {
       success: false,
       message: 'Error al confirmar pago'
     });
+  }
+});
+
+
+// --- GESTIÓN DE SOLICITUDES DE INGRESO (Para Admins) ---
+
+// Obtener solicitudes pendientes
+router.get('/solicitudes', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ success: false, message: 'No autorizado' });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secreto-super-seguro-cambiar-en-produccion');
+    const admin = await User.findById(decoded.id);
+
+    if (!admin || admin.rol !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Requiere rol de administrador' });
+    }
+
+    const solicitudes = await User.find({
+      nombreRestaurante: admin.nombreRestaurante,
+      solicitudPendiente: true,
+      activo: false
+    }).select('nombre email rol fechaBloqueo createdAt');
+
+    res.json({ success: true, solicitudes });
+
+  } catch (error) {
+    console.error('Error al obtener solicitudes:', error);
+    res.status(500).json({ success: false, message: 'Error del servidor' });
+  }
+});
+
+// Aprobar o Rechazar solicitud
+router.post('/gestionar-solicitud', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    const { userId, accion } = req.body; // accion: 'aprobar' | 'rechazar'
+
+    if (!token) return res.status(401).json({ success: false, message: 'No autorizado' });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secreto-super-seguro-cambiar-en-produccion');
+    const admin = await User.findById(decoded.id);
+
+    if (!admin || admin.rol !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Requiere rol de administrador' });
+    }
+
+    const solicitante = await User.findById(userId);
+    if (!solicitante) return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+
+    // Seguridad: Verificar que sea del mismo restaurante
+    if (solicitante.nombreRestaurante !== admin.nombreRestaurante) {
+      return res.status(403).json({ success: false, message: 'No puedes gestionar usuarios ajenos' });
+    }
+
+    if (accion === 'aprobar') {
+      solicitante.activo = true;
+      solicitante.solicitudPendiente = false;
+      await solicitante.save();
+      res.json({ success: true, message: 'Usuario aprobado exitosamente' });
+    } else if (accion === 'rechazar') {
+      await User.findByIdAndDelete(userId); // O marcar como bloqueado permanentemente
+      res.json({ success: true, message: 'Solicitud rechazada y usuario eliminado' });
+    } else {
+      res.status(400).json({ success: false, message: 'Acción no válida' });
+    }
+
+  } catch (error) {
+    console.error('Error gestionando solicitud:', error);
+    res.status(500).json({ success: false, message: 'Error del servidor' });
   }
 });
 
