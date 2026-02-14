@@ -4,7 +4,7 @@ const User = require('../models/User');
 const Product = require('../models/Product');
 const Alimento = require('../models/Alimento');
 const jwt = require('jsonwebtoken');
-const { loginToMandao, getMandaoProducts, getMandaoAlimentos } = require('../services/mandaoIntegration');
+const { loginToMandao } = require('../services/mandaoIntegration');
 
 // Generar JWT Token
 const generarToken = (userId) => {
@@ -16,17 +16,15 @@ const generarToken = (userId) => {
 };
 
 // --- FUNCIÓN DE SINCRONIZACIÓN AUTOMÁTICA ---
-async function syncMandaoData(jcrtUserId, mandaoToken) {
+async function syncMandaoData(jcrtUserId, mandaoProducts, mandaoAlimentos) {
   try {
     console.log(`🔄 Iniciando sincronización de datos para usuario ${jcrtUserId}...`);
 
-    // 1. Obtener datos de Mandao
-    const [mandaoProducts, mandaoAlimentos] = await Promise.all([
-      getMandaoProducts(mandaoToken),
-      getMandaoAlimentos(mandaoToken)
-    ]);
+    // Validar que sean arrays
+    mandaoProducts = Array.isArray(mandaoProducts) ? mandaoProducts : [];
+    mandaoAlimentos = Array.isArray(mandaoAlimentos) ? mandaoAlimentos : [];
 
-    console.log(`📦 Recuperados: ${mandaoProducts.length} productos, ${mandaoAlimentos.length} alimentos.`);
+    console.log(`📦 Datos recibidos: ${mandaoProducts.length} productos, ${mandaoAlimentos.length} alimentos.`);
 
     // 2. Sincronizar Productos
     const productMap = new Map(); // Mapa para vincular ID Mandao -> ID JCRT (si fuera necesario, aquí usaremos nombre como clave simple)
@@ -165,7 +163,7 @@ router.post('/login-mandao', async (req, res) => {
         nombre: nombreUsuario,
         email: email.toLowerCase(),
         password: await require('bcryptjs').hash(password, 10), // Guardamos la misma pass (hash) para que funcione el login tradicional también
-        nombreRestaurante: mandaoUser.nombreRestaurante || mandaoUser.restaurantName || 'Restaurante Mandao',
+        nombreRestaurante: mandaoUser.nombre, // SE USA EL NOMBRE DEL USUARIO DE MANDAO
         sede: mandaoUser.sede || 'Principal',
         rol: 'admin', // Probablemente sea dueño si viene de Mandao
         activo: true,
@@ -184,15 +182,15 @@ router.post('/login-mandao', async (req, res) => {
     user.ultimoAcceso = new Date();
     await user.save();
 
-    // 3. Sincronizar datos (Asíncrono - no bloqueamos la respuesta, o sí?)
-    // Para la primera vez, mejor esperar un poco o hacerlo asíncrino. 
-    // Como es "importar", el usuario espera ver sus datos. Vamos a iniciarlo y no esperar (fire and forget)
-    // O mejor, si es nuevo, esperamos para asegurar que al entrar vea algo.
+    // 3. Sincronizar datos (Extraemos del usuario Mandao)
+    const mProducts = mandaoUser.menu || [];
+    const mAlimentos = mandaoUser.alimentos || [];
+
     if (isNewUser) {
-      await syncMandaoData(user._id, mandaoAuth.token);
+      await syncMandaoData(user._id, mProducts, mAlimentos);
     } else {
       // Si ya existe, sincronizamos en segundo plano para actualizar
-      syncMandaoData(user._id, mandaoAuth.token).catch(err => console.error(err));
+      syncMandaoData(user._id, mProducts, mAlimentos).catch(err => console.error(err));
     }
 
     // 4. Generar Token JC-RT
