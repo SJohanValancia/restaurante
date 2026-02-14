@@ -418,6 +418,7 @@
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -495,30 +496,36 @@
 
 
         function showAlert(message, type = 'error', showWhatsApp = false) {
-            const alert = document.getElementById('alert');
+            const iconType = type === 'success' ? 'success' : (type === 'error' ? 'error' : 'info');
 
             if (showWhatsApp) {
-                const phoneNumber = '573128540908'; // Número con código de país (57 para Colombia)
+                const phoneNumber = '573128540908';
                 const whatsappMessage = encodeURIComponent('Hola, mi cuenta ha sido bloqueada y necesito ayuda');
 
-                alert.innerHTML = `
-            ${message}
-            <br><br>
-            <a href="https://wa.me/${phoneNumber}?text=${whatsappMessage}" 
-               class="whatsapp-link" 
-               target="_blank">
-                📱 Contactar por WhatsApp al 3128540908
-            </a>
-        `;
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Cuenta Suspendida',
+                    html: `
+                        ${message}
+                        <br><br>
+                        <a href="https://wa.me/${phoneNumber}?text=${whatsappMessage}" 
+                           style="display: inline-block; background: #25d366; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold;"
+                           target="_blank">
+                            📱 Contactar por WhatsApp
+                        </a>
+                    `,
+                    showConfirmButton: true,
+                    confirmButtonText: 'Cerrar'
+                });
             } else {
-                alert.textContent = message;
+                Swal.fire({
+                    icon: iconType,
+                    text: message,
+                    timer: 3000,
+                    showConfirmButton: false,
+                    allowOutsideClick: true
+                });
             }
-
-            alert.className = `alert alert-${type} show`;
-
-            setTimeout(() => {
-                alert.classList.remove('show');
-            }, showWhatsApp ? 10000 : 5000); // Más tiempo si hay WhatsApp
         }
 
         function setLoading(isLoading) {

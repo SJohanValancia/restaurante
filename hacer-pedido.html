@@ -1154,6 +1154,7 @@
             }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -1271,7 +1272,7 @@
 
         window.addEventListener('DOMContentLoaded', async () => {
             if (!restaurante) {
-                alert('Información incompleta: restaurante no especificado');
+                Swal.fire({ icon: (('Información incompleta: restaurante no especificado').toLowerCase().includes("error") || ('Información incompleta: restaurante no especificado').toLowerCase().includes("falla") || ('Información incompleta: restaurante no especificado').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Información incompleta: restaurante no especificado', timer: 3000, showConfirmButton: false });
                 window.location.href = 'index.html';
                 return;
             }
@@ -1610,14 +1611,14 @@
 
         async function sendOrder() {
             if (cart.length === 0) {
-                alert('El carrito está vacío');
+                Swal.fire({ icon: (('El carrito está vacío').toLowerCase().includes("error") || ('El carrito está vacío').toLowerCase().includes("falla") || ('El carrito está vacío').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'El carrito está vacío', timer: 3000, showConfirmButton: false });
                 return;
             }
 
             if (!mesa) {
                 const nombreMesa = prompt("Por favor, ingresa tu nombre o número de mesa:");
                 if (!nombreMesa || !nombreMesa.trim()) {
-                    alert('Es necesario un nombre o número de mesa para realizar el pedido');
+                    Swal.fire({ icon: (('Es necesario un nombre o número de mesa para realizar el pedido').toLowerCase().includes("error") || ('Es necesario un nombre o número de mesa para realizar el pedido').toLowerCase().includes("falla") || ('Es necesario un nombre o número de mesa para realizar el pedido').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Es necesario un nombre o número de mesa para realizar el pedido', timer: 3000, showConfirmButton: false });
                     return;
                 }
                 mesa = nombreMesa.trim();
@@ -1658,13 +1659,13 @@
                     closeCart();
                     showSuccessModal();
                 } else {
-                    alert('Error al enviar el pedido: ' + (data.message || 'Error desconocido'));
+                    Swal.fire({ icon: (('Error al enviar el pedido: ' + (data.message || 'Error desconocido')).toLowerCase().includes("error") || ('Error al enviar el pedido: ' + (data.message || 'Error desconocido')).toLowerCase().includes("falla") || ('Error al enviar el pedido: ' + (data.message || 'Error desconocido')).toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al enviar el pedido: ' + (data.message || 'Error desconocido'), timer: 3000, showConfirmButton: false });
                     btnSend.disabled = false;
                     btnSend.innerHTML = '<span>📤</span> Enviar a Cocina';
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error de conexión. Por favor, intente nuevamente.');
+                Swal.fire({ icon: (('Error de conexión. Por favor, intente nuevamente.').toLowerCase().includes("error") || ('Error de conexión. Por favor, intente nuevamente.').toLowerCase().includes("falla") || ('Error de conexión. Por favor, intente nuevamente.').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error de conexión. Por favor, intente nuevamente.', timer: 3000, showConfirmButton: false });
                 btnSend.disabled = false;
                 btnSend.innerHTML = '<span>📤</span> Enviar a Cocina';
             }

@@ -473,6 +473,7 @@
             display: none;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -529,7 +530,7 @@
                     <span class="nav-icon">🥘</span>
                     <span>Alimentos</span>
                 </a>
-                <a href="inventario-alimentos.html" class="nav-item ">
+                <a href="incorrectentario-alimentos.html" class="nav-item ">
                     <span class="nav-icon">📋</span>
                     <span>Inventario Alimentos</span>
                 </a>
@@ -676,7 +677,7 @@
 
                 if (!response.ok) {
                     console.error('Error al cargar usuario');
-                    alert('Error al cargar datos. Intente recargar.');
+                    Swal.fire({ icon: (('Error al cargar datos. Intente recargar.').toLowerCase().includes("error") || ('Error al cargar datos. Intente recargar.').toLowerCase().includes("falla") || ('Error al cargar datos. Intente recargar.').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al cargar datos. Intente recargar.', timer: 3000, showConfirmButton: false });
                     return;
                 }
                 const data = await response.json();
@@ -707,7 +708,7 @@
                 await loadProducts();
             } catch (error) {
                 console.error('❌ Error de red:', error);
-                alert('Error de conexión. Recargue la página.');
+                Swal.fire({ icon: (('Error de conexión. Recargue la página.').toLowerCase().includes("error") || ('Error de conexión. Recargue la página.').toLowerCase().includes("falla") || ('Error de conexión. Recargue la página.').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error de conexión. Recargue la página.', timer: 3000, showConfirmButton: false });
             }
         });
         // CARGAR PRODUCTOS
@@ -815,12 +816,12 @@
                     document.getElementById('imagenUrl').value = data.imageUrl;
                     console.log('✅ Imagen subida:', data.imageUrl);
                 } else {
-                    alert('Error al subir imagen: ' + data.message);
+                    Swal.fire({ icon: (('Error al subir imagen: ' + data.message).toLowerCase().includes("error") || ('Error al subir imagen: ' + data.message).toLowerCase().includes("falla") || ('Error al subir imagen: ' + data.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al subir imagen: ' + data.message, timer: 3000, showConfirmButton: false });
                     resetImagePreview();
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error de conexión al subir la imagen');
+                Swal.fire({ icon: (('Error de conexión al subir la imagen').toLowerCase().includes("error") || ('Error de conexión al subir la imagen').toLowerCase().includes("falla") || ('Error de conexión al subir la imagen').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error de conexión al subir la imagen', timer: 3000, showConfirmButton: false });
                 resetImagePreview();
             }
         }
@@ -845,7 +846,7 @@
             const productId = document.getElementById('productId').value;
 
             if (!currentUser || !currentUser._id) {
-                alert('Error: Usuario no identificado. Recargue la página.');
+                Swal.fire({ icon: (('Error: Usuario no identificado. Recargue la página.').toLowerCase().includes("error") || ('Error: Usuario no identificado. Recargue la página.').toLowerCase().includes("falla") || ('Error: Usuario no identificado. Recargue la página.').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error: Usuario no identificado. Recargue la página.', timer: 3000, showConfirmButton: false });
                 return;
             }
 
@@ -855,7 +856,7 @@
             const descripcion = document.getElementById('descripcion').value.trim();
 
             if (!nombre || !precio || !categoria) {
-                alert('Complete todos los campos obligatorios');
+                Swal.fire({ icon: (('Complete todos los campos obligatorios').toLowerCase().includes("error") || ('Complete todos los campos obligatorios').toLowerCase().includes("falla") || ('Complete todos los campos obligatorios').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Complete todos los campos obligatorios', timer: 3000, showConfirmButton: false });
                 return;
             }
 
@@ -888,18 +889,18 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    alert(data.message);
+                    Swal.fire({ icon: ((data.message).toLowerCase().includes("error") || (data.message).toLowerCase().includes("falla") || (data.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: data.message, timer: 3000, showConfirmButton: false });
                     document.getElementById('productForm').reset();
                     document.getElementById('productId').value = '';
                     document.getElementById('formTitle').textContent = 'Agregar Producto';
                     resetImagePreview();
                     await loadProducts();
                 } else {
-                    alert('Error: ' + (data.message || 'Error desconocido'));
+                    Swal.fire({ icon: (('Error: ' + (data.message || 'Error desconocido')).toLowerCase().includes("error") || ('Error: ' + (data.message || 'Error desconocido')).toLowerCase().includes("falla") || ('Error: ' + (data.message || 'Error desconocido')).toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error: ' + (data.message || 'Error desconocido'), timer: 3000, showConfirmButton: false });
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al guardar el producto');
+                Swal.fire({ icon: (('Error al guardar el producto').toLowerCase().includes("error") || ('Error al guardar el producto').toLowerCase().includes("falla") || ('Error al guardar el producto').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al guardar el producto', timer: 3000, showConfirmButton: false });
             }
         });
 
@@ -934,7 +935,7 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al cargar el producto');
+                Swal.fire({ icon: (('Error al cargar el producto').toLowerCase().includes("error") || ('Error al cargar el producto').toLowerCase().includes("falla") || ('Error al cargar el producto').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al cargar el producto', timer: 3000, showConfirmButton: false });
             }
         }
 
@@ -953,14 +954,14 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    alert(data.message);
+                    Swal.fire({ icon: ((data.message).toLowerCase().includes("error") || (data.message).toLowerCase().includes("falla") || (data.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: data.message, timer: 3000, showConfirmButton: false });
                     await loadProducts();
                 } else {
-                    alert('Error: ' + data.message);
+                    Swal.fire({ icon: (('Error: ' + data.message).toLowerCase().includes("error") || ('Error: ' + data.message).toLowerCase().includes("falla") || ('Error: ' + data.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error: ' + data.message, timer: 3000, showConfirmButton: false });
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al eliminar');
+                Swal.fire({ icon: (('Error al eliminar').toLowerCase().includes("error") || ('Error al eliminar').toLowerCase().includes("falla") || ('Error al eliminar').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al eliminar', timer: 3000, showConfirmButton: false });
             }
         }
 
@@ -983,11 +984,11 @@
                 if (data.success) {
                     await loadProducts();
                 } else {
-                    alert('Error: ' + data.message);
+                    Swal.fire({ icon: (('Error: ' + data.message).toLowerCase().includes("error") || ('Error: ' + data.message).toLowerCase().includes("falla") || ('Error: ' + data.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error: ' + data.message, timer: 3000, showConfirmButton: false });
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al actualizar disponibilidad');
+                Swal.fire({ icon: (('Error al actualizar disponibilidad').toLowerCase().includes("error") || ('Error al actualizar disponibilidad').toLowerCase().includes("falla") || ('Error al actualizar disponibilidad').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al actualizar disponibilidad', timer: 3000, showConfirmButton: false });
             }
         }
 

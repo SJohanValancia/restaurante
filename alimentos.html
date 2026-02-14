@@ -801,6 +801,7 @@
             animation: fadeIn 0.3s ease;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -857,7 +858,7 @@
                     <span class="nav-icon">🥘</span>
                     <span>Alimentos</span>
                 </a>
-                <a href="inventario-alimentos.html" class="nav-item ">
+                <a href="incorrectentario-alimentos.html" class="nav-item ">
                     <span class="nav-icon">📋</span>
                     <span>Inventario Alimentos</span>
                 </a>
@@ -934,7 +935,7 @@
                             <div class="form-group">
                                 <label class="form-label" for="stock">Stock Disponible *</label>
                                 <input type="number" id="stock" class="form-input" min="0"
-                                    placeholder="Cantidad en inventario" required>
+                                    placeholder="Cantidad en incorrectentario" required>
                             </div>
 
 
@@ -1004,7 +1005,7 @@
 
                 if (!response.ok) {
                     console.error('Error al cargar usuario');
-                    alert('Error al cargar datos. Intente recargar.');
+                    Swal.fire({ icon: (('Error al cargar datos. Intente recargar.').toLowerCase().includes("error") || ('Error al cargar datos. Intente recargar.').toLowerCase().includes("falla") || ('Error al cargar datos. Intente recargar.').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al cargar datos. Intente recargar.', timer: 3000, showConfirmButton: false });
                     return;
                 }
 
@@ -1033,7 +1034,7 @@
                 await cargarAlimentos();
             } catch (error) {
                 console.error('❌ Error de red:', error);
-                alert('Error de conexión. Recargue la página.');
+                Swal.fire({ icon: (('Error de conexión. Recargue la página.').toLowerCase().includes("error") || ('Error de conexión. Recargue la página.').toLowerCase().includes("falla") || ('Error de conexión. Recargue la página.').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error de conexión. Recargue la página.', timer: 3000, showConfirmButton: false });
             }
         });
 
@@ -1083,7 +1084,7 @@
         function agregarProductoSeleccionado(producto) {
             const yaExiste = productosSeleccionados.find(p => p.productoId === producto._id);
             if (yaExiste) {
-                alert('⚠️ Este producto ya está en la lista');
+                Swal.fire({ icon: (('⚠️ Este producto ya está en la lista').toLowerCase().includes("error") || ('⚠️ Este producto ya está en la lista').toLowerCase().includes("falla") || ('⚠️ Este producto ya está en la lista').toLowerCase().includes("incorrect")) ? "error" : "success", text: '⚠️ Este producto ya está en la lista', timer: 3000, showConfirmButton: false });
                 return;
             }
 
@@ -1296,7 +1297,7 @@
             e.preventDefault();
 
             if (productosSeleccionados.length === 0) {
-                alert('⚠️ Debe seleccionar al menos un producto donde se usa este alimento');
+                Swal.fire({ icon: (('⚠️ Debe seleccionar al menos un producto donde se usa este alimento').toLowerCase().includes("error") || ('⚠️ Debe seleccionar al menos un producto donde se usa este alimento').toLowerCase().includes("falla") || ('⚠️ Debe seleccionar al menos un producto donde se usa este alimento').toLowerCase().includes("incorrect")) ? "error" : "success", text: '⚠️ Debe seleccionar al menos un producto donde se usa este alimento', timer: 3000, showConfirmButton: false });
                 document.getElementById('productoSearch').focus();
                 return;
             }
@@ -1306,7 +1307,7 @@
             const valor = document.getElementById('valor').value;
 
             if (!nombre || stock === '') {
-                alert('⚠️ Por favor complete todos los campos obligatorios');
+                Swal.fire({ icon: (('⚠️ Por favor complete todos los campos obligatorios').toLowerCase().includes("error") || ('⚠️ Por favor complete todos los campos obligatorios').toLowerCase().includes("falla") || ('⚠️ Por favor complete todos los campos obligatorios').toLowerCase().includes("incorrect")) ? "error" : "success", text: '⚠️ Por favor complete todos los campos obligatorios', timer: 3000, showConfirmButton: false });
                 return;
             }
 
@@ -1341,15 +1342,15 @@
                 console.log('📥 Respuesta del servidor:', result);
 
                 if (result.success) {
-                    alert('✅ ' + result.message);
+                    Swal.fire({ icon: (('✅ ' + result.message).toLowerCase().includes("error") || ('✅ ' + result.message).toLowerCase().includes("falla") || ('✅ ' + result.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: '✅ ' + result.message, timer: 3000, showConfirmButton: false });
                     limpiarFormulario();
                     await cargarAlimentos();
                 } else {
-                    alert('❌ ' + (result.message || result.error || 'Error al guardar el alimento'));
+                    Swal.fire({ icon: (('❌ ' + (result.message || result.error || 'Error al guardar el alimento')).toLowerCase().includes("error") || ('❌ ' + (result.message || result.error || 'Error al guardar el alimento')).toLowerCase().includes("falla") || ('❌ ' + (result.message || result.error || 'Error al guardar el alimento')).toLowerCase().includes("incorrect")) ? "error" : "success", text: '❌ ' + (result.message || result.error || 'Error al guardar el alimento'), timer: 3000, showConfirmButton: false });
                 }
             } catch (error) {
                 console.error('❌ Error completo:', error);
-                alert('❌ Error de conexión al guardar el alimento');
+                Swal.fire({ icon: (('❌ Error de conexión al guardar el alimento').toLowerCase().includes("error") || ('❌ Error de conexión al guardar el alimento').toLowerCase().includes("falla") || ('❌ Error de conexión al guardar el alimento').toLowerCase().includes("incorrect")) ? "error" : "success", text: '❌ Error de conexión al guardar el alimento', timer: 3000, showConfirmButton: false });
             }
         });
 
@@ -1403,7 +1404,7 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('❌ Error al cargar el alimento');
+                Swal.fire({ icon: (('❌ Error al cargar el alimento').toLowerCase().includes("error") || ('❌ Error al cargar el alimento').toLowerCase().includes("falla") || ('❌ Error al cargar el alimento').toLowerCase().includes("incorrect")) ? "error" : "success", text: '❌ Error al cargar el alimento', timer: 3000, showConfirmButton: false });
             }
         }
 
@@ -1423,14 +1424,14 @@
 
                 const result = await response.json();
                 if (result.success) {
-                    alert('✅ ' + result.message);
+                    Swal.fire({ icon: (('✅ ' + result.message).toLowerCase().includes("error") || ('✅ ' + result.message).toLowerCase().includes("falla") || ('✅ ' + result.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: '✅ ' + result.message, timer: 3000, showConfirmButton: false });
                     await cargarAlimentos();
                 } else {
-                    alert('❌ ' + (result.message || 'Error al eliminar el alimento'));
+                    Swal.fire({ icon: (('❌ ' + (result.message || 'Error al eliminar el alimento')).toLowerCase().includes("error") || ('❌ ' + (result.message || 'Error al eliminar el alimento')).toLowerCase().includes("falla") || ('❌ ' + (result.message || 'Error al eliminar el alimento')).toLowerCase().includes("incorrect")) ? "error" : "success", text: '❌ ' + (result.message || 'Error al eliminar el alimento'), timer: 3000, showConfirmButton: false });
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('❌ Error al eliminar el alimento');
+                Swal.fire({ icon: (('❌ Error al eliminar el alimento').toLowerCase().includes("error") || ('❌ Error al eliminar el alimento').toLowerCase().includes("falla") || ('❌ Error al eliminar el alimento').toLowerCase().includes("incorrect")) ? "error" : "success", text: '❌ Error al eliminar el alimento', timer: 3000, showConfirmButton: false });
             }
         }
 

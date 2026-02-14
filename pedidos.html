@@ -1294,6 +1294,7 @@
     </style>
 
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -1350,7 +1351,7 @@
                     <span class="nav-icon">🥘</span>
                     <span>Alimentos</span>
                 </a>
-                <a href="inventario-alimentos.html" class="nav-item ">
+                <a href="incorrectentario-alimentos.html" class="nav-item ">
                     <span class="nav-icon">📋</span>
                     <span>Inventario Alimentos</span>
                 </a>
@@ -1520,7 +1521,7 @@
 
                 if (!response.ok) {
                     console.error('Error al cargar usuario');
-                    alert('Error al cargar datos. Intente recargar.');
+                    Swal.fire({ icon: (('Error al cargar datos. Intente recargar.').toLowerCase().includes("error") || ('Error al cargar datos. Intente recargar.').toLowerCase().includes("falla") || ('Error al cargar datos. Intente recargar.').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al cargar datos. Intente recargar.', timer: 3000, showConfirmButton: false });
                     return;
                 }
                 const data = await response.json();
@@ -1547,7 +1548,7 @@
                 await loadOrders();
             } catch (error) {
                 console.error('❌ Error de red:', error);
-                alert('Error de conexión. Recargue la página.');
+                Swal.fire({ icon: (('Error de conexión. Recargue la página.').toLowerCase().includes("error") || ('Error de conexión. Recargue la página.').toLowerCase().includes("falla") || ('Error de conexión. Recargue la página.').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error de conexión. Recargue la página.', timer: 3000, showConfirmButton: false });
             }
         });
 
@@ -1782,7 +1783,7 @@
             const btnSubmit = document.getElementById('btnSubmit');
 
             if (selectedItems.length === 0) {
-                alert('Debe seleccionar al menos un producto');
+                Swal.fire({ icon: (('Debe seleccionar al menos un producto').toLowerCase().includes("error") || ('Debe seleccionar al menos un producto').toLowerCase().includes("falla") || ('Debe seleccionar al menos un producto').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Debe seleccionar al menos un producto', timer: 3000, showConfirmButton: false });
                 return;
             }
 
@@ -1845,17 +1846,17 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    alert('✅ Pedido creado exitosamente');
+                    Swal.fire({ icon: (('✅ Pedido creado exitosamente').toLowerCase().includes("error") || ('✅ Pedido creado exitosamente').toLowerCase().includes("falla") || ('✅ Pedido creado exitosamente').toLowerCase().includes("incorrect")) ? "error" : "success", text: '✅ Pedido creado exitosamente', timer: 3000, showConfirmButton: false });
                     document.getElementById('orderForm').reset();
                     selectedItems = [];
                     updateSelectedProducts();
                     await loadOrders();
                 } else {
-                    alert('Error: ' + data.message);
+                    Swal.fire({ icon: (('Error: ' + data.message).toLowerCase().includes("error") || ('Error: ' + data.message).toLowerCase().includes("falla") || ('Error: ' + data.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error: ' + data.message, timer: 3000, showConfirmButton: false });
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al crear el pedido');
+                Swal.fire({ icon: (('Error al crear el pedido').toLowerCase().includes("error") || ('Error al crear el pedido').toLowerCase().includes("falla") || ('Error al crear el pedido').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al crear el pedido', timer: 3000, showConfirmButton: false });
             } finally {
                 // 🔓 DESBLOQUEAR BOTÓN siempre al final
                 btnSubmit.disabled = false;
@@ -2069,7 +2070,7 @@
 
             if (!currentOrderIdForPayment) {
                 console.error('❌ No hay orderId guardado');
-                alert('Error: No se encontró el ID del pedido');
+                Swal.fire({ icon: (('Error: No se encontró el ID del pedido').toLowerCase().includes("error") || ('Error: No se encontró el ID del pedido').toLowerCase().includes("falla") || ('Error: No se encontró el ID del pedido').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error: No se encontró el ID del pedido', timer: 3000, showConfirmButton: false });
                 return;
             }
 
@@ -2428,8 +2429,8 @@
             console.log('  - Método de pago:', metodoPago);
 
             if (!orderId || orderId === 'null' || orderId === 'undefined') {
-                console.error('❌ Order ID inválido:', orderId);
-                alert('Error: ID de pedido inválido');
+                console.error('❌ Order ID incorrecto:', orderId);
+                Swal.fire({ icon: (('Error: ID de pedido incorrecto').toLowerCase().includes("error") || ('Error: ID de pedido incorrecto').toLowerCase().includes("falla") || ('Error: ID de pedido incorrecto').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error: ID de pedido incorrecto', timer: 3000, showConfirmButton: false });
                 return;
             }
 
@@ -2489,7 +2490,7 @@
                     await loadOrders();
                 } else {
                     console.error('❌ Error del servidor:', data.message);
-                    alert('Error: ' + data.message);
+                    Swal.fire({ icon: (('Error: ' + data.message).toLowerCase().includes("error") || ('Error: ' + data.message).toLowerCase().includes("falla") || ('Error: ' + data.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error: ' + data.message, timer: 3000, showConfirmButton: false });
                     // 🔓 RESTAURAR BOTONES EN CASO DE ERROR
                     if (orderCard) {
                         const botones = orderCard.querySelectorAll('.btn-action, button[onclick*="cambiarEstadoProducto"]');
@@ -2505,7 +2506,7 @@
                 }
             } catch (error) {
                 console.error('❌ Error en la petición:', error);
-                alert('Error al actualizar el estado: ' + error.message);
+                Swal.fire({ icon: (('Error al actualizar el estado: ' + error.message).toLowerCase().includes("error") || ('Error al actualizar el estado: ' + error.message).toLowerCase().includes("falla") || ('Error al actualizar el estado: ' + error.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al actualizar el estado: ' + error.message, timer: 3000, showConfirmButton: false });
                 // 🔓 RESTAURAR BOTONES EN CASO DE ERROR
                 if (orderCard) {
                     const botones = orderCard.querySelectorAll('.btn-action, button[onclick*="cambiarEstadoProducto"]');
@@ -2834,7 +2835,7 @@
                     // Animación de éxito
                     mostrarNotificacionExito(`Producto marcado como ${nuevoEstado}`);
                 } else {
-                    alert('Error: ' + data.message);
+                    Swal.fire({ icon: (('Error: ' + data.message).toLowerCase().includes("error") || ('Error: ' + data.message).toLowerCase().includes("falla") || ('Error: ' + data.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error: ' + data.message, timer: 3000, showConfirmButton: false });
                     // 🔓 RESTAURAR BOTÓN EN CASO DE ERROR
                     if (botonClickeado) {
                         botonClickeado.disabled = false;
@@ -2845,7 +2846,7 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al actualizar el estado del producto');
+                Swal.fire({ icon: (('Error al actualizar el estado del producto').toLowerCase().includes("error") || ('Error al actualizar el estado del producto').toLowerCase().includes("falla") || ('Error al actualizar el estado del producto').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al actualizar el estado del producto', timer: 3000, showConfirmButton: false });
                 // 🔓 RESTAURAR BOTÓN EN CASO DE ERROR
                 if (botonClickeado) {
                     botonClickeado.disabled = false;
@@ -2984,7 +2985,7 @@
                 }
             } catch (error) {
                 console.error('Error al cargar pedido:', error);
-                alert('Error al cargar los datos del pedido');
+                Swal.fire({ icon: (('Error al cargar los datos del pedido').toLowerCase().includes("error") || ('Error al cargar los datos del pedido').toLowerCase().includes("falla") || ('Error al cargar los datos del pedido').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al cargar los datos del pedido', timer: 3000, showConfirmButton: false });
                 cerrarModalEditar();
             }
         }
@@ -3088,7 +3089,7 @@
                 }
             } catch (error) {
                 console.error('Error al cargar productos:', error);
-                alert('Error al cargar productos');
+                Swal.fire({ icon: (('Error al cargar productos').toLowerCase().includes("error") || ('Error al cargar productos').toLowerCase().includes("falla") || ('Error al cargar productos').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al cargar productos', timer: 3000, showConfirmButton: false });
             }
         }
 
@@ -3289,12 +3290,12 @@
             const notas = document.getElementById('editNotas').value.trim();
 
             if (!mesa) {
-                alert('El número de mesa es obligatorio');
+                Swal.fire({ icon: (('El número de mesa es obligatorio').toLowerCase().includes("error") || ('El número de mesa es obligatorio').toLowerCase().includes("falla") || ('El número de mesa es obligatorio').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'El número de mesa es obligatorio', timer: 3000, showConfirmButton: false });
                 return;
             }
 
             if (editSelectedItems.length === 0) {
-                alert('Debe haber al menos un producto en el pedido');
+                Swal.fire({ icon: (('Debe haber al menos un producto en el pedido').toLowerCase().includes("error") || ('Debe haber al menos un producto en el pedido').toLowerCase().includes("falla") || ('Debe haber al menos un producto en el pedido').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Debe haber al menos un producto en el pedido', timer: 3000, showConfirmButton: false });
                 return;
             }
 
@@ -3329,11 +3330,11 @@
                     cerrarModalEditar();
                     await loadOrders();
                 } else {
-                    alert('Error: ' + data.message);
+                    Swal.fire({ icon: (('Error: ' + data.message).toLowerCase().includes("error") || ('Error: ' + data.message).toLowerCase().includes("falla") || ('Error: ' + data.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error: ' + data.message, timer: 3000, showConfirmButton: false });
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al actualizar el pedido');
+                Swal.fire({ icon: (('Error al actualizar el pedido').toLowerCase().includes("error") || ('Error al actualizar el pedido').toLowerCase().includes("falla") || ('Error al actualizar el pedido').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al actualizar el pedido', timer: 3000, showConfirmButton: false });
             }
         }
 

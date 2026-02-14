@@ -1064,6 +1064,7 @@
             }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -1117,7 +1118,7 @@
                     <span class="nav-icon">🥘</span>
                     <span>Alimentos</span>
                 </a>
-                <a href="inventario-alimentos.html" class="nav-item ">
+                <a href="incorrectentario-alimentos.html" class="nav-item ">
                     <span class="nav-icon">📋</span>
                     <span>Inventario Alimentos</span>
                 </a>
@@ -1532,7 +1533,7 @@
 
                 if (!response.ok) {
                     console.error('Error al cargar usuario');
-                    alert('Error al cargar datos. Intente recargar.');
+                    Swal.fire({ icon: (('Error al cargar datos. Intente recargar.').toLowerCase().includes("error") || ('Error al cargar datos. Intente recargar.').toLowerCase().includes("falla") || ('Error al cargar datos. Intente recargar.').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al cargar datos. Intente recargar.', timer: 3000, showConfirmButton: false });
                     return;
                 }
 
@@ -1554,7 +1555,7 @@
                 await loadOrders();
             } catch (error) {
                 console.error('❌ Error de red:', error);
-                alert('Error de conexión. Recargue la página.');
+                Swal.fire({ icon: (('Error de conexión. Recargue la página.').toLowerCase().includes("error") || ('Error de conexión. Recargue la página.').toLowerCase().includes("falla") || ('Error de conexión. Recargue la página.').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error de conexión. Recargue la página.', timer: 3000, showConfirmButton: false });
             }
         });
 
@@ -1918,7 +1919,7 @@
 
             if (!currentOrderIdForPayment) {
                 console.error('❌ No hay orderId guardado');
-                alert('Error: No se encontró el ID del pedido');
+                Swal.fire({ icon: (('Error: No se encontró el ID del pedido').toLowerCase().includes("error") || ('Error: No se encontró el ID del pedido').toLowerCase().includes("falla") || ('Error: No se encontró el ID del pedido').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error: No se encontró el ID del pedido', timer: 3000, showConfirmButton: false });
                 return;
             }
 
@@ -2278,8 +2279,8 @@
             console.log('  - Método de pago:', metodoPago);
 
             if (!orderId || orderId === 'null' || orderId === 'undefined') {
-                console.error('❌ Order ID inválido:', orderId);
-                alert('Error: ID de pedido inválido');
+                console.error('❌ Order ID incorrecto:', orderId);
+                Swal.fire({ icon: (('Error: ID de pedido incorrecto').toLowerCase().includes("error") || ('Error: ID de pedido incorrecto').toLowerCase().includes("falla") || ('Error: ID de pedido incorrecto').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error: ID de pedido incorrecto', timer: 3000, showConfirmButton: false });
                 return;
             }
 
@@ -2339,7 +2340,7 @@
                     await loadOrders();
                 } else {
                     console.error('❌ Error del servidor:', data.message);
-                    alert('Error: ' + data.message);
+                    Swal.fire({ icon: (('Error: ' + data.message).toLowerCase().includes("error") || ('Error: ' + data.message).toLowerCase().includes("falla") || ('Error: ' + data.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error: ' + data.message, timer: 3000, showConfirmButton: false });
                     // 🔓 RESTAURAR BOTONES EN CASO DE ERROR
                     if (orderCard) {
                         const botones = orderCard.querySelectorAll('.btn-action, button[onclick*="cambiarEstadoProducto"]');
@@ -2355,7 +2356,7 @@
                 }
             } catch (error) {
                 console.error('❌ Error en la petición:', error);
-                alert('Error al actualizar el estado: ' + error.message);
+                Swal.fire({ icon: (('Error al actualizar el estado: ' + error.message).toLowerCase().includes("error") || ('Error al actualizar el estado: ' + error.message).toLowerCase().includes("falla") || ('Error al actualizar el estado: ' + error.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al actualizar el estado: ' + error.message, timer: 3000, showConfirmButton: false });
                 // 🔓 RESTAURAR BOTONES EN CASO DE ERROR
                 if (orderCard) {
                     const botones = orderCard.querySelectorAll('.btn-action, button[onclick*="cambiarEstadoProducto"]');
@@ -2391,14 +2392,14 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    alert('✅ Pedido eliminado exitosamente');
+                    Swal.fire({ icon: (('✅ Pedido eliminado exitosamente').toLowerCase().includes("error") || ('✅ Pedido eliminado exitosamente').toLowerCase().includes("falla") || ('✅ Pedido eliminado exitosamente').toLowerCase().includes("incorrect")) ? "error" : "success", text: '✅ Pedido eliminado exitosamente', timer: 3000, showConfirmButton: false });
                     await loadOrders();
                 } else {
-                    alert('Error: ' + data.message);
+                    Swal.fire({ icon: (('Error: ' + data.message).toLowerCase().includes("error") || ('Error: ' + data.message).toLowerCase().includes("falla") || ('Error: ' + data.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error: ' + data.message, timer: 3000, showConfirmButton: false });
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al eliminar el pedido');
+                Swal.fire({ icon: (('Error al eliminar el pedido').toLowerCase().includes("error") || ('Error al eliminar el pedido').toLowerCase().includes("falla") || ('Error al eliminar el pedido').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al eliminar el pedido', timer: 3000, showConfirmButton: false });
             }
         }
 
@@ -2923,7 +2924,7 @@
                     // Animación de éxito
                     mostrarNotificacionExito(`Producto marcado como ${nuevoEstado}`);
                 } else {
-                    alert('Error: ' + data.message);
+                    Swal.fire({ icon: (('Error: ' + data.message).toLowerCase().includes("error") || ('Error: ' + data.message).toLowerCase().includes("falla") || ('Error: ' + data.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error: ' + data.message, timer: 3000, showConfirmButton: false });
                     // 🔓 RESTAURAR BOTÓN EN CASO DE ERROR
                     if (botonClickeado) {
                         botonClickeado.disabled = false;
@@ -2934,7 +2935,7 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al actualizar el estado del producto');
+                Swal.fire({ icon: (('Error al actualizar el estado del producto').toLowerCase().includes("error") || ('Error al actualizar el estado del producto').toLowerCase().includes("falla") || ('Error al actualizar el estado del producto').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al actualizar el estado del producto', timer: 3000, showConfirmButton: false });
                 // 🔓 RESTAURAR BOTÓN EN CASO DE ERROR
                 if (botonClickeado) {
                     botonClickeado.disabled = false;
@@ -3166,7 +3167,7 @@
         // ✅ FUNCIÓN PARA CAMBIAR ESTADO GLOBAL
         async function cambiarEstadoGlobal() {
             if (!platoSeleccionado || productosFiltrados.length === 0) {
-                alert('⚠️ No hay productos filtrados para cambiar de estado');
+                Swal.fire({ icon: (('⚠️ No hay productos filtrados para cambiar de estado').toLowerCase().includes("error") || ('⚠️ No hay productos filtrados para cambiar de estado').toLowerCase().includes("falla") || ('⚠️ No hay productos filtrados para cambiar de estado').toLowerCase().includes("incorrect")) ? "error" : "success", text: '⚠️ No hay productos filtrados para cambiar de estado', timer: 3000, showConfirmButton: false });
                 return;
             }
 
@@ -3219,7 +3220,7 @@
 
                 // Ejecutar cambios
                 let exitosos = 0;
-                let fallidos = 0;
+                let fallaidos = 0;
 
                 for (const [orderId, cambios] of Object.entries(cambiosPorPedido)) {
                     for (const cambio of cambios) {
@@ -3233,7 +3234,7 @@
                             exitosos++;
                         } catch (error) {
                             console.error('Error al actualizar:', error);
-                            fallidos++;
+                            fallaidos++;
                         }
                     }
                 }
@@ -3242,15 +3243,15 @@
                 await loadOrders();
 
                 // Mostrar resultado
-                if (fallidos === 0) {
+                if (fallaidos === 0) {
                     mostrarNotificacionExito(`✅ ${exitosos} productos actualizados a "${siguienteEstado}"`);
                 } else {
-                    alert(`⚠️ Proceso completado:\n✅ ${exitosos} actualizados\n❌ ${fallidos} fallidos`);
+                    Swal.fire({ icon: ((`⚠️ Proceso completado:\n✅ ${exitosos} actualizados\n❌ ${fallaidos} fallaidos`).toLowerCase().includes("error") || (`⚠️ Proceso completado:\n✅ ${exitosos} actualizados\n❌ ${fallaidos} fallaidos`).toLowerCase().includes("falla") || (`⚠️ Proceso completado:\n✅ ${exitosos} actualizados\n❌ ${fallaidos} fallaidos`).toLowerCase().includes("incorrect")) ? "error" : "success", text: `⚠️ Proceso completado:\n✅ ${exitosos} actualizados\n❌ ${fallaidos} fallaidos`, timer: 3000, showConfirmButton: false });
                 }
 
             } catch (error) {
                 console.error('Error en cambio global:', error);
-                alert('❌ Error al cambiar estados: ' + error.message);
+                Swal.fire({ icon: (('❌ Error al cambiar estados: ' + error.message).toLowerCase().includes("error") || ('❌ Error al cambiar estados: ' + error.message).toLowerCase().includes("falla") || ('❌ Error al cambiar estados: ' + error.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: '❌ Error al cambiar estados: ' + error.message, timer: 3000, showConfirmButton: false });
             } finally {
                 actualizarBotonGlobal();
             }

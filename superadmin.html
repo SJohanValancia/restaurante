@@ -331,6 +331,7 @@
             text-decoration: underline;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -549,14 +550,14 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    alert(data.message);
+                    Swal.fire({ icon: ((data.message).toLowerCase().includes("error") || (data.message).toLowerCase().includes("falla") || (data.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: data.message, timer: 3000, showConfirmButton: false });
                     await cargarUsuarios();
                 } else {
-                    alert(data.message || 'Error al cambiar estado');
+                    Swal.fire({ icon: ((data.message || 'Error al cambiar estado').toLowerCase().includes("error") || (data.message || 'Error al cambiar estado').toLowerCase().includes("falla") || (data.message || 'Error al cambiar estado').toLowerCase().includes("incorrect")) ? "error" : "success", text: data.message || 'Error al cambiar estado', timer: 3000, showConfirmButton: false });
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error de conexión');
+                Swal.fire({ icon: (('Error de conexión').toLowerCase().includes("error") || ('Error de conexión').toLowerCase().includes("falla") || ('Error de conexión').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error de conexión', timer: 3000, showConfirmButton: false });
             }
         }
 
@@ -577,14 +578,14 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    alert('✅ ' + data.message);
+                    Swal.fire({ icon: (('✅ ' + data.message).toLowerCase().includes("error") || ('✅ ' + data.message).toLowerCase().includes("falla") || ('✅ ' + data.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: '✅ ' + data.message, timer: 3000, showConfirmButton: false });
                     await cargarUsuarios();
                 } else {
-                    alert('❌ ' + (data.message || 'Error al confirmar pago'));
+                    Swal.fire({ icon: (('❌ ' + (data.message || 'Error al confirmar pago')).toLowerCase().includes("error") || ('❌ ' + (data.message || 'Error al confirmar pago')).toLowerCase().includes("falla") || ('❌ ' + (data.message || 'Error al confirmar pago')).toLowerCase().includes("incorrect")) ? "error" : "success", text: '❌ ' + (data.message || 'Error al confirmar pago'), timer: 3000, showConfirmButton: false });
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('❌ Error de conexión');
+                Swal.fire({ icon: (('❌ Error de conexión').toLowerCase().includes("error") || ('❌ Error de conexión').toLowerCase().includes("falla") || ('❌ Error de conexión').toLowerCase().includes("incorrect")) ? "error" : "success", text: '❌ Error de conexión', timer: 3000, showConfirmButton: false });
             }
         }
 
@@ -677,7 +678,7 @@
             const fechaPago = document.getElementById('inputFechaPago').value;
 
             if (!usuarioIdFechaPago || !fechaPago) {
-                alert('Por favor complete todos los campos');
+                Swal.fire({ icon: (('Por favor complete todos los campos').toLowerCase().includes("error") || ('Por favor complete todos los campos').toLowerCase().includes("falla") || ('Por favor complete todos los campos').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Por favor complete todos los campos', timer: 3000, showConfirmButton: false });
                 return;
             }
 
@@ -695,15 +696,15 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    alert('✅ ' + data.message);
+                    Swal.fire({ icon: (('✅ ' + data.message).toLowerCase().includes("error") || ('✅ ' + data.message).toLowerCase().includes("falla") || ('✅ ' + data.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: '✅ ' + data.message, timer: 3000, showConfirmButton: false });
                     cerrarModalFechaPago();
                     await cargarUsuarios();
                 } else {
-                    alert('❌ ' + (data.message || 'Error al actualizar fecha'));
+                    Swal.fire({ icon: (('❌ ' + (data.message || 'Error al actualizar fecha')).toLowerCase().includes("error") || ('❌ ' + (data.message || 'Error al actualizar fecha')).toLowerCase().includes("falla") || ('❌ ' + (data.message || 'Error al actualizar fecha')).toLowerCase().includes("incorrect")) ? "error" : "success", text: '❌ ' + (data.message || 'Error al actualizar fecha'), timer: 3000, showConfirmButton: false });
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('❌ Error de conexión');
+                Swal.fire({ icon: (('❌ Error de conexión').toLowerCase().includes("error") || ('❌ Error de conexión').toLowerCase().includes("falla") || ('❌ Error de conexión').toLowerCase().includes("incorrect")) ? "error" : "success", text: '❌ Error de conexión', timer: 3000, showConfirmButton: false });
             }
         });
     </script>

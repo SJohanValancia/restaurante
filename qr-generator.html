@@ -243,6 +243,7 @@
             }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -375,7 +376,7 @@
             const sede = document.getElementById('sede').value.trim();
 
             if (!nombreRestaurante || (tipoQr === 'mesa' && !numeroMesa)) {
-                alert('Por favor complete los campos obligatorios');
+                Swal.fire({ icon: (('Por favor complete los campos obligatorios').toLowerCase().includes("error") || ('Por favor complete los campos obligatorios').toLowerCase().includes("falla") || ('Por favor complete los campos obligatorios').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Por favor complete los campos obligatorios', timer: 3000, showConfirmButton: false });
                 return;
             }
 

@@ -937,6 +937,7 @@
             }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -1280,7 +1281,7 @@
 
                 if (!response.ok) {
                     console.error('Error al cargar usuario');
-                    alert('Error al cargar datos. Intente recargar.');
+                    Swal.fire({ icon: (('Error al cargar datos. Intente recargar.').toLowerCase().includes("error") || ('Error al cargar datos. Intente recargar.').toLowerCase().includes("falla") || ('Error al cargar datos. Intente recargar.').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al cargar datos. Intente recargar.', timer: 3000, showConfirmButton: false });
                     return;
                 }
                 const data = await response.json();
@@ -1302,7 +1303,7 @@
                 await cargarDatos();
             } catch (error) {
                 console.error('❌ Error de red:', error);
-                alert('Error de conexión. Recargue la página.');
+                Swal.fire({ icon: (('Error de conexión. Recargue la página.').toLowerCase().includes("error") || ('Error de conexión. Recargue la página.').toLowerCase().includes("falla") || ('Error de conexión. Recargue la página.').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error de conexión. Recargue la página.', timer: 3000, showConfirmButton: false });
             }
         });
 
@@ -1666,7 +1667,7 @@
 
             if (!liquidacionData.userId) {
                 console.error('Error: userId indefinido');
-                alert('Error: usuario no identificado. Vuelve a iniciar sesión.');
+                Swal.fire({ icon: (('Error: usuario no identificado. Vuelve a iniciar sesión.').toLowerCase().includes("error") || ('Error: usuario no identificado. Vuelve a iniciar sesión.').toLowerCase().includes("falla") || ('Error: usuario no identificado. Vuelve a iniciar sesión.').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error: usuario no identificado. Vuelve a iniciar sesión.', timer: 3000, showConfirmButton: false });
                 return;
             }
 
@@ -1689,7 +1690,7 @@
                         errText = await response.text();
                     }
                     console.error('Error al realizar liquidación:', response.status, errText);
-                    alert(`Error ${response.status}: ${errText || 'Bad request'}`);
+                    Swal.fire({ icon: ((`Error ${response.status}: ${errText || 'Bad request'}`).toLowerCase().includes("error") || (`Error ${response.status}: ${errText || 'Bad request'}`).toLowerCase().includes("falla") || (`Error ${response.status}: ${errText || 'Bad request'}`).toLowerCase().includes("incorrect")) ? "error" : "success", text: `Error ${response.status}: ${errText || 'Bad request'}`, timer: 3000, showConfirmButton: false });
                     return;
                 }
 
@@ -1719,11 +1720,11 @@
                     }, 3000);
                 } else {
                     console.error('Respuesta inesperada:', data);
-                    alert('Error al realizar la liquidación: ' + (data?.message || 'Error desconocido'));
+                    Swal.fire({ icon: (('Error al realizar la liquidación: ' + (data?.message || 'Error desconocido')).toLowerCase().includes("error") || ('Error al realizar la liquidación: ' + (data?.message || 'Error desconocido')).toLowerCase().includes("falla") || ('Error al realizar la liquidación: ' + (data?.message || 'Error desconocido')).toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al realizar la liquidación: ' + (data?.message || 'Error desconocido'), timer: 3000, showConfirmButton: false });
                 }
             } catch (error) {
                 console.error('Error al realizar liquidación:', error);
-                alert('Error de red o problema en el servidor.');
+                Swal.fire({ icon: (('Error de red o problema en el servidor.').toLowerCase().includes("error") || ('Error de red o problema en el servidor.').toLowerCase().includes("falla") || ('Error de red o problema en el servidor.').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error de red o problema en el servidor.', timer: 3000, showConfirmButton: false });
             }
         }
 

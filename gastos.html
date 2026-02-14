@@ -817,6 +817,7 @@
             margin-top: 4px;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -870,7 +871,7 @@
                     <span class="nav-icon">🥘</span>
                     <span>Alimentos</span>
                 </a>
-                <a href="inventario-alimentos.html" class="nav-item ">
+                <a href="incorrectentario-alimentos.html" class="nav-item ">
                     <span class="nav-icon">📋</span>
                     <span>Inventario Alimentos</span>
                 </a>
@@ -1086,7 +1087,7 @@
 
                 if (!response.ok) {
                     console.error('Error al cargar usuario');
-                    alert('Error al cargar datos. Intente recargar.');
+                    Swal.fire({ icon: (('Error al cargar datos. Intente recargar.').toLowerCase().includes("error") || ('Error al cargar datos. Intente recargar.').toLowerCase().includes("falla") || ('Error al cargar datos. Intente recargar.').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al cargar datos. Intente recargar.', timer: 3000, showConfirmButton: false });
                     return;
                 }
 
@@ -1114,7 +1115,7 @@
                 await loadExpenses();
             } catch (error) {
                 console.error('❌ Error de red:', error);
-                alert('Error de conexión. Recargue la página.');
+                Swal.fire({ icon: (('Error de conexión. Recargue la página.').toLowerCase().includes("error") || ('Error de conexión. Recargue la página.').toLowerCase().includes("falla") || ('Error de conexión. Recargue la página.').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error de conexión. Recargue la página.', timer: 3000, showConfirmButton: false });
             }
         });
 
@@ -1212,7 +1213,7 @@
             const validItems = expenseItems.filter(item => item.descripcion.trim() && item.monto > 0);
 
             if (validItems.length === 0) {
-                alert('Debe completar al menos un gasto con descripción y monto válidos');
+                Swal.fire({ icon: (('Debe completar al menos un gasto con descripción y monto válidos').toLowerCase().includes("error") || ('Debe completar al menos un gasto con descripción y monto válidos').toLowerCase().includes("falla") || ('Debe completar al menos un gasto con descripción y monto válidos').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Debe completar al menos un gasto con descripción y monto válidos', timer: 3000, showConfirmButton: false });
                 return;
             }
 
@@ -1237,7 +1238,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    alert('✅ Gastos registrados exitosamente');
+                    Swal.fire({ icon: (('✅ Gastos registrados exitosamente').toLowerCase().includes("error") || ('✅ Gastos registrados exitosamente').toLowerCase().includes("falla") || ('✅ Gastos registrados exitosamente').toLowerCase().includes("incorrect")) ? "error" : "success", text: '✅ Gastos registrados exitosamente', timer: 3000, showConfirmButton: false });
                     document.getElementById('expenseForm').reset();
                     document.getElementById('expenseFields').innerHTML = '';
                     document.getElementById('summaryBox').style.display = 'none';
@@ -1246,11 +1247,11 @@
                     expenseItems = [];
                     await loadExpenses();
                 } else {
-                    alert('Error: ' + data.message);
+                    Swal.fire({ icon: (('Error: ' + data.message).toLowerCase().includes("error") || ('Error: ' + data.message).toLowerCase().includes("falla") || ('Error: ' + data.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error: ' + data.message, timer: 3000, showConfirmButton: false });
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al registrar los gastos');
+                Swal.fire({ icon: (('Error al registrar los gastos').toLowerCase().includes("error") || ('Error al registrar los gastos').toLowerCase().includes("falla") || ('Error al registrar los gastos').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al registrar los gastos', timer: 3000, showConfirmButton: false });
             }
         });
         async function loadExpenses() {
@@ -1492,7 +1493,7 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al cargar el gasto');
+                Swal.fire({ icon: (('Error al cargar el gasto').toLowerCase().includes("error") || ('Error al cargar el gasto').toLowerCase().includes("falla") || ('Error al cargar el gasto').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al cargar el gasto', timer: 3000, showConfirmButton: false });
             }
         }
 
@@ -1547,7 +1548,7 @@
             });
 
             if (gastos.length === 0) {
-                alert('Debe tener al menos un gasto válido');
+                Swal.fire({ icon: (('Debe tener al menos un gasto válido').toLowerCase().includes("error") || ('Debe tener al menos un gasto válido').toLowerCase().includes("falla") || ('Debe tener al menos un gasto válido').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Debe tener al menos un gasto válido', timer: 3000, showConfirmButton: false });
                 return;
             }
 
@@ -1572,15 +1573,15 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    alert('✅ Gastos actualizados exitosamente');
+                    Swal.fire({ icon: (('✅ Gastos actualizados exitosamente').toLowerCase().includes("error") || ('✅ Gastos actualizados exitosamente').toLowerCase().includes("falla") || ('✅ Gastos actualizados exitosamente').toLowerCase().includes("incorrect")) ? "error" : "success", text: '✅ Gastos actualizados exitosamente', timer: 3000, showConfirmButton: false });
                     closeEditModal();
                     await loadExpenses();
                 } else {
-                    alert('Error: ' + data.message);
+                    Swal.fire({ icon: (('Error: ' + data.message).toLowerCase().includes("error") || ('Error: ' + data.message).toLowerCase().includes("falla") || ('Error: ' + data.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error: ' + data.message, timer: 3000, showConfirmButton: false });
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al actualizar los gastos');
+                Swal.fire({ icon: (('Error al actualizar los gastos').toLowerCase().includes("error") || ('Error al actualizar los gastos').toLowerCase().includes("falla") || ('Error al actualizar los gastos').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al actualizar los gastos', timer: 3000, showConfirmButton: false });
             }
         });
 
@@ -1598,14 +1599,14 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    alert('✅ Gastos eliminados exitosamente');
+                    Swal.fire({ icon: (('✅ Gastos eliminados exitosamente').toLowerCase().includes("error") || ('✅ Gastos eliminados exitosamente').toLowerCase().includes("falla") || ('✅ Gastos eliminados exitosamente').toLowerCase().includes("incorrect")) ? "error" : "success", text: '✅ Gastos eliminados exitosamente', timer: 3000, showConfirmButton: false });
                     await loadExpenses();
                 } else {
-                    alert('Error: ' + data.message);
+                    Swal.fire({ icon: (('Error: ' + data.message).toLowerCase().includes("error") || ('Error: ' + data.message).toLowerCase().includes("falla") || ('Error: ' + data.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error: ' + data.message, timer: 3000, showConfirmButton: false });
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al eliminar los gastos');
+                Swal.fire({ icon: (('Error al eliminar los gastos').toLowerCase().includes("error") || ('Error al eliminar los gastos').toLowerCase().includes("falla") || ('Error al eliminar los gastos').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al eliminar los gastos', timer: 3000, showConfirmButton: false });
             }
         }
 

@@ -1072,6 +1072,7 @@
             }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -1371,7 +1372,7 @@
 
         async function testPushNotification() {
             if (!fcmToken) {
-                alert('⚠️ No hay token de notificación activo. Activa las notificaciones primero.');
+                Swal.fire({ icon: (('⚠️ No hay token de notificación activo. Activa las notificaciones primero.').toLowerCase().includes("error") || ('⚠️ No hay token de notificación activo. Activa las notificaciones primero.').toLowerCase().includes("falla") || ('⚠️ No hay token de notificación activo. Activa las notificaciones primero.').toLowerCase().includes("incorrect")) ? "error" : "success", text: '⚠️ No hay token de notificación activo. Activa las notificaciones primero.', timer: 3000, showConfirmButton: false });
                 return;
             }
 
@@ -1390,16 +1391,16 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    alert('✅ Notificación enviada desde el servidor');
+                    Swal.fire({ icon: (('✅ Notificación enviada desde el servidor').toLowerCase().includes("error") || ('✅ Notificación enviada desde el servidor').toLowerCase().includes("falla") || ('✅ Notificación enviada desde el servidor').toLowerCase().includes("incorrect")) ? "error" : "success", text: '✅ Notificación enviada desde el servidor', timer: 3000, showConfirmButton: false });
                 } else {
-                    alert('❌ Error: ' + (data.message || 'Desconocido'));
+                    Swal.fire({ icon: (('❌ Error: ' + (data.message || 'Desconocido')).toLowerCase().includes("error") || ('❌ Error: ' + (data.message || 'Desconocido')).toLowerCase().includes("falla") || ('❌ Error: ' + (data.message || 'Desconocido')).toLowerCase().includes("incorrect")) ? "error" : "success", text: '❌ Error: ' + (data.message || 'Desconocido'), timer: 3000, showConfirmButton: false });
                 }
 
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             } catch (error) {
                 console.error('Error probando push:', error);
-                alert('❌ Error de conexión');
+                Swal.fire({ icon: (('❌ Error de conexión').toLowerCase().includes("error") || ('❌ Error de conexión').toLowerCase().includes("falla") || ('❌ Error de conexión').toLowerCase().includes("incorrect")) ? "error" : "success", text: '❌ Error de conexión', timer: 3000, showConfirmButton: false });
                 document.getElementById('btnTestPush').disabled = false;
             }
         }
@@ -1706,7 +1707,7 @@
         function buscarPedidoPorInput() {
             const input = document.getElementById('mesaInput').value.trim();
             if (!input) {
-                alert('Por favor, ingresa un nombre o mesa');
+                Swal.fire({ icon: (('Por favor, ingresa un nombre o mesa').toLowerCase().includes("error") || ('Por favor, ingresa un nombre o mesa').toLowerCase().includes("falla") || ('Por favor, ingresa un nombre o mesa').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Por favor, ingresa un nombre o mesa', timer: 3000, showConfirmButton: false });
                 return;
             }
             window.location.href = `seguimiento.html?restaurante=${encodeURIComponent(restaurante)}&mesa=${encodeURIComponent(input)}${sede ? '&sede=' + encodeURIComponent(sede) : ''}`;

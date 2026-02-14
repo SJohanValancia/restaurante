@@ -709,6 +709,7 @@
             }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -762,7 +763,7 @@
                     <span class="nav-icon">🥘</span>
                     <span>Alimentos</span>
                 </a>
-                <a href="inventario-alimentos.html" class="nav-item ">
+                <a href="incorrectentario-alimentos.html" class="nav-item ">
                     <span class="nav-icon">📋</span>
                     <span>Inventario Alimentos</span>
                 </a>
@@ -970,7 +971,7 @@
 
                 if (!response.ok) {
                     console.error('Error al cargar usuario');
-                    alert('Error al cargar datos. Intente recargar.');
+                    Swal.fire({ icon: (('Error al cargar datos. Intente recargar.').toLowerCase().includes("error") || ('Error al cargar datos. Intente recargar.').toLowerCase().includes("falla") || ('Error al cargar datos. Intente recargar.').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al cargar datos. Intente recargar.', timer: 3000, showConfirmButton: false });
                     return;
                 }
                 const data = await response.json();
@@ -992,7 +993,7 @@
                 await cargarLiquidaciones();
             } catch (error) {
                 console.error('❌ Error de red:', error);
-                alert('Error de conexión. Recargue la página.');
+                Swal.fire({ icon: (('Error de conexión. Recargue la página.').toLowerCase().includes("error") || ('Error de conexión. Recargue la página.').toLowerCase().includes("falla") || ('Error de conexión. Recargue la página.').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error de conexión. Recargue la página.', timer: 3000, showConfirmButton: false });
             }
         });
 
@@ -1257,11 +1258,11 @@
                 if (data.success) {
                     mostrarModalDetalle(data.data);
                 } else {
-                    alert('Error al cargar el detalle');
+                    Swal.fire({ icon: (('Error al cargar el detalle').toLowerCase().includes("error") || ('Error al cargar el detalle').toLowerCase().includes("falla") || ('Error al cargar el detalle').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al cargar el detalle', timer: 3000, showConfirmButton: false });
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al cargar el detalle de la liquidación');
+                Swal.fire({ icon: (('Error al cargar el detalle de la liquidación').toLowerCase().includes("error") || ('Error al cargar el detalle de la liquidación').toLowerCase().includes("falla") || ('Error al cargar el detalle de la liquidación').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al cargar el detalle de la liquidación', timer: 3000, showConfirmButton: false });
             }
         }
 
@@ -1465,12 +1466,12 @@
 
             if (fechaInicio && fechaFin) {
                 if (new Date(fechaInicio) > new Date(fechaFin)) {
-                    alert('La fecha de inicio no puede ser mayor a la fecha fin');
+                    Swal.fire({ icon: (('La fecha de inicio no puede ser mayor a la fecha fin').toLowerCase().includes("error") || ('La fecha de inicio no puede ser mayor a la fecha fin').toLowerCase().includes("falla") || ('La fecha de inicio no puede ser mayor a la fecha fin').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'La fecha de inicio no puede ser mayor a la fecha fin', timer: 3000, showConfirmButton: false });
                     return;
                 }
                 cargarLiquidaciones(fechaInicio, fechaFin);
             } else if (fechaInicio || fechaFin) {
-                alert('Por favor selecciona ambas fechas');
+                Swal.fire({ icon: (('Por favor selecciona ambas fechas').toLowerCase().includes("error") || ('Por favor selecciona ambas fechas').toLowerCase().includes("falla") || ('Por favor selecciona ambas fechas').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Por favor selecciona ambas fechas', timer: 3000, showConfirmButton: false });
             } else {
                 cargarLiquidaciones();
             }
@@ -1504,7 +1505,7 @@
 
         async function descargarExcel() {
             if (liquidaciones.length === 0) {
-                alert('No hay liquidaciones para descargar');
+                Swal.fire({ icon: (('No hay liquidaciones para descargar').toLowerCase().includes("error") || ('No hay liquidaciones para descargar').toLowerCase().includes("falla") || ('No hay liquidaciones para descargar').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'No hay liquidaciones para descargar', timer: 3000, showConfirmButton: false });
                 return;
             }
 
@@ -1602,11 +1603,11 @@
                 // Descargar archivo
                 XLSX.writeFile(wb, nombreArchivo);
 
-                alert('✅ Excel descargado correctamente');
+                Swal.fire({ icon: (('✅ Excel descargado correctamente').toLowerCase().includes("error") || ('✅ Excel descargado correctamente').toLowerCase().includes("falla") || ('✅ Excel descargado correctamente').toLowerCase().includes("incorrect")) ? "error" : "success", text: '✅ Excel descargado correctamente', timer: 3000, showConfirmButton: false });
 
             } catch (error) {
                 console.error('Error al generar Excel:', error);
-                alert('❌ Error al generar el archivo Excel');
+                Swal.fire({ icon: (('❌ Error al generar el archivo Excel').toLowerCase().includes("error") || ('❌ Error al generar el archivo Excel').toLowerCase().includes("falla") || ('❌ Error al generar el archivo Excel').toLowerCase().includes("incorrect")) ? "error" : "success", text: '❌ Error al generar el archivo Excel', timer: 3000, showConfirmButton: false });
             }
         }
 
