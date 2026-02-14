@@ -144,12 +144,25 @@ router.post('/login-mandao', async (req, res) => {
     if (!user) {
       isNewUser = true;
 
+      // VALIDACIÓN DE NOMBRE: Asegurar mínimo 2 caracteres
+      let nombreUsuario = mandaoUser.nombre || 'Usuario Mandao';
+      if (nombreUsuario.length < 2) {
+        // Si es muy corto, usar el nombre + apellido si existe, o el email
+        if (mandaoUser.apellido) {
+          nombreUsuario = `${nombreUsuario} ${mandaoUser.apellido}`;
+        } else {
+          // Si sigue siendo corto, usar parte del email o rellenar
+          const emailName = email.split('@')[0];
+          nombreUsuario = emailName.length >= 2 ? emailName : `${nombreUsuario} Mandao`;
+        }
+      }
+
       // Fecha de pago = Hoy + 30 días (Prueba Gratis)
       const fechaPago = new Date();
       fechaPago.setDate(fechaPago.getDate() + 30);
 
       user = await User.create({
-        nombre: mandaoUser.nombre,
+        nombre: nombreUsuario,
         email: email.toLowerCase(),
         password: await require('bcryptjs').hash(password, 10), // Guardamos la misma pass (hash) para que funcione el login tradicional también
         nombreRestaurante: mandaoUser.nombreRestaurante || 'Restaurante Mandao',
@@ -160,7 +173,7 @@ router.post('/login-mandao', async (req, res) => {
         fechaUltimoPago: new Date()
       });
 
-      console.log(`🎉 Nuevo usuario creado desde Mandao: ${user.email}`);
+      console.log(`🎉 Nuevo usuario creado desde Mandao: ${user.email} (Nombre: ${user.nombre})`);
     }
 
     // Verificar bloqueos
