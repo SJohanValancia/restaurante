@@ -269,6 +269,10 @@ router.post('/register', async (req, res) => {
       });
     }
 
+    // Calcular fecha de pago (30 días de prueba gratis para TODOS)
+    const fechaPago = new Date();
+    fechaPago.setDate(fechaPago.getDate() + 30);
+
     // Crear nuevo usuario
     const usuario = await User.create({
       nombre,
@@ -276,7 +280,9 @@ router.post('/register', async (req, res) => {
       password,
       nombreRestaurante: nombreRestaurante.trim(),
       sede: sede ? sede.trim() : '',
-      rol: rol || 'mesero'
+      rol: rol || 'mesero',
+      fechaPago: fechaPago, // 30 días gratis
+      fechaUltimoPago: new Date()
     });
 
     // Generar token
@@ -343,7 +349,29 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Verificar si el usuario está bloqueado
+    // Verificación de Vencimiento de Suscripción (Solo para admins o dueños)
+    // Si el usuario es admin y su fecha ha vencido, bloqueamos TODO el restaurante
+    if (usuario.rol === 'admin' && usuario.fechaPago && new Date(usuario.fechaPago) < new Date() && !usuario.bloqueado) {
+      console.log(`⚠️ Suscripción vencida para ${usuario.nombreRestaurante}. Bloqueando...`);
+
+      const motivo = 'Su plan ha vencido. Por favor realice el pago para continuar disfrutando del servicio.';
+
+      // Bloquear al admin y a todos los empleados de este restaurante
+      await User.updateMany(
+        { nombreRestaurante: usuario.nombreRestaurante },
+        {
+          bloqueado: true,
+          motivoBloqueo: motivo,
+          fechaBloqueo: new Date()
+        }
+      );
+
+      // Actualizar el objeto usuario actual para reflejar el bloqueo inmediato
+      usuario.bloqueado = true;
+      usuario.motivoBloqueo = motivo;
+    }
+
+    // Verificar si el usuario está bloqueado (Checkeo posterior a la validación de fecha)
     if (usuario.bloqueado) {
       return res.status(403).json({
         success: false,

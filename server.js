@@ -17,6 +17,10 @@ require('dotenv').config();
 const { initializeFirebase } = require('./services/pushNotification');
 initializeFirebase();
 
+// ✅ Inicializar Cron Jobs (Bloqueo automático)
+const { startCronJobs } = require('./services/cronJobs');
+startCronJobs();
+
 const app = express();
 
 // Middlewares
