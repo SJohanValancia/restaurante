@@ -46,29 +46,33 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  solicitudPendiente: {
+    type: Boolean,
+    default: false
+  },
 
   // En userSchema, después del campo 'activo':
-bloqueado: {
-  type: Boolean,
-  default: false
-},
-motivoBloqueo: {
-  type: String,
-  default: ''
-},
-fechaBloqueo: {
-  type: Date,
-  default: null
-},
+  bloqueado: {
+    type: Boolean,
+    default: false
+  },
+  motivoBloqueo: {
+    type: String,
+    default: ''
+  },
+  fechaBloqueo: {
+    type: Date,
+    default: null
+  },
 
-fechaPago: {
-  type: Date,
-  default: null
-},
-fechaUltimoPago: {
-  type: Date,
-  default: null
-},
+  fechaPago: {
+    type: Date,
+    default: null
+  },
+  fechaUltimoPago: {
+    type: Date,
+    default: null
+  },
 
   ultimoAcceso: {
     type: Date,
@@ -84,7 +88,7 @@ userSchema.index({ email: 1 });
 userSchema.index({ activo: 1 });
 userSchema.index({ nombreRestaurante: 1, sede: 1, bloqueado: 1 });
 // Encriptar password antes de guardar
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     return next();
   }
@@ -99,11 +103,11 @@ userSchema.pre('save', async function(next) {
 });
 
 // Método para comparar passwords
-userSchema.methods.compararPassword = async function(passwordIngresado) {
+userSchema.methods.compararPassword = async function (passwordIngresado) {
   return await bcrypt.compare(passwordIngresado, this.password);
 };
 
-userSchema.methods.obtenerDatosPublicos = function() {
+userSchema.methods.obtenerDatosPublicos = function () {
   return {
     id: this._id,
     nombre: this.nombre,

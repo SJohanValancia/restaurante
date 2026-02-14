@@ -260,10 +260,9 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    // Verificar si ya existe un ADMINISTRADOR para este restaurante
-    // Esto determina si el restaurante ya "existe" y tiene dueño
+    // Verificar si ya existe un ADMINISTRADOR para este restaurante (Búsqueda Insensible a Mayúsculas)
     const adminExistente = await User.findOne({
-      nombreRestaurante: nombreRestaurante.trim(),
+      nombreRestaurante: { $regex: new RegExp(`^${nombreRestaurante.trim()}$`, 'i') },
       rol: 'admin'
     });
 
@@ -279,7 +278,7 @@ router.post('/register', async (req, res) => {
         nombre,
         email: email.toLowerCase(),
         password,
-        nombreRestaurante: nombreRestaurante.trim(),
+        nombreRestaurante: adminExistente.nombreRestaurante,
         sede: sede ? sede.trim() : '',
         rol: rol, // Puede ser admin, mesero, cajero
         activo: false, // Inactivo hasta aprobación
@@ -827,6 +826,8 @@ router.get('/solicitudes', async (req, res) => {
       solicitudPendiente: true,
       activo: false
     }).select('nombre email rol fechaBloqueo createdAt');
+
+    console.log(`🔍 Consultando solicitudes para restaurante: "${admin.nombreRestaurante}" - Encontradas: ${solicitudes.length}`);
 
     res.json({ success: true, solicitudes });
 
