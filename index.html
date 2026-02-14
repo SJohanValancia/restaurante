@@ -476,6 +476,7 @@
 
     <script>
         const API_URL = 'https://restaurante-co77.onrender.com/api/auth';
+        // const API_URL = 'http://localhost:3000/api/auth'; // Para pruebas locales
 
         function togglePassword() {
             const passwordInput = document.getElementById('password');
@@ -588,6 +589,81 @@
                 setLoading(false);
             }
         });
+
+        // 🚀 Login con Mandao
+        const loginMandaoBtn = document.getElementById('loginMandaoBtn');
+        if (loginMandaoBtn) {
+            loginMandaoBtn.addEventListener('click', async () => {
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+
+                if (!email || !password) {
+                    showAlert('Para iniciar con Mandao, ingresa tus credenciales de Mandao arriba', 'info');
+                    return;
+                }
+
+                setLoading(true);
+
+                try {
+                    const response = await fetch(`${API_URL}/login-mandao`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email, password })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        localStorage.setItem('token', data.token);
+                        localStorage.setItem('usuario', JSON.stringify(data.usuario));
+
+                        let msg = '¡Inicio de sesión con Mandao exitoso!';
+
+                        // Mensaje especial de bienvenida para nuevos usuarios de Mandao
+                        if (data.welcomeMessage) {
+                            const nombre = data.usuario.nombre || 'Usuario';
+                            // Usamos un alert distinto o modificamos el mensaje
+                            msg = `¡Bienvenido ${nombre} a JC-RT! 🚀<br>Te brindamos un <strong>mes gratis de prueba</strong> para que ensayes este programa.`;
+                            showAlert(msg, 'success');
+
+                            setTimeout(() => {
+                                redirectUser(data.usuario);
+                            }, 6000);
+                        } else {
+                            showAlert(msg, 'success');
+                            setTimeout(() => {
+                                redirectUser(data.usuario);
+                            }, 1500);
+                        }
+
+                    } else {
+                        if (data.bloqueado) {
+                            showAlert(data.motivoBloqueo || data.message, 'error', true);
+                        } else {
+                            showAlert(data.message || 'Error al iniciar sesión con Mandao', 'error', false);
+                        }
+                    }
+
+                } catch (error) {
+                    console.error('Error Mandao Login:', error);
+                    showAlert('Error conectando con Mandao. Intenta de nuevo.', 'error');
+                } finally {
+                    setLoading(false);
+                }
+            });
+        }
+
+        function redirectUser(usuario) {
+            if (usuario.rol === 'superadmin') {
+                window.location.href = 'superadmin.html';
+            } else if (usuario.rol === 'admin') {
+                window.location.href = 'administrador.html';
+            } else {
+                window.location.href = 'productos.html';
+            }
+        }
 
 
     </script>
