@@ -22,13 +22,14 @@ async function loginToMandao(email, password) {
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.message || 'Error al iniciar sesión en Mandao');
+            console.error(`❌ Mandao Error ${response.status}:`, JSON.stringify(data));
+            throw new Error(data.message || `Error al iniciar sesión en Mandao (Status: ${response.status})`);
         }
 
         return data; // Esperamos { success: true, token, usuario: {...} }
 
     } catch (error) {
-        console.error('❌ Error login en Mandao:', error.message);
+        console.error('❌ Error login en Mandao (Detalle):', error);
         throw error;
     }
 }
