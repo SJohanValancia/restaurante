@@ -218,7 +218,7 @@ router.post('/register', async (req, res) => {
   try {
     console.log('Solicitud de registro recibida:', req.body);
 
-    const { nombre, email, password, rol, nombreRestaurante, sede } = req.body;
+    const { nombre, email, password, rol, nombreRestaurante, nitRestaurante, sede } = req.body;
 
     // Validar que todos los campos obligatorios estén presentes
     if (!nombre || !email || !password || !nombreRestaurante) {
@@ -284,7 +284,8 @@ router.post('/register', async (req, res) => {
         activo: false, // Inactivo hasta aprobación
         solicitudPendiente: true, // Marcar como solicitud
         fechaPago: adminExistente.fechaPago, // Heredar fecha de pago del restaurante
-        fechaUltimoPago: adminExistente.fechaUltimoPago
+        fechaUltimoPago: adminExistente.fechaUltimoPago,
+        nitRestaurante: adminExistente.nitRestaurante
       });
 
       mensajeRespuesta = 'Solicitud enviada a los administradores del restaurante. Espera su aprobación para ingresar.';
@@ -320,7 +321,8 @@ router.post('/register', async (req, res) => {
         activo: true,
         solicitudPendiente: false,
         fechaPago: fechaPago,
-        fechaUltimoPago: new Date()
+        fechaUltimoPago: new Date(),
+        nitRestaurante: nitRestaurante ? nitRestaurante.trim() : ''
       });
 
       token = generarToken(usuarioNuevo._id);
@@ -533,6 +535,7 @@ router.get('/me', async (req, res) => {
         email: usuario.email,
         rol: usuario.rol,
         nombreRestaurante: usuario.nombreRestaurante,
+        nitRestaurante: usuario.nitRestaurante,
         sede: usuario.sede
       }
     });

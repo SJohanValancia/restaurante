@@ -1494,6 +1494,8 @@
         let allProductsCache = [];
         let pedidoParaImprimir = null;
         let metodoPagoSeleccionado = null;
+        let clienteNombreSeleccionado = '';
+        let clienteCcNitSeleccionado = '';
         // DEBE ESTAR después de:
 
         // AGREGAR ESTA LÍNEA:
@@ -2080,6 +2082,59 @@
             // Cerrar modal de método de pago
             document.getElementById('modalMetodoPago').style.display = 'none';
 
+            // Limpiar inputs de datos de cliente
+            document.getElementById('clienteNombre').value = '';
+            document.getElementById('clienteCcNit').value = '';
+
+            // Mostrar modal de datos del cliente
+            document.getElementById('modalDatosCliente').style.display = 'flex';
+
+            // Cargar sugerencias de clientes previos
+            await cargarSugerenciasClientes();
+        }
+
+        async function cargarSugerenciasClientes() {
+            try {
+                const token = localStorage.getItem('token');
+                // Buscamos pedidos entregados del usuario para sugerir nombres
+                const response = await fetch(`${API_URL}/orders`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+
+                if (data.success && data.data) {
+                    const clientesUnicos = new Map();
+                    data.data.forEach(order => {
+                        if (order.clienteNombre) {
+                            clientesUnicos.set(order.clienteNombre.toUpperCase(), order.clienteCcNit || '');
+                        }
+                    });
+
+                    const datalistNombre = document.getElementById('listaNombresClientes');
+                    const datalistCcNit = document.getElementById('listaCcNitClientes');
+
+                    datalistNombre.innerHTML = '';
+                    datalistCcNit.innerHTML = '';
+
+                    clientesUnicos.forEach((ccNit, nombre) => {
+                        datalistNombre.innerHTML += `<option value="${nombre}">`;
+                        if (ccNit) {
+                            datalistCcNit.innerHTML += `<option value="${ccNit}">`;
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error al cargar sugerencias de clientes:', error);
+            }
+        }
+
+        async function confirmarDatosCliente() {
+            clienteNombreSeleccionado = document.getElementById('clienteNombre').value.trim();
+            clienteCcNitSeleccionado = document.getElementById('clienteCcNit').value.trim();
+
+            // Cerrar modal de datos del cliente
+            document.getElementById('modalDatosCliente').style.display = 'none';
+
             // Obtener los datos completos del pedido antes de preguntar por impresión
             await obtenerDatosPedidoParaImprimir(currentOrderIdForPayment);
 
@@ -2124,12 +2179,17 @@
                 }
             }
 
-            // Actualizar el pedido con el método de pago
+            // Actualizar el pedido con el método de pago y datos de cliente
             const orderIdTemp = currentOrderIdForPayment;
+            const clienteNombreTemp = clienteNombreSeleccionado;
+            const clienteCcNitTemp = clienteCcNitSeleccionado;
+
             currentOrderIdForPayment = null;
             pedidoParaImprimir = null;
+            clienteNombreSeleccionado = '';
+            clienteCcNitSeleccionado = '';
 
-            await actualizarEstadoPedido(orderIdTemp, 'entregado', metodoPagoSeleccionado);
+            await actualizarEstadoPedido(orderIdTemp, 'entregado', metodoPagoSeleccionado, clienteNombreTemp, clienteCcNitTemp);
         }
 
 
@@ -2213,6 +2273,19 @@
 
             const metodoPagoTexto = metodoPagoSeleccionado === 'transferencia' ? 'TRANSFERENCIA' : 'EFECTIVO';
             const nombreRestaurante = currentUser.nombreRestaurante || 'RESTAURANTE';
+            const nitRestaurante = currentUser.nitRestaurante ? `NIT: ${currentUser.nitRestaurante}` : '';
+
+            // Datos del cliente
+            const clienteHTML = pedidoParaImprimir.clienteNombre || clienteNombreSeleccionado ? `
+                <div class="print-info-row">
+                    <span class="print-info-label">Cliente:</span>
+                    <span>${(pedidoParaImprimir.clienteNombre || clienteNombreSeleccionado).toUpperCase()} 222222222222</span>
+                </div>
+                <div class="print-info-row">
+                    <span class="print-info-label">CC/NIT:</span>
+                    <span>${pedidoParaImprimir.clienteCcNit || clienteCcNitSeleccionado || '---'}</span>
+                </div>
+            ` : '';
 
             // Generar filas de productos
             const productosHTML = pedidoParaImprimir.items.map(item => {
@@ -2238,6 +2311,7 @@
             printContainer.innerHTML = `
         <div class="print-header">
             <h1>${nombreRestaurante}</h1>
+            ${nitRestaurante ? `<div style="font-size: 12px; font-weight: bold; margin-bottom: 5px;">${nitRestaurante}</div>` : ''}
             <div class="print-subtitle">FACTURA DE VENTA</div>
         </div>
         
@@ -2250,6 +2324,7 @@
                 <span class="print-info-label">Hora:</span>
                 <span>${horaStr}</span>
             </div>
+            ${clienteHTML}
             <div class="print-info-row">
                 <span class="print-info-label">Mesa:</span>
                 <span>${pedidoParaImprimir.mesa}</span>
@@ -2321,6 +2396,12 @@
             agregarTexto(comandos, nombreRestaurante);
             comandos.push(LF);
 
+            // NIT del restaurante
+            if (currentUser.nitRestaurante) {
+                agregarTexto(comandos, `NIT: ${currentUser.nitRestaurante}`);
+                comandos.push(LF);
+            }
+
             // Negrita OFF
             comandos.push(ESC, 0x45, 0x00);
 
@@ -2343,6 +2424,16 @@
             comandos.push(LF);
             agregarTexto(comandos, `Hora: ${horaStr}`);
             comandos.push(LF);
+
+            // Datos del cliente
+            const cliNombre = (pedidoParaImprimir.clienteNombre || clienteNombreSeleccionado || '').toUpperCase();
+            if (cliNombre) {
+                agregarTexto(comandos, `Cliente: ${cliNombre} 222222222222`);
+                comandos.push(LF);
+                const cliCcNit = pedidoParaImprimir.clienteCcNit || clienteCcNitSeleccionado || '---';
+                agregarTexto(comandos, `CC/NIT: ${cliCcNit}`);
+                comandos.push(LF);
+            }
 
             // Mesa
             agregarTexto(comandos, `Mesa: ${pedidoParaImprimir.mesa}`);
@@ -2420,13 +2511,14 @@
 
         // Debe estar ASÍ:
 
-        async function actualizarEstadoPedido(orderId, newStatus, metodoPago = null) {
+        async function actualizarEstadoPedido(orderId, newStatus, metodoPago = null, clienteNombre = null, clienteCcNit = null) {
             const token = localStorage.getItem('token');
 
             console.log('📤 Enviando petición:');
             console.log('  - Order ID:', orderId);
             console.log('  - Estado:', newStatus);
             console.log('  - Método de pago:', metodoPago);
+            console.log('  - Cliente:', clienteNombre, clienteCcNit);
 
             if (!orderId || orderId === 'null' || orderId === 'undefined') {
                 console.error('❌ Order ID incorrecto:', orderId);
@@ -2455,6 +2547,11 @@
                 const body = {
                     estado: newStatus
                 };
+
+                // Si hay método de pago, clienteNombre o clienteCcNit, enviarlos
+                if (metodoPago) body.metodoPago = metodoPago;
+                if (clienteNombre) body.clienteNombre = clienteNombre;
+                if (clienteCcNit) body.clienteCcNit = clienteCcNit;
 
                 // ✅ SOLO agregar actualizarTodosLosProductos si NO es cancelado
                 if (newStatus !== 'cancelado') {
@@ -3341,6 +3438,49 @@
 
 
     </script>
+
+    <!-- Modal para datos del cliente -->
+    <div id="modalDatosCliente"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10001; align-items: center; justify-content: center;">
+        <div
+            style="background: white; border-radius: 16px; padding: 2.5rem; max-width: 450px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <h3 style="font-size: 22px; font-weight: 700; color: #1a202c; margin-bottom: 0.5rem; text-align: center;">👤
+                Datos del Cliente</h3>
+            <p style="font-size: 14px; color: #718096; text-align: center; margin-bottom: 2rem;">Ingrese los datos para
+                la factura (Opcional)</p>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label
+                    style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 8px;">Nombre
+                    del Cliente</label>
+                <input type="text" id="clienteNombre" list="listaNombresClientes"
+                    style="width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 15px; transition: all 0.2s;"
+                    placeholder="Ej: Juan Pérez">
+                <datalist id="listaNombresClientes"></datalist>
+            </div>
+
+            <div style="margin-bottom: 2rem;">
+                <label
+                    style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 8px;">Cédula
+                    / NIT</label>
+                <input type="text" id="clienteCcNit" list="listaCcNitClientes"
+                    style="width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 15px; transition: all 0.2s;"
+                    placeholder="Ej: 12345678">
+                <datalist id="listaCcNitClientes"></datalist>
+            </div>
+
+            <div style="display: grid; gap: 1rem;">
+                <button onclick="confirmarDatosCliente()"
+                    style="padding: 1rem; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);">
+                    Continuar
+                </button>
+                <button onclick="document.getElementById('modalDatosCliente').style.display = 'none'"
+                    style="padding: 0.75rem; background: #f7fafc; color: #718096; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal para método de pago -->
     <div id="modalMetodoPago"

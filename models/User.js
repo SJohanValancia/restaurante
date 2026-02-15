@@ -77,6 +77,11 @@ const userSchema = new mongoose.Schema({
   ultimoAcceso: {
     type: Date,
     default: null
+  },
+  nitRestaurante: {
+    type: String,
+    trim: true,
+    default: ''
   }
 }, {
   timestamps: true,

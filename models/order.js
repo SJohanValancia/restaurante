@@ -98,6 +98,16 @@ const orderSchema = new mongoose.Schema({
     type: String,
     enum: ['local', 'mandao'],
     default: 'local'
+  },
+  clienteNombre: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  clienteCcNit: {
+    type: String,
+    trim: true,
+    default: ''
   }
 }, {
   timestamps: true,

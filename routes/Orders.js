@@ -538,8 +538,10 @@ router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (re
     order.estado = estado;
 
     // Si es entregado y hay método de pago, guardarlo
-    if (estado === 'entregado' && metodoPago) {
-      order.metodoPago = metodoPago;
+    if (estado === 'entregado') {
+      if (metodoPago) order.metodoPago = metodoPago;
+      if (req.body.clienteNombre) order.clienteNombre = req.body.clienteNombre;
+      if (req.body.clienteCcNit) order.clienteCcNit = req.body.clienteCcNit;
     }
 
     await order.save();

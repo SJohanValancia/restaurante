@@ -2066,6 +2066,19 @@
 
             const metodoPagoTexto = metodoPagoSeleccionado === 'transferencia' ? 'TRANSFERENCIA' : 'EFECTIVO';
             const nombreRestaurante = currentUser.nombreRestaurante || 'RESTAURANTE';
+            const nitRestaurante = currentUser.nitRestaurante ? `NIT: ${currentUser.nitRestaurante}` : '';
+
+            // Datos del cliente
+            const clienteHTML = pedidoParaImprimir.clienteNombre ? `
+                <div class="print-info-row">
+                    <span class="print-info-label">Cliente:</span>
+                    <span>${pedidoParaImprimir.clienteNombre.toUpperCase()} 222222222222</span>
+                </div>
+                <div class="print-info-row">
+                    <span class="print-info-label">CC/NIT:</span>
+                    <span>${pedidoParaImprimir.clienteCcNit || '---'}</span>
+                </div>
+            ` : '';
 
             // Generar filas de productos
             const productosHTML = pedidoParaImprimir.items.map(item => {
@@ -2091,6 +2104,7 @@
             printContainer.innerHTML = `
         <div class="print-header">
             <h1>${nombreRestaurante}</h1>
+            ${nitRestaurante ? `<div style="font-size: 12px; font-weight: bold; margin-bottom: 5px;">${nitRestaurante}</div>` : ''}
             <div class="print-subtitle">FACTURA DE VENTA</div>
         </div>
         
@@ -2103,6 +2117,7 @@
                 <span class="print-info-label">Hora:</span>
                 <span>${horaStr}</span>
             </div>
+            ${clienteHTML}
             <div class="print-info-row">
                 <span class="print-info-label">Mesa:</span>
                 <span>${pedidoParaImprimir.mesa}</span>
@@ -2175,6 +2190,12 @@
             agregarTexto(comandos, nombreRestaurante);
             comandos.push(LF);
 
+            // NIT del restaurante
+            if (currentUser.nitRestaurante) {
+                agregarTexto(comandos, `NIT: ${currentUser.nitRestaurante}`);
+                comandos.push(LF);
+            }
+
             // Negrita OFF
             comandos.push(ESC, 0x45, 0x00);
 
@@ -2197,6 +2218,15 @@
             comandos.push(LF);
             agregarTexto(comandos, `Hora: ${horaStr}`);
             comandos.push(LF);
+
+            // Datos del cliente
+            if (pedidoParaImprimir.clienteNombre) {
+                agregarTexto(comandos, `Cliente: ${pedidoParaImprimir.clienteNombre.toUpperCase()} 222222222222`);
+                comandos.push(LF);
+                const cliCcNit = pedidoParaImprimir.clienteCcNit || '---';
+                agregarTexto(comandos, `CC/NIT: ${cliCcNit}`);
+                comandos.push(LF);
+            }
 
             // Mesa
             agregarTexto(comandos, `Mesa: ${pedidoParaImprimir.mesa}`);
