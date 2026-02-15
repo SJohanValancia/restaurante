@@ -637,6 +637,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h2>Mis Productos</h2>
+                        <input type="text" id="searchInput" class="form-input" placeholder="🔍 Buscar productos..." oninput="filterProducts()" style="margin-top: 1rem;">
                     </div>
                     <div class="card-body">
                         <div class="products-grid" id="productsGrid">
@@ -652,6 +653,7 @@
         const API_URL = 'https://restaurante-co77.onrender.com/api';
         let currentUser = null;
         let allCategories = [];
+        let allProducts = [];
 
         // CARGA INICIAL
         window.addEventListener('DOMContentLoaded', async () => {
@@ -725,6 +727,7 @@
                 const data = await response.json();
 
                 if (data.success) {
+                    allProducts = data.data;
                     displayProducts(data.data);
                     // Extraer categorías únicas
                     allCategories = [...new Set(data.data.map(p => p.categoria))].sort();
@@ -990,6 +993,22 @@
                 console.error('Error:', error);
                 Swal.fire({ icon: (('Error al actualizar disponibilidad').toLowerCase().includes("error") || ('Error al actualizar disponibilidad').toLowerCase().includes("falla") || ('Error al actualizar disponibilidad').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al actualizar disponibilidad', timer: 3000, showConfirmButton: false });
             }
+        }
+
+        // FILTRAR PRODUCTOS
+        function filterProducts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                displayProducts(allProducts);
+                return;
+            }
+
+            const filteredProducts = allProducts.filter(product => 
+                product.nombre.toLowerCase().includes(searchTerm)
+            );
+            
+            displayProducts(filteredProducts);
         }
 
         // MENU TOGGLE
