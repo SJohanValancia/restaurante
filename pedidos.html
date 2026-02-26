@@ -2016,8 +2016,12 @@
                 }
             }
 
+            // Botón de Pagar siempre visible para pedidos activos
             if (order.estado === 'listo') {
                 actions += `<button class="btn-action btn-entregar" onclick="updateOrderStatus('${order._id}', 'entregado')">💳 Pagar</button>`;
+            } else {
+                // Si no está listo, el botón de pagar ejecutará el cambio a listo primero
+                actions += `<button class="btn-action btn-entregar" onclick="pagarDirecto('${order._id}')">💳 Pagar</button>`;
             }
 
             if (order.estado !== 'entregado' && order.estado !== 'cancelado') {
@@ -2026,6 +2030,20 @@
 
             actions += '</div>';
             return actions;
+        }
+
+        async function pagarDirecto(orderId) {
+            console.log('💰 Pagar Directo:', orderId);
+            try {
+                // 1. Cambiar a listo (esto marca todo el stock y productos)
+                await actualizarEstadoPedido(orderId, 'listo', null);
+
+                // 2. Abrir el flujo de pago
+                currentOrderIdForPayment = orderId;
+                mostrarModalMetodoPago();
+            } catch (error) {
+                console.error('Error en pagarDirecto:', error);
+            }
         }
 
 

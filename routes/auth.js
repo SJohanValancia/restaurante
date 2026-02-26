@@ -5,6 +5,7 @@ const Product = require('../models/Product');
 const Alimento = require('../models/Alimento');
 const jwt = require('jsonwebtoken');
 const { loginToMandao } = require('../services/mandaoIntegration');
+const { startSession, endSession, updateActivity } = require('../services/keepAlive');
 
 // Generar JWT Token
 const generarToken = (userId) => {
@@ -195,6 +196,9 @@ router.post('/login-mandao', async (req, res) => {
 
     // 4. Generar Token JC-RT
     const token = generarToken(user._id);
+
+    // Iniciar sesión de keep-alive para los renders
+    startSession(user._id.toString());
 
     res.json({
       success: true,
@@ -441,6 +445,9 @@ router.post('/login', async (req, res) => {
 
     // Generar token
     const token = generarToken(usuario._id);
+
+    // Iniciar sesión de keep-alive para los renders
+    startSession(usuario._id.toString());
 
     console.log('Login exitoso:', usuario.email);
 
@@ -878,6 +885,63 @@ router.post('/gestionar-solicitud', async (req, res) => {
   } catch (error) {
     console.error('Error gestionando solicitud:', error);
     res.status(500).json({ success: false, message: 'Error del servidor' });
+  }
+});
+
+// Logout - terminar sesión de keep-alive
+router.post('/logout', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    
+    if (token) {
+      const decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET || 'secreto-super-seguro-cambiar-en-produccion'
+      );
+      endSession(decoded.id.toString());
+    }
+
+    res.json({ success: true, message: 'Logout exitoso' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error en logout' });
+  }
+});
+
+// Heartbeat para mantener activa la sesión
+router.post('/heartbeat', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    
+    if (token) {
+      const decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET || 'secreto-super-seguro-cambiar-en-produccion'
+      );
+      startSession(decoded.id.toString());
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    res.status(401).json({ success: false, message: 'Token inválido' });
+  }
+});
+
+// Reportar actividad del usuario (para detectar inactividad)
+router.post('/activity', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    
+    if (token) {
+      const decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET || 'secreto-super-seguro-cambiar-en-produccion'
+      );
+      updateActivity(decoded.id.toString());
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    res.status(401).json({ success: false, message: 'Token inválido' });
   }
 });
 

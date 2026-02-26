@@ -1314,6 +1314,8 @@
         let audioUnlocked = false;
         let pedidoParaImprimir = null;
         let metodoPagoSeleccionado = null;
+        let clienteNombreSeleccionado = '';
+        let clienteCcNitSeleccionado = '';
         let todosLosPlatos = new Set();
         let platoSeleccionado = null;
         let productosFiltrados = [];
@@ -1847,7 +1849,6 @@
                 } else {
                     actions += `<button class="btn-action btn-preparar" onclick="updateOrderStatus('${order._id}', 'preparando')">👨‍🍳 Preparar</button>`;
                 }
-                actions += `<button class="btn-action btn-cancelar" onclick="cancelOrder('${order._id}')">❌ Cancelar</button>`;
             }
 
             if (order.estado === 'preparando') {
@@ -1856,11 +1857,18 @@
                 } else {
                     actions += `<button class="btn-action btn-listo" onclick="updateOrderStatus('${order._id}', 'listo')">✅ Listo</button>`;
                 }
-                actions += `<button class="btn-action btn-cancelar" onclick="cancelOrder('${order._id}')">❌ Cancelar</button>`;
             }
 
-            if (order.estado === 'listo') {
-                actions += `<button class="btn-action btn-entregar" onclick="updateOrderStatus('${order._id}', 'entregado')">🍽️ Pagar</button>`;
+            // Botón de Pagar siempre visible para pedidos activos
+            if (order.estado === 'pendiente' || order.estado === 'preparando' || order.estado === 'listo') {
+                if (order.estado === 'listo') {
+                    actions += `<button class="btn-action btn-entregar" onclick="updateOrderStatus('${order._id}', 'entregado')">💳 Pagar</button>`;
+                } else {
+                    actions += `<button class="btn-action btn-entregar" onclick="pagarDirecto('${order._id}')">💳 Pagar</button>`;
+                }
+            }
+
+            if (order.estado !== 'entregado' && order.estado !== 'cancelado') {
                 actions += `<button class="btn-action btn-cancelar" onclick="cancelOrder('${order._id}')">❌ Cancelar</button>`;
             }
 
@@ -1875,6 +1883,20 @@
 
             actions += '</div>';
             return actions;
+        }
+
+        async function pagarDirecto(orderId) {
+            console.log('💰 Pagar Directo (Historial):', orderId);
+            try {
+                // 1. Cambiar a listo
+                await actualizarEstadoPedido(orderId, 'listo', null);
+
+                // 2. Abrir el flujo de pago
+                currentOrderIdForPayment = orderId;
+                mostrarModalMetodoPago();
+            } catch (error) {
+                console.error('Error en pagarDirecto:', error);
+            }
         }
 
         // FUNCIONES DEL MODAL DE MÉTODO DE PAGO
@@ -1896,7 +1918,7 @@
         }
 
 
-        function mostrarModalMetodoPago() {
+        async function mostrarModalMetodoPago() {
             console.log('🪟 Mostrando modal con orderId:', currentOrderIdForPayment);
             const modal = document.getElementById('modalMetodoPago');
             if (!modal) {
@@ -1904,6 +1926,45 @@
                 return;
             }
             modal.style.display = 'flex';
+
+            // Cargar sugerencias de clientes previos
+            await cargarSugerenciasClientes();
+        }
+
+        async function cargarSugerenciasClientes() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_URL}/orders`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+
+                if (data.success && data.data) {
+                    const clientesUnicos = new Map();
+                    data.data.forEach(order => {
+                        if (order.clienteNombre) {
+                            clientesUnicos.set(order.clienteNombre.toUpperCase(), order.clienteCcNit || '');
+                        }
+                    });
+
+                    const datalistNombre = document.getElementById('listaNombresClientes');
+                    const datalistCcNit = document.getElementById('listaCcNitClientes');
+
+                    if (datalistNombre && datalistCcNit) {
+                        datalistNombre.innerHTML = '';
+                        datalistCcNit.innerHTML = '';
+
+                        clientesUnicos.forEach((ccNit, nombre) => {
+                            datalistNombre.innerHTML += `<option value="${nombre}">`;
+                            if (ccNit) {
+                                datalistCcNit.innerHTML += `<option value="${ccNit}">`;
+                            }
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error al cargar sugerencias de clientes:', error);
+            }
         }
 
         function cerrarModalMetodoPago() {
@@ -1928,6 +1989,21 @@
 
             // Cerrar modal de método de pago
             document.getElementById('modalMetodoPago').style.display = 'none';
+
+            // Limpiar inputs de datos de cliente
+            document.getElementById('clienteNombre').value = '';
+            document.getElementById('clienteCcNit').value = '';
+
+            // Mostrar modal de datos del cliente
+            document.getElementById('modalDatosCliente').style.display = 'flex';
+        }
+
+        async function confirmarDatosCliente() {
+            clienteNombreSeleccionado = document.getElementById('clienteNombre').value.trim();
+            clienteCcNitSeleccionado = document.getElementById('clienteCcNit').value.trim();
+
+            // Cerrar modal de datos del cliente
+            document.getElementById('modalDatosCliente').style.display = 'none';
 
             // Obtener los datos completos del pedido antes de preguntar por impresión
             await obtenerDatosPedidoParaImprimir(currentOrderIdForPayment);
@@ -1973,12 +2049,15 @@
                 }
             }
 
-            // Actualizar el pedido con el método de pago
+            // Actualizar el pedido con el método de pago y datos del cliente
             const orderIdTemp = currentOrderIdForPayment;
+            await actualizarEstadoPedido(orderIdTemp, 'entregado', metodoPagoSeleccionado, clienteNombreSeleccionado, clienteCcNitSeleccionado);
+
+            // Limpiar variables
             currentOrderIdForPayment = null;
             pedidoParaImprimir = null;
-
-            await actualizarEstadoPedido(orderIdTemp, 'entregado', metodoPagoSeleccionado);
+            clienteNombreSeleccionado = '';
+            clienteCcNitSeleccionado = '';
         }
 
 
@@ -2300,13 +2379,14 @@
             return `$${precio.toLocaleString('es-CO')}`;
         }
 
-        async function actualizarEstadoPedido(orderId, newStatus, metodoPago = null) {
+        async function actualizarEstadoPedido(orderId, newStatus, metodoPago = null, clienteNombre = null, clienteCcNit = null) {
             const token = localStorage.getItem('token');
 
             console.log('📤 Enviando petición:');
             console.log('  - Order ID:', orderId);
             console.log('  - Estado:', newStatus);
             console.log('  - Método de pago:', metodoPago);
+            console.log('  - Cliente:', clienteNombre, clienteCcNit);
 
             if (!orderId || orderId === 'null' || orderId === 'undefined') {
                 console.error('❌ Order ID incorrecto:', orderId);
@@ -2341,9 +2421,11 @@
                     body.actualizarTodosLosProductos = true;
                 }
 
-                // SOLO agregar metodoPago si existe Y el estado es 'entregado'
-                if (metodoPago && newStatus === 'entregado') {
-                    body.metodoPago = metodoPago;
+                // SOLO agregar metodoPago, clienteNombre y clienteCcNit si existen Y el estado es 'entregado'
+                if (newStatus === 'entregado') {
+                    if (metodoPago) body.metodoPago = metodoPago;
+                    if (clienteNombre) body.clienteNombre = clienteNombre;
+                    if (clienteCcNit) body.clienteCcNit = clienteCcNit;
                 }
 
                 console.log('  - Body:', JSON.stringify(body, null, 2));
@@ -3351,6 +3433,49 @@
         }
 
     </script>
+
+    <!-- Modal para datos del cliente -->
+    <div id="modalDatosCliente"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10001; align-items: center; justify-content: center;">
+        <div
+            style="background: white; border-radius: 16px; padding: 2.5rem; max-width: 450px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <h3 style="font-size: 22px; font-weight: 700; color: #1a202c; margin-bottom: 0.5rem; text-align: center;">👤
+                Datos del Cliente</h3>
+            <p style="font-size: 14px; color: #718096; text-align: center; margin-bottom: 2rem;">Ingrese los datos para
+                la factura (Opcional)</p>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label
+                    style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 8px;">Nombre
+                    del Cliente</label>
+                <input type="text" id="clienteNombre" list="listaNombresClientes"
+                    style="width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 15px; transition: all 0.2s;"
+                    placeholder="Ej: Juan Pérez">
+                <datalist id="listaNombresClientes"></datalist>
+            </div>
+
+            <div style="margin-bottom: 2rem;">
+                <label
+                    style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 8px;">Cédula
+                    / NIT</label>
+                <input type="text" id="clienteCcNit" list="listaCcNitClientes"
+                    style="width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 15px; transition: all 0.2s;"
+                    placeholder="Ej: 12345678">
+                <datalist id="listaCcNitClientes"></datalist>
+            </div>
+
+            <div style="display: grid; gap: 1rem;">
+                <button onclick="confirmarDatosCliente()"
+                    style="padding: 1rem; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);">
+                    Continuar
+                </button>
+                <button onclick="document.getElementById('modalDatosCliente').style.display = 'none'"
+                    style="padding: 0.75rem; background: #f7fafc; color: #718096; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal para método de pago -->
     <div id="modalMetodoPago"
