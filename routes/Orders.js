@@ -335,38 +335,67 @@ router.get('/stats/productos-mas-vendidos', protect, async (req, res) => {
     const { limit = 3 } = req.query;
     const limitNum = parseInt(limit) || 3;
 
+    if (!req.userIdsRestaurante || req.userIdsRestaurante.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No se encontraron usuarios para el restaurante'
+      });
+    }
+
+    const objectIds = req.userIdsRestaurante.map(id => {
+      try {
+        return mongoose.Types.ObjectId(id);
+      } catch (e) {
+        return null;
+      }
+    }).filter(id => id !== null);
+
+    if (objectIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'IDs de usuario inválidos'
+      });
+    }
+
     const productosMasVendidos = await Order.aggregate([
-      { $match: { userId: { $in: req.userIdsRestaurante.map(id => mongoose.Types.ObjectId(id)) }, estado: { $ne: 'cancelado' } } },
+      { $match: { userId: { $in: objectIds }, estado: { $ne: 'cancelado' } } },
       { $unwind: '$items' },
       { $group: { _id: '$items.producto', cantidadTotal: { $sum: '$items.cantidad' }, ingresosTotales: { $sum: { $multiply: ['$items.cantidad', '$items.precio'] } } } },
       { $sort: { cantidadTotal: -1 } },
-      { $limit: limitNum },
-      {
-        $lookup: {
-          from: 'products',
-          localField: '_id',
-          foreignField: '_id',
-          as: 'productoInfo'
-        }
-      },
-      { $unwind: { path: '$productoInfo', preserveNullAndEmptyArrays: true } },
-      {
-        $project: {
-          _id: 0,
-          productoId: '$_id',
-          nombre: { $ifNull: ['$productoInfo.nombre', 'Producto eliminado'] },
-          categoria: { $ifNull: ['$productoInfo.categoria', 'Sin categoría'] },
-          cantidadTotal: 1,
-          ingresosTotales: 1
+      { $limit: limitNum }
+    ]);
+
+    const productosConInfo = await Promise.all(productosMasVendidos.map(async (prod) => {
+      let nombre = 'Producto eliminado';
+      let categoria = 'Sin categoría';
+      
+      if (prod._id) {
+        try {
+          const producto = await require('../models/Product').findById(prod._id).lean();
+          if (producto) {
+            nombre = producto.nombre;
+            categoria = producto.categoria;
+          }
+        } catch (e) {
+          console.log('Producto no encontrado:', prod._id);
         }
       }
-    ]);
+
+      return {
+        productoId: prod._id,
+        nombre,
+        categoria,
+        cantidadTotal: prod.cantidadTotal,
+        ingresosTotales: prod.ingresosTotales
+      };
+    }));
 
     res.json({
       success: true,
-      data: productosMasVendidos
+      data: productosConInfo
     });
   } catch (error) {
+    console.error('❌ Error en productos-mas-vendidos:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener productos más vendidos',

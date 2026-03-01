@@ -1757,6 +1757,8 @@
             const container = document.getElementById('productsRanking');
             container.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><p>Cargando...</p></div>';
 
+            const token = localStorage.getItem('token');
+
             fetch(`${API_URL}/orders/stats/productos-mas-vendidos?limit=3`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             })
