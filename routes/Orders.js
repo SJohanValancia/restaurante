@@ -329,6 +329,52 @@ router.get('/stats/resumen', protect, async (req, res) => {
   }
 });
 
+// ⭐ NUEVA RUTA: Productos más vendidos del restaurante
+router.get('/stats/productos-mas-vendidos', protect, async (req, res) => {
+  try {
+    const { limit = 3 } = req.query;
+    const limitNum = parseInt(limit) || 3;
+
+    const productosMasVendidos = await Order.aggregate([
+      { $match: { userId: { $in: req.userIdsRestaurante.map(id => mongoose.Types.ObjectId(id)) }, estado: { $ne: 'cancelado' } } },
+      { $unwind: '$items' },
+      { $group: { _id: '$items.producto', cantidadTotal: { $sum: '$items.cantidad' }, ingresosTotales: { $sum: { $multiply: ['$items.cantidad', '$items.precio'] } } } },
+      { $sort: { cantidadTotal: -1 } },
+      { $limit: limitNum },
+      {
+        $lookup: {
+          from: 'products',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'productoInfo'
+        }
+      },
+      { $unwind: { path: '$productoInfo', preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          _id: 0,
+          productoId: '$_id',
+          nombre: { $ifNull: ['$productoInfo.nombre', 'Producto eliminado'] },
+          categoria: { $ifNull: ['$productoInfo.categoria', 'Sin categoría'] },
+          cantidadTotal: 1,
+          ingresosTotales: 1
+        }
+      }
+    ]);
+
+    res.json({
+      success: true,
+      data: productosMasVendidos
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener productos más vendidos',
+      error: error.message
+    });
+  }
+});
+
 router.get('/:id', protect, async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)

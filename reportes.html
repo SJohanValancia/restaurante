@@ -1754,73 +1754,54 @@
         }
 
         function updateProductsRanking() {
-            const productStats = {};
-
-            filteredOrders.filter(o => o.estado !== 'cancelado').forEach(order => {
-                order.items.forEach(item => {
-                    // Manejo seguro de productos
-                    let productId, nombre, categoria;
-
-                    if (item.productoInfo) {
-                        productId = item.producto || item._id;
-                        nombre = item.productoInfo.nombre;
-                        categoria = item.productoInfo.categoria;
-                    } else if (item.producto && item.producto._id) {
-                        productId = item.producto._id;
-                        nombre = item.producto.nombre;
-                        categoria = item.producto.categoria;
-                    } else if (item.nombreProducto) {
-                        productId = item.nombreProducto;
-                        nombre = item.nombreProducto;
-                        categoria = item.categoriaProducto || 'Sin categoría';
-                    } else {
-                        return; // Skip items sin información válida
-                    }
-
-                    if (!productStats[productId]) {
-                        productStats[productId] = {
-                            nombre: nombre,
-                            categoria: categoria,
-                            cantidad: 0,
-                            ingresos: 0
-                        };
-                    }
-                    productStats[productId].cantidad += item.cantidad;
-                    productStats[productId].ingresos += item.cantidad * item.precio;
-                });
-            });
-
-            const ranking = Object.values(productStats)
-                .sort((a, b) => b.cantidad - a.cantidad)
-                .slice(0, 10);
-
             const container = document.getElementById('productsRanking');
+            container.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><p>Cargando...</p></div>';
 
-            if (ranking.length === 0) {
-                container.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">📊</div>
-                <p>No hay datos para mostrar</p>
-            </div>
-        `;
-                return;
-            }
+            fetch(`${API_URL}/orders/stats/productos-mas-vendidos?limit=3`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(response => {
+                if (!response.success) {
+                    throw new Error(response.message);
+                }
+                const ranking = response.data;
 
-            container.innerHTML = ranking.map((product, index) => `
-        <div class="product-rank-item">
-            <div class="product-rank-info">
-                <div class="rank-number">${index + 1}</div>
-                <div class="product-details">
-                    <h4>${product.nombre}</h4>
-                    <p>${product.categoria}</p>
+                if (ranking.length === 0) {
+                    container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">📊</div>
+                    <p>No hay productos vendidos aún</p>
+                </div>
+            `;
+                    return;
+                }
+
+                container.innerHTML = ranking.map((product, index) => `
+            <div class="product-rank-item">
+                <div class="product-rank-info">
+                    <div class="rank-number">${index + 1}</div>
+                    <div class="product-details">
+                        <h4>${product.nombre}</h4>
+                        <p>${product.categoria}</p>
+                    </div>
+                </div>
+                <div class="product-stats">
+                    <div class="product-quantity">${product.cantidadTotal} unidades</div>
+                    <div class="product-revenue">$${product.ingresosTotales.toLocaleString('es-CO')}</div>
                 </div>
             </div>
-            <div class="product-stats">
-                <div class="product-quantity">${product.cantidad} unidades</div>
-                <div class="product-revenue">$${product.ingresos.toLocaleString('es-CO')}</div>
+        `).join('');
+            })
+            .catch(error => {
+                console.error('Error al cargar productos más vendidos:', error);
+                container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">❌</div>
+                <p>Error al cargar datos</p>
             </div>
-        </div>
-    `).join('');
+        `;
+            });
         }
         function displayOrders() {
             const tbody = document.getElementById('ordersTableBody');
