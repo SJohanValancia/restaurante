@@ -335,7 +335,11 @@ router.get('/stats/productos-mas-vendidos', protect, async (req, res) => {
     const { limit = 3 } = req.query;
     const limitNum = parseInt(limit) || 3;
 
+    console.log('🔍 userIdsRestaurante:', req.userIdsRestaurante);
+    console.log('🔍 user:', req.user);
+
     if (!req.userIdsRestaurante || req.userIdsRestaurante.length === 0) {
+      console.log('❌ userIdsRestaurante vacío');
       return res.status(400).json({
         success: false,
         message: 'No se encontraron usuarios para el restaurante'
