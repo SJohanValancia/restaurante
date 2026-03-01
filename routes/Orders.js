@@ -14,54 +14,57 @@ async function descontarStockAlimentos(items, userId, ignorarStock = false) {
   const Alimento = require('../models/Alimento');
 
   try {
-    // Por cada item del pedido
+    const productoIds = [...new Set(items.map(item => item.producto))];
+    
+    const alimentos = await Alimento.find({
+      'productos.productoId': { $in: productoIds },
+      userId: userId
+    }).lean();
+
+    const operaciones = [];
+
     for (const item of items) {
       const productoId = item.producto;
       const cantidadPedida = item.cantidad;
 
-      // Buscar todos los alimentos que usan este producto
-      const alimentos = await Alimento.find({
-        'productos.productoId': productoId,
-        userId: userId
-      });
-
-      // Descontar stock de cada alimento
       for (const alimento of alimentos) {
-        // Encontrar la configuración del producto en este alimento
         const productoConfig = alimento.productos.find(
-          p => p.productoId.toString() === productoId.toString()
+          p => p.productoId && p.productoId.toString() === productoId.toString()
         );
 
         if (productoConfig) {
           const cantidadADescontar = productoConfig.cantidadRequerida * cantidadPedida;
 
-          // ✅ Si ignorarStock es true, solo descontar lo que hay disponible
           if (ignorarStock) {
             if (alimento.stock > 0) {
               const descontado = Math.min(alimento.stock, cantidadADescontar);
-              alimento.stock -= descontado;
-              await alimento.save();
-              console.log(`⚠️ Descontado parcialmente ${descontado} unidades de "${alimento.nombre}". Stock restante: ${alimento.stock}`);
-            } else {
-              console.log(`⚠️ "${alimento.nombre}" sin stock, pedido creado sin descontar`);
+              operaciones.push({
+                updateOne: {
+                  filter: { _id: alimento._id },
+                  update: { $inc: { stock: -descontado } }
+                }
+              });
             }
           } else {
-            // Validar que haya stock suficiente (comportamiento original)
             if (alimento.stock < cantidadADescontar) {
               throw new Error(
                 `Stock insuficiente de "${alimento.nombre}". ` +
                 `Disponible: ${alimento.stock}, Requerido: ${cantidadADescontar}`
               );
             }
-
-            // Descontar stock
-            alimento.stock -= cantidadADescontar;
-            await alimento.save();
-
-            console.log(`✅ Descontado ${cantidadADescontar} unidades de "${alimento.nombre}". Stock restante: ${alimento.stock}`);
+            operaciones.push({
+              updateOne: {
+                filter: { _id: alimento._id },
+                update: { $inc: { stock: -cantidadADescontar } }
+              }
+            });
           }
         }
       }
+    }
+
+    if (operaciones.length > 0) {
+      await Alimento.bulkWrite(operaciones);
     }
 
     return { success: true };
@@ -200,7 +203,11 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
 // â­ RUTAS PROTEGIDAS - Con protect
 router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
   try {
-    const { estado, mesa, fecha } = req.query;
+    const { estado, mesa, fecha, page = 1, limit = 50 } = req.query;
+
+    const pageNum = parseInt(page) || 1;
+    const limitNum = Math.min(parseInt(limit) || 50, 100);
+    const skip = (pageNum - 1) * limitNum;
 
     let query = { userId: { $in: req.userIdsRestaurante } };
 
@@ -224,12 +231,18 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
       query.createdAt = { $gte: mes };
     }
 
-    const orders = await Order.find(query)
-      .populate('items.producto', 'nombre categoria precio')
-      .sort({ createdAt: -1 });
+    const [orders, total] = await Promise.all([
+      Order.find(query)
+        .populate('items.producto', 'nombre categoria precio')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limitNum)
+        .lean(),
+      Order.countDocuments(query)
+    ]);
 
     const ordersNormalizados = orders.map(order => {
-      const orderObj = order.toObject();
+      const orderObj = { ...order };
       orderObj.items = orderObj.items.map(item => {
         if (item.producto) {
           return {
@@ -245,7 +258,7 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
             ...item,
             productoInfo: {
               nombre: item.nombreProducto || 'Producto eliminado',
-              categoria: item.categoriaProducto || 'Sin categorÃ­a',
+              categoria: item.categoriaProducto || 'Sin categoría',
               precio: item.precio
             }
           };
@@ -257,6 +270,9 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
     res.json({
       success: true,
       count: ordersNormalizados.length,
+      total,
+      page: pageNum,
+      pages: Math.ceil(total / limitNum),
       data: ordersNormalizados
     });
   } catch (error) {
@@ -273,50 +289,41 @@ router.get('/stats/resumen', protect, async (req, res) => {
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
 
-    const stats = await Order.aggregate([
-      {
-        $match: {
-          userId: { $in: req.userIdsRestaurante.map(id => mongoose.Types.ObjectId(id)) },
-          createdAt: { $gte: hoy }
-        }
-      },
-      {
-        $group: {
-          _id: '$estado',
-          count: { $sum: 1 },
-          total: { $sum: '$total' }
-        }
-      }
-    ]);
-
-    const totalPedidos = await Order.countDocuments({
-      userId: { $in: req.userIdsRestaurante },
+    const matchStage = {
+      userId: { $in: req.userIdsRestaurante.map(id => mongoose.Types.ObjectId(id)) },
       createdAt: { $gte: hoy }
-    });
+    };
 
-    const totalVentas = await Order.aggregate([
-      {
-        $match: {
-          userId: { $in: req.userIdsRestaurante.map(id => mongoose.Types.ObjectId(id)) },
-          createdAt: { $gte: hoy },
-          estado: { $ne: 'cancelado' }
+    const [stats, totalPedidos] = await Promise.all([
+      Order.aggregate([
+        { $match: matchStage },
+        {
+          $group: {
+            _id: '$estado',
+            count: { $sum: 1 },
+            total: { $sum: '$total' }
+          }
         }
-      },
-      { $group: { _id: null, total: { $sum: '$total' } } }
+      ]),
+      Order.countDocuments(matchStage)
     ]);
+
+    const ventasHoy = stats
+      .filter(s => s._id !== 'cancelado')
+      .reduce((sum, s) => sum + s.total, 0);
 
     res.json({
       success: true,
       data: {
         pedidosHoy: totalPedidos,
-        ventasHoy: totalVentas[0]?.total || 0,
+        ventasHoy,
         porEstado: stats
       }
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error al obtener estadÃ­sticas',
+      message: 'Error al obtener estadísticas',
       error: error.message
     });
   }

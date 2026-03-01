@@ -8,7 +8,12 @@ const { checkPermission } = require('../middleware/permissions');
 // Obtener todos los gastos del restaurante
 router.get('/', protect, checkPermission('verGastos'), async (req, res) => {
   try {
-    const { month } = req.query;
+    const { month, page = 1, limit = 50 } = req.query;
+    
+    const pageNum = parseInt(page) || 1;
+    const limitNum = Math.min(parseInt(limit) || 50, 100);
+    const skip = (pageNum - 1) * limitNum;
+
     let query = { userId: { $in: req.userIdsRestaurante } };
 
     if (month) {
@@ -22,11 +27,17 @@ router.get('/', protect, checkPermission('verGastos'), async (req, res) => {
       };
     }
 
-    const expenses = await Expense.find(query).sort({ fecha: -1 });
+    const [expenses, total] = await Promise.all([
+      Expense.find(query).sort({ fecha: -1 }).skip(skip).limit(limitNum).lean(),
+      Expense.countDocuments(query)
+    ]);
     
     res.json({
       success: true,
       count: expenses.length,
+      total,
+      page: pageNum,
+      pages: Math.ceil(total / limitNum),
       data: expenses
     });
   } catch (error) {
@@ -172,19 +183,28 @@ router.get('/stats/summary', protect, async (req, res) => {
       };
     }
 
-    const expenses = await Expense.find(query);
-    
-    const totalGastos = expenses.reduce((sum, exp) => sum + exp.total, 0);
-    const cantidadRegistros = expenses.length;
-    const cantidadGastos = expenses.reduce((sum, exp) => sum + exp.gastos.length, 0);
+    const result = await Expense.aggregate([
+      { $match: query },
+      { $unwind: '$gastos' },
+      {
+        $group: {
+          _id: null,
+          totalGastos: { $sum: '$gastos.monto' },
+          cantidadRegistros: { $addToSet: '$_id' },
+          cantidadGastos: { $sum: 1 }
+        }
+      }
+    ]);
 
+    const data = result[0] || { totalGastos: 0, cantidadRegistros: [], cantidadGastos: 0 };
+    
     res.json({
       success: true,
       data: {
-        totalGastos,
-        cantidadRegistros,
-        cantidadGastos,
-        promedioporRegistro: cantidadRegistros > 0 ? totalGastos / cantidadRegistros : 0
+        totalGastos: data.totalGastos,
+        cantidadRegistros: data.cantidadRegistros.length,
+        cantidadGastos: data.cantidadGastos,
+        promedioporRegistro: data.cantidadRegistros.length > 0 ? data.totalGastos / data.cantidadRegistros.length : 0
       }
     });
   } catch (error) {

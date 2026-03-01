@@ -49,7 +49,8 @@ const productSchema = new mongoose.Schema({
 productSchema.index({ nombre: 1 });
 productSchema.index({ categoria: 1 });
 productSchema.index({ disponible: 1 });
-productSchema.index({ userId: 1 });
+productSchema.index({ userId: 1, categoria: 1 });
+productSchema.index({ userId: 1, disponible: 1 });
 
 // ✅ VIRTUAL CORREGIDO - Validar que precio exista
 productSchema.virtual('precioFormateado').get(function() {

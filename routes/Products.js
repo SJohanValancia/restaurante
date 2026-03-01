@@ -61,9 +61,12 @@ router.get('/public/restaurante', async (req, res) => {
 // Obtener todos los productos del restaurante
 router.get('/', protect, checkPermission('verProductos'), async (req, res) => {
   try {
-    const { categoria, disponible, search } = req.query;
+    const { categoria, disponible, search, page = 1, limit = 100 } = req.query;
 
-    // Filtrar por todos los usuarios del mismo restaurante
+    const pageNum = parseInt(page) || 1;
+    const limitNum = Math.min(parseInt(limit) || 100, 200);
+    const skip = (pageNum - 1) * limitNum;
+
     let query = { userId: { $in: req.userIdsRestaurante } };
 
     if (categoria) query.categoria = categoria;
@@ -72,10 +75,17 @@ router.get('/', protect, checkPermission('verProductos'), async (req, res) => {
       query.nombre = { $regex: search, $options: 'i' };
     }
 
-    const products = await Product.find(query).sort({ nombre: 1 });
+    const [products, total] = await Promise.all([
+      Product.find(query).sort({ nombre: 1 }).skip(skip).limit(limitNum).lean(),
+      Product.countDocuments(query)
+    ]);
+
     res.json({
       success: true,
       count: products.length,
+      total,
+      page: pageNum,
+      pages: Math.ceil(total / limitNum),
       data: products
     });
   } catch (error) {

@@ -55,7 +55,7 @@ expenseSchema.pre('findOneAndUpdate', function(next) {
 });
 
 expenseSchema.index({ fecha: -1 });
-expenseSchema.index({ userId: 1 });
-expenseSchema.index({ reciboDia: 1 });
+expenseSchema.index({ userId: 1, fecha: -1 });
+expenseSchema.index({ userId: 1, reciboDia: 1 });
 
 module.exports = mongoose.model('Expense', expenseSchema);

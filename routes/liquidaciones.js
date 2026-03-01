@@ -257,7 +257,11 @@ router.post('/', protect, async (req, res) => {
 
 router.get('/', protect, async (req, res) => {
   try {
-    const { startDate, endDate } = req.query;
+    const { startDate, endDate, page = 1, limit = 30 } = req.query;
+
+    const pageNum = parseInt(page) || 1;
+    const limitNum = Math.min(parseInt(limit) || 30, 100);
+    const skip = (pageNum - 1) * limitNum;
 
     let query = { userId: { $in: req.userIdsRestaurante } };
 
@@ -268,17 +272,22 @@ router.get('/', protect, async (req, res) => {
       };
     }
 
-    const liquidaciones = await Liquidacion.find(query)
-      .populate({
-        path: 'ingresos.pedidos',
-        select: 'mesa total createdAt estado metodoPago'
-      })
-      .populate({
-        path: 'egresos.gastos',
-        select: 'fecha total gastos'
-      })
-      .sort({ fecha: -1 })
-      .lean();
+    const [liquidaciones, total] = await Promise.all([
+      Liquidacion.find(query)
+        .populate({
+          path: 'ingresos.pedidos',
+          select: 'mesa total createdAt estado metodoPago'
+        })
+        .populate({
+          path: 'egresos.gastos',
+          select: 'fecha total gastos'
+        })
+        .sort({ fecha: -1 })
+        .skip(skip)
+        .limit(limitNum)
+        .lean(),
+      Liquidacion.countDocuments(query)
+    ]);
 
     liquidaciones.forEach(liq => {
       if (liq.ingresos && Array.isArray(liq.ingresos.pedidos)) {
@@ -293,6 +302,9 @@ router.get('/', protect, async (req, res) => {
     res.json({
       success: true,
       count: liquidaciones.length,
+      total,
+      page: pageNum,
+      pages: Math.ceil(total / limitNum),
       data: liquidaciones
     });
   } catch (error) {
