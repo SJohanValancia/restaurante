@@ -15,7 +15,7 @@ async function descontarStockAlimentos(items, userId, ignorarStock = false) {
 
   try {
     const productoIds = [...new Set(items.map(item => item.producto))];
-    
+
     const alimentos = await Alimento.find({
       'productos.productoId': { $in: productoIds },
       userId: userId
@@ -290,7 +290,7 @@ router.get('/stats/resumen', protect, async (req, res) => {
     hoy.setHours(0, 0, 0, 0);
 
     const matchStage = {
-      userId: { $in: req.userIdsRestaurante.map(id => mongoose.Types.ObjectId(id)) },
+      userId: { $in: req.userIdsRestaurante.map(id => new mongoose.Types.ObjectId(id)) },
       createdAt: { $gte: hoy }
     };
 
@@ -348,7 +348,7 @@ router.get('/stats/productos-mas-vendidos', protect, async (req, res) => {
 
     const objectIds = req.userIdsRestaurante.map(id => {
       try {
-        return mongoose.Types.ObjectId(id);
+        return new mongoose.Types.ObjectId(id);
       } catch (e) {
         return null;
       }
@@ -372,7 +372,7 @@ router.get('/stats/productos-mas-vendidos', protect, async (req, res) => {
     const productosConInfo = await Promise.all(productosMasVendidos.map(async (prod) => {
       let nombre = 'Producto eliminado';
       let categoria = 'Sin categoría';
-      
+
       if (prod._id) {
         try {
           const producto = await require('../models/Product').findById(prod._id).lean();
