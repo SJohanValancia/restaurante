@@ -203,10 +203,10 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
 // â­ RUTAS PROTEGIDAS - Con protect
 router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
   try {
-    const { estado, mesa, fecha, page = 1, limit = 50 } = req.query;
+    const { estado, mesa, fecha, page = 1, limit = 1000 } = req.query;
 
     const pageNum = parseInt(page) || 1;
-    const limitNum = Math.min(parseInt(limit) || 50, 100);
+    const limitNum = parseInt(limit) || 1000;
     const skip = (pageNum - 1) * limitNum;
 
     let query = { userId: { $in: req.userIdsRestaurante } };
