@@ -16,49 +16,72 @@ async function descontarStockAlimentos(items, userId, ignorarStock = false) {
   try {
     const productoIds = [...new Set(items.map(item => item.producto))];
 
-    const alimentos = await Alimento.find({
-      'productos.productoId': { $in: productoIds },
-      userId: userId
-    }).lean();
+    // ✅ OPTIMIZACIÓN: Usar aggregation pipeline para evitar doble bucle
+    const alimentos = await Alimento.aggregate([
+      { $match: { 
+        'productos.productoId': { $in: productoIds },
+        userId: userId
+      }},
+      { $unwind: '$productos' },
+      { $match: { 'productos.productoId': { $in: productoIds } } }
+    ]);
+
+    // Crear mapa de alimentos por productoId
+    const alimentosMap = new Map();
+    alimentos.forEach(alimento => {
+      const productoId = alimento.productos.productoId.toString();
+      if (!alimentosMap.has(productoId)) {
+        alimentosMap.set(productoId, {
+          _id: alimento._id,
+          stock: alimento.stock,
+          nombre: alimento.nombre,
+          productos: [alimento.productos]
+        });
+      } else {
+        const existing = alimentosMap.get(productoId);
+        existing.productos.push(alimento.productos);
+      }
+    });
 
     const operaciones = [];
 
     for (const item of items) {
-      const productoId = item.producto;
+      const productoId = item.producto.toString();
       const cantidadPedida = item.cantidad;
 
-      for (const alimento of alimentos) {
-        const productoConfig = alimento.productos.find(
-          p => p.productoId && p.productoId.toString() === productoId.toString()
-        );
+      if (alimentosMap.has(productoId)) {
+        const alimentoData = alimentosMap.get(productoId);
+        let cantidadADescontar = 0;
 
-        if (productoConfig) {
-          const cantidadADescontar = productoConfig.cantidadRequerida * cantidadPedida;
+        // Calcular cantidad total requerida
+        alimentoData.productos.forEach(config => {
+          const productoConfig = config;
+          cantidadADescontar += productoConfig.cantidadRequerida * cantidadPedida;
+        });
 
-          if (ignorarStock) {
-            if (alimento.stock > 0) {
-              const descontado = Math.min(alimento.stock, cantidadADescontar);
-              operaciones.push({
-                updateOne: {
-                  filter: { _id: alimento._id },
-                  update: { $inc: { stock: -descontado } }
-                }
-              });
-            }
-          } else {
-            if (alimento.stock < cantidadADescontar) {
-              throw new Error(
-                `Stock insuficiente de "${alimento.nombre}". ` +
-                `Disponible: ${alimento.stock}, Requerido: ${cantidadADescontar}`
-              );
-            }
+        if (ignorarStock) {
+          if (alimentoData.stock > 0) {
+            const descontado = Math.min(alimentoData.stock, cantidadADescontar);
             operaciones.push({
               updateOne: {
-                filter: { _id: alimento._id },
-                update: { $inc: { stock: -cantidadADescontar } }
+                filter: { _id: alimentoData._id },
+                update: { $inc: { stock: -descontado } }
               }
             });
           }
+        } else {
+          if (alimentoData.stock < cantidadADescontar) {
+            throw new Error(
+              `Stock insuficiente de "${alimentoData.nombre}". ` +
+              `Disponible: ${alimentoData.stock}, Requerido: ${cantidadADescontar}`
+            );
+          }
+          operaciones.push({
+            updateOne: {
+              filter: { _id: alimentoData._id },
+              update: { $inc: { stock: -cantidadADescontar } }
+            }
+          });
         }
       }
     }
@@ -203,10 +226,10 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
 // â­ RUTAS PROTEGIDAS - Con protect
 router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
   try {
-    const { estado, mesa, fecha, page = 1, limit = 1000 } = req.query;
+    const { estado, mesa, fecha, page = 1, limit = 30 } = req.query;
 
     const pageNum = parseInt(page) || 1;
-    const limitNum = parseInt(limit) || 1000;
+    const limitNum = Math.min(parseInt(limit) || 30, 100); // Límite máximo de 100
     const skip = (pageNum - 1) * limitNum;
 
     let query = { userId: { $in: req.userIdsRestaurante } };
@@ -231,9 +254,16 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
       query.createdAt = { $gte: mes };
     }
 
+    // ✅ OPTIMIZACIÓN: Usar proyección en lugar de populate
     const [orders, total] = await Promise.all([
-      Order.find(query)
-        .populate('items.producto', 'nombre categoria precio')
+      Order.find(query, { 
+        items: 1, 
+        total: 1, 
+        estado: 1, 
+        mesa: 1,
+        createdAt: 1,
+        userId: 1
+      })
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limitNum)
@@ -241,16 +271,33 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
       Order.countDocuments(query)
     ]);
 
+    // ✅ OPTIMIZACIÓN: Procesar items en lote
+    const productIds = new Set();
+    orders.forEach(order => {
+      order.items.forEach(item => {
+        if (item.producto) productIds.add(item.producto);
+      });
+    });
+
+    const productsMap = new Map();
+    if (productIds.size > 0) {
+      const products = await Product.find({ 
+        _id: { $in: Array.from(productIds) } 
+      }, 'nombre categoria precio');
+      products.forEach(p => productsMap.set(p._id.toString(), p));
+    }
+
     const ordersNormalizados = orders.map(order => {
       const orderObj = { ...order };
       orderObj.items = orderObj.items.map(item => {
         if (item.producto) {
+          const product = productsMap.get(item.producto.toString());
           return {
             ...item,
             productoInfo: {
-              nombre: item.producto.nombre,
-              categoria: item.producto.categoria,
-              precio: item.producto.precio
+              nombre: product ? product.nombre : 'Producto eliminado',
+              categoria: product ? product.categoria : 'Sin categoría',
+              precio: product ? product.precio : item.precio
             }
           };
         } else {

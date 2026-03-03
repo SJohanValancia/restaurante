@@ -117,6 +117,9 @@ const orderSchema = new mongoose.Schema({
 orderSchema.index({ mesaNormalizada: 1, userId: 1 });
 orderSchema.index({ userId: 1, estado: 1, createdAt: -1 });
 orderSchema.index({ userId: 1, createdAt: -1 });
+orderSchema.index({ estado: 1, createdAt: -1 });
+orderSchema.index({ source: 1, createdAt: -1 });
+orderSchema.index({ mandaoOrderId: 1 });
 
 // ✅ FUNCIÓN PARA NORMALIZAR TEXTO (QUITAR TILDES)
 function normalizeText(text) {

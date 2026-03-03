@@ -4,6 +4,13 @@ const Order = require('../models/order');
 const Product = require('../models/Product');
 const Alimento = require('../models/Alimento');
 
+// ✅ CACHE PARA LLAMADAS A MANDAO
+const mandaoCache = {
+  products: null,
+  productsTimestamp: 0,
+  productsTTL: 5 * 60 * 1000 // 5 minutos
+};
+
 // ✅ FUNCIÓN REUTILIZADA DE JC-RT PARA DESCONTAR STOCK
 async function descontarStockAlimentos(items, userId) {
     try {
@@ -56,7 +63,7 @@ router.post('/order', async (req, res) => {
             const nombreLimpio = item.nombre.trim();
             const product = await Product.findOne({
                 userId: req.user._id,
-                nombre: { $regex: new RegExp(`^\\s*${nombreLimpio}\\s*$`, 'i') }
+                nombre: { $regex: new RegExp(`^\s*${nombreLimpio}\s*$`, 'i') }
             });
 
             return {
@@ -121,6 +128,14 @@ router.post('/order', async (req, res) => {
 router.get('/products', async (req, res) => {
     try {
         const userId = req.user._id;
+        
+        // ✅ OPTIMIZACIÓN: Caché de productos Mandao
+        const now = Date.now();
+        if (mandaoCache.products && (now - mandaoCache.productsTimestamp) < mandaoCache.productsTTL) {
+            console.log('🔄 Devolviendo productos desde caché (expira en', Math.ceil((mandaoCache.productsTTL - (now - mandaoCache.productsTimestamp)) / 1000), 'seg)');
+            return res.json(mandaoCache.products);
+        }
+
         const products = await Product.find({ userId });
         const alimentos = await Alimento.find({ userId });
 
@@ -132,6 +147,13 @@ router.get('/products', async (req, res) => {
                 disponible: product.disponible // Ahora es 100% manual por el negocio
             };
         });
+
+        // Guardar en caché
+        mandaoCache.products = {
+            success: true,
+            products: results
+        };
+        mandaoCache.productsTimestamp = Date.now();
 
         res.json({
             success: true,

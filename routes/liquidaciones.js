@@ -79,108 +79,68 @@ router.get('/stats/resumen', protect, async (req, res) => {
       };
     }
 
-    const liquidaciones = await Liquidacion.find(query)
-      .populate({
-        path: 'ingresos.pedidos',
-        select: 'total metodoPago estado'
-      })
-      .populate({
-        path: 'egresos.gastos',
-        select: 'total gastos'
-      })
-      .lean();
+    // ✅ OPTIMIZACIÓN: Usar agregación para cálculos complejos
+    const pipeline = [
+      { $match: query },
+      { $addFields: { 
+        totalTransferenciasIngresos: { $sum: '$ingresos.pedidos.total' },
+        totalTransferenciasGastos: { $sum: '$egresos.gastos.monto' },
+        totalGastosEfectivo: { $sum: '$egresos.gastos.monto' },
+        totalAportes: { $sum: '$movimientosCaja.monto' },
+        totalRetiros: { $sum: '$movimientosCaja.monto' }
+      }},
+      { $group: {
+        _id: null,
+        totalLiquidaciones: { $sum: 1 },
+        totalIngresos: { $sum: '$ingresos.totalPedidos' },
+        totalEgresos: { $sum: '$egresos.totalGastos' },
+        totalGastosEfectivo: { $sum: '$totalGastosEfectivo' },
+        totalAportes: { $sum: '$totalAportes' },
+        totalRetiros: { $sum: '$totalRetiros' },
+        totalTransferenciasIngresos: { $sum: '$totalTransferenciasIngresos' },
+        totalTransferenciasGastos: { $sum: '$totalTransferenciasGastos' }
+      }}
+    ];
 
-    console.log('📊 Total liquidaciones encontradas:', liquidaciones.length);
+    const [stats] = await Liquidacion.aggregate(pipeline);
 
-    // Calcular transferencias, movimientos y GASTOS EN EFECTIVO
-    let totalTransferenciasIngresos = 0;
-    let totalTransferenciasGastos = 0;
-    let totalAportes = 0;
-    let totalRetiros = 0;
-    let totalGastosEfectivo = 0;  // ✅ NUEVO
+    if (!stats) {
+      return res.json({
+        success: true,
+        data: {
+          totalLiquidaciones: 0,
+          totalIngresos: 0,
+          totalEgresos: 0,
+          totalGastosEfectivo: 0,
+          totalAportes: 0,
+          totalRetiros: 0,
+          totalTransferenciasIngresos: 0,
+          totalTransferenciasGastos: 0,
+          cajaTransferencias: 0,
+          cajaFinalTotal: 0,
+          promedioIngresosPorDia: 0,
+          promedioEgresosPorDia: 0
+        }
+      });
+    }
 
-    liquidaciones.forEach((liq, index) => {
-      console.log(`\n🔍 Liquidación ${index + 1}:`, liq._id);
-      
-      // Transferencias de pedidos
-      if (liq.ingresos && Array.isArray(liq.ingresos.pedidos)) {
-        liq.ingresos.pedidos.forEach(pedido => {
-          if (pedido && pedido.metodoPago === 'transferencia') {
-            console.log('  📱 Pedido transferencia:', pedido.total);
-            totalTransferenciasIngresos += pedido.total;
-          }
-        });
-      }
-
-      // ✅ CALCULAR GASTOS EN EFECTIVO Y TRANSFERENCIAS
-      if (liq.egresos && Array.isArray(liq.egresos.gastos)) {
-        liq.egresos.gastos.forEach(registro => {
-          if (registro && Array.isArray(registro.gastos)) {
-            registro.gastos.forEach(gasto => {
-              if (gasto.metodoPago === 'transferencia') {
-                console.log('  💳 Gasto transferencia:', gasto.monto);
-                totalTransferenciasGastos += gasto.monto;
-              } else {
-                // Asumimos que si no es transferencia, es efectivo
-                console.log('  💵 Gasto efectivo:', gasto.monto);
-                totalGastosEfectivo += gasto.monto;
-              }
-            });
-          }
-        });
-      }
-
-      // Movimientos de caja
-      if (liq.movimientosCaja && Array.isArray(liq.movimientosCaja)) {
-        liq.movimientosCaja.forEach(mov => {
-          if (mov.tipo === 'ingreso') {
-            console.log('  💵 Aporte:', mov.monto);
-            totalAportes += mov.monto;
-          } else if (mov.tipo === 'retiro') {
-            console.log('  💸 Retiro:', mov.monto);
-            totalRetiros += mov.monto;
-          }
-        });
-      }
-    });
-
-    const totalMovimientos = totalAportes - totalRetiros;
-
-    console.log('\n💰 Totales calculados:');
-    console.log('  - Transferencias Ingresos:', totalTransferenciasIngresos);
-    console.log('  - Transferencias Gastos:', totalTransferenciasGastos);
-    console.log('  - Gastos Efectivo:', totalGastosEfectivo);  // ✅ NUEVO LOG
-    console.log('  - Total Aportes:', totalAportes);
-    console.log('  - Total Retiros:', totalRetiros);
-    console.log('  - Total Movimientos:', totalMovimientos);
-    console.log('  - Caja Transferencias:', totalTransferenciasIngresos - totalTransferenciasGastos);
-
-    const totalIngresos = liquidaciones.reduce((sum, l) => sum + (l.ingresos?.totalPedidos || 0), 0);
-    const totalEgresos = liquidaciones.reduce((sum, l) => sum + (l.egresos?.totalGastos || 0), 0);
-
-    const stats = {
-      totalLiquidaciones: liquidaciones.length,
-      totalIngresos,
-      totalEgresos,
-      totalGastosEfectivo,  // ✅ NUEVO CAMPO
-      totalAportes,
-      totalRetiros,
-      totalMovimientos,
-      totalTransferenciasIngresos,
-      totalTransferenciasGastos,
-      cajaTransferencias: totalTransferenciasIngresos - totalTransferenciasGastos,
-      cajaFinalTotal: totalIngresos - totalEgresos + totalMovimientos,
-      promedioIngresosPorDia: liquidaciones.length > 0 
-        ? totalIngresos / liquidaciones.length 
-        : 0,
-      promedioEgresosPorDia: liquidaciones.length > 0 
-        ? totalEgresos / liquidaciones.length 
-        : 0
-    };
+    const totalMovimientos = stats.totalAportes - stats.totalRetiros;
+    const cajaTransferencias = stats.totalTransferenciasIngresos - stats.totalTransferenciasGastos;
+    const cajaFinalTotal = stats.totalIngresos - stats.totalEgresos + totalMovimientos;
 
     res.json({
       success: true,
-      data: stats
+      data: {
+        ...stats,
+        cajaTransferencias,
+        cajaFinalTotal,
+        promedioIngresosPorDia: stats.totalLiquidaciones > 0 
+          ? stats.totalIngresos / stats.totalLiquidaciones 
+          : 0,
+        promedioEgresosPorDia: stats.totalLiquidaciones > 0 
+          ? stats.totalEgresos / stats.totalLiquidaciones 
+          : 0
+      }
     });
   } catch (error) {
     console.error('❌ Error al obtener estadísticas:', error);

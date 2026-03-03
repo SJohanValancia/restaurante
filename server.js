@@ -21,6 +21,25 @@ initializeFirebase();
 const { startCronJobs } = require('./services/cronJobs');
 startCronJobs();
 
+// ✅ MONITOREO DE RENDIMIENTO
+const performance = require('perf_hooks').performance;
+const consoleTime = console.time;
+const consoleTimeEnd = console.timeEnd;
+
+// Reemplazar console.time con medición de rendimiento
+console.time = function(label) {
+  performance.mark(`start-${label}`);
+};
+
+console.timeEnd = function(label) {
+  performance.mark(`end-${label}`);
+  performance.measure(label, `start-${label}`, `end-${label}`);
+  const measure = performance.getEntriesByName(label)[0];
+  console.log(`⏱ ${label}: ${measure.duration.toFixed(2)}ms`);
+  performance.clearMarks();
+  performance.clearMeasures();
+};
+
 const app = express();
 
 // Middlewares
