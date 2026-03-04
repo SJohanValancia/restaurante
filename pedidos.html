@@ -1873,7 +1873,8 @@
             const token = localStorage.getItem('token');
             const estado = document.getElementById('filterEstado').value;
 
-            let url = `${API_URL}/orders?userId=${currentUser._id}`;
+            // Para pedidos activos, siempre hacer fetch fresco (tiempo real)
+            let url = `${API_URL}/orders?userId=${currentUser._id}&limit=50000`;
             if (estado) url += `&estado=${estado}`;
 
             try {
@@ -1884,6 +1885,8 @@
                 const data = await response.json();
 
                 if (data.success) {
+                    // Actualizar caché
+                    if (window.dataCache) window.dataCache.pedidos = data.data;
                     displayOrders(data.data);
                     document.getElementById('orderCount').textContent = data.count;
                 }

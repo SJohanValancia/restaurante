@@ -1257,8 +1257,9 @@
         async function loadExpenses() {
             const token = localStorage.getItem('token');
 
+            // Siempre hacer fetch fresco para mantener datos actualizados
             try {
-                const response = await fetch(`${API_URL}/expenses?userId=${currentUser._id}`, {
+                const response = await fetch(`${API_URL}/expenses?userId=${currentUser._id}&limit=50000`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
@@ -1266,6 +1267,8 @@
 
                 if (data.success) {
                     allExpenses = data.data;
+                    // Actualizar caché
+                    if (window.dataCache) window.dataCache.gastos = data.data;
                     console.log(`✅ Total gastos cargados: ${allExpenses.length}`);
                     applyFilters();
                 }

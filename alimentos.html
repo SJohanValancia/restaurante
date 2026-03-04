@@ -1189,13 +1189,17 @@
         // CARGAR ALIMENTOS
         async function cargarAlimentos() {
             const token = localStorage.getItem('token');
+
+            // Siempre hacer fetch fresco para mantener datos actualizados
             try {
-                const response = await fetch(`${API_URL}/alimentos`, {
+                const response = await fetch(`${API_URL}/alimentos?userId=${currentUser._id}&limit=50000`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 const result = await response.json();
                 if (result.success) {
+                    // Actualizar caché
+                    if (window.dataCache) window.dataCache.alimentos = result.data;
                     mostrarAlimentos(result.data);
                 }
             } catch (error) {

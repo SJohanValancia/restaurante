@@ -717,8 +717,9 @@
         async function loadProducts() {
             const token = localStorage.getItem('token');
 
+            // Siempre hacer fetch fresco para mantener datos actualizados
             try {
-                const response = await fetch(`${API_URL}/products?userId=${currentUser._id}`, {
+                const response = await fetch(`${API_URL}/products?userId=${currentUser._id}&limit=50000`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -728,6 +729,8 @@
 
                 if (data.success) {
                     allProducts = data.data;
+                    // Actualizar caché
+                    if (window.dataCache) window.dataCache.productos = data.data;
                     displayProducts(data.data);
                     // Extraer categorías únicas
                     allCategories = [...new Set(data.data.map(p => p.categoria))].sort();

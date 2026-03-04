@@ -1571,6 +1571,8 @@
 
             // Mostrar indicador de carga
             const grid = document.getElementById('ordersGrid');
+
+            // Para historial, siempre hacer fetch fresco (necesita datos actualizados)
             grid.innerHTML = `
         <div class="empty-state">
             <div class="empty-icon">⏳</div>
@@ -1579,7 +1581,7 @@
     `;
 
             try {
-                const response = await fetch(`${API_URL}/orders?userId=${currentUser._id}`, {
+                const response = await fetch(`${API_URL}/orders?userId=${currentUser._id}&limit=50000`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
@@ -1587,8 +1589,10 @@
 
                 if (data.success) {
                     allOrders = data.data;
+                    // Actualizar caché
+                    if (window.dataCache) window.dataCache.pedidos = data.data;
                     console.log(`✅ ${allOrders.length} pedidos cargados`);
-                    cargarTodosLosPlatos(); // ✅ NUEVO
+                    cargarTodosLosPlatos();
                     applyFilters();
                 }
             } catch (error) {

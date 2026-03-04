@@ -574,6 +574,8 @@
 
                     showAlert('¡Inicio de sesión exitoso! Redirigiendo...', 'success');
 
+                    precargarDatos(data.usuario);
+
                     setTimeout(() => {
                         if (data.usuario.rol === 'superadmin') {
                             window.location.href = 'superadmin.html';
@@ -582,7 +584,7 @@
                         } else {
                             window.location.href = 'productos.html';
                         }
-                    }, 1500);
+                    }, 1000);
                 } else {
                     // Si la cuenta está bloqueada, mostrar mensaje especial con WhatsApp
                     if (data.bloqueado) {
@@ -630,17 +632,16 @@
 
                         let msg = '¡Inicio de sesión con Mandao exitoso!';
 
-                        // Mensaje especial de bienvenida para nuevos usuarios de Mandao
                         if (data.welcomeMessage) {
-                            // Guardar flag para mostrar bienvenida en el dashboard
                             localStorage.setItem('welcome_mandao', 'true');
-                            // Redirección inmediata
+                            precargarDatos(data.usuario);
                             redirectUser(data.usuario);
                         } else {
                             showAlert(msg, 'success');
+                            precargarDatos(data.usuario);
                             setTimeout(() => {
                                 redirectUser(data.usuario);
-                            }, 1500);
+                            }, 1000);
                         }
 
                     } else {
@@ -670,6 +671,127 @@
             }
         }
 
+        // 🚀 SISTEMA DE PRECARGA CON PRIORIDAD
+        window.dataCache = {
+            productos: null,
+            pedidos: null,
+            alimentos: null,
+            historial: null,
+            gastos: null,
+            liquidaciones: null,
+            usuarios: null,
+            loading: {}
+        };
+
+        async function precargarDatos(usuario) {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            const headers = { 'Authorization': `Bearer ${token}` };
+            const userId = usuario._id;
+
+            // PRIORIDAD 1: Productos (alta) - lo más necesario
+            setTimeout(async () => {
+                try {
+                    const res = await fetch(`${API_URL}/products?userId=${userId}&limit=50000`, { headers });
+                    const data = await res.json();
+                    if (data.success) {
+                        window.dataCache.productos = data.data;
+                        console.log('✅ Productos precargados:', data.data.length);
+                    }
+                } catch (e) { console.error('Error precargando productos:', e); }
+            }, 100);
+
+            // PRIORIDAD 2: Pedidos activos (alta)
+            setTimeout(async () => {
+                try {
+                    const res = await fetch(`${API_URL}/orders?userId=${userId}&limit=50000`, { headers });
+                    const data = await res.json();
+                    if (data.success) {
+                        window.dataCache.pedidos = data.data;
+                        console.log('✅ Pedidos precargados:', data.data.length);
+                    }
+                } catch (e) { console.error('Error precargando pedidos:', e); }
+            }, 300);
+
+            // PRIORIDAD 3: Alimentos (media)
+            setTimeout(async () => {
+                try {
+                    const res = await fetch(`${API_URL}/alimentos?userId=${userId}&limit=50000`, { headers });
+                    const data = await res.json();
+                    if (data.success) {
+                        window.dataCache.alimentos = data.data;
+                        console.log('✅ Alimentos precargados:', data.data.length);
+                    }
+                } catch (e) { console.error('Error precargando alimentos:', e); }
+            }, 600);
+
+            // PRIORIDAD 4: Gastos (baja)
+            setTimeout(async () => {
+                try {
+                    const res = await fetch(`${API_URL}/expenses?userId=${userId}&limit=50000`, { headers });
+                    const data = await res.json();
+                    if (data.success) {
+                        window.dataCache.gastos = data.data;
+                        console.log('✅ Gastos precargados:', data.data.length);
+                    }
+                } catch (e) { console.error('Error precargando gastos:', e); }
+            }, 1200);
+
+            // PRIORIDAD 5: Liquidaciones (baja)
+            setTimeout(async () => {
+                try {
+                    const res = await fetch(`${API_URL}/liquidaciones?userId=${userId}&limit=50000`, { headers });
+                    const data = await res.json();
+                    if (data.success) {
+                        window.dataCache.liquidaciones = data.data;
+                        console.log('✅ Liquidaciones precargadas:', data.data.length);
+                    }
+                } catch (e) { console.error('Error precargando liquidaciones:', e); }
+            }, 2000);
+
+            // PRIORIDAD 6: Usuarios (solo admin/superadmin)
+            if (usuario.rol === 'admin' || usuario.rol === 'superadmin') {
+                setTimeout(async () => {
+                    try {
+                        const res = await fetch(`${API_URL}/superadmin/usuarios?limit=50000`, { headers });
+                        const data = await res.json();
+                        if (data.success) {
+                            window.dataCache.usuarios = data.data;
+                            console.log('✅ Usuarios precargados:', data.data.length);
+                        }
+                    } catch (e) { console.error('Error precargando usuarios:', e); }
+                }, 2500);
+            }
+
+            console.log('🚀 Precarga iniciada en background...');
+        }
+
+        // Función helper para obtener datos del caché o hacer fetch
+        window.getCachedData = async function(key, fetchFn) {
+            if (window.dataCache && window.dataCache[key]) {
+                console.log(`📦 Usando caché para ${key}`);
+                return window.dataCache[key];
+            }
+            return await fetchFn();
+        };
+
+        // Función para invalidar caché
+        window.invalidateCache = function(key) {
+            if (key) {
+                window.dataCache[key] = null;
+                console.log(`🗑️ Caché invalidado: ${key}`);
+            } else {
+                window.dataCache.productos = null;
+                window.dataCache.pedidos = null;
+                window.dataCache.alimentos = null;
+                window.dataCache.historial = null;
+                window.dataCache.gastos = null;
+                window.dataCache.liquidaciones = null;
+                window.dataCache.usuarios = null;
+                console.log('🗑️ Todo el caché invalidado');
+            }
+        };
 
     </script>
 </body>
