@@ -18,10 +18,12 @@ async function descontarStockAlimentos(items, userId, ignorarStock = false) {
 
     // ✅ OPTIMIZACIÓN: Usar aggregation pipeline para evitar doble bucle
     const alimentos = await Alimento.aggregate([
-      { $match: { 
-        'productos.productoId': { $in: productoIds },
-        userId: userId
-      }},
+      {
+        $match: {
+          'productos.productoId': { $in: productoIds },
+          userId: userId
+        }
+      },
       { $unwind: '$productos' },
       { $match: { 'productos.productoId': { $in: productoIds } } }
     ]);
@@ -226,7 +228,7 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
 // â­ RUTAS PROTEGIDAS - Con protect
 router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
   try {
-    const { estado, mesa, fecha, page = 1, limit = 30 } = req.query;
+    const { estado, mesa, fecha, page = 1, limit = 30, search } = req.query;
 
     const pageNum = parseInt(page) || 1;
     const limitNum = Math.min(parseInt(limit) || 30, 100); // Límite máximo de 100
@@ -237,7 +239,20 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
     if (estado) query.estado = estado;
     if (mesa) {
       const mesaNorm = normalizeText(mesa);
-      query.mesaNormalizada = { $regex: mesaNorm, $options: 'i' };
+      query.$and = query.$and || [];
+      query.$and.push({
+        $or: [
+          { mesaNormalizada: { $regex: mesaNorm, $options: 'i' } },
+          { mesa: { $regex: mesa, $options: 'i' } }
+        ]
+      });
+    }
+
+    if (search) {
+      query.$or = [
+        { notas: { $regex: search, $options: 'i' } },
+        { mesa: { $regex: search, $options: 'i' } }
+      ];
     }
 
     if (fecha === 'hoy') {
@@ -255,25 +270,63 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
     }
 
     // ✅ OPTIMIZACIÓN: Usar proyección en lugar de populate
+    let ordersQuery = Order.find(query, {
+      items: 1,
+      total: 1,
+      estado: 1,
+      mesa: 1,
+      createdAt: 1,
+      userId: 1,
+      notas: 1,
+      source: 1,
+      metodoPago: 1,
+      mandaoOrderId: 1,
+      clienteNombre: 1,
+      clienteCcNit: 1
+    })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNum)
+      .lean();
+
     const [orders, total] = await Promise.all([
-      Order.find(query, { 
-        items: 1, 
-        total: 1, 
-        estado: 1, 
-        mesa: 1,
-        createdAt: 1,
-        userId: 1
-      })
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limitNum)
-        .lean(),
+      ordersQuery,
       Order.countDocuments(query)
     ]);
 
+    // ✅ BÚSQUEDA: Si hay búsqueda por producto, filtrar después de obtener pedidos
+    let filteredOrders = orders;
+    let searchTotal = total;
+    if (search) {
+      // Obtener todos los productos que coincidan con la búsqueda
+      const matchingProducts = await Product.find({
+        nombre: { $regex: search, $options: 'i' },
+        userId: { $in: req.userIdsRestaurante }
+      }).select('_id').lean();
+      const matchingProductIds = new Set(matchingProducts.map(p => p._id.toString()));
+
+      // Filtrar pedidos que contengan productos coincidentes o notas coincidentes
+      filteredOrders = orders.filter(order => {
+        // Buscar en notas
+        if (order.notas && order.notas.toLowerCase().includes(search.toLowerCase())) return true;
+        // Buscar en productos
+        return order.items.some(item => item.producto && matchingProductIds.has(item.producto.toString()));
+      });
+
+      // Contar total de pedidos que coinciden con la búsqueda (sin paginación)
+      const countQuery = { ...query };
+      delete countQuery.$or;
+      const allOrdersForCount = await Order.find(countQuery, { notas: 1, items: 1, mesa: 1 }).lean();
+      searchTotal = allOrdersForCount.filter(order => {
+        if (order.notas && order.notas.toLowerCase().includes(search.toLowerCase())) return true;
+        if (order.mesa && order.mesa.toString().toLowerCase().includes(search.toLowerCase())) return true;
+        return order.items.some(item => item.producto && matchingProductIds.has(item.producto.toString()));
+      }).length;
+    }
+
     // ✅ OPTIMIZACIÓN: Procesar items en lote
     const productIds = new Set();
-    orders.forEach(order => {
+    filteredOrders.forEach(order => {
       order.items.forEach(item => {
         if (item.producto) productIds.add(item.producto);
       });
@@ -281,13 +334,13 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
 
     const productsMap = new Map();
     if (productIds.size > 0) {
-      const products = await Product.find({ 
-        _id: { $in: Array.from(productIds) } 
+      const products = await Product.find({
+        _id: { $in: Array.from(productIds) }
       }, 'nombre categoria precio');
       products.forEach(p => productsMap.set(p._id.toString(), p));
     }
 
-    const ordersNormalizados = orders.map(order => {
+    const ordersNormalizados = filteredOrders.map(order => {
       const orderObj = { ...order };
       orderObj.items = orderObj.items.map(item => {
         if (item.producto) {
@@ -317,9 +370,9 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
     res.json({
       success: true,
       count: ordersNormalizados.length,
-      total,
+      total: search ? searchTotal : total,
       page: pageNum,
-      pages: Math.ceil(total / limitNum),
+      pages: Math.ceil((search ? searchTotal : total) / limitNum),
       data: ordersNormalizados
     });
   } catch (error) {

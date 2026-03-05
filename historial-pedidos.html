@@ -1217,7 +1217,7 @@
                 <div class="filters-grid">
                     <div class="filter-group">
                         <label class="filter-label">Estado</label>
-                        <select id="filterEstado" class="filter-select" onchange="applyFilters()">
+                        <select id="filterEstado" class="filter-select" onchange="loadOrders(true)">
                             <option value="">Todos los estados</option>
                             <option value="activos">📋 Activos (sin entregados)</option>
                             <option value="pendiente">Pendientes</option>
@@ -1229,7 +1229,7 @@
                     </div>
                     <div class="filter-group">
                         <label class="filter-label">Origen</label>
-                        <select id="filterOrigen" class="filter-select" onchange="applyFilters()">
+                        <select id="filterOrigen" class="filter-select" onchange="loadOrders(true)">
                             <option value="">Todos los orígenes</option>
                             <option value="local">🏠 Local</option>
                             <option value="mandao">🚲 Mandao</option>
@@ -1238,20 +1238,20 @@
                     <div class="filter-group">
                         <label class="filter-label">Mesa</label>
                         <input type="text" id="filterMesa" class="filter-input" placeholder="Nombre/Número de mesa"
-                            maxlength="20" onchange="applyFilters()">
+                            maxlength="20" oninput="handleSearchInput()" onchange="loadOrders(true)">
                     </div>
                     <div class="filter-group">
                         <label class="filter-label">Desde</label>
-                        <input type="date" id="filterFechaDesde" class="filter-input" onchange="applyFilters()">
+                        <input type="date" id="filterFechaDesde" class="filter-input" onchange="loadOrders(true)">
                     </div>
                     <div class="filter-group">
                         <label class="filter-label">Hasta</label>
-                        <input type="date" id="filterFechaHasta" class="filter-input" onchange="applyFilters()">
+                        <input type="date" id="filterFechaHasta" class="filter-input" onchange="loadOrders(true)">
                     </div>
                     <div class="filter-group">
                         <label class="filter-label">Buscar</label>
                         <input type="text" id="filterSearch" class="filter-input" placeholder="Producto, notas..."
-                            oninput="applyFilters()">
+                            oninput="handleSearchInput()">
                     </div>
                 </div>
 
@@ -1260,7 +1260,7 @@
                     <div class="filter-platos-container">
                         <div class="filter-group" style="flex: 1;">
                             <label class="filter-label">🍽️ Filtrar por Plato</label>
-                            <select id="filterPlato" class="filter-select" onchange="applyFilters()">
+                            <select id="filterPlato" class="filter-select" onchange="loadOrders(true)">
                                 <option value="">Todos los platos</option>
                             </select>
                         </div>
@@ -1298,6 +1298,9 @@
                     <div class="empty-icon">📋</div>
                     <p>Cargando pedidos...</p>
                 </div>
+            </div>
+            <div id="loadingMoreOrders" style="display: none; text-align: center; padding: 20px; color: #667eea;">
+                <span>Cargando más pedidos...</span>
             </div>
         </div>
     </div>
@@ -1513,6 +1516,10 @@
         let allOrders = [];
         let filteredOrders = [];
         let currentOrderIdForPayment = null;
+        let currentPage = 1;
+        let isLoadingMore = false;
+        let hasMoreOrders = true;
+        let allLoadedOrders = [];
 
         window.addEventListener('DOMContentLoaded', async () => {
             const token = localStorage.getItem('token');
@@ -1554,10 +1561,20 @@
                 }
 
                 setDefaultDates();
-                await loadOrders();
+                await loadOrders(true);
             } catch (error) {
                 console.error('❌ Error de red:', error);
                 Swal.fire({ icon: (('Error de conexión. Recargue la página.').toLowerCase().includes("error") || ('Error de conexión. Recargue la página.').toLowerCase().includes("falla") || ('Error de conexión. Recargue la página.').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error de conexión. Recargue la página.', timer: 3000, showConfirmButton: false });
+            }
+        });
+
+        // Scroll infinito
+        window.addEventListener('scroll', () => {
+            const scrollPosition = window.innerHeight + window.scrollY;
+            const documentHeight = document.documentElement.scrollHeight;
+
+            if (scrollPosition >= documentHeight - 200) {
+                loadOrders(false);
             }
         });
 
@@ -1566,43 +1583,81 @@
             document.getElementById('filterFechaDesde').value = '';
             console.log('📅 Filtros de fecha vacíos - Mostrando todos los pedidos');
         }
-        async function loadOrders() {
-            const token = localStorage.getItem('token');
 
-            // Mostrar indicador de carga
+        let searchTimeout;
+        function handleSearchInput() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                loadOrders(true);
+            }, 500);
+        }
+
+        async function loadOrders(reset = false) {
+            if (!currentUser) return;
+            const token = localStorage.getItem('token');
             const grid = document.getElementById('ordersGrid');
 
-            // Para historial, siempre hacer fetch fresco (necesita datos actualizados)
-            grid.innerHTML = `
-        <div class="empty-state">
-            <div class="empty-icon">⏳</div>
-            <p>Cargando pedidos...</p>
-        </div>
-    `;
+            if (reset) {
+                currentPage = 1;
+                allLoadedOrders = [];
+                hasMoreOrders = true;
+                grid.innerHTML = '';
+            }
+
+            if (isLoadingMore || !hasMoreOrders) return;
+            isLoadingMore = true;
+
+            const loadingEl = document.getElementById('loadingMoreOrders');
+            if (loadingEl) loadingEl.style.display = 'block';
+
+            const search = document.getElementById('filterSearch').value.trim();
+            const mesaFilter = document.getElementById('filterMesa').value.trim();
+            let url = `${API_URL}/orders?userId=${currentUser._id}&page=${currentPage}&limit=30`;
+            if (search) url += `&search=${encodeURIComponent(search)}`;
+            if (mesaFilter) url += `&mesa=${encodeURIComponent(mesaFilter)}`;
 
             try {
-                const response = await fetch(`${API_URL}/orders?userId=${currentUser._id}&limit=50000`, {
+                const response = await fetch(url, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
-                    allOrders = data.data;
-                    // Actualizar caché
-                    if (window.dataCache) window.dataCache.pedidos = data.data;
-                    console.log(`✅ ${allOrders.length} pedidos cargados`);
+                    const newOrders = data.data;
+                    hasMoreOrders = newOrders.length === 30;
+
+                    if (reset) {
+                        allLoadedOrders = newOrders;
+                    } else {
+                        allLoadedOrders = [...allLoadedOrders, ...newOrders];
+                    }
+
+                    allOrders = allLoadedOrders;
+                    if (window.dataCache) window.dataCache.pedidos = allOrders;
+                    console.log(`✅ ${allOrders.length} pedidos cargados, página ${currentPage}`);
                     cargarTodosLosPlatos();
-                    applyFilters();
+
+                    if (reset) {
+                        grid.innerHTML = '';
+                    }
+                    const hasSearch = document.getElementById('filterSearch').value.trim();
+                    applyFilters(reset, !!hasSearch);
+                    currentPage++;
                 }
             } catch (error) {
                 console.error('Error al cargar pedidos:', error);
-                grid.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">❌</div>
-                <p>Error al cargar pedidos. Por favor, recarga la página.</p>
-            </div>
-        `;
+                if (reset) {
+                    grid.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">❌</div>
+                    <p>Error al cargar pedidos. Por favor, recarga la página.</p>
+                </div>
+            `;
+                }
+            } finally {
+                isLoadingMore = false;
+                if (loadingEl) loadingEl.style.display = 'none';
             }
         }
 
@@ -1618,7 +1673,7 @@
             setTimeout(() => alert.remove(), 3000);
         }
 
-        function applyFilters() {
+        function applyFilters(reset = false, skipSearchFilter = false) {
             const estado = document.getElementById('filterEstado').value;
             const origen = document.getElementById('filterOrigen').value;
             const mesa = document.getElementById('filterMesa').value.trim();
@@ -1645,8 +1700,12 @@
                     if (order.estado !== estado) return false;
                 }
 
-                // Filtro de mesa
-                if (mesa && order.mesa !== parseInt(mesa)) return false;
+                // Filtro de mesa (comparación flexible: string includes, case-insensitive)
+                if (mesa) {
+                    const orderMesa = String(order.mesa).toLowerCase();
+                    const mesaSearch = mesa.toLowerCase();
+                    if (!orderMesa.includes(mesaSearch) && orderMesa !== mesaSearch) return false;
+                }
 
                 // Filtro de fecha
                 if (fechaDesde || fechaHasta) {
@@ -1663,8 +1722,8 @@
                     }
                 }
 
-                // Filtro de búsqueda
-                if (search) {
+                // Filtro de búsqueda - solo si no se hizo en el servidor
+                if (search && !skipSearchFilter) {
                     const notasMatch = order.notas?.toLowerCase().includes(search);
                     const productMatch = order.items.some(item =>
                         item.producto?.nombre?.toLowerCase().includes(search)
@@ -1696,7 +1755,7 @@
             recopilarProductosFiltrados();
 
             updateStatistics();
-            displayOrders();
+            displayOrders(reset);
             mostrarNotas(); // ✅ NUEVO: Mostrar notas
             actualizarBotonGlobal(); // ✅ NUEVO: Actualizar estado del botón
         }
@@ -1716,7 +1775,9 @@
             document.getElementById('orderCount').textContent = total;
         }
 
-        function displayOrders() {
+        let displayedOrderIds = [];
+
+        function displayOrders(reset = false) {
             const list = document.getElementById('ordersGrid');
 
             if (filteredOrders.length === 0) {
@@ -1726,6 +1787,7 @@
                 <p>No se encontraron pedidos con los filtros seleccionados</p>
             </div>
         `;
+                displayedOrderIds = [];
                 return;
             }
 
@@ -1739,10 +1801,18 @@
 
             const orderedOrders = [...activos, ...cancelados, ...entregados];
 
-            const fragment = document.createDocumentFragment();
-            const tempDiv = document.createElement('div');
+            if (reset) {
+                list.innerHTML = '';
+                displayedOrderIds = [];
+            }
 
-            tempDiv.innerHTML = orderedOrders.map(order => {
+            const ordersToRender = orderedOrders.filter(order => !displayedOrderIds.includes(order._id));
+
+            if (ordersToRender.length === 0) {
+                return;
+            }
+
+            const html = ordersToRender.map(order => {
                 const isMandao = order.source === 'mandao';
                 const fecha = new Date(order.createdAt);
                 const fechaStr = fecha.toLocaleDateString('es-CO', {
@@ -1838,8 +1908,12 @@
         `;
             }).join('');
 
-            list.innerHTML = '';
-            list.appendChild(tempDiv);
+            if (reset) {
+                list.innerHTML = '';
+            }
+            list.insertAdjacentHTML('beforeend', html);
+
+            displayedOrderIds = [...displayedOrderIds, ...ordersToRender.map(o => o._id)];
         }
 
 
@@ -2453,7 +2527,7 @@
 
                 if (data.success) {
                     console.log('✅ Pedido actualizado correctamente');
-                    await loadOrders();
+                    await loadOrders(true);
                 } else {
                     console.error('❌ Error del servidor:', data.message);
                     Swal.fire({ icon: (('Error: ' + data.message).toLowerCase().includes("error") || ('Error: ' + data.message).toLowerCase().includes("falla") || ('Error: ' + data.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error: ' + data.message, timer: 3000, showConfirmButton: false });
@@ -2509,7 +2583,7 @@
 
                 if (data.success) {
                     Swal.fire({ icon: (('✅ Pedido eliminado exitosamente').toLowerCase().includes("error") || ('✅ Pedido eliminado exitosamente').toLowerCase().includes("falla") || ('✅ Pedido eliminado exitosamente').toLowerCase().includes("incorrect")) ? "error" : "success", text: '✅ Pedido eliminado exitosamente', timer: 3000, showConfirmButton: false });
-                    await loadOrders();
+                    await loadOrders(true);
                 } else {
                     Swal.fire({ icon: (('Error: ' + data.message).toLowerCase().includes("error") || ('Error: ' + data.message).toLowerCase().includes("falla") || ('Error: ' + data.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error: ' + data.message, timer: 3000, showConfirmButton: false });
                 }
@@ -3034,7 +3108,7 @@
                         currentOrderIdForPayment = orderId;
                         mostrarModalMetodoPago();
                     } else {
-                        await loadOrders();
+                        await loadOrders(true);
                     }
 
                     // Animación de éxito
@@ -3356,7 +3430,7 @@
                 }
 
                 // Recargar pedidos
-                await loadOrders();
+                await loadOrders(true);
 
                 // Mostrar resultado
                 if (fallaidos === 0) {
