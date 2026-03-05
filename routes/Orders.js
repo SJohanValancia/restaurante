@@ -309,6 +309,8 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
       filteredOrders = orders.filter(order => {
         // Buscar en notas
         if (order.notas && order.notas.toLowerCase().includes(search.toLowerCase())) return true;
+        // Buscar en mesa
+        if (order.mesa && order.mesa.toString().toLowerCase().includes(search.toLowerCase())) return true;
         // Buscar en productos
         return order.items.some(item => item.producto && matchingProductIds.has(item.producto.toString()));
       });
