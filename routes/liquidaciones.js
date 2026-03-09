@@ -9,16 +9,27 @@ const { protect } = require('../middleware/auth');
 // Obtener la última liquidación del restaurante
 router.get('/ultima', protect, async (req, res) => {
   try {
-    const ultimaLiquidacion = await Liquidacion.findOne({ 
+    const liquidaciones = await Liquidacion.find({
       userId: { $in: req.userIdsRestaurante },
-      cerrada: true 
+      cerrada: true
     })
       .sort({ fecha: -1 })
-      .limit(1);
+      .limit(10)
+      .lean();
+
+    const liquidacionValida = liquidaciones.find(lq => {
+      const tieneIngresos = lq.ingresos?.totalPedidos > 0;
+      const tieneEgresos = lq.egresos?.totalGastos > 0;
+      const tieneMovimientos = lq.movimientosCaja && lq.movimientosCaja.length > 0;
+      const tieneCajaInicial = lq.cajaInicial > 0;
+      const tieneCajaFinal = lq.cajaFinal > 0;
+
+      return tieneIngresos || tieneEgresos || tieneMovimientos || tieneCajaInicial || tieneCajaFinal;
+    });
 
     res.json({
       success: true,
-      data: ultimaLiquidacion
+      data: liquidacionValida || null
     });
   } catch (error) {
     res.status(500).json({
@@ -82,24 +93,28 @@ router.get('/stats/resumen', protect, async (req, res) => {
     // ✅ OPTIMIZACIÓN: Usar agregación para cálculos complejos
     const pipeline = [
       { $match: query },
-      { $addFields: { 
-        totalTransferenciasIngresos: { $sum: '$ingresos.pedidos.total' },
-        totalTransferenciasGastos: { $sum: '$egresos.gastos.monto' },
-        totalGastosEfectivo: { $sum: '$egresos.gastos.monto' },
-        totalAportes: { $sum: '$movimientosCaja.monto' },
-        totalRetiros: { $sum: '$movimientosCaja.monto' }
-      }},
-      { $group: {
-        _id: null,
-        totalLiquidaciones: { $sum: 1 },
-        totalIngresos: { $sum: '$ingresos.totalPedidos' },
-        totalEgresos: { $sum: '$egresos.totalGastos' },
-        totalGastosEfectivo: { $sum: '$totalGastosEfectivo' },
-        totalAportes: { $sum: '$totalAportes' },
-        totalRetiros: { $sum: '$totalRetiros' },
-        totalTransferenciasIngresos: { $sum: '$totalTransferenciasIngresos' },
-        totalTransferenciasGastos: { $sum: '$totalTransferenciasGastos' }
-      }}
+      {
+        $addFields: {
+          totalTransferenciasIngresos: { $sum: '$ingresos.pedidos.total' },
+          totalTransferenciasGastos: { $sum: '$egresos.gastos.monto' },
+          totalGastosEfectivo: { $sum: '$egresos.gastos.monto' },
+          totalAportes: { $sum: '$movimientosCaja.monto' },
+          totalRetiros: { $sum: '$movimientosCaja.monto' }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          totalLiquidaciones: { $sum: 1 },
+          totalIngresos: { $sum: '$ingresos.totalPedidos' },
+          totalEgresos: { $sum: '$egresos.totalGastos' },
+          totalGastosEfectivo: { $sum: '$totalGastosEfectivo' },
+          totalAportes: { $sum: '$totalAportes' },
+          totalRetiros: { $sum: '$totalRetiros' },
+          totalTransferenciasIngresos: { $sum: '$totalTransferenciasIngresos' },
+          totalTransferenciasGastos: { $sum: '$totalTransferenciasGastos' }
+        }
+      }
     ];
 
     const [stats] = await Liquidacion.aggregate(pipeline);
@@ -134,11 +149,11 @@ router.get('/stats/resumen', protect, async (req, res) => {
         ...stats,
         cajaTransferencias,
         cajaFinalTotal,
-        promedioIngresosPorDia: stats.totalLiquidaciones > 0 
-          ? stats.totalIngresos / stats.totalLiquidaciones 
+        promedioIngresosPorDia: stats.totalLiquidaciones > 0
+          ? stats.totalIngresos / stats.totalLiquidaciones
           : 0,
-        promedioEgresosPorDia: stats.totalLiquidaciones > 0 
-          ? stats.totalEgresos / stats.totalLiquidaciones 
+        promedioEgresosPorDia: stats.totalLiquidaciones > 0
+          ? stats.totalEgresos / stats.totalLiquidaciones
           : 0
       }
     });
@@ -169,6 +184,17 @@ router.post('/', protect, async (req, res) => {
 
     const totalPedidos = pedidos.reduce((sum, pedido) => sum + pedido.total, 0);
     const totalGastos = gastos.reduce((sum, gasto) => sum + gasto.total, 0);
+    const totalMovimientos = movimientosCaja && movimientosCaja.length > 0
+      ? movimientosCaja.reduce((sum, mov) => sum + mov.monto, 0)
+      : 0;
+
+    const tieneDatosReales = totalPedidos > 0 || totalGastos > 0 || totalMovimientos > 0;
+    if (!tieneDatosReales) {
+      return res.status(400).json({
+        success: false,
+        message: 'No hay pedidos, gastos o movimientos para liquidar. La liquidación debe contener al menos un elemento con valor.'
+      });
+    }
 
     const liquidacion = await Liquidacion.create({
       fecha: new Date(),
@@ -253,7 +279,7 @@ router.get('/', protect, async (req, res) => {
       if (liq.ingresos && Array.isArray(liq.ingresos.pedidos)) {
         liq.ingresos.pedidos = liq.ingresos.pedidos.filter(p => p !== null);
       }
-      
+
       if (liq.egresos && Array.isArray(liq.egresos.gastos)) {
         liq.egresos.gastos = liq.egresos.gastos.filter(g => g !== null);
       }
@@ -303,7 +329,7 @@ router.get('/:id', protect, async (req, res) => {
     if (liquidacion.ingresos && Array.isArray(liquidacion.ingresos.pedidos)) {
       liquidacion.ingresos.pedidos = liquidacion.ingresos.pedidos.filter(p => p !== null);
     }
-    
+
     if (liquidacion.egresos && Array.isArray(liquidacion.egresos.gastos)) {
       liquidacion.egresos.gastos = liquidacion.egresos.gastos.filter(g => g !== null);
     }
