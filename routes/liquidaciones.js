@@ -80,7 +80,6 @@ router.get('/pendientes', protect, async (req, res) => {
 router.get('/stats/resumen', protect, async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
-
     let query = { userId: { $in: req.userIdsRestaurante } };
 
     if (startDate && endDate) {
@@ -90,18 +89,114 @@ router.get('/stats/resumen', protect, async (req, res) => {
       };
     }
 
-    // ✅ OPTIMIZACIÓN: Usar agregación para cálculos complejos
     const pipeline = [
       { $match: query },
+
+      // Lookup pedidos para calcular transferencias reales
       {
-        $addFields: {
-          totalTransferenciasIngresos: { $sum: '$ingresos.pedidos.total' },
-          totalTransferenciasGastos: { $sum: '$egresos.gastos.monto' },
-          totalGastosEfectivo: { $sum: '$egresos.gastos.monto' },
-          totalAportes: { $sum: '$movimientosCaja.monto' },
-          totalRetiros: { $sum: '$movimientosCaja.monto' }
+        $lookup: {
+          from: 'orders',
+          localField: 'ingresos.pedidos',
+          foreignField: '_id',
+          as: 'pedidosPopulados'
         }
       },
+
+      // Lookup gastos para calcular gastos efectivo/transferencia reales
+      {
+        $lookup: {
+          from: 'expenses',
+          localField: 'egresos.gastos',
+          foreignField: '_id',
+          as: 'gastosPopulados'
+        }
+      },
+
+      {
+        $addFields: {
+          // Transferencias de ingresos
+          totalTransferenciasIngresos: {
+            $sum: {
+              $map: {
+                input: '$pedidosPopulados',
+                as: 'p',
+                in: {
+                  $cond: [{ $eq: ['$$p.metodoPago', 'transferencia'] }, '$$p.total', 0]
+                }
+              }
+            }
+          },
+
+          // Gastos por transferencia
+          totalTransferenciasGastos: {
+            $sum: {
+              $map: {
+                input: '$gastosPopulados',
+                as: 'g',
+                in: {
+                  $sum: {
+                    $map: {
+                      input: { $ifNull: ['$$g.gastos', []] },
+                      as: 'item',
+                      in: {
+                        $cond: [{ $eq: ['$$item.metodoPago', 'transferencia'] }, '$$item.monto', 0]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+
+          // Gastos en efectivo
+          totalGastosEfectivo: {
+            $sum: {
+              $map: {
+                input: '$gastosPopulados',
+                as: 'g',
+                in: {
+                  $sum: {
+                    $map: {
+                      input: { $ifNull: ['$$g.gastos', []] },
+                      as: 'item',
+                      in: {
+                        $cond: [{ $ne: ['$$item.metodoPago', 'transferencia'] }, '$$item.monto', 0]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+
+          // Aportes (ingresos a caja)
+          totalAportes: {
+            $sum: {
+              $map: {
+                input: '$movimientosCaja',
+                as: 'm',
+                in: {
+                  $cond: [{ $eq: ['$$m.tipo', 'ingreso'] }, '$$m.monto', 0]
+                }
+              }
+            }
+          },
+
+          // Retiros de caja
+          totalRetiros: {
+            $sum: {
+              $map: {
+                input: '$movimientosCaja',
+                as: 'm',
+                in: {
+                  $cond: [{ $eq: ['$$m.tipo', 'retiro'] }, '$$m.monto', 0]
+                }
+              }
+            }
+          }
+        }
+      },
+
       {
         $group: {
           _id: null,
@@ -157,6 +252,7 @@ router.get('/stats/resumen', protect, async (req, res) => {
           : 0
       }
     });
+
   } catch (error) {
     console.error('❌ Error al obtener estadísticas:', error);
     res.status(500).json({
