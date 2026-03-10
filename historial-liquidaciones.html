@@ -950,6 +950,11 @@
         let currentUser = null;
         let liquidaciones = [];
 
+        let currentPage = 1;
+        const LIMIT = 15;
+        let totalPages = 1;
+
+
         window.addEventListener('DOMContentLoaded', async () => {
             const token = localStorage.getItem('token');
             if (!token) {
@@ -997,12 +1002,13 @@
             }
         });
 
-        async function cargarLiquidaciones(fechaInicio = null, fechaFin = null) {
+        async function cargarLiquidaciones(fechaInicio = null, fechaFin = null, page = 1) {
             const token = localStorage.getItem('token');
             const container = document.getElementById('liquidacionesContainer');
+            container.innerHTML = '<div class="loading">Cargando liquidaciones...</div>';
 
             try {
-                let url = `${API_URL}/liquidaciones?userId=${currentUser._id}`;
+                let url = `${API_URL}/liquidaciones?page=${page}&limit=${LIMIT}`;
 
                 if (fechaInicio && fechaFin) {
                     url += `&startDate=${fechaInicio}&endDate=${fechaFin}`;
@@ -1016,29 +1022,30 @@
 
                 if (data.success) {
                     liquidaciones = data.data;
+                    currentPage = data.page;
+                    totalPages = data.pages;
                     mostrarLiquidaciones();
                     await cargarEstadisticas(fechaInicio, fechaFin);
                 } else {
                     container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-icon">⚠️</div>
-                            <div class="empty-title">Error al cargar</div>
-                            <div class="empty-text">${data.message}</div>
-                        </div>
-                    `;
+                <div class="empty-state">
+                    <div class="empty-icon">⚠️</div>
+                    <div class="empty-title">Error al cargar</div>
+                    <div class="empty-text">${data.message}</div>
+                </div>
+            `;
                 }
             } catch (error) {
                 console.error('Error al cargar liquidaciones:', error);
                 container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">❌</div>
-                        <div class="empty-title">Error de conexión</div>
-                        <div class="empty-text">No se pudieron cargar las liquidaciones</div>
-                    </div>
-                `;
+            <div class="empty-state">
+                <div class="empty-icon">❌</div>
+                <div class="empty-title">Error de conexión</div>
+                <div class="empty-text">No se pudieron cargar las liquidaciones</div>
+            </div>
+        `;
             }
         }
-
         async function cargarEstadisticas(fechaInicio = null, fechaFin = null) {
             const token = localStorage.getItem('token');
 
@@ -1110,20 +1117,67 @@
 
             if (liquidaciones.length === 0) {
                 container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">📋</div>
-                        <div class="empty-title">No hay liquidaciones</div>
-                        <div class="empty-text">Aún no has realizado ninguna liquidación</div>
-                    </div>
-                `;
+            <div class="empty-state">
+                <div class="empty-icon">📋</div>
+                <div class="empty-title">No hay liquidaciones</div>
+                <div class="empty-text">Aún no has realizado ninguna liquidación</div>
+            </div>
+        `;
                 return;
             }
 
+            // Generar botones de paginación
+            const paginacion = totalPages > 1 ? `
+        <div style="display:flex; justify-content:center; align-items:center; gap:8px; margin-top:2rem; flex-wrap:wrap;">
+            <button 
+                onclick="cambiarPagina(${currentPage - 1})" 
+                ${currentPage === 1 ? 'disabled' : ''}
+                style="padding:8px 16px; border:1px solid #e2e8f0; border-radius:8px; background:white; cursor:${currentPage === 1 ? 'not-allowed' : 'pointer'}; color:${currentPage === 1 ? '#cbd5e0' : '#2d3748'}; font-weight:600;">
+                ← Anterior
+            </button>
+
+            ${Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter(p => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 2)
+                    .reduce((acc, p, idx, arr) => {
+                        if (idx > 0 && p - arr[idx - 1] > 1) acc.push('...');
+                        acc.push(p);
+                        return acc;
+                    }, [])
+                    .map(p => p === '...'
+                        ? `<span style="padding:8px 4px; color:#718096;">...</span>`
+                        : `<button 
+                        onclick="cambiarPagina(${p})" 
+                        style="padding:8px 14px; border-radius:8px; border:1px solid ${p === currentPage ? '#667eea' : '#e2e8f0'}; background:${p === currentPage ? 'linear-gradient(135deg,#667eea,#764ba2)' : 'white'}; color:${p === currentPage ? 'white' : '#2d3748'}; font-weight:600; cursor:pointer;">
+                        ${p}
+                    </button>`
+                    ).join('')}
+
+            <button 
+                onclick="cambiarPagina(${currentPage + 1})" 
+                ${currentPage === totalPages ? 'disabled' : ''}
+                style="padding:8px 16px; border:1px solid #e2e8f0; border-radius:8px; background:white; cursor:${currentPage === totalPages ? 'not-allowed' : 'pointer'}; color:${currentPage === totalPages ? '#cbd5e0' : '#2d3748'}; font-weight:600;">
+                Siguiente →
+            </button>
+        </div>
+        <div style="text-align:center; margin-top:0.5rem; font-size:13px; color:#718096;">
+            Página ${currentPage} de ${totalPages}
+        </div>
+    ` : '';
+
             container.innerHTML = `
-                <div class="liquidaciones-list">
-                    ${liquidaciones.map(liq => crearTarjetaLiquidacion(liq)).join('')}
-                </div>
-            `;
+        <div class="liquidaciones-list">
+            ${liquidaciones.map(liq => crearTarjetaLiquidacion(liq)).join('')}
+        </div>
+        ${paginacion}
+    `;
+        }
+
+        function cambiarPagina(page) {
+            if (page < 1 || page > totalPages) return;
+            const fechaInicio = document.getElementById('fechaInicio').value || null;
+            const fechaFin = document.getElementById('fechaFin').value || null;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            cargarLiquidaciones(fechaInicio, fechaFin, page);
         }
 
         function crearTarjetaLiquidacion(liquidacion) {
@@ -1466,14 +1520,16 @@
 
             if (fechaInicio && fechaFin) {
                 if (new Date(fechaInicio) > new Date(fechaFin)) {
-                    Swal.fire({ icon: (('La fecha de inicio no puede ser mayor a la fecha fin').toLowerCase().includes("error") || ('La fecha de inicio no puede ser mayor a la fecha fin').toLowerCase().includes("falla") || ('La fecha de inicio no puede ser mayor a la fecha fin').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'La fecha de inicio no puede ser mayor a la fecha fin', timer: 3000, showConfirmButton: false });
+                    Swal.fire({ icon: 'error', text: 'La fecha de inicio no puede ser mayor a la fecha fin', timer: 3000, showConfirmButton: false });
                     return;
                 }
-                cargarLiquidaciones(fechaInicio, fechaFin);
+                currentPage = 1; // resetear
+                cargarLiquidaciones(fechaInicio, fechaFin, 1);
             } else if (fechaInicio || fechaFin) {
-                Swal.fire({ icon: (('Por favor selecciona ambas fechas').toLowerCase().includes("error") || ('Por favor selecciona ambas fechas').toLowerCase().includes("falla") || ('Por favor selecciona ambas fechas').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Por favor selecciona ambas fechas', timer: 3000, showConfirmButton: false });
+                Swal.fire({ icon: 'error', text: 'Por favor selecciona ambas fechas', timer: 3000, showConfirmButton: false });
             } else {
-                cargarLiquidaciones();
+                currentPage = 1;
+                cargarLiquidaciones(null, null, 1);
             }
         }
 
