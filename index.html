@@ -494,22 +494,25 @@
                         }
                     });
 
-                    const data = await response.json();
+                    if (response.ok) {
+                        const data = await response.json();
 
-                    if (data.success && data.usuario) {
-                        localStorage.setItem('usuario', JSON.stringify(data.usuario));
-                        
-                        if (data.usuario.rol === 'superadmin') {
-                            window.location.href = 'superadmin.html';
-                        } else if (data.usuario.rol === 'admin') {
-                            window.location.href = 'administrador.html';
-                        } else {
-                            window.location.href = 'productos.html';
+                        if (data.success && data.usuario) {
+                            localStorage.setItem('usuario', JSON.stringify(data.usuario));
+                            
+                            if (data.usuario.rol === 'superadmin') {
+                                window.location.href = 'superadmin.html';
+                            } else if (data.usuario.rol === 'admin') {
+                                window.location.href = 'administrador.html';
+                            } else {
+                                window.location.href = 'productos.html';
+                            }
+                            return true;
                         }
-                        return true;
                     }
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('usuario');
                 } catch (error) {
-                    console.log('Token inválido o expirado, manteniendo login');
                     localStorage.removeItem('token');
                     localStorage.removeItem('usuario');
                 }
