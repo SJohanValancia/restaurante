@@ -1450,6 +1450,10 @@
 
                 const data = await response.json();
                 currentUser = data.data;
+                
+                if (data.data) {
+                    localStorage.setItem('usuario', JSON.stringify(data.data));
+                }
 
                 if (currentUser.rol !== 'admin') {
                     window.location.href = 'productos.html';

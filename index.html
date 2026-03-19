@@ -481,6 +481,44 @@
         const API_URL = 'https://restaurante-co77.onrender.com/api/auth';
         // const API_URL = 'http://localhost:3000/api/auth'; // Para pruebas locales
 
+        async function verificarSesionAutomatica() {
+            const token = localStorage.getItem('token');
+            const usuarioGuardado = localStorage.getItem('usuario');
+
+            if (token && usuarioGuardado) {
+                try {
+                    const response = await fetch(`${API_URL}/verify`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success && data.usuario) {
+                        localStorage.setItem('usuario', JSON.stringify(data.usuario));
+                        
+                        if (data.usuario.rol === 'superadmin') {
+                            window.location.href = 'superadmin.html';
+                        } else if (data.usuario.rol === 'admin') {
+                            window.location.href = 'administrador.html';
+                        } else {
+                            window.location.href = 'productos.html';
+                        }
+                        return true;
+                    }
+                } catch (error) {
+                    console.log('Token inválido o expirado, manteniendo login');
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('usuario');
+                }
+            }
+            return false;
+        }
+
+        verificarSesionAutomatica();
+
         function togglePassword() {
             const passwordInput = document.getElementById('password');
             const toggleBtn = event.target;

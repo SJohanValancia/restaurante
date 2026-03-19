@@ -413,15 +413,31 @@
         // Verificar autenticación al cargar
         window.addEventListener('DOMContentLoaded', async () => {
             const token = localStorage.getItem('token');
-            const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
-
-            if (!token || usuario.rol !== 'superadmin') {
+            
+            if (!token) {
                 window.location.href = 'index.html';
                 return;
             }
 
-            document.getElementById('userName').textContent = usuario.nombre;
-            await cargarUsuarios();
+            try {
+                const response = await fetch(`${API_URL}/verify`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+
+                if (!data.success || data.usuario.rol !== 'superadmin') {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('usuario');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                localStorage.setItem('usuario', JSON.stringify(data.usuario));
+                document.getElementById('userName').textContent = data.usuario.nombre;
+                await cargarUsuarios();
+            } catch (error) {
+                window.location.href = 'index.html';
+            }
         });
 
         async function cargarUsuarios() {
