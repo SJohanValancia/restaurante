@@ -962,8 +962,7 @@ router.get('/sedes-relacionadas', async (req, res) => {
     // También filtramos por nit si existe para mayor precisión
     const query = {
       nombreRestaurante: { $regex: new RegExp(`^${usuarioActual.nombreRestaurante}$`, 'i') },
-      activo: true,
-      _id: { $ne: usuarioActual._id } // Excluir el actual
+      activo: true
     };
 
     if (usuarioActual.nitRestaurante) {

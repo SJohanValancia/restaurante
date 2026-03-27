@@ -302,18 +302,24 @@
             if (result.success) {
                 const sedes = result.data;
                 if (sedes.length === 0) {
-                    listContainer.innerHTML = '<div style="text-align:center; padding: 20px; color: #718096;">No se encontraron otras sedes vinculadas.</div>';
+                    listContainer.innerHTML = '<div style="text-align:center; padding: 20px; color: #718096;">No se encontraron sucursales vinculadas.</div>';
                 } else {
-                    listContainer.innerHTML = sedes.map(s => `
-                        <div class="rs-item" onclick="window.switchRestaurant('${s._id}')">
-                            <div class="rs-icon">🏪</div>
-                            <div class="rs-info">
-                                <span class="rs-sede-name">${s.sede || 'Sin Nombre'}</span>
-                                <span class="rs-user-email">${s.email}</span>
+                    listContainer.innerHTML = sedes.map(s => {
+                        const isCurrent = s._id === currentUser.id || s._id === currentUser._id;
+                        const sedeLabel = s.sede || 'Sede Principal';
+                        
+                        return `
+                            <div class="rs-item ${isCurrent ? 'active' : ''}" 
+                                 onclick="${isCurrent ? '' : `window.switchRestaurant('${s._id}')`}">
+                                <div class="rs-icon">${isCurrent ? '📍' : '🏪'}</div>
+                                <div class="rs-info">
+                                    <span class="rs-sede-name">${sedeLabel} ${isCurrent ? '<span style="color: #4299e1; font-size: 10px; margin-left: 5px;">(ACTUAL)</span>' : ''}</span>
+                                    <span class="rs-user-email">${s.email}</span>
+                                </div>
+                                <span class="rs-badge">${s.rol}</span>
                             </div>
-                            <span class="rs-badge">${s.rol}</span>
-                        </div>
-                    `).join('');
+                        `;
+                    }).join('');
                 }
             } else {
                 listContainer.innerHTML = `<div style="color:red; text-align:center;">Error: ${result.message}</div>`;
