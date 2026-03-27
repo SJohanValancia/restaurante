@@ -570,6 +570,8 @@
             border-radius: 12px;
             padding: 1.5rem;
             transition: all 0.2s;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .order-card:hover {
@@ -1293,40 +1295,53 @@
             }
         }
         /* ESTILOS PARA GESTO DESHACER */
-        .order-card {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            user-select: none;
-            touch-action: pan-y; /* Permitir scroll vertical normal */
-        }
-
+        /* ESTILOS PARA GESTO DESHACER - ESTANDARIZADOS */
         .order-card.ready-to-undo {
-            box-shadow: 0 0 15px rgba(102, 126, 234, 0.5);
-            border: 2px solid #667eea;
-            animation: pulse-ready 1s infinite;
+            background-color: #fff5f5 !important;
+            border-color: #feb2b2 !important;
+            animation: undo-pulse 1.5s infinite;
+            transform: scale(1.02);
+            z-index: 10;
+            box-shadow: 0 10px 25px rgba(245, 101, 101, 0.2);
         }
 
-        @keyframes pulse-ready {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
+        @keyframes undo-pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(245, 101, 101, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(245, 101, 101, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(245, 101, 101, 0);
+            }
         }
 
         .undo-indicator {
             position: absolute;
-            left: -80px;
+            left: -100px;
             top: 50%;
             transform: translateY(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: #667eea;
-            font-weight: 700;
-            font-size: 12px;
+            background: #f56565;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 0 30px 30px 0;
+            font-weight: 800;
+            font-size: 14px;
+            pointer-events: none;
             opacity: 0;
-            transition: opacity 0.2s;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 4px 0 15px rgba(245, 101, 101, 0.3);
+            z-index: 100;
         }
 
-        .order-card.swiping-right .undo-indicator {
+        .ready-to-undo .undo-indicator {
+            left: 0;
             opacity: 1;
         }
     </style>
@@ -1630,42 +1645,41 @@
 
                 // No permitir deshacer orders pagadas (entregado) o canceladas
                 const statusBadge = card.querySelector('.status-badge');
-                if (statusBadge && (statusBadge.classList.contains('status-entregado') || statusBadge.classList.contains('status-cancelado'))) {
+                if (statusBadge && (statusBadge.classList.contains('status-entregado') || statusBadge.classList.contains('status-cancelado') || statusBadge.textContent.toLowerCase().includes('pagado'))) {
                     return;
                 }
 
                 currentCard = card;
-                touchStartX = e.touches ? e.touches[0].clientX : e.clientX;
+                const touch = e.touches ? e.touches[0] : e;
+                touchStartX = touch.clientX;
+                touchStartY = touch.clientY;
                 isGestureStarted = false;
 
                 longPressTimer = setTimeout(() => {
                     isGestureStarted = true;
                     currentCard.classList.add('ready-to-undo');
-                    
-                    // Añadir indicador visual si no existe
-                    if (!currentCard.querySelector('.undo-indicator')) {
-                        const indicator = document.createElement('div');
-                        indicator.className = 'undo-indicator';
-                        indicator.innerHTML = '<span>↩️</span><span>DESHACER</span>';
-                        currentCard.appendChild(indicator);
-                    }
-                }, 1500); // 1.5s para que sea más ágil, aunque el usuario pidió 2s (ajustable)
+                    if (window.navigator.vibrate) window.navigator.vibrate(50);
+                }, 1500);
             };
 
             const handleMove = (e) => {
                 if (!currentCard || !isGestureStarted) return;
                 
-                const currentX = e.touches ? e.touches[0].clientX : e.clientX;
-                const diffX = currentX - touchStartX;
+                const touch = e.touches ? e.touches[0] : e;
+                const diffX = touch.clientX - touchStartX;
+                const diffY = touch.clientY - touchStartY;
 
-                if (diffX > 0) {
-                    currentCard.classList.add('swiping-right');
-                    currentCard.style.transform = `translateX(${Math.min(diffX, 150)}px)`;
-                    
-                    // Vibración suave si el navegador lo soporta
-                    if (diffX > 100 && window.navigator.vibrate) {
-                        window.navigator.vibrate(10);
-                    }
+                // Si se mueve mucho verticalmente, cancelar para permitir scroll
+                if (Math.abs(diffY) > 50 && !isGestureStarted) {
+                    handleEnd(e);
+                    return;
+                }
+
+                if (isGestureStarted && diffX > 0) {
+                    currentCard.style.transform = `scale(1.02) translateX(${diffX}px)`;
+                    const opacity = Math.min(diffX / 150, 1);
+                    const indicator = currentCard.querySelector('.undo-indicator');
+                    if (indicator) indicator.style.opacity = opacity;
                 }
             };
 
@@ -1673,18 +1687,22 @@
                 clearTimeout(longPressTimer);
                 if (!currentCard) return;
 
-                const currentX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+                const currentX = e.changedTouches ? e.changedTouches[0].clientX : (e.touches ? e.touches[0].clientX : (e.clientX || touchStartX));
                 const diffX = currentX - touchStartX;
 
-                if (isGestureStarted && diffX > 100) {
+                if (isGestureStarted && diffX > 150) {
                     // Acción confirmada
-                    const orderId = currentCard.id.replace('order-card-', '');
+                    const orderId = currentCard.dataset.id || currentCard.id.replace('order-card-', '');
                     await undoOrderState(orderId);
                 }
 
                 // Resetear estilos
-                currentCard.classList.remove('ready-to-undo', 'swiping-right');
+                currentCard.classList.remove('ready-to-undo');
                 currentCard.style.transform = '';
+                const indicator = currentCard.querySelector('.undo-indicator');
+                if (indicator) {
+                    indicator.style.opacity = '';
+                }
                 currentCard = null;
                 isGestureStarted = false;
             };
@@ -1692,36 +1710,48 @@
             list.addEventListener('touchstart', handleStart);
             list.addEventListener('touchmove', handleMove);
             list.addEventListener('touchend', handleEnd);
-            // Compatibilidad con mouse (opcional)
             list.addEventListener('mousedown', handleStart);
-            list.addEventListener('mousemove', handleMove);
-            list.addEventListener('mouseup', handleEnd);
-            list.addEventListener('mouseleave', handleEnd);
+            window.addEventListener('mousemove', handleMove);
+            window.addEventListener('mouseup', handleEnd);
         });
 
         async function undoOrderState(orderId) {
             const order = allLoadedOrders.find(o => o._id === orderId);
             if (!order) return;
 
-            const stateFlow = ['pendiente', 'preparando', 'listo', 'entregado'];
-            const currentIndex = stateFlow.indexOf(order.estado);
-            
+            const currentStatus = order.estado;
+            const flow = ['pendiente', 'preparando', 'listo', 'entregado'];
+            const currentIndex = flow.indexOf(currentStatus);
+
             if (currentIndex <= 0) {
-                Swal.fire({ icon: 'info', text: 'El pedido ya está en el estado inicial', timer: 2000, showConfirmButton: false });
+                Swal.fire({ icon: 'info', text: 'El pedido ya está en su estado inicial', timer: 2000, showConfirmButton: false });
                 return;
             }
 
-            const previousState = stateFlow[currentIndex - 1];
-            
-            try {
-                await updateOrderStatus(orderId, previousState);
-                // La función updateOrderStatus ya recarga la lista o podemos hacerlo manual
-                // para asegurar que se mueva de sección si es necesario
-                await loadOrders(true); 
-                Swal.fire({ icon: 'success', text: `Estado revertido a: ${previousState}`, timer: 1500, showConfirmButton: false });
-            } catch (error) {
-                console.error('Error al deshacer:', error);
-            }
+            const previousStatus = flow[currentIndex - 1];
+
+            Swal.fire({
+                title: '¿Deshacer estado?',
+                text: `El pedido pasará de "${currentStatus}" a "${previousStatus}"`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#4299e1',
+                cancelButtonColor: '#718096',
+                confirmButtonText: 'Sí, deshacer',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        await updateOrderStatus(orderId, previousStatus);
+                        Swal.fire({ icon: 'success', text: `Pedido devuelto a ${previousStatus}`, timer: 1500, showConfirmButton: false });
+                        // Forzamos recarga si es necesario
+                        if (typeof loadOrders === 'function') await loadOrders(true);
+                    } catch (error) {
+                        console.error('Error al deshacer:', error);
+                        Swal.fire({ icon: 'error', text: 'Error al procesar el cambio', timer: 2000, showConfirmButton: false });
+                    }
+                }
+            });
         }
 
 
@@ -2156,7 +2186,8 @@
                 }).join('');
 
                 return `
-            <div class="order-card ${isMandao ? 'mandao-order' : ''}" id="order-card-${order._id}">
+            <div class="order-card ${isMandao ? 'mandao-order' : ''}" id="order-card-${order._id}" data-id="${order._id}">
+                <div class="undo-indicator">↩️ DESHACER</div>
                 <div class="order-header">
                     <div class="order-info">
                         <div style="display: flex; align-items: center; gap: 8px;">
