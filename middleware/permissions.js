@@ -8,21 +8,23 @@ exports.checkPermission = (permiso) => {
         return next();
       }
 
-      // Buscar la relación admin-mesero
-      const relacion = await AdminMesero.findOne({
+      // Buscar TODAS las relaciones admin-mesero (soporta multi-local hub)
+      const relaciones = await AdminMesero.find({
         meseroId: req.user._id,
         activo: true
       });
 
-      if (!relacion) {
+      if (!relaciones || relaciones.length === 0) {
         return res.status(403).json({
           success: false,
           message: 'No tienes permisos asignados'
         });
       }
 
-      // Verificar si tiene el permiso específico
-      if (!relacion.permisos[permiso]) {
+      // Verificar si ALGUNA relación tiene el permiso específico
+      const tienePermisoEnAlguna = relaciones.some(rel => rel.permisos[permiso]);
+
+      if (!tienePermisoEnAlguna) {
         return res.status(403).json({
           success: false,
           message: `No tienes permiso para: ${permiso}`

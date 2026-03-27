@@ -51,6 +51,42 @@ exports.protect = async (req, res, next) => {
     const usuariosRestaurante = await User.find(query).select('_id');
     req.userIdsRestaurante = usuariosRestaurante.map(u => u._id);
 
+    // --- MULTI-LOCAL HUB: Si es mesero, expandir vista con todos los admins vinculados ---
+    req.isHubMesero = false;
+    req.linkedAdminIds = [];
+
+    if (['mesero', 'cajero'].includes(req.user.rol)) {
+      const AdminMesero = require('../models/AdminMesero');
+      const relaciones = await AdminMesero.find({
+        meseroId: req.user._id,
+        activo: true
+      }).select('adminId');
+
+      if (relaciones.length > 0) {
+        const adminIds = relaciones.map(r => r.adminId);
+        req.linkedAdminIds = adminIds;
+
+        // Si está vinculado a admins de OTROS restaurantes, es un Hub Mesero
+        const adminsExternos = await User.find({
+          _id: { $in: adminIds },
+          nombreRestaurante: { $ne: req.user.nombreRestaurante }
+        }).select('_id');
+
+        if (adminsExternos.length > 0) {
+          req.isHubMesero = true;
+          // Agregar TODOS los adminIds a userIdsRestaurante para ver sus productos/pedidos
+          const allAdminIds = adminIds.map(id => id.toString());
+          const existingIds = req.userIdsRestaurante.map(id => id.toString());
+          
+          for (const adminId of allAdminIds) {
+            if (!existingIds.includes(adminId)) {
+              req.userIdsRestaurante.push(adminId);
+            }
+          }
+        }
+      }
+    }
+
     next();
   } catch (error) {
     console.error('❌ Error de verificación JWT:', error.message);

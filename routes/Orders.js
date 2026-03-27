@@ -125,15 +125,15 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
       });
     }
 
-    // Buscar usuario del restaurante
+    // Buscar usuarios del restaurante (incluye meseros hub con ese nombreRestaurante)
     const query = { nombreRestaurante: restaurante };
     if (sede) {
       query.sede = sede;
     }
 
-    const usuario = await User.findOne(query);
+    const usuarios = await User.find(query).select('_id');
 
-    if (!usuario) {
+    if (!usuarios || usuarios.length === 0) {
       console.log('❌ Restaurante no encontrado:', restaurante);
       return res.status(404).json({
         success: false,
@@ -141,14 +141,20 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
       });
     }
 
-    console.log('✅ Usuario encontrado:', usuario._id);
+    const userIds = usuarios.map(u => u._id);
+
+    console.log('✅ Usuarios encontrados:', userIds.length);
 
     const mesaNorm = normalizeText(numeroMesa);
 
     // Buscar pedido activo primero (estados activos)
+    // Incluye órdenes de los locales Y las del mesero hub (via meseroHubId)
     const orderQuery = {
       mesaNormalizada: mesaNorm,
-      userId: usuario._id,
+      $or: [
+        { userId: { $in: userIds } },
+        { meseroHubId: { $in: userIds } }
+      ],
       estado: { $in: ['pendiente', 'preparando', 'listo'] }
     };
 
@@ -167,7 +173,10 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
       console.log('🔍 Buscando último pedido de la mesa...');
       order = await Order.findOne({
         mesaNormalizada: mesaNorm,
-        userId: usuario._id
+        $or: [
+          { userId: { $in: userIds } },
+          { meseroHubId: { $in: userIds } }
+        ]
       })
         .populate('items.producto', 'nombre categoria precio')
         .populate('userId', 'nombre')
@@ -570,51 +579,102 @@ router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
       });
     }
 
-    // ✅ VALIDAR Y DESCONTAR STOCK ANTES DE CREAR EL PEDIDO
-    try {
-      await descontarStockAlimentos(items, req.user._id, ignorarStockAlimentos);
-    } catch (error) {
-      // Solo retornar error si NO se debe ignorar el stock
-      if (!ignorarStockAlimentos) {
-        return res.status(400).json({
-          success: false,
-          message: error.message
-        });
-      }
-    }
-
+    // ✅ Obtener info completa de cada product (incluyendo userId = dueño)
     const itemsConInfo = await Promise.all(items.map(async (item) => {
       const producto = await Product.findById(item.producto);
+      if (!producto) throw new Error(`Producto no encontrado: ${item.producto}`);
       return {
         producto: item.producto,
         nombreProducto: producto.nombre,
         categoriaProducto: producto.categoria,
         cantidad: item.cantidad,
-        precio: item.precio
+        precio: item.precio,
+        ownerUserId: producto.userId // Dueño del producto (local)
       };
     }));
 
-    const total = itemsConInfo.reduce((sum, item) => {
-      return sum + (item.precio * item.cantidad);
-    }, 0);
+    // ✅ VALIDAR Y DESCONTAR STOCK
+    try {
+      await descontarStockAlimentos(items, req.user._id, ignorarStockAlimentos);
+    } catch (error) {
+      if (!ignorarStockAlimentos) {
+        return res.status(400).json({ success: false, message: error.message });
+      }
+    }
 
-    const orderData = {
-      mesa,
-      items: itemsConInfo,
-      total,
-      notas,
-      userId: req.user._id,
-      estado: 'pendiente'
-    };
+    // --- MULTI-LOCAL HUB: Decidir si dividir o crear normalmente ---
+    if (req.isHubMesero) {
+      // AGRUPAR ITEMS POR DUEÑO (ownerUserId)
+      const itemsPorLocal = {};
+      for (const item of itemsConInfo) {
+        const ownerId = item.ownerUserId.toString();
+        if (!itemsPorLocal[ownerId]) {
+          itemsPorLocal[ownerId] = [];
+        }
+        itemsPorLocal[ownerId].push(item);
+      }
 
-    const order = await Order.create(orderData);
-    await order.populate('items.producto', 'nombre categoria precio');
+      const ownerIds = Object.keys(itemsPorLocal);
+      const hubGroupId = new mongoose.Types.ObjectId().toString(); // ID de grupo compartido
+      const ordersCreadas = [];
 
-    res.status(201).json({
-      success: true,
-      message: 'Pedido creado exitosamente',
-      data: order
-    });
+      for (const ownerId of ownerIds) {
+        const localItems = itemsPorLocal[ownerId];
+        const localTotal = localItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+
+        const orderData = {
+          mesa,
+          items: localItems,
+          total: localTotal,
+          notas,
+          userId: ownerId, // El dueño del local recibe la orden
+          meseroHubId: req.user._id, // Quién la creó (el mesero hub)
+          hubOrderGroup: hubGroupId,
+          mesero: req.user.nombre || 'Mesero',
+          estado: 'pendiente'
+        };
+
+        const order = await Order.create(orderData);
+        ordersCreadas.push(order);
+
+        // Notificar al local (push notification)
+        try {
+          await notifyOrderStatusChange(order, 'creado');
+        } catch (e) {
+          console.error('Error notificando local:', e.message);
+        }
+      }
+
+      // Responder con todas las órdenes creadas
+      res.status(201).json({
+        success: true,
+        message: `Pedido dividido en ${ordersCreadas.length} órdenes para cada local`,
+        hubGroupId,
+        data: ordersCreadas
+      });
+
+    } else {
+      // FLUJO NORMAL (no es hub mesero)
+      const total = itemsConInfo.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+
+      const orderData = {
+        mesa,
+        items: itemsConInfo,
+        total,
+        notas,
+        userId: req.user._id,
+        estado: 'pendiente'
+      };
+
+      const order = await Order.create(orderData);
+      await order.populate('items.producto', 'nombre categoria precio');
+
+      res.status(201).json({
+        success: true,
+        message: 'Pedido creado exitosamente',
+        data: order
+      });
+    }
   } catch (error) {
     res.status(400).json({
       success: false,

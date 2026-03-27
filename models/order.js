@@ -53,7 +53,13 @@ const orderSchema = new mongoose.Schema({
         enum: ['pendiente', 'preparando', 'listo', 'entregado'],
         default: 'pendiente'
       }
-    }]
+    }],
+    // ✅ MULTI-LOCAL HUB: Dueño del producto (local)
+    ownerUserId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
+    }
   }],
   total: {
     type: Number,
@@ -108,6 +114,17 @@ const orderSchema = new mongoose.Schema({
     type: String,
     trim: true,
     default: ''
+  },
+  // ✅ MULTI-LOCAL HUB: Mesero que creó el pedido (cuando es hub)
+  meseroHubId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
+  // ✅ MULTI-LOCAL HUB: Grupo de órdenes divididas (mismo pedido original)
+  hubOrderGroup: {
+    type: String,
+    default: null
   }
 }, {
   timestamps: true,
