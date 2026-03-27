@@ -1046,6 +1046,11 @@
                         <input type="date" id="editFecha" class="form-input" required>
                     </div>
 
+                    <div class="form-group">
+                        <label class="form-label" for="editCantidad">Cantidad de gastos</label>
+                        <input type="number" id="editCantidad" class="form-input" min="1" max="20" oninput="adjustEditExpenseItems(this.value)">
+                    </div>
+
                     <div class="expense-fields" id="editExpenseFields"></div>
 
                     <div class="summary-box">
@@ -1063,8 +1068,8 @@
         const API_URL = 'https://restaurante-co77.onrender.com/api';
         let currentUser = null;
         let expenseItems = [];
+        let currentEditItems = [];
         let allExpenses = [];
-        let filteredExpenses = [];
 
         window.addEventListener('DOMContentLoaded', async () => {
             const token = localStorage.getItem('token');
@@ -1449,11 +1454,29 @@
 
                     document.getElementById('editExpenseId').value = expense._id;
                     document.getElementById('editFecha').value = expense.fecha.split('T')[0];
+                    document.getElementById('editCantidad').value = expense.gastos.length;
+                    
+                    // Inicializar items de edición
+                    currentEditItems = JSON.parse(JSON.stringify(expense.gastos));
+                    
+                    renderEditExpenseFields();
+                    document.getElementById('editModal').classList.add('active');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({ icon: 'error', text: 'Error al cargar el gasto', timer: 3000, showConfirmButton: false });
+            }
+        }
 
-                    const container = document.getElementById('editExpenseFields');
-                    container.innerHTML = expense.gastos.map((gasto, index) => `
-                <div class="expense-item">
-                    <div class="expense-item-header">Gasto #${index + 1}</div>
+        function renderEditExpenseFields() {
+            const container = document.getElementById('editExpenseFields');
+            
+            container.innerHTML = currentEditItems.map((gasto, index) => `
+                <div class="expense-item" id="edit-item-${index}">
+                    <div class="expense-item-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>Gasto #${index + 1}</span>
+                        <button type="button" onclick="removeEditExpenseItem(${index})" style="background: none; border: none; color: #fc8181; cursor: pointer; font-size: 16px; padding: 0 4px;">🗑️</button>
+                    </div>
                     <div class="expense-row">
                         <div class="form-group" style="margin-bottom: 0;">
                             <input 
@@ -1463,7 +1486,7 @@
                                 required 
                                 maxlength="200"
                                 value="${gasto.descripcion}"
-                                data-index="${index}"
+                                oninput="updateEditItemValue(${index}, 'descripcion', this.value)"
                             >
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
@@ -1475,36 +1498,69 @@
                                 min="0"
                                 step="0.01"
                                 value="${gasto.monto}"
-                                data-index="${index}"
+                                oninput="updateEditItemValue(${index}, 'monto', this.value)"
                             >
                         </div>
                     </div>
                     <div class="payment-method-selector">
-                        <button type="button" class="payment-method-btn edit-payment-method ${gasto.metodoPago === 'efectivo' ? 'active' : ''}" data-index="${index}" data-method="efectivo" onclick="selectEditPaymentMethod(${index}, 'efectivo', this)">
+                        <button type="button" class="payment-method-btn ${gasto.metodoPago === 'efectivo' ? 'active' : ''}" onclick="selectEditPaymentMethod(${index}, 'efectivo', this)">
                             💵 Efectivo
                         </button>
-                        <button type="button" class="payment-method-btn edit-payment-method ${gasto.metodoPago === 'transferencia' ? 'active' : ''}" data-index="${index}" data-method="transferencia" onclick="selectEditPaymentMethod(${index}, 'transferencia', this)">
+                        <button type="button" class="payment-method-btn ${gasto.metodoPago === 'transferencia' ? 'active' : ''}" onclick="selectEditPaymentMethod(${index}, 'transferencia', this)">
                             💳 Transferencia
                         </button>
                     </div>
                 </div>
             `).join('');
 
-                    updateEditTotal(expense.gastos);
+            updateEditTotal();
+        }
 
-                    document.querySelectorAll('.edit-descripcion, .edit-monto').forEach(input => {
-                        input.addEventListener('input', updateEditTotalFromInputs);
-                    });
+        function adjustEditExpenseItems(value) {
+            const count = parseInt(value) || 0;
+            if (count < 1 || count > 20) return;
 
-                    document.getElementById('editModal').classList.add('active');
+            const currentCount = currentEditItems.length;
+
+            if (count > currentCount) {
+                // Agregar items vacíos
+                const toAdd = count - currentCount;
+                for (let i = 0; i < toAdd; i++) {
+                    currentEditItems.push({ descripcion: '', monto: 0, metodoPago: 'efectivo' });
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                Swal.fire({ icon: (('Error al cargar el gasto').toLowerCase().includes("error") || ('Error al cargar el gasto').toLowerCase().includes("falla") || ('Error al cargar el gasto').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al cargar el gasto', timer: 3000, showConfirmButton: false });
+            } else if (count < currentCount) {
+                // Truncar items (pero el usuario dijo que no pueda ser menor, 
+                // aunque con el botón eliminar sí se puede. 
+                // Ajustaremos el input de cantidad para que refleje la realidad)
+                currentEditItems = currentEditItems.slice(0, count);
             }
+
+            renderEditExpenseFields();
+        }
+
+        function removeEditExpenseItem(index) {
+            if (currentEditItems.length <= 1) {
+                Swal.fire({ icon: 'warning', text: 'Debe haber al menos un gasto', timer: 2000, showConfirmButton: false });
+                return;
+            }
+
+            currentEditItems.splice(index, 1);
+            document.getElementById('editCantidad').value = currentEditItems.length;
+            renderEditExpenseFields();
+        }
+
+        function updateEditItemValue(index, field, value) {
+            if (field === 'monto') {
+                currentEditItems[index][field] = parseFloat(value) || 0;
+            } else {
+                currentEditItems[index][field] = value;
+            }
+            updateEditTotal();
         }
 
         function selectEditPaymentMethod(index, method, button) {
+            currentEditItems[index].metodoPago = method;
+            
             const parent = button.parentElement;
             parent.querySelectorAll('.payment-method-btn').forEach(btn => {
                 btn.classList.remove('active');
@@ -1512,20 +1568,8 @@
             button.classList.add('active');
         }
 
-
-        function updateEditTotalFromInputs() {
-            const montos = document.querySelectorAll('.edit-monto');
-
-            let total = 0;
-            montos.forEach(input => {
-                total += parseFloat(input.value) || 0;
-            });
-
-            document.getElementById('editTotalAmount').textContent = `$${total.toLocaleString('es-CO')}`;
-        }
-
-        function updateEditTotal(gastos) {
-            const total = gastos.reduce((sum, gasto) => sum + gasto.monto, 0);
+        function updateEditTotal() {
+            const total = currentEditItems.reduce((sum, item) => sum + item.monto, 0);
             document.getElementById('editTotalAmount').textContent = `$${total.toLocaleString('es-CO')}`;
         }
 
@@ -1537,31 +1581,18 @@
             e.preventDefault();
 
             const expenseId = document.getElementById('editExpenseId').value;
-            const fecha = document.getElementById('editFecha').value; // Ya no convertir a ISO
+            const fecha = document.getElementById('editFecha').value;
 
-            const descripciones = document.querySelectorAll('.edit-descripcion');
-            const montos = document.querySelectorAll('.edit-monto');
-            const metodosPago = document.querySelectorAll('.edit-payment-method.active');
+            const validItems = currentEditItems.filter(item => item.descripcion.trim() && item.monto > 0);
 
-            const gastos = [];
-            descripciones.forEach((desc, index) => {
-                const descripcion = desc.value.trim();
-                const monto = parseFloat(montos[index].value) || 0;
-                const metodoPago = metodosPago[index]?.dataset.method || 'efectivo';
-
-                if (descripcion && monto > 0) {
-                    gastos.push({ descripcion, monto, metodoPago });
-                }
-            });
-
-            if (gastos.length === 0) {
-                Swal.fire({ icon: (('Debe tener al menos un gasto válido').toLowerCase().includes("error") || ('Debe tener al menos un gasto válido').toLowerCase().includes("falla") || ('Debe tener al menos un gasto válido').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Debe tener al menos un gasto válido', timer: 3000, showConfirmButton: false });
+            if (validItems.length === 0) {
+                Swal.fire({ icon: 'error', text: 'Debe tener al menos un gasto válido', timer: 3000, showConfirmButton: false });
                 return;
             }
 
             const expenseData = {
                 fecha: fecha,
-                gastos: gastos,
+                gastos: validItems,
                 userId: currentUser._id
             };
 

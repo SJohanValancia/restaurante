@@ -1975,8 +1975,8 @@
                 ? orderedOrders.filter(o => o.source === 'mandao')
                 : orderedOrders;
 
-            if (reset) {
-                list.innerHTML = finalOrders.map(order => {
+            // Always overwrite innerHTML to prevent duplicates and maintain sorting across all loaded pages
+            list.innerHTML = finalOrders.map(order => {
                 const isMandao = order.source === 'mandao';
                 // Generar HTML para items con estados individuales
                 const itemsHTML = order.items.map((item, itemIndex) => {
@@ -1995,7 +1995,7 @@
                     </div>
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span style="font-size: 14px; font-weight: 700; color: #1a202c;">$${(item.precio * grupo.cantidad).toLocaleString('es-CO')}</span>
-                        ${order.estado !== 'Pagado' && order.estado !== 'cancelado' ? `
+                        ${order.estado !== 'entregado' && order.estado !== 'cancelado' ? `
                             <span class="status-badge status-${grupo.estado}" style="font-size: 10px; padding: 4px 8px;">${grupo.estado}</span>
                             <button onclick="cambiarEstadoProducto('${order._id}', ${itemIndex}, ${grupo.cantidad}, '${grupo.estado}')" 
                                     style="padding: 4px 8px; background: #4299e1; color: white; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 600;">
@@ -2025,7 +2025,7 @@
                     <div style="display: flex; gap: 8px; align-items: center;">
                         <span class="status-badge status-${order.estado}">${order.estado === 'entregado' ? 'pagado' : order.estado}</span>
 
-                        ${order.estado !== 'Pagado' && order.estado !== 'cancelado' ? `
+                        ${order.estado !== 'entregado' && order.estado !== 'cancelado' ? `
                             <button onclick="abrirModalEditar('${order._id}')" style="padding: 6px 12px; background: #805ad5; color: white; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 4px;">
                                 ✏️ Editar
                             </button>
@@ -2044,70 +2044,6 @@
             </div>
         `;
             }).join('');
-            } else {
-                list.insertAdjacentHTML('beforeend', finalOrders.map(order => {
-                const isMandao = order.source === 'mandao';
-                const itemsHTML = order.items.map((item, itemIndex) => {
-                    const nombre = item.productoInfo ? item.productoInfo.nombre :
-                        (item.producto && item.producto.nombre ? item.producto.nombre :
-                            (item.nombreProducto || 'Producto eliminado'));
-                    const grupos = item.estadosIndividuales || [{ cantidad: item.cantidad, estado: 'pendiente' }];
-                    return grupos.map(grupo => `
-                <div class="order-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #f7fafc; border-radius: 8px; margin-bottom: 8px;">
-                    <div style="flex: 1;">
-                        <span class="item-name" style="font-weight: 600; color: #2d3748;">${nombre}</span>
-                        <span class="item-qty" style="margin-left: 8px; color: #667eea; font-weight: 700;">x${grupo.cantidad}</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 14px; font-weight: 700; color: #1a202c;">$${(item.precio * grupo.cantidad).toLocaleString('es-CO')}</span>
-                        ${order.estado !== 'Pagado' && order.estado !== 'cancelado' ? `
-                            <span class="status-badge status-${grupo.estado}" style="font-size: 10px; padding: 4px 8px;">${grupo.estado}</span>
-                            <button onclick="cambiarEstadoProducto('${order._id}', ${itemIndex}, ${grupo.cantidad}, '${grupo.estado}')" 
-                                    style="padding: 4px 8px; background: #4299e1; color: white; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 600;">
-                                ▶️
-                            </button>
-                        ` : `
-                            <span class="status-badge status-${grupo.estado}" style="font-size: 10px; padding: 4px 8px;">${grupo.estado}</span>
-                        `}
-                    </div>
-                </div>
-            `).join('');
-                }).join('');
-                return `
-            <div class="order-card ${isMandao ? 'mandao-order' : ''}" id="order-card-${order._id}">
-                <div class="order-header">
-                    <div class="order-info">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            ${isMandao ? '<span class="source-badge source-mandao"><span class="mandao-icon">🚲</span> MANDAO</span>' : ''}
-                            <h3>Mesa ${order.mesa}</h3>
-                        </div>
-                        <div class="order-meta">
-                            ${new Date(order.createdAt).toLocaleString('es-CO')}
-                            ${order.metodoPago ? `<br><strong style="color: ${order.metodoPago === 'transferencia' ? '#667eea' : '#48bb78'};">💳 ${order.metodoPago === 'transferencia' ? 'Transferencia' : 'Efectivo'}</strong>` : ''}
-                        </div>
-                    </div>
-                    <div style="display: flex; gap: 8px; align-items: center;">
-                        <span class="status-badge status-${order.estado}">${order.estado === 'entregado' ? 'pagado' : order.estado}</span>
-                        ${order.estado !== 'Pagado' && order.estado !== 'cancelado' ? `
-                            <button onclick="abrirModalEditar('${order._id}')" style="padding: 6px 12px; background: #805ad5; color: white; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 4px;">
-                                ✏️ Editar
-                            </button>
-                        ` : ''}
-                    </div>
-                </div>
-                <div class="order-items">
-                    ${itemsHTML}
-                </div>
-                ${order.notas ? `<p style="font-size: 12px; color: #718096; font-style: italic; margin: 8px 0;">📝 ${order.notas}</p>` : ''}
-                <div class="order-total">
-                    <span>Total:</span>
-                    <span>$${order.total.toLocaleString('es-CO')}</span>
-                </div>
-                ${getOrderActions(order)}
-            </div>
-        `;
-                }).join(''));
-            }
         }
 
         function getOrderActions(order) {

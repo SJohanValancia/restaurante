@@ -31,7 +31,8 @@ async function resetPassword(email, nuevaPassword) {
     console.log('   Restaurant:', usuario.nombreRestaurante);
     console.log('   Bloqueado:', usuario.bloqueado);
 
-    usuario.password = nuevaPassword;
+    const salt = await bcrypt.genSalt(10);
+    usuario.password = await bcrypt.hash(nuevaPassword, salt);
     usuario.bloqueado = false;
     usuario.motivoBloqueo = '';
     await usuario.save();
