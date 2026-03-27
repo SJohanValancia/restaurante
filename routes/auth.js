@@ -945,4 +945,98 @@ router.post('/activity', async (req, res) => {
   }
 });
 
+// --- ENDPOINTS PARA CAMBIADOR DE RESTAURANTES (SWITCHER) ---
+
+// Obtener todas las sedes relacionadas por nombre de restaurante
+router.get('/sedes-relacionadas', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ success: false, message: 'No autorizado' });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secreto-super-seguro-cambiar-en-produccion');
+    const usuarioActual = await User.findById(decoded.id);
+
+    if (!usuarioActual) return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+
+    // Buscar todos los usuarios con el mismo nombre de restaurante (Insensible a mayúsculas)
+    // También filtramos por nit si existe para mayor precisión
+    const query = {
+      nombreRestaurante: { $regex: new RegExp(`^${usuarioActual.nombreRestaurante}$`, 'i') },
+      activo: true,
+      _id: { $ne: usuarioActual._id } // Excluir el actual
+    };
+
+    if (usuarioActual.nitRestaurante) {
+      query.nitRestaurante = usuarioActual.nitRestaurante;
+    }
+
+    const sedes = await User.find(query)
+      .select('_id sede nombre email rol')
+      .sort({ sede: 1 });
+
+    res.json({
+      success: true,
+      data: sedes
+    });
+
+  } catch (error) {
+    console.error('Error al obtener sedes relacionadas:', error);
+    res.status(500).json({ success: false, message: 'Error al obtener sedes' });
+  }
+});
+
+// Cambiar a otra cuenta de la misma organización
+router.post('/switch-account', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ success: false, message: 'No autorizado' });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secreto-super-seguro-cambiar-en-produccion');
+    const usuarioActual = await User.findById(decoded.id);
+
+    if (!usuarioActual) return res.status(404).json({ success: false, message: 'Usuario origen no encontrado' });
+
+    const { targetUserId } = req.body;
+    if (!targetUserId) return res.status(400).json({ success: false, message: 'ID de destino no proporcionado' });
+
+    const targetUser = await User.findById(targetUserId);
+    if (!targetUser || !targetUser.activo) {
+      return res.status(404).json({ success: false, message: 'Usuario de destino no encontrado o inactivo' });
+    }
+
+    // VALIDACIÓN DE SEGURIDAD:
+    // Solo permitir el cambio si pertenecen al mismo restaurante/nit
+    const mismoRestaurante = targetUser.nombreRestaurante.toLowerCase() === usuarioActual.nombreRestaurante.toLowerCase();
+    
+    // Si tienen NIT, deben coincidir. Si no, solo confiamos en el nombre (según solicitud del usuario)
+    const mismoNit = (usuarioActual.nitRestaurante && targetUser.nitRestaurante) 
+                     ? usuarioActual.nitRestaurante === targetUser.nitRestaurante 
+                     : true;
+
+    if (!mismoRestaurante || !mismoNit) {
+      return res.status(403).json({ success: false, message: 'No tiene permiso para acceder a esta sede' });
+    }
+
+    // Generar nuevo token para el usuario destino
+    const nuevoToken = generarToken(targetUser._id);
+    
+    // Actualizar último acceso del destino
+    targetUser.ultimoAcceso = new Date();
+    await targetUser.save();
+
+    // Iniciar sesión keep-alive para el nuevo usuario
+    startSession(targetUser._id.toString());
+
+    res.json({
+      success: true,
+      token: nuevoToken,
+      usuario: targetUser.obtenerDatosPublicos()
+    });
+
+  } catch (error) {
+    console.error('Error al cambiar de cuenta:', error);
+    res.status(500).json({ success: false, message: 'Error interno al cambiar de cuenta' });
+  }
+});
+
 module.exports = router;
