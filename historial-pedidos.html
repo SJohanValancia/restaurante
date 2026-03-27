@@ -799,9 +799,66 @@
             }
 
             to {
-                transform: translateX(400px);
+                transform: translateX(100%);
                 opacity: 0;
             }
+        }
+
+        /* GESTURE STYLES */
+        .order-card {
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: pan-y;
+        }
+
+        .order-card.ready-to-undo {
+            background-color: #fff5f5 !important;
+            border-color: #feb2b2 !important;
+            animation: undo-pulse 1.5s infinite;
+            transform: scale(1.02);
+            z-index: 10;
+            box-shadow: 0 10px 25px rgba(245, 101, 101, 0.2);
+        }
+
+        @keyframes undo-pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(245, 101, 101, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(245, 101, 101, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(245, 101, 101, 0);
+            }
+        }
+
+        .undo-indicator {
+            position: absolute;
+            left: -100px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #f56565;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 0 30px 30px 0;
+            font-weight: 800;
+            font-size: 14px;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 4px 0 15px rgba(245, 101, 101, 0.3);
+        }
+
+        .ready-to-undo .undo-indicator {
+            left: 0;
+            opacity: 1;
         }
 
 
@@ -1642,11 +1699,15 @@
                     console.log(`✅ ${allOrders.length} pedidos cargados, página ${currentPage}`);
                     cargarTodosLosPlatos();
 
-                    if (reset) {
-                        grid.innerHTML = '';
-                    }
                     const hasSearch = document.getElementById('filterSearch').value.trim();
-                    applyFilters(reset, !!hasSearch);
+                    const hasMesa = document.getElementById('filterMesa').value.trim();
+                    const hasEstado = document.getElementById('filterEstado').value;
+                    const hasPlato = document.getElementById('filterPlato').value;
+                    
+                    // Si hay filtros locales activos (estado, plato), forzamos reset para no duplicar ni ocultar
+                    const needsFullReset = reset || hasEstado || hasPlato;
+                    
+                    applyFilters(needsFullReset, !!hasSearch);
                     currentPage++;
                 }
             } catch (error) {
@@ -1785,19 +1846,22 @@
             const list = document.getElementById('ordersGrid');
 
             if (filteredOrders.length === 0) {
-                list.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">🔍</div>
-                <p>No se encontraron pedidos con los filtros seleccionados</p>
-            </div>
-        `;
-                displayedOrderIds = [];
+                // Solo mostrar empty-state si estamos en un reset completo o si no hay NADA que mostrar
+                if (reset || list.children.length === 0) {
+                    list.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">🔍</div>
+                            <p>No se encontraron pedidos con los filtros seleccionados</p>
+                        </div>
+                    `;
+                    displayedOrderIds = [];
+                }
                 return;
             }
 
-            const activos = filteredOrders.filter(o => !['entregado', 'cancelado'].includes(o.estado));
+            const activos = filteredOrders.filter(o => !['entregado', 'cancelado', 'pagado'].includes(o.estado));
             const cancelados = filteredOrders.filter(o => o.estado === 'cancelado');
-            const entregados = filteredOrders.filter(o => o.estado === 'entregado');
+            const entregados = filteredOrders.filter(o => o.estado === 'entregado' || o.estado === 'pagado');
 
             activos.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
             cancelados.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
@@ -1830,7 +1894,8 @@
                 });
 
                 return `
-            <div class="order-card ${isMandao ? 'mandao-order' : ''}">
+            <div class="order-card ${isMandao ? 'mandao-order' : ''}" id="order-${order._id}" data-id="${order._id}">
+                <div class="undo-indicator">↩️ DESHACER</div>
                 <div class="order-header">
                     <div class="order-info">
                         <div style="display: flex; align-items: center; gap: 8px;">
@@ -3513,6 +3578,130 @@
         `;
             }).join('');
         }
+
+        // ============================================
+        // SISTEMA DE GESTOS (LONG PRESS + SWIPE)
+        // ============================================
+
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let longPressTimer = null;
+        let activeCard = null;
+        let isLongPressed = false;
+
+        function handleStart(e) {
+            const card = e.target.closest('.order-card');
+            if (!card) return;
+
+            // No permitir deshacer pedidos pagados o cancelados si así se prefiere
+            // El usuario pidió "excepto las que ya fueron pagadas"
+            const statusBadge = card.querySelector('.status-badge');
+            if (statusBadge && (statusBadge.classList.contains('status-entregado') || statusBadge.textContent.toLowerCase().includes('pagado'))) {
+                return;
+            }
+
+            activeCard = card;
+            const touch = e.touches ? e.touches[0] : e;
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+            isLongPressed = false;
+
+            longPressTimer = setTimeout(() => {
+                isLongPressed = true;
+                activeCard.classList.add('ready-to-undo');
+                if (window.navigator.vibrate) window.navigator.vibrate(50);
+            }, 1500); // 1.5 segundos de presión
+        }
+
+        function handleMove(e) {
+            if (!activeCard || !isLongPressed) return;
+
+            const touch = e.touches ? e.touches[0] : e;
+            const deltaX = touch.clientX - touchStartX;
+            const deltaY = touch.clientY - touchStartY;
+
+            // Si se mueve mucho verticalmente, cancelar para permitir scroll
+            if (Math.abs(deltaY) > 50 && !isLongPressed) {
+                handleEnd();
+                return;
+            }
+
+            if (isLongPressed) {
+                if (deltaX > 0) {
+                    activeCard.style.transform = `scale(1.02) translateX(${deltaX}px)`;
+                    const opacity = Math.min(deltaX / 150, 1);
+                    const indicator = activeCard.querySelector('.undo-indicator');
+                    if (indicator) indicator.style.opacity = opacity;
+                }
+            }
+        }
+
+        function handleEnd(e) {
+            clearTimeout(longPressTimer);
+
+            if (activeCard && isLongPressed) {
+                const touch = e.changedTouches ? e.changedTouches[0] : e;
+                const deltaX = touch.clientX - touchStartX;
+
+                if (deltaX > 150) {
+                    // Acción confirmada
+                    const orderId = activeCard.dataset.id;
+                    undoOrderState(orderId);
+                }
+            }
+
+            if (activeCard) {
+                activeCard.classList.remove('ready-to-undo');
+                activeCard.style.transform = '';
+                const indicator = activeCard.querySelector('.undo-indicator');
+                if (indicator) indicator.style.opacity = '';
+            }
+
+            activeCard = null;
+            isLongPressed = false;
+        }
+
+        async function undoOrderState(orderId) {
+            const order = allOrders.find(o => o._id === orderId);
+            if (!order) return;
+
+            const currentStatus = order.estado;
+            const flow = ['pendiente', 'preparando', 'listo', 'entregado'];
+            const currentIndex = flow.indexOf(currentStatus);
+
+            if (currentIndex <= 0) {
+                Swal.fire({ icon: 'info', text: 'El pedido ya está en su estado inicial', timer: 2000, showConfirmButton: false });
+                return;
+            }
+
+            const previousStatus = flow[currentIndex - 1];
+
+            Swal.fire({
+                title: '¿Deshacer estado?',
+                text: `El pedido pasará de "${currentStatus}" a "${previousStatus}"`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#4299e1',
+                cancelButtonColor: '#718096',
+                confirmButtonText: 'Sí, deshacer',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    await actualizarEstadoPedido(orderId, previousStatus, null);
+                    mostrarNotificacionExito(`Pedido devuelto a ${previousStatus}`);
+                }
+            });
+        }
+
+        // Inicializar listeners de gestos (Desktop y Mobile)
+        const grid = document.getElementById('ordersGrid');
+        grid.addEventListener('touchstart', handleStart, { passive: true });
+        grid.addEventListener('touchmove', handleMove, { passive: true });
+        grid.addEventListener('touchend', handleEnd);
+
+        grid.addEventListener('mousedown', handleStart);
+        window.addEventListener('mousemove', handleMove);
+        window.addEventListener('mouseup', handleEnd);
 
     </script>
 
