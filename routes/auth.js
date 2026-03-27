@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const Product = require('../models/Product');
 const Alimento = require('../models/Alimento');
+const AdminMesero = require('../models/AdminMesero');
 const jwt = require('jsonwebtoken');
 const { loginToMandao } = require('../services/mandaoIntegration');
 const { startSession, endSession, updateActivity } = require('../services/keepAlive');
@@ -264,9 +265,10 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    // Verificar si ya existe un ADMINISTRADOR para este restaurante (Búsqueda Insensible a Mayúsculas)
+    // Verificar si ya existe un ADMINISTRADOR para esta SEDE específica de este restaurante
     const adminExistente = await User.findOne({
       nombreRestaurante: { $regex: new RegExp(`^${nombreRestaurante.trim()}$`, 'i') },
+      sede: { $regex: new RegExp(`^${sede?.trim() || ''}$`, 'i') },
       rol: 'admin'
     });
 
@@ -833,6 +835,7 @@ router.get('/solicitudes', async (req, res) => {
 
     const solicitudes = await User.find({
       nombreRestaurante: admin.nombreRestaurante,
+      sede: admin.sede, // FILTRAR POR SEDE
       solicitudPendiente: true,
       activo: false
     }).select('nombre email rol fechaBloqueo createdAt');
@@ -865,16 +868,27 @@ router.post('/gestionar-solicitud', async (req, res) => {
     const solicitante = await User.findById(userId);
     if (!solicitante) return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
 
-    // Seguridad: Verificar que sea del mismo restaurante
-    if (solicitante.nombreRestaurante !== admin.nombreRestaurante) {
-      return res.status(403).json({ success: false, message: 'No puedes gestionar usuarios ajenos' });
+    // Seguridad: Verificar que sea del mismo restaurante Y LA MISMA SEDE
+    if (solicitante.nombreRestaurante !== admin.nombreRestaurante || solicitante.sede !== admin.sede) {
+      return res.status(403).json({ success: false, message: 'No puedes gestionar usuarios ajenos o de otras sedes' });
     }
 
     if (accion === 'aprobar') {
       solicitante.activo = true;
       solicitante.solicitudPendiente = false;
       await solicitante.save();
-      res.json({ success: true, message: 'Usuario aprobado exitosamente' });
+
+      // VINCULACIÓN AUTOMÁTICA: Crear relación AdminMesero si no existe
+      if (['mesero', 'cajero'].includes(solicitante.rol)) {
+        await AdminMesero.findOneAndUpdate(
+          { adminId: admin._id, meseroId: solicitante._id },
+          { adminId: admin._id, meseroId: solicitante._id, activo: true },
+          { upsert: true, new: true }
+        );
+        console.log(`🔗 Vínculo automático creado entre Admin ${admin.email} y ${solicitante.rol} ${solicitante.email}`);
+      }
+
+      res.json({ success: true, message: 'Usuario aprobado y vinculado exitosamente' });
     } else if (accion === 'rechazar') {
       await User.findByIdAndDelete(userId); // O marcar como bloqueado permanentemente
       res.json({ success: true, message: 'Solicitud rechazada y usuario eliminado' });
