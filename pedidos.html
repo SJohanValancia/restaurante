@@ -31,12 +31,15 @@
             z-index: 1000;
             box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar-header {
             padding: 1.5rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             background: rgba(0, 0, 0, 0.2);
+            flex-shrink: 0;
         }
 
         .sidebar-brand {
@@ -73,6 +76,23 @@
 
         .sidebar-nav {
             padding: 1rem 0;
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+        }
+
+        .sidebar-nav::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
         }
 
         .nav-section {
@@ -102,13 +122,15 @@
         }
 
         .nav-item:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
             color: white;
+            padding-left: 1.75rem;
         }
 
         .nav-item.active {
-            background: linear-gradient(90deg, rgba(102, 126, 234, 0.2) 0%, transparent 100%);
-            color: white;
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.15) 0%, transparent 100%);
+            color: #667eea;
+            font-weight: 700;
         }
 
         .nav-item.active::before {
@@ -117,24 +139,29 @@
             left: 0;
             top: 0;
             bottom: 0;
-            width: 3px;
-            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            width: 4px;
+            background: #667eea;
+            box-shadow: 2px 0 10px rgba(102, 126, 234, 0.5);
         }
 
         .nav-icon {
-            font-size: 20px;
+            font-size: 18px;
             width: 24px;
             text-align: center;
+            opacity: 0.8;
+            transition: transform 0.2s;
+        }
+
+        .nav-item:hover .nav-icon {
+            transform: scale(1.1);
+            opacity: 1;
         }
 
         .sidebar-footer {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
             padding: 1.5rem;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             background: rgba(0, 0, 0, 0.2);
+            flex-shrink: 0;
         }
 
         .user-info {
@@ -1373,39 +1400,39 @@
             <div class="nav-section">
                 <div class="nav-section-title">Principal</div>
                 <a href="productos.html" class="nav-item">
-                    <span class="nav-icon">📦</span>
+                    <span class="nav-icon">🍔</span>
                     <span>Platos</span>
                 </a>
                 <a href="pedidos.html" class="nav-item active">
-                    <span class="nav-icon">🍽️</span>
+                    <span class="nav-icon">📝</span>
                     <span>Pedidos</span>
                 </a>
                 <a href="gastos.html" class="nav-item">
-                    <span class="nav-icon">🧾</span>
+                    <span class="nav-icon">💰</span>
                     <span>Gastos</span>
                 </a>
                 <a href="qr-generator.html" class="nav-item">
-                    <span class="nav-icon">📱</span>
+                    <span class="nav-icon">🔗</span>
                     <span>QR Generador</span>
                 </a>
                 <a href="reportes.html" class="nav-item ">
-                    <span class="nav-icon">📊</span>
+                    <span class="nav-icon">📈</span>
                     <span>Reportes</span>
                 </a>
                 <a href="historial-pedidos.html" class="nav-item ">
-                    <span class="nav-icon">📜</span>
+                    <span class="nav-icon">📖</span>
                     <span>Historial</span>
                 </a>
                 <a href="catalogo-productos.html" class="nav-item">
-                    <span class="nav-icon">📜📦</span>
+                    <span class="nav-icon">📋</span>
                     <span>Todos los platos</span>
                 </a>
                 <a href="alimentos.html" class="nav-item">
-                    <span class="nav-icon">🥘</span>
+                    <span class="nav-icon">🥑</span>
                     <span>Alimentos</span>
                 </a>
                 <a href="inventario-alimentos.html" class="nav-item ">
-                    <span class="nav-icon">📋</span>
+                    <span class="nav-icon">📦</span>
                     <span>Inventario Alimentos</span>
                 </a>
             </div>
@@ -1414,19 +1441,19 @@
             <div class="nav-section" id="adminSection" style="display: none;">
                 <div class="nav-section-title">Administración</div>
                 <a href="administrador.html" class="nav-item">
-                    <span class="nav-icon">👥</span>
+                    <span class="nav-icon">👔</span>
                     <span>Gestión de Meseros</span>
                 </a>
                 <a href="liquidacion.html" class="nav-item">
-                    <span class="nav-icon">💵</span>
+                    <span class="nav-icon">💎</span>
                     <span>Liquidación</span>
                 </a>
                 <a href="historial-liquidaciones.html" class="nav-item">
-                    <span class="nav-icon">📋</span>
+                    <span class="nav-icon">📓</span>
                     <span>Hist. Liquidaciones</span>
                 </a>
                 <a href="solicitudes.html" class="nav-item">
-                    <span class="nav-icon">👤✅</span>
+                    <span class="nav-icon">✔️</span>
                     <span>Aceptación de Empleados</span>
                 </a>
             </div>
@@ -1513,6 +1540,7 @@
                                 <span class="order-count" id="orderCount">0</span>
                             </div>
                             <div class="filters">
+                                <input type="text" id="orderSearch" class="filter-select" placeholder="🔍 Buscar mesa..." style="width: 150px;">
                                 <select id="filterEstado" class="filter-select" onchange="loadOrders(true)">
                                     <option value="">Todos los estados</option>
                                     <option value="pendiente">Pendientes</option>
@@ -1713,6 +1741,16 @@
             list.addEventListener('mousedown', handleStart);
             window.addEventListener('mousemove', handleMove);
             window.addEventListener('mouseup', handleEnd);
+
+            // BUSCADOR DE PEDIDOS (MESA)
+            const orderSearch = document.getElementById('orderSearch');
+            let searchTimeout;
+            orderSearch.addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    loadOrders(true);
+                }, 500);
+            });
         });
 
         async function undoOrderState(orderId) {
@@ -2072,6 +2110,7 @@
         async function loadOrders(reset = false) {
             const token = localStorage.getItem('token');
             const estado = document.getElementById('filterEstado').value;
+            const search = document.getElementById('orderSearch').value.trim();
 
             if (reset) {
                 currentPage = 1;
@@ -2088,6 +2127,7 @@
 
             let url = `${API_URL}/orders?userId=${currentUser._id}&page=${currentPage}&limit=30`;
             if (estado) url += `&estado=${estado}`;
+            if (search) url += `&search=${encodeURIComponent(search)}`;
 
             try {
                 const response = await fetch(url, {
