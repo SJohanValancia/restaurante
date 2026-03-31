@@ -14,19 +14,32 @@ async function descontarStockAlimentos(items, userId, ignorarStock = false) {
   const Alimento = require('../models/Alimento');
 
   try {
-    const productoIds = [...new Set(items.map(item => item.producto))];
+    // ✅ FIX: Convertir IDs a ObjectId para que el aggregation pipeline funcione
+    const productoIds = [...new Set(items.map(item => {
+      try {
+        return new mongoose.Types.ObjectId(item.producto.toString());
+      } catch (e) {
+        return item.producto;
+      }
+    }))];
+
+    const userObjectId = new mongoose.Types.ObjectId(userId.toString());
+
+    console.log('🔍 Descontando stock - ProductoIds:', productoIds.length, 'UserId:', userObjectId);
 
     // ✅ OPTIMIZACIÓN: Usar aggregation pipeline para evitar doble bucle
     const alimentos = await Alimento.aggregate([
       {
         $match: {
           'productos.productoId': { $in: productoIds },
-          userId: userId
+          userId: userObjectId
         }
       },
       { $unwind: '$productos' },
       { $match: { 'productos.productoId': { $in: productoIds } } }
     ]);
+
+    console.log('🔍 Alimentos encontrados para descontar:', alimentos.length);
 
     // Crear mapa de alimentos por productoId
     const alimentosMap = new Map();
@@ -70,6 +83,7 @@ async function descontarStockAlimentos(items, userId, ignorarStock = false) {
                 update: { $inc: { stock: -descontado } }
               }
             });
+            console.log(`📦 Descontando ${descontado} de "${alimentoData.nombre}" (ignorar stock)`);
           }
         } else {
           if (alimentoData.stock < cantidadADescontar) {
@@ -84,12 +98,16 @@ async function descontarStockAlimentos(items, userId, ignorarStock = false) {
               update: { $inc: { stock: -cantidadADescontar } }
             }
           });
+          console.log(`📦 Descontando ${cantidadADescontar} de "${alimentoData.nombre}"`);
         }
       }
     }
 
     if (operaciones.length > 0) {
-      await Alimento.bulkWrite(operaciones);
+      const result = await Alimento.bulkWrite(operaciones);
+      console.log('✅ Stock descontado exitosamente:', result.modifiedCount, 'alimentos actualizados');
+    } else {
+      console.log('⚠️ No se encontraron alimentos vinculados a los productos del pedido');
     }
 
     return { success: true };
@@ -722,6 +740,13 @@ router.post('/public', async (req, res) => {
     const total = itemsConInfo.reduce((sum, item) => {
       return sum + (item.precio * item.cantidad);
     }, 0);
+
+    // ✅ DESCONTAR STOCK DE ALIMENTOS (pedidos de clientes también)
+    try {
+      await descontarStockAlimentos(items, userId, true); // ignorarStock=true para no bloquear al cliente
+    } catch (error) {
+      console.error('⚠️ Error descontando stock en pedido público:', error.message);
+    }
 
     const orderData = {
       mesa,
