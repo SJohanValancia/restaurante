@@ -453,7 +453,7 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
       products.forEach(p => productsMap.set(p._id.toString(), p));
     }
 
-    const ordersNormalizados = filteredOrders.map(order => {
+    let ordersNormalizados = filteredOrders.map(order => {
       const orderObj = { ...order };
       orderObj.items = orderObj.items.map(item => {
         if (item.producto) {
