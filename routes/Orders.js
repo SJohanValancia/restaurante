@@ -743,11 +743,31 @@ router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
     }));
 
     // ✅ VALIDAR Y DESCONTAR STOCK
-    try {
-      await descontarStockAlimentos(items, req.user._id, ignorarStockAlimentos);
-    } catch (error) {
-      if (!ignorarStockAlimentos) {
-        return res.status(400).json({ success: false, message: error.message });
+    if (req.isHubMesero) {
+      // MULTI-LOCAL HUB: Descontar stock POR LOCAL (cada alimento pertenece a su admin)
+      const itemsPorOwner = {};
+      for (const item of itemsConInfo) {
+        const ownerId = item.ownerUserId.toString();
+        if (!itemsPorOwner[ownerId]) itemsPorOwner[ownerId] = [];
+        itemsPorOwner[ownerId].push(item);
+      }
+      for (const [ownerId, ownerItems] of Object.entries(itemsPorOwner)) {
+        try {
+          await descontarStockAlimentos(ownerItems, ownerId, ignorarStockAlimentos);
+        } catch (error) {
+          if (!ignorarStockAlimentos) {
+            return res.status(400).json({ success: false, message: error.message });
+          }
+        }
+      }
+    } else {
+      // Flujo normal: descontar con el userId del usuario actual
+      try {
+        await descontarStockAlimentos(items, req.user._id, ignorarStockAlimentos);
+      } catch (error) {
+        if (!ignorarStockAlimentos) {
+          return res.status(400).json({ success: false, message: error.message });
+        }
       }
     }
 
