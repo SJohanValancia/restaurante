@@ -686,6 +686,11 @@
             border-left: 5px solid #f59e0b;
         }
 
+        .order-card.unified-order {
+            border-left: 5px solid #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.03) 0%, white 100%);
+        }
+
         .order-items {
             margin-bottom: 1rem;
         }
@@ -2226,12 +2231,13 @@
                 }).join('');
 
                 return `
-            <div class="order-card ${isMandao ? 'mandao-order' : ''}" id="order-card-${order._id}" data-id="${order._id}">
+            <div class="order-card ${isMandao ? 'mandao-order' : ''} ${order._isUnified ? 'unified-order' : ''}" id="order-card-${order._id}" data-id="${order._id}" ${order._subOrderIds ? `data-sub-ids='${JSON.stringify(order._subOrderIds)}'` : ''} ${order._isUnified ? 'data-unified="true"' : ''}>
                 <div class="undo-indicator">↩️ DESHACER</div>
                 <div class="order-header">
                     <div class="order-info">
-                        <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                             ${isMandao ? '<span class="source-badge source-mandao"><span class="mandao-icon">🚲</span> MANDAO</span>' : ''}
+                            ${order._isUnified ? `<span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; background: linear-gradient(135deg, #667eea, #764ba2); color: white; box-shadow: 0 2px 8px rgba(102,126,234,0.3);">🏪 ${order._subOrderCount} Locales</span>` : ''}
                             <h3>Mesa ${order.mesa}</h3>
                         </div>
                         <div class="order-meta">

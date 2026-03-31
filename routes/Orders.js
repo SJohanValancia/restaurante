@@ -391,7 +391,9 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
       metodoPago: 1,
       mandaoOrderId: 1,
       clienteNombre: 1,
-      clienteCcNit: 1
+      clienteCcNit: 1,
+      hubOrderGroup: 1,
+      meseroHubId: 1
     })
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -477,6 +479,53 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
       });
       return orderObj;
     });
+
+    // ✅ MULTI-LOCAL HUB: Agrupar pedidos por hubOrderGroup para hub mesero
+    if (req.isHubMesero) {
+      const groupMap = new Map();
+      const ungrouped = [];
+
+      ordersNormalizados.forEach(order => {
+        if (order.hubOrderGroup && order.meseroHubId && order.meseroHubId.toString() === req.user._id.toString()) {
+          if (!groupMap.has(order.hubOrderGroup)) {
+            groupMap.set(order.hubOrderGroup, []);
+          }
+          groupMap.get(order.hubOrderGroup).push(order);
+        } else {
+          ungrouped.push(order);
+        }
+      });
+
+      const mergedOrders = [];
+      const estadoPrioridad = { pendiente: 0, preparando: 1, listo: 2, entregado: 3, cancelado: 4 };
+
+      groupMap.forEach((group, groupId) => {
+        if (group.length <= 1) {
+          // Si solo hay 1 orden en el grupo, no unificar
+          mergedOrders.push(...group);
+          return;
+        }
+
+        // Crear orden unificada
+        const merged = { ...group[0] };
+        merged.items = group.flatMap(o => o.items);
+        merged.total = group.reduce((sum, o) => sum + o.total, 0);
+        merged._subOrderIds = group.map(o => o._id);
+        merged._isUnified = true;
+        merged._subOrderCount = group.length;
+        // Estado: el más bajo del grupo (si uno está pendiente, el grupo es pendiente)
+        merged.estado = group.reduce((minEstado, o) => {
+          return (estadoPrioridad[o.estado] || 0) < (estadoPrioridad[minEstado] || 0) ? o.estado : minEstado;
+        }, group[0].estado);
+        // Método de pago: usar el que tenga alguno
+        merged.metodoPago = group.find(o => o.metodoPago)?.metodoPago || null;
+        mergedOrders.push(merged);
+      });
+
+      ordersNormalizados = [...mergedOrders, ...ungrouped];
+      // Re-ordenar por fecha descendente
+      ordersNormalizados.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
 
     res.json({
       success: true,
@@ -879,37 +928,66 @@ router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (re
       });
     }
 
-    // ✅ SI SE CANCELA: Devolver stock de alimentos
-    if (estado === 'cancelado' && order.estado !== 'cancelado') {
+    // ✅ MULTI-LOCAL HUB: Si es hub mesero y la orden tiene grupo, propagar a todas
+    let ordersToUpdate = [order];
+    if (req.isHubMesero && order.hubOrderGroup) {
+      const groupOrders = await Order.find({
+        hubOrderGroup: order.hubOrderGroup,
+        _id: { $ne: order._id }
+      });
+      ordersToUpdate = [order, ...groupOrders];
+      console.log(`🔗 Hub mesero: Propagando estado '${estado}' a ${ordersToUpdate.length} órdenes del grupo ${order.hubOrderGroup}`);
+    }
+
+    for (const currentOrder of ordersToUpdate) {
+      // ✅ SI SE CANCELA: Devolver stock de alimentos
+      if (estado === 'cancelado' && currentOrder.estado !== 'cancelado') {
+        try {
+          await revertirStockAlimentos(currentOrder.items, currentOrder.userId);
+          console.log('✅ Stock revertido por cancelación del pedido:', currentOrder._id);
+        } catch (revertError) {
+          console.error('⚠️ Error revirtiendo stock:', revertError.message);
+        }
+      }
+
+      // ✅ SI SE SOLICITA ACTUALIZAR TODOS LOS PRODUCTOS
+      if (actualizarTodosLosProductos) {
+        currentOrder.items.forEach(item => {
+          item.estadosIndividuales = [{
+            cantidad: item.cantidad,
+            estado: estado
+          }];
+        });
+      }
+
+      // Actualizar el estado general del pedido
+      currentOrder.estado = estado;
+
+      // Si es entregado y hay método de pago, guardarlo
+      if (estado === 'entregado') {
+        if (metodoPago) currentOrder.metodoPago = metodoPago;
+        if (req.body.clienteNombre) currentOrder.clienteNombre = req.body.clienteNombre;
+        if (req.body.clienteCcNit) currentOrder.clienteCcNit = req.body.clienteCcNit;
+      }
+
+      await currentOrder.save();
+
+      // ✅ ENVIAR PUSH NOTIFICATION AL LOCAL
       try {
-        await revertirStockAlimentos(order.items, order.userId);
-        console.log('✅ Stock revertido por cancelación del pedido:', order._id);
-      } catch (revertError) {
-        console.error('⚠️ Error revirtiendo stock:', revertError.message);
+        const user = await User.findById(currentOrder.userId);
+        if (user && user.nombreRestaurante) {
+          await notifyOrderStatusChange(currentOrder.mesa, user.nombreRestaurante, estado);
+        }
+      } catch (pushError) {
+        console.error('⚠️ Error enviando push notification:', pushError);
+      }
+
+      // ✅ NOTIFICAR A MANDAO SI ES UN PEDIDO EXTERNO
+      if (currentOrder.source === 'mandao' && currentOrder.mandaoOrderId) {
+        notifyMandaoStatusChange(currentOrder.mandaoOrderId, estado).catch(console.error);
       }
     }
 
-    // ✅ SI SE SOLICITA ACTUALIZAR TODOS LOS PRODUCTOS
-    if (actualizarTodosLosProductos) {
-      order.items.forEach(item => {
-        item.estadosIndividuales = [{
-          cantidad: item.cantidad,
-          estado: estado
-        }];
-      });
-    }
-
-    // Actualizar el estado general del pedido
-    order.estado = estado;
-
-    // Si es entregado y hay método de pago, guardarlo
-    if (estado === 'entregado') {
-      if (metodoPago) order.metodoPago = metodoPago;
-      if (req.body.clienteNombre) order.clienteNombre = req.body.clienteNombre;
-      if (req.body.clienteCcNit) order.clienteCcNit = req.body.clienteCcNit;
-    }
-
-    await order.save();
     await order.populate('items.producto', 'nombre categoria precio');
 
     console.log('✅ Estado actualizado:', order._id, '→', estado);
@@ -917,25 +995,9 @@ router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (re
       console.log('✅ Todos los productos actualizados a:', estado);
     }
 
-    // ✅ ENVIAR PUSH NOTIFICATION AL CLIENTE
-    try {
-      const user = await User.findById(order.userId);
-      if (user && user.nombreRestaurante) {
-        await notifyOrderStatusChange(order.mesa, user.nombreRestaurante, estado);
-      }
-    } catch (pushError) {
-      console.error('⚠️ Error enviando push notification:', pushError);
-      // No fallar la request por error de push
-    }
-
-    // ✅ NOTIFICAR A MANDAO SI ES UN PEDIDO EXTERNO
-    if (order.source === 'mandao' && order.mandaoOrderId) {
-      notifyMandaoStatusChange(order.mandaoOrderId, estado).catch(console.error);
-    }
-
     res.json({
       success: true,
-      message: `Pedido actualizado a estado: ${estado}`,
+      message: `Pedido actualizado a estado: ${estado}${ordersToUpdate.length > 1 ? ` (${ordersToUpdate.length} órdenes del grupo)` : ''}`,
       data: order
     });
   } catch (error) {
@@ -1190,21 +1252,34 @@ router.delete('/:id', protect, checkPermission('cancelarPedidos'), async (req, r
       });
     }
 
-    // ✅ DEVOLVER STOCK antes de eliminar (si no estaba cancelado ya)
-    if (order.estado !== 'cancelado') {
-      try {
-        await revertirStockAlimentos(order.items, order.userId);
-        console.log('✅ Stock revertido por eliminación del pedido:', order._id);
-      } catch (revertError) {
-        console.error('⚠️ Error revirtiendo stock al eliminar:', revertError.message);
-      }
+    // ✅ MULTI-LOCAL HUB: Si es hub mesero y la orden tiene grupo, eliminar todas
+    let ordersToDelete = [order];
+    if (req.isHubMesero && order.hubOrderGroup) {
+      const groupOrders = await Order.find({
+        hubOrderGroup: order.hubOrderGroup,
+        _id: { $ne: order._id }
+      });
+      ordersToDelete = [order, ...groupOrders];
+      console.log(`🔗 Hub mesero: Eliminando ${ordersToDelete.length} órdenes del grupo ${order.hubOrderGroup}`);
     }
 
-    await Order.findByIdAndDelete(req.params.id);
+    for (const currentOrder of ordersToDelete) {
+      // ✅ DEVOLVER STOCK antes de eliminar (si no estaba cancelado ya)
+      if (currentOrder.estado !== 'cancelado') {
+        try {
+          await revertirStockAlimentos(currentOrder.items, currentOrder.userId);
+          console.log('✅ Stock revertido por eliminación del pedido:', currentOrder._id);
+        } catch (revertError) {
+          console.error('⚠️ Error revirtiendo stock al eliminar:', revertError.message);
+        }
+      }
+
+      await Order.findByIdAndDelete(currentOrder._id);
+    }
 
     res.json({
       success: true,
-      message: 'Pedido eliminado exitosamente',
+      message: `Pedido${ordersToDelete.length > 1 ? 's' : ''} eliminado${ordersToDelete.length > 1 ? 's' : ''} exitosamente`,
       data: order
     });
   } catch (error) {
