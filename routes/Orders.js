@@ -117,6 +117,88 @@ async function descontarStockAlimentos(items, userId, ignorarStock = false) {
   }
 }
 
+// ✅ FUNCIÓN PARA DEVOLVER STOCK DE ALIMENTOS (al cancelar/eliminar pedido)
+async function revertirStockAlimentos(items, userId) {
+  const Alimento = require('../models/Alimento');
+
+  try {
+    const productoIds = [...new Set(items.map(item => {
+      try {
+        return new mongoose.Types.ObjectId(item.producto.toString());
+      } catch (e) {
+        return item.producto;
+      }
+    }))];
+
+    const userObjectId = new mongoose.Types.ObjectId(userId.toString());
+
+    console.log('🔄 Revirtiendo stock - ProductoIds:', productoIds.length, 'UserId:', userObjectId);
+
+    const alimentos = await Alimento.aggregate([
+      {
+        $match: {
+          'productos.productoId': { $in: productoIds },
+          userId: userObjectId
+        }
+      },
+      { $unwind: '$productos' },
+      { $match: { 'productos.productoId': { $in: productoIds } } }
+    ]);
+
+    console.log('🔄 Alimentos encontrados para revertir:', alimentos.length);
+
+    const alimentosMap = new Map();
+    alimentos.forEach(alimento => {
+      const productoId = alimento.productos.productoId.toString();
+      if (!alimentosMap.has(productoId)) {
+        alimentosMap.set(productoId, {
+          _id: alimento._id,
+          nombre: alimento.nombre,
+          productos: [alimento.productos]
+        });
+      } else {
+        alimentosMap.get(productoId).productos.push(alimento.productos);
+      }
+    });
+
+    const operaciones = [];
+
+    for (const item of items) {
+      const productoId = item.producto.toString();
+      const cantidadPedida = item.cantidad;
+
+      if (alimentosMap.has(productoId)) {
+        const alimentoData = alimentosMap.get(productoId);
+        let cantidadADevolver = 0;
+
+        alimentoData.productos.forEach(config => {
+          cantidadADevolver += config.cantidadRequerida * cantidadPedida;
+        });
+
+        operaciones.push({
+          updateOne: {
+            filter: { _id: alimentoData._id },
+            update: { $inc: { stock: cantidadADevolver } }
+          }
+        });
+        console.log(`📦 Devolviendo ${cantidadADevolver} a "${alimentoData.nombre}"`);
+      }
+    }
+
+    if (operaciones.length > 0) {
+      const result = await Alimento.bulkWrite(operaciones);
+      console.log('✅ Stock revertido exitosamente:', result.modifiedCount, 'alimentos actualizados');
+    } else {
+      console.log('⚠️ No se encontraron alimentos para revertir');
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('❌ Error al revertir stock:', error);
+    // No lanzar error para no bloquear la cancelación
+  }
+}
+
 // ✅ FUNCIÓN PARA NORMALIZAR TEXTO (QUITAR TILDES)
 function normalizeText(text) {
   if (!text) return '';
@@ -797,6 +879,16 @@ router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (re
       });
     }
 
+    // ✅ SI SE CANCELA: Devolver stock de alimentos
+    if (estado === 'cancelado' && order.estado !== 'cancelado') {
+      try {
+        await revertirStockAlimentos(order.items, order.userId);
+        console.log('✅ Stock revertido por cancelación del pedido:', order._id);
+      } catch (revertError) {
+        console.error('⚠️ Error revirtiendo stock:', revertError.message);
+      }
+    }
+
     // ✅ SI SE SOLICITA ACTUALIZAR TODOS LOS PRODUCTOS
     if (actualizarTodosLosProductos) {
       order.items.forEach(item => {
@@ -1089,7 +1181,7 @@ router.put('/:id', protect, checkPermission('editarPedidos'), async (req, res) =
 
 router.delete('/:id', protect, checkPermission('cancelarPedidos'), async (req, res) => {
   try {
-    const order = await Order.findByIdAndDelete(req.params.id);
+    const order = await Order.findById(req.params.id);
 
     if (!order) {
       return res.status(404).json({
@@ -1097,6 +1189,18 @@ router.delete('/:id', protect, checkPermission('cancelarPedidos'), async (req, r
         message: 'Pedido no encontrado'
       });
     }
+
+    // ✅ DEVOLVER STOCK antes de eliminar (si no estaba cancelado ya)
+    if (order.estado !== 'cancelado') {
+      try {
+        await revertirStockAlimentos(order.items, order.userId);
+        console.log('✅ Stock revertido por eliminación del pedido:', order._id);
+      } catch (revertError) {
+        console.error('⚠️ Error revirtiendo stock al eliminar:', revertError.message);
+      }
+    }
+
+    await Order.findByIdAndDelete(req.params.id);
 
     res.json({
       success: true,
