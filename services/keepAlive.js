@@ -4,8 +4,7 @@ const http = require('http');
 const RENDER_URLS = [
   'https://jv-nhzs.onrender.com',
   'https://mandao.onrender.com',
-  'https://comparti.onrender.com',
-  'https://todoaqui.onrender.com'
+  'https://pipe-h8d4.onrender.com'
 ];
 
 const PING_INTERVAL = 10 * 60 * 1000;
@@ -18,7 +17,7 @@ let inactivityChecker = null;
 function pingUrl(url) {
   return new Promise((resolve) => {
     const protocol = url.startsWith('https') ? https : http;
-    
+
     const req = protocol.get(url, { timeout: 10000 }, (res) => {
       console.log(`[KeepAlive] Ping a ${url}: Estado ${res.statusCode}`);
       resolve(res.statusCode);
@@ -88,7 +87,7 @@ function startSession(userId) {
   }
 
   console.log(`[KeepAlive] 🚀 Iniciando sesión de keep-alive para usuario ${userId}`);
-  
+
   wakeUpAll();
 
   const intervalId = setInterval(() => {
