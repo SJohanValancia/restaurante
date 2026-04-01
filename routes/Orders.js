@@ -1120,6 +1120,65 @@ router.patch('/:id/item/:itemIndex/estado', protect, checkPermission('editarPedi
   }
 });
 
+// NUEVA RUTA: Cambiar método de pago
+router.patch('/:id/metodo-pago', protect, checkPermission('editarPedidos'), async (req, res) => {
+  try {
+    const { metodoPago } = req.body;
+    const validMethods = ['efectivo', 'transferencia'];
+    
+    if (!metodoPago || !validMethods.includes(metodoPago)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Método de pago inválido'
+      });
+    }
+
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Pedido no encontrado'
+      });
+    }
+
+    // Verificar que el pedido esté pagado (entregado)
+    if (order.estado !== 'entregado') {
+      return res.status(400).json({
+        success: false,
+        message: 'Solo se puede cambiar el método de pago de pedidos pagados'
+      });
+    }
+
+    // Verificar que no haya sido liquidado
+    if (order.reciboDia === true) {
+      return res.status(400).json({
+        success: false,
+        message: 'No se puede cambiar el método de pago de un pedido ya liquidado'
+      });
+    }
+
+    const metodoAnterior = order.metodoPago;
+    order.metodoPago = metodoPago;
+    await order.save();
+
+    console.log('✅ Método de pago actualizado:', order._id, 'de', metodoAnterior, '→', metodoPago);
+
+    res.json({
+      success: true,
+      message: `Método de pago cambiado de ${metodoAnterior} a ${metodoPago}`,
+      data: order
+    });
+  } catch (error) {
+    console.error('Error al cambiar método de pago:', error);
+    res.status(400).json({
+      success: false,
+      message: 'Error al cambiar el método de pago',
+      error: error.message
+    });
+  }
+});
+
 router.put('/:id', protect, checkPermission('editarPedidos'), async (req, res) => {
   try {
     const { mesa, items, notas } = req.body;

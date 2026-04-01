@@ -1376,6 +1376,62 @@
             left: 0;
             opacity: 1;
         }
+
+        /* ESTILOS PARA GESTO CAMBIAR MÉTODO DE PAGO */
+        .order-card.ready-to-change-payment {
+            background-color: #f0fff4 !important;
+            border-color: #68d391 !important;
+            animation: change-payment-pulse 1.5s infinite;
+            transform: scale(1.02);
+            z-index: 10;
+            box-shadow: 0 10px 25px rgba(72, 187, 120, 0.2);
+        }
+
+        @keyframes change-payment-pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(72, 187, 120, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(72, 187, 120, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(72, 187, 120, 0);
+            }
+        }
+
+        .payment-method-indicator {
+            position: absolute;
+            right: -120px;
+            left: auto;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #48bb78;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px 0 0 30px;
+            font-weight: 800;
+            font-size: 14px;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: -4px 0 15px rgba(72, 187, 120, 0.3);
+            z-index: 100;
+            white-space: nowrap;
+        }
+
+        .order-card.ready-to-change-payment .payment-method-indicator {
+            right: 0;
+            left: auto;
+            opacity: 1;
+        }
+
+        .order-card.payment-method-selected {
+            border: 2px solid #48bb78 !important;
+            box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.2);
+        }
     </style>
 
 
@@ -1664,11 +1720,13 @@
                 }
             });
 
-            // GESTIÓN DE GESTOS (DESHACER ESTADO)
+            // GESTIÓN DE GESTOS (DESHACER ESTADO + CAMBIAR MÉTODO DE PAGO)
             let longPressTimer = null;
             let touchStartX = 0;
+            let touchStartY = 0;
             let currentCard = null;
             let isGestureStarted = false;
+            let gestureType = null; // 'undo' o 'change-payment'
 
             const list = document.getElementById('ordersList');
 
@@ -1676,23 +1734,48 @@
                 const card = e.target.closest('.order-card');
                 if (!card) return;
 
-                // No permitir deshacer orders pagadas (entregado) o canceladas
-                const statusBadge = card.querySelector('.status-badge');
-                if (statusBadge && (statusBadge.classList.contains('status-entregado') || statusBadge.classList.contains('status-cancelado') || statusBadge.textContent.toLowerCase().includes('pagado'))) {
-                    return;
-                }
-
                 currentCard = card;
                 const touch = e.touches ? e.touches[0] : e;
                 touchStartX = touch.clientX;
                 touchStartY = touch.clientY;
                 isGestureStarted = false;
+                gestureType = null;
 
-                longPressTimer = setTimeout(() => {
-                    isGestureStarted = true;
-                    currentCard.classList.add('ready-to-undo');
-                    if (window.navigator.vibrate) window.navigator.vibrate(50);
-                }, 1500);
+                // Verificar si es un pedido pagado (entregado) que no ha sido liquidado
+                const statusBadge = card.querySelector('.status-badge');
+                const isPagado = statusBadge && (statusBadge.classList.contains('status-entregado') || statusBadge.textContent.toLowerCase().includes('pagado'));
+                const metodoPago = card.dataset.metodo;
+                const reciboDia = card.dataset.recibo === 'true';
+
+                if (isPagado && !reciboDia) {
+                    // Para pedidos pagados NO liquidados, permitir cambio de método de pago
+                    longPressTimer = setTimeout(() => {
+                        isGestureStarted = true;
+                        gestureType = 'change-payment';
+                        currentCard.classList.add('ready-to-change-payment');
+                        
+                        // Actualizar texto del indicador según el método actual
+                        const indicador = currentCard.querySelector('.payment-method-indicator');
+                        const nuevoMetodo = metodoPago === 'efectivo' ? 'TRANSFERENCIA' : 'EFECTIVO';
+                        if (indicador) {
+                            indicador.innerHTML = metodoPago === 'efectivo' ? '💳 A TRANSFERENCIA' : '💵 A EFECTIVO';
+                        }
+                        
+                        if (window.navigator.vibrate) window.navigator.vibrate(50);
+                    }, 2000); // 2 segundos para cambiar método de pago
+                } else if (!isPagado) {
+                    // Para pedidos NO pagados, permitir deshacer estado
+                    if (statusBadge && statusBadge.classList.contains('status-cancelado')) {
+                        return;
+                    }
+                    
+                    longPressTimer = setTimeout(() => {
+                        isGestureStarted = true;
+                        gestureType = 'undo';
+                        currentCard.classList.add('ready-to-undo');
+                        if (window.navigator.vibrate) window.navigator.vibrate(50);
+                    }, 1500); // 1.5 segundos para deshacer
+                }
             };
 
             const handleMove = (e) => {
@@ -1703,16 +1786,27 @@
                 const diffY = touch.clientY - touchStartY;
 
                 // Si se mueve mucho verticalmente, cancelar para permitir scroll
-                if (Math.abs(diffY) > 50 && !isGestureStarted) {
+                if (Math.abs(diffY) > 50) {
                     handleEnd(e);
                     return;
                 }
 
-                if (isGestureStarted && diffX > 0) {
-                    currentCard.style.transform = `scale(1.02) translateX(${diffX}px)`;
-                    const opacity = Math.min(diffX / 150, 1);
-                    const indicator = currentCard.querySelector('.undo-indicator');
-                    if (indicator) indicator.style.opacity = opacity;
+                if (gestureType === 'undo') {
+                    // Gesto hacia la derecha para deshacer
+                    if (diffX > 0) {
+                        currentCard.style.transform = `scale(1.02) translateX(${diffX}px)`;
+                        const opacity = Math.min(diffX / 150, 1);
+                        const indicator = currentCard.querySelector('.undo-indicator');
+                        if (indicator) indicator.style.opacity = opacity;
+                    }
+                } else if (gestureType === 'change-payment') {
+                    // Gesto hacia la izquierda para cambiar método de pago
+                    if (diffX < 0) {
+                        currentCard.style.transform = `scale(1.02) translateX(${diffX}px)`;
+                        const opacity = Math.min(Math.abs(diffX) / 150, 1);
+                        const indicator = currentCard.querySelector('.payment-method-indicator');
+                        if (indicator) indicator.style.opacity = opacity;
+                    }
                 }
             };
 
@@ -1720,24 +1814,33 @@
                 clearTimeout(longPressTimer);
                 if (!currentCard) return;
 
-                const currentX = e.changedTouches ? e.changedTouches[0].clientX : (e.touches ? e.touches[0].clientX : (e.clientX || touchStartX));
+                const currentX = e.changedTouches ? e.changedTouches[0].clientX : (e.clientX || touchStartX);
                 const diffX = currentX - touchStartX;
 
-                if (isGestureStarted && diffX > 150) {
-                    // Acción confirmada
+                if (gestureType === 'undo' && isGestureStarted && diffX > 150) {
+                    // Deshacer estado
                     const orderId = currentCard.dataset.id || currentCard.id.replace('order-card-', '');
                     await undoOrderState(orderId);
+                } else if (gestureType === 'change-payment' && isGestureStarted && diffX < -150) {
+                    // Cambiar método de pago
+                    const orderId = currentCard.dataset.id || currentCard.id.replace('order-card-', '');
+                    const metodoActual = currentCard.dataset.metodo;
+                    await cambiarMetodoPago(orderId, metodoActual);
                 }
 
                 // Resetear estilos
-                currentCard.classList.remove('ready-to-undo');
+                currentCard.classList.remove('ready-to-undo', 'ready-to-change-payment');
                 currentCard.style.transform = '';
-                const indicator = currentCard.querySelector('.undo-indicator');
-                if (indicator) {
-                    indicator.style.opacity = '';
-                }
+                
+                const undoIndicator = currentCard.querySelector('.undo-indicator');
+                if (undoIndicator) undoIndicator.style.opacity = '';
+                
+                const paymentIndicator = currentCard.querySelector('.payment-method-indicator');
+                if (paymentIndicator) paymentIndicator.style.opacity = '';
+                
                 currentCard = null;
                 isGestureStarted = false;
+                gestureType = null;
             };
 
             list.addEventListener('touchstart', handleStart);
@@ -1787,11 +1890,87 @@
                     try {
                         await updateOrderStatus(orderId, previousStatus);
                         Swal.fire({ icon: 'success', text: `Pedido devuelto a ${previousStatus}`, timer: 1500, showConfirmButton: false });
-                        // Forzamos recarga si es necesario
                         if (typeof loadOrders === 'function') await loadOrders(true);
                     } catch (error) {
                         console.error('Error al deshacer:', error);
                         Swal.fire({ icon: 'error', text: 'Error al procesar el cambio', timer: 2000, showConfirmButton: false });
+                    }
+                }
+            });
+        }
+
+        async function cambiarMetodoPago(orderId, metodoActual) {
+            const order = allLoadedOrders.find(o => o._id === orderId);
+            if (!order) return;
+
+            const nuevoMetodo = metodoActual === 'efectivo' ? 'transferencia' : 'efectivo';
+            const metodoActualTexto = metodoActual === 'efectivo' ? 'Efectivo' : 'Transferencia';
+            const nuevoMetodoTexto = nuevoMetodo === 'efectivo' ? 'Efectivo' : 'Transferencia';
+
+            Swal.fire({
+                title: '¿Cambiar método de pago?',
+                text: `Cambiar de "${metodoActualTexto}" a "${nuevoMetodoTexto}"`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#48bb78',
+                cancelButtonColor: '#718096',
+                confirmButtonText: 'Sí, cambiar',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const token = localStorage.getItem('token');
+                        const response = await fetch(`${API_URL}/orders/${orderId}/metodo-pago`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ metodoPago: nuevoMetodo })
+                        });
+
+                        const data = await response.json();
+
+                        if (data.success) {
+                            // Actualizar la UI con borde verde
+                            const card = document.getElementById(`order-card-${orderId}`);
+                            if (card) {
+                                card.classList.add('payment-method-selected');
+                                card.dataset.metodo = nuevoMetodo;
+                                
+                                // Actualizar el texto del método en la tarjeta
+                                const metaElement = card.querySelector('.order-meta');
+                                if (metaElement) {
+                                    metaElement.innerHTML = metaElement.innerHTML.replace(
+                                        /💳 (Efectivo|Transferencia)/g,
+                                        `💳 ${nuevoMetodoTexto}`
+                                    );
+                                }
+
+                                // Quitar el borde verde después de 3 segundos
+                                setTimeout(() => {
+                                    card.classList.remove('payment-method-selected');
+                                }, 3000);
+                            }
+
+                            // Actualizar en allLoadedOrders
+                            const orderIndex = allLoadedOrders.findIndex(o => o._id === orderId);
+                            if (orderIndex !== -1) {
+                                allLoadedOrders[orderIndex].metodoPago = nuevoMetodo;
+                            }
+
+                            Swal.fire({ 
+                                icon: 'success', 
+                                text: `Método cambiado a ${nuevoMetodoTexto}`, 
+                                timer: 1500, 
+                                showConfirmButton: false 
+                            });
+                        } else {
+                            throw new Error(data.message || 'Error al cambiar método');
+                        }
+                    } catch (error) {
+                        console.error('Error al cambiar método de pago:', error);
+                        Swal.fire({ icon: 'error', text: 'Error al cambiar el método de pago', timer: 2000, showConfirmButton: false });
                     }
                 }
             });
@@ -2231,8 +2410,9 @@
                 }).join('');
 
                 return `
-            <div class="order-card ${isMandao ? 'mandao-order' : ''} ${order._isUnified ? 'unified-order' : ''}" id="order-card-${order._id}" data-id="${order._id}" ${order._subOrderIds ? `data-sub-ids='${JSON.stringify(order._subOrderIds)}'` : ''} ${order._isUnified ? 'data-unified="true"' : ''}>
+            <div class="order-card ${isMandao ? 'mandao-order' : ''} ${order._isUnified ? 'unified-order' : ''}" id="order-card-${order._id}" data-id="${order._id}" data-metodo="${order.metodoPago || ''}" data-recibo="${order.reciboDia || false}" ${order._subOrderIds ? `data-sub-ids='${JSON.stringify(order._subOrderIds)}'` : ''} ${order._isUnified ? 'data-unified="true"' : ''}>
                 <div class="undo-indicator">↩️ DESHACER</div>
+                <div class="payment-method-indicator" id="payment-indicator-${order._id}">💳 CAMBIAR</div>
                 <div class="order-header">
                     <div class="order-info">
                         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
