@@ -404,6 +404,49 @@
             }
         }
 
+        /* Optimizaciones para móvil (iPhone etc) */
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+                margin-top: 50px; /* Espacio para el botón de menú */
+            }
+            .page-title {
+                font-size: 24px;
+            }
+            .products-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            .card-header, .card-body {
+                padding: 1rem;
+            }
+            .product-card {
+                padding: 1rem;
+            }
+            .product-image {
+                height: 160px;
+            }
+            .layout {
+                gap: 1rem;
+            }
+            /* Make action buttons stack on very small screens */
+            .product-card > div:last-child {
+                flex-direction: column;
+            }
+            .product-card > div:last-child button {
+                width: 100%;
+                padding: 12px;
+                font-size: 14px;
+            }
+            .menu-toggle {
+                top: 15px;
+                left: 15px;
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+        }
+
         .nav-section {
             margin-bottom: 1.5rem;
         }
