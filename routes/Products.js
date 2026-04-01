@@ -31,7 +31,28 @@ router.get('/public/restaurante', async (req, res) => {
     }
 
     // ✅ CAMBIO 2: Extraer todos los IDs
-    const userIds = usuarios.map(u => u._id);
+    let userIds = usuarios.map(u => u._id.toString());
+
+    // --- MULTI-LOCAL HUB: Buscar admins vinculados si el usuario es un mesero/cajero hub ---
+    const AdminMesero = require('../models/AdminMesero');
+    for (const usuario of usuarios) {
+      if (['mesero', 'cajero'].includes(usuario.rol)) {
+        const relaciones = await AdminMesero.find({
+          meseroId: usuario._id,
+          activo: true
+        }).select('adminId');
+
+        if (relaciones.length > 0) {
+          console.log(`🔗 Hub Mesero Detectado en ruta pública (${usuario.nombre}): Encontrados ${relaciones.length} locales asociados.`);
+          for (const rel of relaciones) {
+            const adminIdStr = rel.adminId.toString();
+            if (!userIds.includes(adminIdStr)) {
+              userIds.push(adminIdStr);
+            }
+          }
+        }
+      }
+    }
 
     // ✅ CAMBIO 3: Buscar productos de TODOS esos usuarios
     const products = await Product.find({

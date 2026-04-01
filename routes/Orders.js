@@ -294,16 +294,51 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
       });
     }
 
+    let finalOrderObj = null;
+
+    // ✅ MULTI-LOCAL HUB: Unificar todas las órdenes del mismo grupo si pertenece a un Hub
+    if (order.hubOrderGroup) {
+      console.log('🔗 Hub Order de Seguimiento detectado (Grupo ID):', order.hubOrderGroup);
+      const groupOrders = await Order.find({ hubOrderGroup: order.hubOrderGroup })
+        .populate('items.producto', 'nombre categoria precio')
+        .populate('userId', 'nombre');
+
+      if (groupOrders.length > 0) {
+        // Crear orden unificada
+        const merged = groupOrders[0].toObject();
+        merged.items = groupOrders.flatMap(o => o.toObject().items);
+        merged.total = groupOrders.reduce((sum, o) => sum + o.total, 0);
+        merged._subOrderIds = groupOrders.map(o => o._id);
+        merged._isUnified = true;
+        merged._subOrderCount = groupOrders.length;
+
+        // Estado: el más bajo del grupo
+        const estadoPrioridad = { pendiente: 0, preparando: 1, listo: 2, entregado: 3, cancelado: 4 };
+        merged.estado = groupOrders.reduce((minEstado, o) => {
+          return (estadoPrioridad[o.estado] || 0) < (estadoPrioridad[minEstado] || 0) ? o.estado : minEstado;
+        }, groupOrders[0].estado);
+        
+        // Mantener métodos de pago
+        merged.metodoPago = groupOrders.find(o => o.metodoPago)?.metodoPago || null;
+
+        finalOrderObj = merged;
+      } else {
+        finalOrderObj = order.toObject();
+      }
+    } else {
+      finalOrderObj = order.toObject();
+    }
+
     // Normalizar datos
-    const orderObj = order.toObject();
-    orderObj.items = orderObj.items.map(item => {
+    finalOrderObj.items = finalOrderObj.items.map(item => {
       if (item.producto) {
+        // En Mongoose toObject() preserva la población
         return {
           ...item,
           productoInfo: {
-            nombre: item.producto.nombre,
-            categoria: item.producto.categoria,
-            precio: item.producto.precio
+            nombre: item.producto.nombre || item.nombreProducto,
+            categoria: item.producto.categoria || item.categoriaProducto,
+            precio: item.producto.precio || item.precio
           }
         };
       } else {
@@ -318,11 +353,11 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
       }
     });
 
-    console.log('✅ Pedido encontrado y enviado');
+    console.log('✅ Pedido unificado/encontrado y enviado, items formados:', finalOrderObj.items.length);
 
     res.json({
       success: true,
-      data: orderObj
+      data: finalOrderObj
     });
   } catch (error) {
     console.error('❌ Error en /mesa:', error);
