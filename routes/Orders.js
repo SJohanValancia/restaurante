@@ -657,41 +657,45 @@ router.get('/stats/productos-mas-vendidos', protect, async (req, res) => {
     }
 
     const productosMasVendidos = await Order.aggregate([
-      { $match: { userId: { $in: objectIds }, estado: { $ne: 'cancelado' } } },
+      // Ignorar órdenes canceladas siempre
+      { $match: { estado: { $ne: 'cancelado' } } },
       { $unwind: '$items' },
-      { $group: { _id: '$items.producto', cantidadTotal: { $sum: '$items.cantidad' }, ingresosTotales: { $sum: { $multiply: ['$items.cantidad', '$items.precio'] } } } },
+      // Traer la información del producto asociado para poder validar su dueño
+      { $lookup: {
+          from: 'products',
+          localField: 'items.producto',
+          foreignField: '_id',
+          as: 'productInfo'
+      }},
+      // Filtrar items sin producto equivalente en la DB
+      { $unwind: { path: '$productInfo', preserveNullAndEmptyArrays: false } },
+      // ⭐ CLAVE: El verdadero filtro para que CADA LOCAL VEA SOLO LO SUYO
+      // Revisamos que el ID del DUEÑO del producto esté dentro de mis objectIds permitidos
+      { $match: { 'productInfo.userId': { $in: objectIds } } },
+      // Agrupar y procesar resultado final
+      { $group: { 
+          _id: '$items.producto', 
+          nombre: { $first: '$productInfo.nombre' },
+          categoria: { $first: '$productInfo.categoria' },
+          cantidadTotal: { $sum: '$items.cantidad' }, 
+          ingresosTotales: { $sum: { $multiply: ['$items.cantidad', '$items.precio'] } } 
+      }},
       { $sort: { cantidadTotal: -1 } },
       { $limit: limitNum }
     ]);
 
-    const productosConInfo = await Promise.all(productosMasVendidos.map(async (prod) => {
-      let nombre = 'Producto eliminado';
-      let categoria = 'Sin categoría';
-
-      if (prod._id) {
-        try {
-          const producto = await require('../models/Product').findById(prod._id).lean();
-          if (producto) {
-            nombre = producto.nombre;
-            categoria = producto.categoria;
-          }
-        } catch (e) {
-          console.log('Producto no encontrado:', prod._id);
-        }
-      }
-
-      return {
-        productoId: prod._id,
-        nombre,
-        categoria,
-        cantidadTotal: prod.cantidadTotal,
-        ingresosTotales: prod.ingresosTotales
-      };
+    // Opcional: Estandarizar el esquema de la respuesta con productoId
+    const dataResponse = productosMasVendidos.map(prod => ({
+      productoId: prod._id,
+      nombre: prod.nombre,
+      categoria: prod.categoria,
+      cantidadTotal: prod.cantidadTotal,
+      ingresosTotales: prod.ingresosTotales
     }));
 
     res.json({
       success: true,
-      data: productosConInfo
+      data: dataResponse
     });
   } catch (error) {
     console.error('❌ Error en productos-mas-vendidos:', error);
