@@ -292,6 +292,32 @@
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
 
+        .btn-base {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #38b2ac 0%, #319795 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 10px;
+        }
+
+        .btn-base:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(56, 178, 172, 0.4);
+        }
+
+        .header-buttons {
+            display: flex;
+            align-items: center;
+        }
+
         .card {
             background: white;
             border-radius: 12px;
@@ -1033,18 +1059,24 @@
                     <h1 class="page-title">💵 Liquidación del Día</h1>
                     <p class="page-subtitle">Cierre de caja y resumen financiero</p>
                 </div>
-                <button class="btn-control-caja" onclick="openControlCajaModal()">
-                    <span>💰</span>
-                    <span>Control de Caja</span>
-                </button>
+                <div class="header-buttons">
+                    <button class="btn-control-caja" onclick="openControlCajaModal()">
+                        <span>💰</span>
+                        <span>Control de Caja</span>
+                    </button>
+                    <button class="btn-base" onclick="openBaseModal()">
+                        <span>📊</span>
+                        <span>Base</span>
+                    </button>
+                </div>
             </div>
 
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-icon blue">💵</div>
-                    <div class="stat-label">Caja Inicial</div>
+                    <div class="stat-label">Caja Inicial + Base</div>
                     <div class="stat-value" id="cajaInicial">$0</div>
-                    <div class="stat-detail">De la última liquidación</div>
+                    <div class="stat-detail">De la última liquidación + Base</div>
                 </div>
 
                 <div class="stat-card">
@@ -1208,6 +1240,29 @@
         </div>
     </div>
 
+    <!-- Modal Base -->
+    <div class="modal" id="modalBase">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📊 Valor Base del Día</h2>
+            </div>
+            <form onsubmit="guardarBase(event)">
+                <div class="form-group">
+                    <label class="form-label">Valor de la base de hoy</label>
+                    <input type="number" id="valorBase" class="form-input" placeholder="0" min="0" step="0.01"
+                        required>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-modal btn-modal-secondary"
+                        onclick="closeBaseModal()">Cancelar</button>
+                    <button type="submit" class="btn-modal btn-modal-primary">
+                        Guardar Base
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Modal Observaciones -->
     <div class="modal" id="modalObservaciones">
         <div class="modal-content">
@@ -1252,6 +1307,7 @@
         const API_URL = 'https://restaurante-co77.onrender.com/api';
         let currentUser = null;
         let cajaInicialValue = 0;
+        let valorBase = 0;
         let datosPendientes = {
             pedidos: [],
             gastos: [],
@@ -1505,7 +1561,7 @@
                 });
             });
 
-            const cajaFinal = cajaInicialValue + totalIngresos - totalEgresos + totalMovimientos;
+            const cajaFinal = cajaInicialValue + valorBase + totalIngresos - totalEgresos + totalMovimientos;
 
             // Actualizar tarjetas
             document.getElementById('totalIngresos').textContent =
@@ -1524,8 +1580,11 @@
                 `${movimientosCaja.length} movimientos`;
 
             // Actualizar resumen final
+            const cajaInicialTotal = cajaInicialValue + valorBase;
+            document.getElementById('cajaInicial').textContent =
+                `$${cajaInicialTotal.toLocaleString('es-CO')}`;
             document.getElementById('resumenCajaInicial').textContent =
-                `$${cajaInicialValue.toLocaleString('es-CO')}`;
+                `$${cajaInicialTotal.toLocaleString('es-CO')}`;
             document.getElementById('resumenIngresos').textContent =
                 `$${totalIngresos.toLocaleString('es-CO')}`;
             document.getElementById('resumenEgresos').textContent =
@@ -1549,6 +1608,29 @@
             document.getElementById('tipoMovimiento').value = '';
             document.getElementById('montoMovimiento').value = '';
             document.getElementById('motivoMovimiento').value = '';
+        }
+
+        function openBaseModal() {
+            document.getElementById('valorBase').value = valorBase || '';
+            document.getElementById('modalBase').classList.add('active');
+        }
+
+        function closeBaseModal() {
+            document.getElementById('modalBase').classList.remove('active');
+            document.getElementById('valorBase').value = '';
+        }
+
+        function guardarBase(event) {
+            event.preventDefault();
+            valorBase = parseFloat(document.getElementById('valorBase').value) || 0;
+            closeBaseModal();
+            actualizarResumen();
+            Swal.fire({
+                icon: 'success',
+                text: `Base de $${valorBase.toLocaleString('es-CO')} guardada`,
+                timer: 2000,
+                showConfirmButton: false
+            });
         }
 
         function agregarMovimiento(event) {
@@ -1624,6 +1706,7 @@
                 btnConfirmar.innerHTML = '<span>⏳ Procesando liquidación...</span>';
 
                 const cajaInicialNum = Number(typeof cajaInicialValue !== 'undefined' ? cajaInicialValue : 0);
+                const cajaInicialConBase = cajaInicialNum + valorBase;
 
                 const totalIngresos = Number(
                     (typeof datosPendientes !== 'undefined' && (datosPendientes.totalPedidos ?? datosPendientes.totalIngresos)) || 0
@@ -1639,7 +1722,7 @@
                     }, 0)
                     : 0;
 
-                const cajaFinalCalc = Number(cajaInicialNum + totalIngresos - totalEgresos + totalMovimientos);
+                const cajaFinalCalc = Number(cajaInicialConBase + totalIngresos - totalEgresos + totalMovimientos);
 
                 const pedidosArray = (datosPendientes && Array.isArray(datosPendientes.pedidos) ? datosPendientes.pedidos : [])
                     .map(p => {
@@ -1663,7 +1746,8 @@
 
                 const liquidacionData = {
                     fecha: new Date().toISOString(),
-                    cajaInicial: Number(cajaInicialNum || 0),
+                    cajaInicial: Number(cajaInicialConBase || 0),
+                    valorBase: Number(valorBase || 0),
                     ingresos: {
                         totalPedidos: Number(totalIngresos || 0),
                         pedidos: pedidosArray
@@ -1727,6 +1811,7 @@
                         // Mostrar animación de éxito
                         mostrarExito({
                             cajaInicial: cajaInicialNum,
+                            base: valorBase,
                             ingresos: totalIngresos,
                             egresos: totalEgresos,
                             movimientos: totalMovimientos,
@@ -1759,11 +1844,19 @@
             const overlay = document.getElementById('successOverlay');
             const details = document.getElementById('successDetails');
 
+            const cajaInicialMostrar = datos.cajaInicial + datos.base;
+
             details.innerHTML = `
         <div class="success-detail-row">
             <span class="success-detail-label">Caja Inicial:</span>
-            <span class="success-detail-value">$${datos.cajaInicial.toLocaleString('es-CO')}</span>
+            <span class="success-detail-value">$${cajaInicialMostrar.toLocaleString('es-CO')}</span>
         </div>
+        ${datos.base > 0 ? `
+        <div class="success-detail-row">
+            <span class="success-detail-label">Base agregada:</span>
+            <span class="success-detail-value">+$${datos.base.toLocaleString('es-CO')}</span>
+        </div>
+        ` : ''}
         <div class="success-detail-row">
             <span class="success-detail-label">Ingresos:</span>
             <span class="success-detail-value">+$${datos.ingresos.toLocaleString('es-CO')}</span>
