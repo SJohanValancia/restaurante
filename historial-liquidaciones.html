@@ -1245,6 +1245,12 @@
                         <span class="resumen-label">💵 Caja Inicial</span>
                         <span class="resumen-value">$${liquidacion.cajaInicial.toLocaleString('es-CO')}</span>
                     </div>
+                    ${liquidacion.valorBase > 0 ? `
+                    <div class="resumen-item">
+                        <span class="resumen-label">📊 Base</span>
+                        <span class="resumen-value" style="color: #38b2ac;">+$${liquidacion.valorBase.toLocaleString('es-CO')}</span>
+                    </div>
+                    ` : ''}
                     <div class="resumen-item">
                         <span class="resumen-label">📈 Ingresos</span>
                         <span class="resumen-value positive">+$${liquidacion.ingresos.totalPedidos.toLocaleString('es-CO')}</span>
@@ -1377,6 +1383,12 @@
                     <span class="resumen-label">Caja Inicial</span>
                     <span class="resumen-value">$${liquidacion.cajaInicial.toLocaleString('es-CO')}</span>
                 </div>
+                ${liquidacion.valorBase > 0 ? `
+                <div class="resumen-item">
+                    <span class="resumen-label">📊 Base</span>
+                    <span class="resumen-value" style="color: #38b2ac;">+$${liquidacion.valorBase.toLocaleString('es-CO')}</span>
+                </div>
+                ` : ''}
                 <div class="resumen-item">
                     <span class="resumen-label">Total Ingresos</span>
                     <span class="resumen-value positive">$${liquidacion.ingresos.totalPedidos.toLocaleString('es-CO')}</span>
@@ -1614,6 +1626,7 @@
                         'Fecha': fecha.toLocaleDateString('es-CO'),
                         'Hora': fecha.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }),
                         'Caja Inicial': liq.cajaInicial,
+                        'Base': liq.valorBase || 0,
                         'Total Ingresos': liq.ingresos.totalPedidos,
                         'Total Egresos': liq.egresos.totalGastos,
                         'Gastos Efectivo': gastosEfectivo,

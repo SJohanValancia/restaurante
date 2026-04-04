@@ -1170,6 +1170,10 @@
                     <span class="resumen-label">Caja Inicial:</span>
                     <span class="resumen-value" id="resumenCajaInicial">$0</span>
                 </div>
+                <div class="resumen-row" id="resumenBaseRow" style="display: none;">
+                    <span class="resumen-label">📊 Base agregada:</span>
+                    <span class="resumen-value" id="resumenBaseValue" style="color: #38b2ac;"></span>
+                </div>
                 <div class="resumen-row">
                     <span class="resumen-label">+ Ingresos:</span>
                     <span class="resumen-value" id="resumenIngresos">$0</span>
@@ -1597,6 +1601,16 @@
                 `$${totalGastosTransferencia.toLocaleString('es-CO')}`;
             document.getElementById('cajaFinal').textContent =
                 `$${cajaFinal.toLocaleString('es-CO')}`;
+
+            // Mostrar/ocultar fila de base
+            const resumenBaseRow = document.getElementById('resumenBaseRow');
+            if (valorBase > 0) {
+                resumenBaseRow.style.display = 'flex';
+                document.getElementById('resumenBaseValue').textContent = 
+                    `+$${valorBase.toLocaleString('es-CO')}`;
+            } else {
+                resumenBaseRow.style.display = 'none';
+            }
         }
 
         function openControlCajaModal() {
