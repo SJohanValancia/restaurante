@@ -265,60 +265,55 @@ router.get('/stats/resumen', protect, async (req, res) => {
 
 router.post('/', protect, async (req, res) => {
   try {
-    const { cajaInicial, movimientosCaja, observaciones } = req.body;
+    const { cajaInicial, valorBase, ingresos, egresos, movimientosCaja, observaciones, cajaFinal } = req.body;
 
-    const pedidos = await Order.find({
-      userId: { $in: req.userIdsRestaurante },
-      estado: 'entregado',
-      reciboDia: false
-    });
-
-    const gastos = await Expense.find({
-      userId: { $in: req.userIdsRestaurante },
-      reciboDia: false
-    });
-
-    const totalPedidos = pedidos.reduce((sum, pedido) => sum + pedido.total, 0);
-    const totalGastos = gastos.reduce((sum, gasto) => sum + gasto.total, 0);
-    const totalMovimientos = movimientosCaja && movimientosCaja.length > 0
-      ? movimientosCaja.reduce((sum, mov) => sum + mov.monto, 0)
+    // Usar datos enviados desde el frontend
+    const totalPedidos = ingresos?.totalPedidos || 0;
+    const totalGastos = egresos?.totalGastos || 0;
+    const movimientos = movimientosCaja || [];
+    const totalMovimientos = movimientos.length > 0
+      ? movimientos.reduce((sum, mov) => mov.tipo === 'ingreso' ? sum + mov.monto : sum - mov.monto, 0)
       : 0;
 
-    const tieneDatosReales = totalPedidos > 0 || totalGastos > 0 || totalMovimientos > 0;
-    if (!tieneDatosReales) {
-      return res.status(400).json({
-        success: false,
-        message: 'No hay pedidos, gastos o movimientos para liquidar. La liquidación debe contener al menos un elemento con valor.'
-      });
-    }
+    // Calcular cajaFinal si no viene del frontend
+    const cajaInicialTotal = (cajaInicial || 0) + (valorBase || 0);
+    const cajaFinalCalculada = cajaFinal !== undefined 
+      ? cajaFinal 
+      : cajaInicialTotal + totalPedidos - totalGastos + totalMovimientos;
 
     const liquidacion = await Liquidacion.create({
       fecha: new Date(),
-      cajaInicial: cajaInicial || 0,
+      cajaInicial: cajaInicialTotal,
+      valorBase: valorBase || 0,
       ingresos: {
         totalPedidos,
-        pedidos: pedidos.map(p => p._id)
+        pedidos: (ingresos?.pedidos || []).map(p => p._id || p)
       },
       egresos: {
         totalGastos,
-        gastos: gastos.map(g => g._id)
+        gastos: (egresos?.gastos || []).map(g => g._id || g)
       },
-      movimientosCaja: movimientosCaja || [],
+      movimientosCaja: movimientos,
       observaciones,
       userId: req.user._id,
+      cajaFinal: cajaFinalCalculada,
       cerrada: true
     });
 
-    if (pedidos.length > 0) {
+    // Marcar pedidos como liquidados
+    const pedidosIds = (ingresos?.pedidos || []).map(p => p._id || p).filter(Boolean);
+    if (pedidosIds.length > 0) {
       await Order.updateMany(
-        { _id: { $in: pedidos.map(p => p._id) } },
+        { _id: { $in: pedidosIds } },
         { $set: { reciboDia: true } }
       );
     }
 
-    if (gastos.length > 0) {
+    // Marcar gastos como liquidados
+    const gastosIds = (egresos?.gastos || []).map(g => g._id || g).filter(Boolean);
+    if (gastosIds.length > 0) {
       await Expense.updateMany(
-        { _id: { $in: gastos.map(g => g._id) } },
+        { _id: { $in: gastosIds } },
         { $set: { reciboDia: true } }
       );
     }

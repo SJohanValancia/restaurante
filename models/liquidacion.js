@@ -11,6 +11,10 @@ const liquidacionSchema = new mongoose.Schema({
     required: true,
     default: 0
   },
+  valorBase: {
+    type: Number,
+    default: 0
+  },
   ingresos: {
     totalPedidos: {
       type: Number,
