@@ -489,7 +489,15 @@ router.get('/verify', async (req, res) => {
 
     const usuario = await User.findById(decoded.id);
 
-    if (!usuario || !usuario.activo) {
+    if (!usuario) {
+      return res.status(401).json({
+        success: false,
+        message: 'Token inválido o usuario inactivo'
+      });
+    }
+
+    // Los superadmins pueden acceder aunque no estén activos
+    if (!usuario.activo && usuario.rol !== 'superadmin') {
       return res.status(401).json({
         success: false,
         message: 'Token inválido o usuario inactivo'

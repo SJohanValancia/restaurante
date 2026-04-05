@@ -31,11 +31,23 @@ exports.protect = async (req, res, next) => {
       });
     }
 
-    if (!req.user.activo) {
+    // Los superadmins pueden acceder aunque no estén activos
+    const isSuperadmin = req.user.rol === 'superadmin';
+    if (!req.user.activo && !isSuperadmin) {
       return res.status(401).json({
         success: false,
         message: 'Usuario inactivo'
       });
+    }
+
+    // SKIP PARA SUPERADMIN - No necesita datos de restaurante
+    if (isSuperadmin) {
+      req.nombreRestaurante = null;
+      req.sede = null;
+      req.userIdsRestaurante = [];
+      req.isHubMesero = false;
+      req.linkedAdminIds = [];
+      return next();
     }
 
     // AGREGAR DATOS DEL RESTAURANTE AL REQUEST
