@@ -7,6 +7,7 @@ const liquidacionesRoutes = require('./routes/liquidaciones');
 const adminMeserosRoutes = require('./routes/adminMeseros');
 const ordersRoutes = require('./routes/Orders');
 const alimentosRoutes = require('./routes/alimentos');
+const mesasRoutes = require('./routes/mesas');
 const productsRoutes = require('./routes/Products');
 const mandaoRoutes = require('./routes/mandao'); // ✅ Integración Mandao
 const pushRoutes = require('./routes/push'); // ✅ Push notifications
@@ -65,6 +66,7 @@ app.use('/api/expenses', protect, expensesRoutes);
 app.use('/api/liquidaciones', protect, liquidacionesRoutes);
 app.use('/api/admin-meseros', protect, adminMeserosRoutes);
 app.use('/api/alimentos', alimentosRoutes);
+app.use('/api/mesas', protect, mesasRoutes);
 
 // Ruta principal (sirve index.html)
 app.get('/', (req, res) => {

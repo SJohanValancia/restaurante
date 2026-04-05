@@ -1432,6 +1432,373 @@
             border: 2px solid #48bb78 !important;
             box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.2);
         }
+
+        /* ============================================
+           VISTA DE MESAS - ESTILOS
+           ============================================ */
+        .table-view-container {
+            display: none;
+            animation: fadeInTableView 0.4s ease-out;
+        }
+
+        .table-view-container.active {
+            display: block;
+        }
+
+        .default-view {
+            display: block;
+        }
+
+        .default-view.hidden {
+            display: none;
+        }
+
+        @keyframes fadeInTableView {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .table-view-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .table-view-search {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 16px 12px 42px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: white;
+            position: relative;
+        }
+
+        .table-view-search:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .table-view-search-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .table-view-search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            color: #a0aec0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .btn-gestionar-mesas {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            white-space: nowrap;
+        }
+
+        .btn-gestionar-mesas:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .mesas-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 1.5rem;
+            padding: 1rem 0;
+        }
+
+        .mesa-circle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .mesa-circle:hover {
+            transform: scale(1.1);
+        }
+
+        .mesa-circle:active {
+            transform: scale(0.95);
+        }
+
+        .mesa-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 8px;
+            position: relative;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s;
+        }
+
+        .mesa-circle:hover .mesa-icon {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .mesa-icon.libre {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+
+        .mesa-icon.ocupada {
+            background: linear-gradient(135deg, #fc8181 0%, #e53e3e 100%);
+            animation: pulseOcupada 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseOcupada {
+            0%, 100% {
+                box-shadow: 0 6px 20px rgba(229, 62, 62, 0.3);
+            }
+            50% {
+                box-shadow: 0 6px 30px rgba(229, 62, 62, 0.6);
+            }
+        }
+
+        .mesa-icon::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            right: 3px;
+            bottom: 3px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .mesa-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #2d3748;
+            text-align: center;
+            max-width: 90px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .mesa-status-text {
+            font-size: 10px;
+            font-weight: 600;
+            color: #718096;
+            margin-top: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .mesa-status-text.libre {
+            color: #38a169;
+        }
+
+        .mesa-status-text.ocupada {
+            color: #e53e3e;
+        }
+
+        /* Indicador de modo */
+        .view-mode-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 700;
+            z-index: 998;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            display: none;
+            align-items: center;
+            gap: 6px;
+            animation: slideInRight 0.3s ease-out;
+            cursor: pointer;
+        }
+
+        .view-mode-indicator.show {
+            display: flex;
+        }
+
+        /* Responsive mesas */
+        @media (max-width: 1024px) {
+            .mesas-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1.25rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .mesas-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1rem;
+            }
+
+            .mesa-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 24px;
+            }
+
+            .mesa-name {
+                font-size: 12px;
+            }
+
+            .table-view-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .mesas-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.75rem;
+            }
+
+            .mesa-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 20px;
+            }
+        }
+
+        /* Modal Gestión de Mesas */
+        .modal-gestion-mesas {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 10001;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-gestion-mesas.active {
+            display: flex;
+        }
+
+        .modal-gestion-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .mesa-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+        }
+
+        .mesa-list-item:hover {
+            border-color: #cbd5e0;
+            background: #f7fafc;
+        }
+
+        .btn-delete-mesa {
+            width: 32px;
+            height: 32px;
+            background: rgba(229, 62, 62, 0.1);
+            color: #e53e3e;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .btn-delete-mesa:hover {
+            background: #e53e3e;
+            color: white;
+        }
+
+        /* Modal de pedido para mesa seleccionada */
+        .modal-pedido-mesa {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 10001;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal-pedido-mesa.active {
+            display: flex;
+        }
+
+        .modal-pedido-mesa-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 550px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
     </style>
 
 
@@ -1539,98 +1906,127 @@
     <div class="content-wrapper" id="contentWrapper">
         <div class="container">
             <div class="page-header">
-                <h1 class="page-title">🍽️ Gestión de Pedidos</h1>
+                <h1 class="page-title" id="pageTitlePedidos">🍽️ Gestión de Pedidos</h1>
                 <p class="page-subtitle">Administra los pedidos de tu restaurante</p>
             </div>
 
-            <div class="layout">
-                <!-- Formulario de nuevo pedido -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2>➕ Nuevo Pedido <button type="button" class="btn-submit" id="btnSubmit" onclick="document.getElementById('orderForm').requestSubmit()" disabled>Crear Pedido</button></h2>
-                        <p>Complete los datos para crear un pedido</p>
+            <!-- ===== VISTA POR DEFECTO ===== -->
+            <div class="default-view" id="defaultView">
+                <div class="layout">
+                    <!-- Formulario de nuevo pedido -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>➕ Nuevo Pedido <button type="button" class="btn-submit" id="btnSubmit" onclick="document.getElementById('orderForm').requestSubmit()" disabled>Crear Pedido</button></h2>
+                            <p>Complete los datos para crear un pedido</p>
+                        </div>
+                        <div class="card-body">
+                            <form id="orderForm">
+                                <div class="form-group">
+                                    <label class="form-label" for="mesa">Nombre/Número de Mesa *</label>
+                                    <input type="text" id="mesa" class="form-input" required maxlength="20"
+                                        placeholder="Ej: 5, Mesa A, VIP1">
+                                </div>
+
+                                <div class="products-selector">
+                                    <label class="form-label">Seleccionar Productos *</label>
+                                    <div class="search-box">
+                                        <span class="search-icon">🔍</span>
+                                        <input type="text" id="searchProduct" class="form-input search-input"
+                                            placeholder="Buscar producto...">
+                                    </div>
+                                    <div class="products-list" id="productsList"></div>
+                                </div>
+
+                                <div class="selected-products" id="selectedProducts"></div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="notas">Notas del Pedido</label>
+                                    <textarea id="notas" class="form-textarea" maxlength="500"
+                                        placeholder="Observaciones especiales del cliente..."></textarea>
+                                </div>
+
+                                <div class="order-summary" id="orderSummary" style="display: none;">
+                                    <div class="summary-row">
+                                        <span>Productos:</span>
+                                        <span id="summaryItems">0</span>
+                                    </div>
+                                    <div class="summary-row total">
+                                        <span>Total:</span>
+                                        <span id="summaryTotal">$0</span>
+                                    </div>
+                                </div>
+
+
+                            </form>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <form id="orderForm">
-                            <div class="form-group">
-                                <label class="form-label" for="mesa">Nombre/Número de Mesa *</label>
-                                <input type="text" id="mesa" class="form-input" required maxlength="20"
-                                    placeholder="Ej: 5, Mesa A, VIP1">
-                            </div>
 
-                            <div class="products-selector">
-                                <label class="form-label">Seleccionar Productos *</label>
-                                <div class="search-box">
-                                    <span class="search-icon">🔍</span>
-                                    <input type="text" id="searchProduct" class="form-input search-input"
-                                        placeholder="Buscar producto...">
+                    <!-- Lista de pedidos -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="orders-header">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <h2>📋 Pedidos</h2>
+                                    <span class="order-count" id="orderCount">0</span>
                                 </div>
-                                <div class="products-list" id="productsList"></div>
-                            </div>
-
-                            <div class="selected-products" id="selectedProducts"></div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="notas">Notas del Pedido</label>
-                                <textarea id="notas" class="form-textarea" maxlength="500"
-                                    placeholder="Observaciones especiales del cliente..."></textarea>
-                            </div>
-
-                            <div class="order-summary" id="orderSummary" style="display: none;">
-                                <div class="summary-row">
-                                    <span>Productos:</span>
-                                    <span id="summaryItems">0</span>
-                                </div>
-                                <div class="summary-row total">
-                                    <span>Total:</span>
-                                    <span id="summaryTotal">$0</span>
+                                <div class="filters">
+                                    <input type="text" id="orderSearch" class="filter-select" placeholder="🔍 Buscar mesa..." style="width: 150px;">
+                                    <select id="filterEstado" class="filter-select" onchange="loadOrders(true)">
+                                        <option value="">Todos los estados</option>
+                                        <option value="pendiente">Pendientes</option>
+                                        <option value="preparando">Preparando</option>
+                                        <option value="listo">Listos</option>
+                                        <option value="entregado">Pagados</option>
+                                        <option value="cancelado">Cancelados</option>
+                                        <option value="mandao">Solo Mandao</option>
+                                    </select>
                                 </div>
                             </div>
-
-
-                        </form>
+                        </div>
+                        <div class="card-body">
+                            <div class="orders-list" id="ordersList">
+                                <div class="empty-state">
+                                    <div class="empty-icon">📋</div>
+                                    <p>Cargando pedidos...</p>
+                                </div>
+                            </div>
+                            <div id="loadingMoreOrders" style="display: none; text-align: center; padding: 20px; color: #667eea;">
+                                <span>Cargando más pedidos...</span>
+                            </div>
+                            <div id="noMoreOrders" style="display: none; text-align: center; padding: 20px; color: #a0aec0;">
+                                <span>No hay más pedidos</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Lista de pedidos -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="orders-header">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <h2>📋 Pedidos</h2>
-                                <span class="order-count" id="orderCount">0</span>
-                            </div>
-                            <div class="filters">
-                                <input type="text" id="orderSearch" class="filter-select" placeholder="🔍 Buscar mesa..." style="width: 150px;">
-                                <select id="filterEstado" class="filter-select" onchange="loadOrders(true)">
-                                    <option value="">Todos los estados</option>
-                                    <option value="pendiente">Pendientes</option>
-                                    <option value="preparando">Preparando</option>
-                                    <option value="listo">Listos</option>
-                                    <option value="entregado">Pagados</option>
-                                    <option value="cancelado">Cancelados</option>
-                                    <option value="mandao">Solo Mandao</option>
-                                </select>
-                            </div>
-                        </div>
+            <!-- ===== VISTA DE MESAS ===== -->
+            <div class="table-view-container" id="tableView">
+                <div class="table-view-header">
+                    <div class="table-view-search-wrapper">
+                        <span class="table-view-search-icon">🔍</span>
+                        <input type="text" class="table-view-search" id="mesaSearchInput" placeholder="Buscar mesa..." autocomplete="off">
                     </div>
-                    <div class="card-body">
-                        <div class="orders-list" id="ordersList">
-                            <div class="empty-state">
-                                <div class="empty-icon">📋</div>
-                                <p>Cargando pedidos...</p>
-                            </div>
-                        </div>
-                        <div id="loadingMoreOrders" style="display: none; text-align: center; padding: 20px; color: #667eea;">
-                            <span>Cargando más pedidos...</span>
-                        </div>
-                        <div id="noMoreOrders" style="display: none; text-align: center; padding: 20px; color: #a0aec0;">
-                            <span>No hay más pedidos</span>
-                        </div>
+                    <button class="btn-gestionar-mesas" onclick="abrirGestionMesas()">
+                        <span>⚙️</span>
+                        <span>Gestionar Mesas</span>
+                    </button>
+                </div>
+                <div class="mesas-grid" id="mesasGrid">
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="empty-icon">🪑</div>
+                        <p>Cargando mesas...</p>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Indicador del modo vista -->
+    <div class="view-mode-indicator" id="viewModeIndicator" onclick="toggleTableView()">
+        <span id="viewModeIcon">🪑</span>
+        <span id="viewModeText">Vista Mesas</span>
     </div>
 
     <script>
@@ -4096,7 +4492,558 @@
         </div>
     </div>
 
+    <!-- Modal de Gestión de Mesas -->
+    <div class="modal-gestion-mesas" id="modalGestionMesas">
+        <div class="modal-gestion-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="font-size: 20px; font-weight: 700; color: #1a202c;">🪑 Gestionar Mesas</h3>
+                <button onclick="cerrarGestionMesas()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #718096;">✕</button>
+            </div>
+
+            <!-- Agregar mesa individual -->
+            <div style="display: flex; gap: 8px; margin-bottom: 1rem;">
+                <input type="text" id="nuevaMesaNombre" style="flex: 1; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px;" placeholder="Nombre de la mesa (ej: VIP 1, Terraza 3)" maxlength="30">
+                <button onclick="crearMesaIndividual()" style="padding: 12px 20px; background: linear-gradient(135deg, #48bb78, #38a169); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; white-space: nowrap;">+ Agregar</button>
+            </div>
+
+            <!-- Agregar mesas en bloque -->
+            <div style="display: flex; gap: 8px; margin-bottom: 1.5rem; padding: 1rem; background: #f7fafc; border-radius: 10px; border: 1px solid #e2e8f0;">
+                <div style="flex: 1;">
+                    <label style="font-size: 11px; font-weight: 600; color: #718096; text-transform: uppercase; letter-spacing: 0.5px;">Crear múltiples</label>
+                    <div style="display: flex; gap: 6px; margin-top: 6px;">
+                        <input type="text" id="bulkPrefix" value="Mesa" style="width: 100px; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px;" placeholder="Prefijo">
+                        <input type="number" id="bulkCantidad" min="1" max="50" value="10" style="width: 70px; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px;">
+                        <button onclick="crearMesasEnBloque()" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap;">Crear</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de mesas -->
+            <div style="margin-bottom: 1rem;">
+                <label style="font-size: 12px; font-weight: 700; color: #718096; text-transform: uppercase; letter-spacing: 0.5px;">Mesas registradas</label>
+            </div>
+            <div id="listaMesasGestion" style="max-height: 300px; overflow-y: auto;">
+                <p style="text-align: center; color: #a0aec0; padding: 2rem;">Cargando mesas...</p>
+            </div>
+
+            <button onclick="cerrarGestionMesas()" style="width: 100%; margin-top: 1rem; padding: 12px; background: #e2e8f0; color: #2d3748; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                Cerrar
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal de Pedido para Mesa Seleccionada -->
+    <div class="modal-pedido-mesa" id="modalPedidoMesa">
+        <div class="modal-pedido-mesa-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="font-size: 20px; font-weight: 700; color: #1a202c;" id="modalPedidoMesaTitulo">📝 Nuevo Pedido</h3>
+                <button onclick="cerrarModalPedidoMesa()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #718096;">✕</button>
+            </div>
+
+            <div style="padding: 12px; background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1)); border-radius: 10px; margin-bottom: 1.5rem; text-align: center;">
+                <span style="font-size: 14px; font-weight: 700; color: #667eea;" id="mesaSeleccionadaLabel">Mesa seleccionada</span>
+            </div>
+
+            <form id="orderFormMesa">
+                <div style="margin-bottom: 1.25rem;">
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px;">Seleccionar Productos *</label>
+                    <div style="position: relative; margin-bottom: 8px;">
+                        <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #a0aec0;">🔍</span>
+                        <input type="text" id="searchProductMesa" style="width: 100%; padding: 10px 14px 10px 38px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;" placeholder="Buscar producto..." autocomplete="off">
+                    </div>
+                    <div id="productsListMesa" style="max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; background: #f7fafc;"></div>
+                </div>
+
+                <div id="selectedProductsMesa" style="margin-bottom: 1.25rem;"></div>
+
+                <div style="margin-bottom: 1.25rem;">
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px;">Notas del Pedido</label>
+                    <textarea id="notasMesa" style="width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; resize: vertical; min-height: 60px; font-family: inherit;" maxlength="500" placeholder="Observaciones especiales..."></textarea>
+                </div>
+
+                <div id="orderSummaryMesa" style="display: none; background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;">
+                        <span>Productos:</span>
+                        <span id="summaryItemsMesa">0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding-top: 12px; border-top: 2px solid #e2e8f0; font-size: 18px; font-weight: 700; color: #48bb78;">
+                        <span>Total:</span>
+                        <span id="summaryTotalMesa">$0</span>
+                    </div>
+                </div>
+
+                <button type="button" id="btnSubmitMesa" onclick="crearPedidoMesa()" disabled style="width: 100%; padding: 14px; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; opacity: 0.5; transition: all 0.3s;">
+                    🍽️ Crear Pedido
+                </button>
+            </form>
+        </div>
+    </div>
+
     <script src="scripts/restaurant-switcher.js"></script>
+
+    <script>
+    // ============================================
+    // SISTEMA DE VISTA DE MESAS
+    // ============================================
+    
+    let isTableView = false;
+    let mesasData = [];
+    let mesaSelectedItems = [];
+    let mesaSeleccionadaNombre = '';
+    let keySequence = [];
+    let keySequenceTimer = null;
+
+    // ATAJO DE TECLADO: Cmd/Ctrl + J → C
+    document.addEventListener('keydown', (e) => {
+        const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+        const modKey = isMac ? e.metaKey : e.ctrlKey;
+
+        if (modKey && e.key.toLowerCase() === 'j') {
+            e.preventDefault();
+            keySequence = ['j'];
+            clearTimeout(keySequenceTimer);
+            keySequenceTimer = setTimeout(() => { keySequence = []; }, 800);
+            return;
+        }
+
+        if (keySequence.length === 1 && keySequence[0] === 'j' && e.key.toLowerCase() === 'c') {
+            e.preventDefault();
+            keySequence = [];
+            clearTimeout(keySequenceTimer);
+            toggleTableView();
+        }
+    });
+
+    // DOBLE TAP en el título para móvil
+    let lastTapTime = 0;
+    document.addEventListener('DOMContentLoaded', () => {
+        const pageTitle = document.getElementById('pageTitlePedidos');
+        if (pageTitle) {
+            pageTitle.addEventListener('touchend', (e) => {
+                const now = Date.now();
+                if (now - lastTapTime < 400) {
+                    e.preventDefault();
+                    toggleTableView();
+                    lastTapTime = 0;
+                } else {
+                    lastTapTime = now;
+                }
+            });
+            // visual feedback que es tapeable
+            pageTitle.style.cursor = 'pointer';
+        }
+    });
+
+    function toggleTableView() {
+        isTableView = !isTableView;
+        const defaultView = document.getElementById('defaultView');
+        const tableView = document.getElementById('tableView');
+        const indicator = document.getElementById('viewModeIndicator');
+
+        if (isTableView) {
+            defaultView.classList.add('hidden');
+            tableView.classList.add('active');
+            indicator.classList.add('show');
+            document.getElementById('viewModeIcon').textContent = '📋';
+            document.getElementById('viewModeText').textContent = 'Vista Normal';
+            loadMesas();
+        } else {
+            defaultView.classList.remove('hidden');
+            tableView.classList.remove('active');
+            indicator.classList.remove('show');
+            document.getElementById('viewModeIcon').textContent = '🪑';
+            document.getElementById('viewModeText').textContent = 'Vista Mesas';
+        }
+
+        // Feedback visual
+        mostrarNotificacionExito(isTableView ? '🪑 Vista de Mesas activada' : '📋 Vista Normal activada');
+    }
+
+    // CARGAR MESAS
+    async function loadMesas() {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch(`${API_URL}/mesas`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                mesasData = data.data;
+                renderMesas(mesasData);
+            }
+        } catch (error) {
+            console.error('Error al cargar mesas:', error);
+        }
+    }
+
+    // RENDERIZAR MESAS CON ESTADO
+    function renderMesas(mesas) {
+        const grid = document.getElementById('mesasGrid');
+        const searchVal = document.getElementById('mesaSearchInput').value.toLowerCase().trim();
+
+        let mesasFiltradas = mesas;
+        if (searchVal) {
+            mesasFiltradas = mesas.filter(m => m.nombre.toLowerCase().includes(searchVal));
+        }
+
+        if (mesasFiltradas.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-state" style="grid-column: 1/-1;">
+                    <div class="empty-icon">🪑</div>
+                    <p>${mesas.length === 0 ? 'No hay mesas registradas. Usa "Gestionar Mesas" para crear.' : 'No se encontraron mesas con ese nombre.'}</p>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = mesasFiltradas.map(mesa => {
+            // Determinar si la mesa tiene pedidos activos
+            const pedidoActivo = allLoadedOrders.find(o =>
+                o.mesa && o.mesa.toLowerCase().trim() === mesa.nombre.toLowerCase().trim() &&
+                !['entregado', 'cancelado'].includes(o.estado)
+            );
+            const isOcupada = !!pedidoActivo;
+            const estadoClass = isOcupada ? 'ocupada' : 'libre';
+
+            // Icono dentro del círculo (emoji mesa o primera letra)
+            const iconContent = mesa.nombre.match(/\d+/) ? mesa.nombre.match(/\d+/)[0] : mesa.nombre.charAt(0).toUpperCase();
+
+            return `
+                <div class="mesa-circle" onclick="onMesaClick('${mesa._id}', '${mesa.nombre.replace(/'/g, "\\'")}',' ${isOcupada}')">
+                    <div class="mesa-icon ${estadoClass}">
+                        ${iconContent}
+                    </div>
+                    <div class="mesa-name">${mesa.nombre}</div>
+                    <div class="mesa-status-text ${estadoClass}">${isOcupada ? 'Ocupada' : 'Libre'}</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // BUSCADOR DE MESAS
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById('mesaSearchInput');
+        if (searchInput) {
+            let searchTimeout;
+            searchInput.addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    renderMesas(mesasData);
+                }, 200);
+            });
+        }
+    });
+
+    // CLICK EN MESA → ABRIR MODAL DE PEDIDO
+    function onMesaClick(mesaId, mesaNombre, isOcupada) {
+        mesaSeleccionadaNombre = mesaNombre.trim();
+        mesaSelectedItems = [];
+
+        document.getElementById('modalPedidoMesaTitulo').textContent = `📝 Pedido - ${mesaSeleccionadaNombre}`;
+        document.getElementById('mesaSeleccionadaLabel').textContent = `Mesa: ${mesaSeleccionadaNombre}`;
+
+        // Resetear formulario
+        document.getElementById('selectedProductsMesa').innerHTML = '';
+        document.getElementById('orderSummaryMesa').style.display = 'none';
+        document.getElementById('btnSubmitMesa').disabled = true;
+        document.getElementById('btnSubmitMesa').style.opacity = '0.5';
+        const notasInput = document.getElementById('notasMesa');
+        if (notasInput) notasInput.value = '';
+
+        // Mostrar productos
+        displayProductsMesa(availableProducts);
+
+        // Configurar buscador
+        const searchInput = document.getElementById('searchProductMesa');
+        searchInput.value = '';
+        const newSearch = searchInput.cloneNode(true);
+        searchInput.parentNode.replaceChild(newSearch, searchInput);
+        document.getElementById('searchProductMesa').addEventListener('input', (e) => {
+            const search = e.target.value.toLowerCase();
+            const filtered = availableProducts.filter(p =>
+                p.nombre.toLowerCase().includes(search) ||
+                p.categoria.toLowerCase().includes(search)
+            );
+            displayProductsMesa(filtered);
+        });
+
+        // Abrir modal
+        document.getElementById('modalPedidoMesa').classList.add('active');
+    }
+
+    function cerrarModalPedidoMesa() {
+        document.getElementById('modalPedidoMesa').classList.remove('active');
+        mesaSelectedItems = [];
+        mesaSeleccionadaNombre = '';
+    }
+
+    function displayProductsMesa(products) {
+        const list = document.getElementById('productsListMesa');
+        if (products.length === 0) {
+            list.innerHTML = '<div style="text-align: center; padding: 1rem; color: #a0aec0;">No hay productos</div>';
+            return;
+        }
+        list.innerHTML = products.map(p => {
+            const agotado = !p.disponible;
+            return `
+                <div style="padding: 10px; border-bottom: 1px solid #e2e8f0; cursor: ${agotado ? 'not-allowed' : 'pointer'}; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; ${agotado ? 'opacity: 0.5;' : ''}" 
+                     onclick="${agotado ? '' : `addProductMesa('${p._id}')`}" onmouseover="if(!${agotado}) this.style.background='white'" onmouseout="this.style.background='transparent'">
+                    <div>
+                        <div style="font-size: 13px; font-weight: 600; color: #2d3748;">${p.nombre}${agotado ? ' <span style="color:#e53e3e;font-size:10px;">AGOTADO</span>' : ''}</div>
+                        <div style="font-size: 11px; color: #718096;">${p.categoria}</div>
+                    </div>
+                    <div style="font-size: 14px; font-weight: 700; color: ${agotado ? '#a0aec0' : '#48bb78'};">
+                        $${p.precio.toLocaleString('es-CO')}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function addProductMesa(productId) {
+        const product = availableProducts.find(p => p._id === productId);
+        if (!product) return;
+        const existing = mesaSelectedItems.find(item => item.producto._id === productId);
+        if (existing) {
+            existing.cantidad++;
+        } else {
+            mesaSelectedItems.push({ producto: product, cantidad: 1 });
+        }
+        updateSelectedProductsMesa();
+    }
+
+    function updateSelectedProductsMesa() {
+        const container = document.getElementById('selectedProductsMesa');
+        const summary = document.getElementById('orderSummaryMesa');
+        const btnSubmit = document.getElementById('btnSubmitMesa');
+
+        if (mesaSelectedItems.length === 0) {
+            container.innerHTML = '';
+            summary.style.display = 'none';
+            btnSubmit.disabled = true;
+            btnSubmit.style.opacity = '0.5';
+            return;
+        }
+
+        summary.style.display = 'block';
+        btnSubmit.disabled = false;
+        btnSubmit.style.opacity = '1';
+
+        container.innerHTML = `
+            <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px;">Productos Seleccionados</label>
+            ${mesaSelectedItems.map((item, index) => `
+                <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="flex: 1;">
+                        <div style="font-size: 13px; font-weight: 600; color: #2d3748;">${item.producto.nombre}</div>
+                        <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
+                            <button type="button" onclick="changeMesaQty(${index}, -1)" style="width: 26px; height: 26px; border: 1px solid #e2e8f0; background: white; border-radius: 6px; cursor: pointer; font-size: 14px;">-</button>
+                            <span style="min-width: 30px; text-align: center; font-weight: 600; font-size: 13px;">${item.cantidad}</span>
+                            <button type="button" onclick="changeMesaQty(${index}, 1)" style="width: 26px; height: 26px; border: 1px solid #e2e8f0; background: white; border-radius: 6px; cursor: pointer; font-size: 14px;">+</button>
+                            <span style="font-size: 13px; font-weight: 700; color: #2d3748; margin-left: 8px;">$${(item.producto.precio * item.cantidad).toLocaleString('es-CO')}</span>
+                        </div>
+                    </div>
+                    <button type="button" onclick="removeMesaItem(${index})" style="background: #fc8181; color: white; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">✕</button>
+                </div>
+            `).join('')}
+        `;
+
+        const totalItems = mesaSelectedItems.reduce((sum, item) => sum + item.cantidad, 0);
+        const totalPrice = mesaSelectedItems.reduce((sum, item) => sum + (item.producto.precio * item.cantidad), 0);
+        document.getElementById('summaryItemsMesa').textContent = totalItems;
+        document.getElementById('summaryTotalMesa').textContent = `$${totalPrice.toLocaleString('es-CO')}`;
+    }
+
+    function changeMesaQty(index, delta) {
+        mesaSelectedItems[index].cantidad += delta;
+        if (mesaSelectedItems[index].cantidad <= 0) mesaSelectedItems.splice(index, 1);
+        updateSelectedProductsMesa();
+    }
+
+    function removeMesaItem(index) {
+        mesaSelectedItems.splice(index, 1);
+        updateSelectedProductsMesa();
+    }
+
+    // CREAR PEDIDO DESDE MESA
+    async function crearPedidoMesa() {
+        if (mesaSelectedItems.length === 0) return;
+
+        const btnSubmit = document.getElementById('btnSubmitMesa');
+        btnSubmit.disabled = true;
+        btnSubmit.style.opacity = '0.6';
+        btnSubmit.textContent = '⏳ Creando...';
+
+        const notas = document.getElementById('notasMesa').value.trim();
+
+        const orderData = {
+            mesa: mesaSeleccionadaNombre,
+            items: mesaSelectedItems.map(item => ({
+                producto: item.producto._id,
+                cantidad: item.cantidad,
+                precio: item.producto.precio
+            })),
+            notas: notas,
+            userId: currentUser._id
+        };
+
+        const token = localStorage.getItem('token');
+
+        try {
+            const response = await fetch(`${API_URL}/orders`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(orderData)
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                cerrarModalPedidoMesa();
+                mostrarNotificacionExito('✅ Pedido creado para ' + mesaSeleccionadaNombre);
+                await loadOrders(true);
+                renderMesas(mesasData); // Actualizar colores de mesas
+            } else {
+                Swal.fire({ icon: 'error', text: 'Error: ' + data.message, timer: 3000, showConfirmButton: false });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({ icon: 'error', text: 'Error al crear el pedido', timer: 3000, showConfirmButton: false });
+        } finally {
+            btnSubmit.disabled = false;
+            btnSubmit.style.opacity = '1';
+            btnSubmit.textContent = '🍽️ Crear Pedido';
+        }
+    }
+
+    // ===== GESTIÓN DE MESAS =====
+    function abrirGestionMesas() {
+        document.getElementById('modalGestionMesas').classList.add('active');
+        cargarListaMesasGestion();
+    }
+
+    function cerrarGestionMesas() {
+        document.getElementById('modalGestionMesas').classList.remove('active');
+        // Recargar mesas por si se hicieron cambios
+        loadMesas();
+    }
+
+    async function cargarListaMesasGestion() {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch(`${API_URL}/mesas`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+
+            const container = document.getElementById('listaMesasGestion');
+
+            if (data.success && data.data.length > 0) {
+                container.innerHTML = data.data.map(mesa => `
+                    <div class="mesa-list-item" id="mesa-item-${mesa._id}">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 13px;">
+                                ${mesa.nombre.match(/\d+/) ? mesa.nombre.match(/\d+/)[0] : mesa.nombre.charAt(0)}
+                            </div>
+                            <span style="font-weight: 600; color: #2d3748; font-size: 14px;">${mesa.nombre}</span>
+                        </div>
+                        <button class="btn-delete-mesa" onclick="eliminarMesa('${mesa._id}')" title="Eliminar">🗑️</button>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<p style="text-align: center; color: #a0aec0; padding: 2rem;">No hay mesas registradas</p>';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    async function crearMesaIndividual() {
+        const input = document.getElementById('nuevaMesaNombre');
+        const nombre = input.value.trim();
+        if (!nombre) {
+            Swal.fire({ icon: 'warning', text: 'Ingresa un nombre para la mesa', timer: 2000, showConfirmButton: false });
+            return;
+        }
+
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch(`${API_URL}/mesas`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ nombre })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                input.value = '';
+                mostrarNotificacionExito(`✅ Mesa "${nombre}" creada`);
+                cargarListaMesasGestion();
+            } else {
+                Swal.fire({ icon: 'error', text: data.message, timer: 2000, showConfirmButton: false });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    async function crearMesasEnBloque() {
+        const prefijo = document.getElementById('bulkPrefix').value.trim() || 'Mesa';
+        const cantidad = parseInt(document.getElementById('bulkCantidad').value) || 10;
+
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch(`${API_URL}/mesas/bulk`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ prefijo, cantidad })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                mostrarNotificacionExito(`✅ ${data.data.length} mesas creadas`);
+                cargarListaMesasGestion();
+            } else {
+                Swal.fire({ icon: 'error', text: data.message, timer: 2000, showConfirmButton: false });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    async function eliminarMesa(mesaId) {
+        if (!confirm('¿Eliminar esta mesa?')) return;
+
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch(`${API_URL}/mesas/${mesaId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                const item = document.getElementById(`mesa-item-${mesaId}`);
+                if (item) {
+                    item.style.animation = 'fadeOut 0.3s ease';
+                    setTimeout(() => item.remove(), 300);
+                }
+                mostrarNotificacionExito('✅ Mesa eliminada');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+    </script>
 </body>
 
 </html>

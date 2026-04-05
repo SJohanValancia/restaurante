@@ -1210,6 +1210,198 @@
             }
         }
     </style>
+    <style>
+        /* ============================================
+           VISTA DE MESAS - HISTORIAL
+           ============================================ */
+        .table-view-container-hist {
+            display: none;
+            animation: fadeInTableView 0.4s ease-out;
+        }
+        .table-view-container-hist.active {
+            display: block;
+        }
+        .default-view-hist {
+            display: block;
+        }
+        .default-view-hist.hidden {
+            display: none;
+        }
+        @keyframes fadeInTableView {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .table-view-header-hist {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .table-view-search-hist {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 16px 12px 42px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: white;
+        }
+        .table-view-search-hist:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+        .table-view-search-wrapper-hist {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+        }
+        .table-view-search-icon-hist {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            color: #a0aec0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .mesas-grid-hist {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 1.5rem;
+            padding: 1rem 0;
+        }
+        .mesa-circle-hist {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            user-select: none;
+        }
+        .mesa-circle-hist:hover { transform: scale(1.1); }
+        .mesa-circle-hist:active { transform: scale(0.95); }
+        .mesa-icon-hist {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 8px;
+            position: relative;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s;
+        }
+        .mesa-circle-hist:hover .mesa-icon-hist {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+        }
+        .mesa-icon-hist.libre {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+        .mesa-icon-hist.ocupada {
+            background: linear-gradient(135deg, #fc8181 0%, #e53e3e 100%);
+            animation: pulseOcupadaHist 2s ease-in-out infinite;
+        }
+        @keyframes pulseOcupadaHist {
+            0%, 100% { box-shadow: 0 6px 20px rgba(229, 62, 62, 0.3); }
+            50% { box-shadow: 0 6px 30px rgba(229, 62, 62, 0.6); }
+        }
+        .mesa-icon-hist::after {
+            content: '';
+            position: absolute;
+            top: 3px; left: 3px; right: 3px; bottom: 3px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        .mesa-name-hist {
+            font-size: 13px;
+            font-weight: 700;
+            color: #2d3748;
+            text-align: center;
+            max-width: 90px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .mesa-status-text-hist {
+            font-size: 10px;
+            font-weight: 600;
+            margin-top: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .mesa-status-text-hist.libre { color: #38a169; }
+        .mesa-status-text-hist.ocupada { color: #e53e3e; }
+
+        .view-mode-indicator-hist {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 700;
+            z-index: 998;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            display: none;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+        .view-mode-indicator-hist.show { display: flex; }
+
+        /* Popup detalle de mesa */
+        .modal-detalle-mesa-hist {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 10001;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-detalle-mesa-hist.active { display: flex; }
+        .modal-detalle-content-hist {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @media (max-width: 1024px) {
+            .mesas-grid-hist { grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
+        }
+        @media (max-width: 768px) {
+            .mesas-grid-hist { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+            .mesa-icon-hist { width: 70px; height: 70px; font-size: 24px; }
+            .table-view-header-hist { flex-direction: column; align-items: stretch; }
+        }
+        @media (max-width: 480px) {
+            .mesas-grid-hist { grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+            .mesa-icon-hist { width: 60px; height: 60px; font-size: 20px; }
+        }
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
@@ -1310,9 +1502,12 @@
     <div class="content-wrapper">
         <div class="container">
             <div class="page-header">
-                <h1 class="page-title">📜 Historial Completo de Pedidos</h1>
+                <h1 class="page-title" id="pageTitleHistorial">📜 Historial Completo de Pedidos</h1>
                 <p class="page-subtitle">Gestiona todos los pedidos de tu restaurante en un solo lugar</p>
             </div>
+
+            <!-- ===== VISTA POR DEFECTO HISTORIAL ===== -->
+            <div class="default-view-hist" id="defaultViewHist">
 
             <!-- Estadísticas -->
             <div class="stats-grid">
@@ -1447,6 +1642,43 @@
             </div>
             <div id="loadingMoreOrders" style="display: none; text-align: center; padding: 20px; color: #667eea;">
                 <span>Cargando más pedidos...</span>
+            </div>
+            </div> <!-- /default-view-hist -->
+
+            <!-- ===== VISTA DE MESAS HISTORIAL ===== -->
+            <div class="table-view-container-hist" id="tableViewHist">
+                <div class="table-view-header-hist">
+                    <div class="table-view-search-wrapper-hist">
+                        <span class="table-view-search-icon-hist">🔍</span>
+                        <input type="text" class="table-view-search-hist" id="mesaSearchInputHist" placeholder="Buscar mesa..." autocomplete="off">
+                    </div>
+                </div>
+                <div class="mesas-grid-hist" id="mesasGridHist">
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="empty-icon">🪑</div>
+                        <p>Cargando mesas...</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Indicador del modo vista historial -->
+    <div class="view-mode-indicator-hist" id="viewModeIndicatorHist" onclick="toggleTableViewHist()">
+        <span id="viewModeIconHist">🪑</span>
+        <span id="viewModeTextHist">Vista Mesas</span>
+    </div>
+
+    <!-- Popup detalle pedido de mesa -->
+    <div class="modal-detalle-mesa-hist" id="modalDetalleMesaHist">
+        <div class="modal-detalle-content-hist">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="font-size: 20px; font-weight: 700; color: #1a202c;" id="detalleMesaTitulo">📝 Detalle</h3>
+                <button onclick="cerrarDetalleMesaHist()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #718096;">✕</button>
+            </div>
+            <div id="detalleMesaContenido">
+                <p style="text-align: center; color: #a0aec0; padding: 2rem;">Sin pedidos</p>
             </div>
         </div>
     </div>
@@ -4030,6 +4262,273 @@
 
 
     <script src="scripts/restaurant-switcher.js"></script>
+
+    <script>
+    // ============================================
+    // SISTEMA DE VISTA DE MESAS - HISTORIAL
+    // ============================================
+
+    let isTableViewHist = false;
+    let mesasDataHist = [];
+    let keySequenceHist = [];
+    let keySequenceTimerHist = null;
+
+    // ATAJO DE TECLADO: Cmd/Ctrl + J → C
+    document.addEventListener('keydown', (e) => {
+        const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+        const modKey = isMac ? e.metaKey : e.ctrlKey;
+
+        if (modKey && e.key.toLowerCase() === 'j') {
+            e.preventDefault();
+            keySequenceHist = ['j'];
+            clearTimeout(keySequenceTimerHist);
+            keySequenceTimerHist = setTimeout(() => { keySequenceHist = []; }, 800);
+            return;
+        }
+
+        if (keySequenceHist.length === 1 && keySequenceHist[0] === 'j' && e.key.toLowerCase() === 'c') {
+            e.preventDefault();
+            keySequenceHist = [];
+            clearTimeout(keySequenceTimerHist);
+            toggleTableViewHist();
+        }
+    });
+
+    // DOBLE TAP en el título para móvil
+    let lastTapTimeHist = 0;
+    document.addEventListener('DOMContentLoaded', () => {
+        const pageTitle = document.getElementById('pageTitleHistorial');
+        if (pageTitle) {
+            pageTitle.addEventListener('touchend', (e) => {
+                const now = Date.now();
+                if (now - lastTapTimeHist < 400) {
+                    e.preventDefault();
+                    toggleTableViewHist();
+                    lastTapTimeHist = 0;
+                } else {
+                    lastTapTimeHist = now;
+                }
+            });
+            pageTitle.style.cursor = 'pointer';
+        }
+
+        // Buscador de mesas
+        const searchInput = document.getElementById('mesaSearchInputHist');
+        if (searchInput) {
+            let searchTimeout;
+            searchInput.addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => renderMesasHist(mesasDataHist), 200);
+            });
+        }
+    });
+
+    function toggleTableViewHist() {
+        isTableViewHist = !isTableViewHist;
+        const defaultView = document.getElementById('defaultViewHist');
+        const tableView = document.getElementById('tableViewHist');
+        const indicator = document.getElementById('viewModeIndicatorHist');
+
+        if (isTableViewHist) {
+            defaultView.classList.add('hidden');
+            tableView.classList.add('active');
+            indicator.classList.add('show');
+            document.getElementById('viewModeIconHist').textContent = '📋';
+            document.getElementById('viewModeTextHist').textContent = 'Vista Normal';
+            loadMesasHist();
+        } else {
+            defaultView.classList.remove('hidden');
+            tableView.classList.remove('active');
+            indicator.classList.remove('show');
+            document.getElementById('viewModeIconHist').textContent = '🪑';
+            document.getElementById('viewModeTextHist').textContent = 'Vista Mesas';
+        }
+
+        // Feedback
+        const notif = document.createElement('div');
+        notif.textContent = isTableViewHist ? '🪑 Vista de Mesas activada' : '📋 Vista Normal activada';
+        notif.style.cssText = 'position:fixed;top:80px;right:20px;background:linear-gradient(135deg,#48bb78,#38a169);color:white;padding:1rem 1.5rem;border-radius:12px;font-weight:600;font-size:14px;box-shadow:0 4px 12px rgba(72,187,120,0.4);z-index:10000;animation:slideInRight 0.3s ease-out;';
+        document.body.appendChild(notif);
+        setTimeout(() => notif.remove(), 2500);
+    }
+
+    async function loadMesasHist() {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch(`${API_URL}/mesas`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            if (data.success) {
+                mesasDataHist = data.data;
+                renderMesasHist(mesasDataHist);
+            }
+        } catch (error) {
+            console.error('Error al cargar mesas:', error);
+        }
+    }
+
+    function renderMesasHist(mesas) {
+        const grid = document.getElementById('mesasGridHist');
+        const searchVal = document.getElementById('mesaSearchInputHist').value.toLowerCase().trim();
+
+        let mesasFiltradas = mesas;
+        if (searchVal) {
+            mesasFiltradas = mesas.filter(m => m.nombre.toLowerCase().includes(searchVal));
+        }
+
+        if (mesasFiltradas.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-state" style="grid-column: 1/-1;">
+                    <div class="empty-icon">🪑</div>
+                    <p>${mesas.length === 0 ? 'No hay mesas registradas.' : 'No se encontraron mesas.'}</p>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = mesasFiltradas.map(mesa => {
+            const pedidoActivo = allLoadedOrders.find(o =>
+                o.mesa && o.mesa.toLowerCase().trim() === mesa.nombre.toLowerCase().trim() &&
+                !['entregado', 'cancelado'].includes(o.estado)
+            );
+            const isOcupada = !!pedidoActivo;
+            const estadoClass = isOcupada ? 'ocupada' : 'libre';
+            const iconContent = mesa.nombre.match(/\d+/) ? mesa.nombre.match(/\d+/)[0] : mesa.nombre.charAt(0).toUpperCase();
+
+            return `
+                <div class="mesa-circle-hist" onclick="onMesaClickHist('${mesa.nombre.replace(/'/g, "\\\'")}')">
+                    <div class="mesa-icon-hist ${estadoClass}">${iconContent}</div>
+                    <div class="mesa-name-hist">${mesa.nombre}</div>
+                    <div class="mesa-status-text-hist ${estadoClass}">${isOcupada ? 'Ocupada' : 'Libre'}</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function onMesaClickHist(mesaNombre) {
+        // Buscar el último pedido de esta mesa
+        const pedido = allLoadedOrders.find(o =>
+            o.mesa && o.mesa.toLowerCase().trim() === mesaNombre.toLowerCase().trim()
+        );
+
+        document.getElementById('detalleMesaTitulo').textContent = `📝 ${mesaNombre}`;
+
+        const contenido = document.getElementById('detalleMesaContenido');
+
+        if (!pedido) {
+            contenido.innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <div style="font-size: 48px; margin-bottom: 1rem;">💭</div>
+                    <p style="color: #718096; font-size: 14px;">No hay pedidos para esta mesa</p>
+                </div>
+            `;
+        } else {
+            const estadoColors = {
+                'pendiente': '#f6ad55',
+                'preparando': '#667eea',
+                'listo': '#48bb78',
+                'entregado': '#38a169',
+                'cancelado': '#e53e3e'
+            };
+            const estadoEmojis = {
+                'pendiente': '⏳',
+                'preparando': '👨\u200d🍳',
+                'listo': '✅',
+                'entregado': '🎉',
+                'cancelado': '❌'
+            };
+
+            const fecha = new Date(pedido.createdAt).toLocaleString('es-CO', {
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+
+            contenido.innerHTML = `
+                <div style="background: ${estadoColors[pedido.estado]}15; border: 1px solid ${estadoColors[pedido.estado]}40; border-radius: 10px; padding: 12px; margin-bottom: 1rem; text-align: center;">
+                    <span style="font-size: 20px;">${estadoEmojis[pedido.estado] || ''}</span>
+                    <span style="font-size: 14px; font-weight: 700; color: ${estadoColors[pedido.estado]}; text-transform: uppercase;"> ${pedido.estado}</span>
+                    <div style="font-size: 11px; color: #718096; margin-top: 4px;">${fecha}</div>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <h4 style="font-size: 13px; font-weight: 700; color: #718096; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Productos</h4>
+                    ${pedido.items.map(item => `
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0;">
+                            <div>
+                                <span style="font-weight: 600; color: #2d3748; font-size: 13px;">${item.productoInfo ? item.productoInfo.nombre : (item.nombreProducto || 'Producto')}</span>
+                                <span style="color: #718096; font-size: 12px;"> x${item.cantidad}</span>
+                            </div>
+                            <span style="font-weight: 700; color: #2d3748; font-size: 13px;">$${(item.precio * item.cantidad).toLocaleString('es-CO')}</span>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div style="display: flex; justify-content: space-between; padding: 12px; background: #f7fafc; border-radius: 10px; margin-bottom: 1rem;">
+                    <span style="font-weight: 700; color: #2d3748;">Total</span>
+                    <span style="font-weight: 800; font-size: 18px; color: #48bb78;">$${pedido.total.toLocaleString('es-CO')}</span>
+                </div>
+
+                ${pedido.notas ? `<div style="padding: 10px; background: #fffbeb; border: 1px solid #fbbf24; border-radius: 8px; margin-bottom: 1rem; font-size: 13px; color: #92400e;">📝 ${pedido.notas}</div>` : ''}
+
+                ${pedido.metodoPago ? `<div style="text-align: center; margin-bottom: 1rem; font-size: 13px; color: #718096;">Método: <strong>${pedido.metodoPago === 'efectivo' ? '💵 Efectivo' : '📱 Transferencia'}</strong></div>` : ''}
+
+                <!-- Botones de acción -->
+                ${pedido.estado !== 'entregado' && pedido.estado !== 'cancelado' ? `
+                    <div style="display: grid; gap: 8px;">
+                        ${pedido.estado === 'pendiente' ? `
+                            <button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'preparando')" style="padding: 12px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 14px;">👨‍🍳 Marcar Preparando</button>
+                        ` : ''}
+                        ${pedido.estado === 'preparando' ? `
+                            <button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'listo')" style="padding: 12px; background: linear-gradient(135deg, #48bb78, #38a169); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 14px;">✅ Marcar Listo</button>
+                        ` : ''}
+                        ${pedido.estado === 'listo' ? `
+                            <button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'entregado')" style="padding: 12px; background: linear-gradient(135deg, #48bb78, #38a169); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 14px;">🎉 Marcar Pagado</button>
+                        ` : ''}
+                        <button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'cancelado')" style="padding: 10px; background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 13px;">❌ Cancelar Pedido</button>
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        document.getElementById('modalDetalleMesaHist').classList.add('active');
+    }
+
+    function cerrarDetalleMesaHist() {
+        document.getElementById('modalDetalleMesaHist').classList.remove('active');
+    }
+
+    async function cambiarEstadoDesdeVistaMesa(orderId, nuevoEstado) {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch(`${API_URL}/orders/${orderId}/status`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ estado: nuevoEstado })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                cerrarDetalleMesaHist();
+                const notif = document.createElement('div');
+                notif.textContent = `✅ Pedido actualizado a ${nuevoEstado}`;
+                notif.style.cssText = 'position:fixed;top:80px;right:20px;background:linear-gradient(135deg,#48bb78,#38a169);color:white;padding:1rem 1.5rem;border-radius:12px;font-weight:600;font-size:14px;box-shadow:0 4px 12px rgba(72,187,120,0.4);z-index:10000;';
+                document.body.appendChild(notif);
+                setTimeout(() => notif.remove(), 2500);
+                await loadOrders(true);
+                renderMesasHist(mesasDataHist);
+            } else {
+                Swal.fire({ icon: 'error', text: data.message, timer: 3000, showConfirmButton: false });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({ icon: 'error', text: 'Error al cambiar estado', timer: 3000, showConfirmButton: false });
+        }
+    }
+    </script>
 </body>
 
 </html>
