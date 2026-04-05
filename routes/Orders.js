@@ -8,6 +8,7 @@ const { protect } = require('../middleware/auth');
 const { checkPermission } = require('../middleware/permissions');
 const { notifyOrderStatusChange } = require('../services/pushNotification'); // ✅ Push notifications
 const { notifyMandaoStatusChange } = require('../services/mandaoIntegration'); // ✅ Integración Mandao
+const Mesa = require('../models/Mesa'); // ✅ Auto-crear mesas
 
 // ✅ FUNCIÓN PARA DESCONTAR STOCK DE ALIMENTOS
 async function descontarStockAlimentos(items, userId, ignorarStock = false) {
@@ -843,6 +844,18 @@ router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
       }
 
       // Responder con todas las órdenes creadas
+
+      // ✅ AUTO-CREAR MESA si no existe (para hub mesero)
+      if (mesa && mesa.trim()) {
+        try {
+          await Mesa.findOneAndUpdate(
+            { userId: req.user._id, nombre: mesa.trim() },
+            { userId: req.user._id, nombre: mesa.trim(), activa: true },
+            { upsert: true, new: true, setDefaultsOnInsert: true }
+          );
+        } catch (e) { /* Ignorar errores */ }
+      }
+
       res.status(201).json({
         success: true,
         message: `Pedido dividido en ${ordersCreadas.length} órdenes para cada local`,
@@ -865,6 +878,17 @@ router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
 
       const order = await Order.create(orderData);
       await order.populate('items.producto', 'nombre categoria precio');
+
+      // ✅ AUTO-CREAR MESA si no existe
+      if (mesa && mesa.trim()) {
+        try {
+          await Mesa.findOneAndUpdate(
+            { userId: req.user._id, nombre: mesa.trim() },
+            { userId: req.user._id, nombre: mesa.trim(), activa: true },
+            { upsert: true, new: true, setDefaultsOnInsert: true }
+          );
+        } catch (e) { /* Ignorar errores de mesa duplicada */ }
+      }
 
       res.status(201).json({
         success: true,

@@ -4518,6 +4518,15 @@
                 </div>
             </div>
 
+            <!-- Importar mesas de pedidos existentes -->
+            <div style="margin-bottom: 1.5rem;">
+                <button onclick="importarMesasDePedidos()" id="btnImportarMesas" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #f6ad55, #ed8936); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s;">
+                    <span>📥</span>
+                    <span>Importar mesas de pedidos existentes</span>
+                </button>
+                <p style="font-size: 11px; color: #a0aec0; text-align: center; margin-top: 6px;">Detecta automáticamente las mesas usadas en pedidos anteriores</p>
+            </div>
+
             <!-- Lista de mesas -->
             <div style="margin-bottom: 1rem;">
                 <label style="font-size: 12px; font-weight: 700; color: #718096; text-transform: uppercase; letter-spacing: 0.5px;">Mesas registradas</label>
@@ -5041,6 +5050,36 @@
             }
         } catch (error) {
             console.error('Error:', error);
+        }
+    }
+
+    async function importarMesasDePedidos() {
+        const btn = document.getElementById('btnImportarMesas');
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+        btn.innerHTML = '<span>⏳</span><span>Importando...</span>';
+
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch(`${API_URL}/mesas/seed`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                mostrarNotificacionExito(`📥 ${data.message}`);
+                cargarListaMesasGestion();
+            } else {
+                Swal.fire({ icon: 'error', text: data.message, timer: 3000, showConfirmButton: false });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({ icon: 'error', text: 'Error al importar mesas', timer: 3000, showConfirmButton: false });
+        } finally {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.innerHTML = '<span>📥</span><span>Importar mesas de pedidos existentes</span>';
         }
     }
     </script>

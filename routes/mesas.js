@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Mesa = require('../models/Mesa');
+const Order = require('../models/order');
 
 // GET /api/mesas - Obtener todas las mesas del restaurante
 router.get('/', async (req, res) => {
@@ -145,6 +146,51 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error al eliminar la mesa',
+      error: error.message
+    });
+  }
+});
+
+// POST /api/mesas/seed - Importar mesas de pedidos existentes
+router.post('/seed', async (req, res) => {
+  try {
+    // Obtener todos los nombres de mesa únicos de los pedidos del restaurante
+    const mesasUnicas = await Order.distinct('mesa', {
+      userId: { $in: req.userIdsRestaurante },
+      mesa: { $ne: null, $ne: '' }
+    });
+
+    let creadas = 0;
+    let yaExistian = 0;
+
+    for (const nombreMesa of mesasUnicas) {
+      const nombre = nombreMesa.toString().trim();
+      if (!nombre) continue;
+
+      try {
+        await Mesa.findOneAndUpdate(
+          { userId: req.user._id, nombre },
+          { userId: req.user._id, nombre, activa: true },
+          { upsert: true, new: true, setDefaultsOnInsert: true }
+        );
+        creadas++;
+      } catch (err) {
+        if (err.code === 11000) {
+          yaExistian++;
+        }
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `${creadas} mesas importadas de pedidos existentes${yaExistian > 0 ? ` (${yaExistian} ya existían)` : ''}`,
+      total: creadas
+    });
+  } catch (error) {
+    console.error('❌ Error al importar mesas:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al importar mesas',
       error: error.message
     });
   }
