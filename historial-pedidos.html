@@ -4834,7 +4834,7 @@
 
         setTimeout(() => {
             const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-            const keyPrefix = isMac ? '⌘ Cmd' : '⊞ Win';
+            const keyPrefix = isMac ? '⌘ Cmd' : 'Ctrl';
             
             const onboarding = document.createElement('div');
             onboarding.className = 'onboarding-shortcut-popup';
