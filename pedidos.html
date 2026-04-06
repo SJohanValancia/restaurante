@@ -1813,8 +1813,52 @@
         .gesture-swipe-smooth {
             transition: transform 0.1s cubic-bezier(0.1, 0.7, 0.1, 1), box-shadow 0.2s !important;
         }
-        .gesture-return-smooth {
-            transition: transform 0.5s cubic-bezier(0.3, 1.2, 0.3, 1), background 0.3s !important;
+        /* ONBOARDING ANIMATIONS */
+        @keyframes slideUpFadeBtn {
+            0% { transform: translate(-50%, 50px); opacity: 0; }
+            100% { transform: translate(-50%, 0); opacity: 1; }
+        }
+        @keyframes slideDownFadeBtn {
+            0% { transform: translate(-50%, 0); opacity: 1; }
+            100% { transform: translate(-50%, 50px); opacity: 0; }
+        }
+        @keyframes bounceGlowIcon {
+            0%, 100% { transform: translateY(0); text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+            50% { transform: translateY(-5px); text-shadow: 0 0 20px rgba(255,255,255,0.8); }
+        }
+
+        .onboarding-shortcut-popup {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            padding: 18px 24px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.15);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4), 0 0 0 1px rgba(99, 102, 241, 0.4);
+            animation: slideUpFadeBtn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            pointer-events: auto;
+            max-width: 90vw;
+            width: max-content;
+        }
+
+        .onboarding-shortcut-popup kbd {
+            background: #334155;
+            color: #f8fafc;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: monospace;
+            font-weight: bold;
+            border-bottom: 2px solid #0f172a;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            margin: 0 2px;
         }
     </style>
 
@@ -4656,6 +4700,7 @@
             keySequence = [];
             clearTimeout(keySequenceTimer);
             toggleTableView();
+            if (typeof dismissShortcutOnboarding === 'function') dismissShortcutOnboarding();
         }
     });
 
@@ -5264,6 +5309,41 @@
             btn.innerHTML = '<span>📥</span><span>Importar mesas de pedidos existentes</span>';
         }
     }
+
+    function checkAndShowShortcutOnboarding() {
+        if (localStorage.getItem('sawMinimalistShortcut')) return;
+
+        setTimeout(() => {
+            const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+            const keyPrefix = isMac ? '⌘ Cmd' : '⊞ Win';
+            
+            const onboarding = document.createElement('div');
+            onboarding.className = 'onboarding-shortcut-popup';
+            onboarding.id = 'shortcutOnboarding';
+            onboarding.innerHTML = `
+                <div style="font-size: 32px; animation: bounceGlowIcon 2s infinite;">✨</div>
+                <div>
+                    <p style="margin: 0 0 6px 0; font-weight: 800; font-size: 16px; color: #e2e8f0;">¡Prueba la nueva vista de mesas!</p>
+                    <p style="margin: 0; color: #94a3b8; font-size: 14px; line-height: 1.4;">Presiona <kbd>${keyPrefix}</kbd> + <kbd>J</kbd> + <kbd>C</kbd> para activar el modo minimalista.</p>
+                </div>
+                <button onclick="dismissShortcutOnboarding()" style="background: rgba(99, 102, 241, 0.2); border: 1px solid rgba(99, 102, 241, 0.5); color: #818cf8; padding: 10px 16px; border-radius: 12px; cursor: pointer; font-weight: 700; transition: all 0.2s; white-space: nowrap; margin-left: auto;">¡Entendido!</button>
+            `;
+            document.body.appendChild(onboarding);
+        }, 1500); 
+    }
+
+    function dismissShortcutOnboarding() {
+        const el = document.getElementById('shortcutOnboarding');
+        if (el) {
+            el.style.animation = 'slideDownFadeBtn 0.4s ease-in forwards';
+            setTimeout(() => el.remove(), 400);
+        }
+        localStorage.setItem('sawMinimalistShortcut', 'true');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        checkAndShowShortcutOnboarding();
+    });
     </script>
 </body>
 
