@@ -4166,6 +4166,7 @@
         grid.addEventListener('touchstart', handleStart, { passive: true });
         grid.addEventListener('touchmove', handleMove, { passive: true });
         grid.addEventListener('touchend', handleEnd);
+        grid.addEventListener('touchcancel', handleEnd);
 
         grid.addEventListener('mousedown', handleStart);
         window.addEventListener('mousemove', handleMove);
@@ -4536,9 +4537,9 @@
             <div class="mesa-pedido-card" data-id="${pedido._id}" data-estado="${pedido.estado}" data-metodo="${pedido.metodoPago || ''}" 
                  style="position: relative; overflow: hidden; margin-bottom: 1rem; transition: transform 0.2s; touch-action: pan-y; user-select: none; -webkit-user-select: none; ${!isActive ? 'opacity: 0.8;' : ''}">
                 <!-- Indicador Undo (derecha) -->
-                <div class="mesa-undo-indicator" style="position: absolute; left: 0; top: 0; bottom: 0; width: 60px; background: linear-gradient(90deg, #4299e1, #3182ce); display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; font-weight: 800; opacity: 0; transition: opacity 0.2s; border-radius: 10px 0 0 10px; z-index: 1;">↩️</div>
+                <div class="mesa-undo-indicator" style="position: absolute; left: 0; top: 0; bottom: 0; width: 60px; background: linear-gradient(90deg, #4299e1, #3182ce); display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; font-weight: 800; opacity: 0; transition: opacity 0.2s; border-radius: 10px 0 0 10px; z-index: 1; pointer-events: none;">↩️</div>
                 <!-- Indicador Cambio Pago (izquierda) -->
-                <div class="mesa-payment-indicator" style="position: absolute; right: 0; top: 0; bottom: 0; width: 60px; background: linear-gradient(270deg, #ed8936, #dd6b20); display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; font-weight: 800; opacity: 0; transition: opacity 0.2s; border-radius: 0 10px 10px 0; z-index: 1;">💳</div>
+                <div class="mesa-payment-indicator" style="position: absolute; right: 0; top: 0; bottom: 0; width: 60px; background: linear-gradient(270deg, #ed8936, #dd6b20); display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; font-weight: 800; opacity: 0; transition: opacity 0.2s; border-radius: 0 10px 10px 0; z-index: 1; pointer-events: none;">💳</div>
                 
                 ${total > 1 ? `<div style="font-size: 11px; font-weight: 700; color: #667eea; margin-bottom: 6px;">Pedido ${idx + 1} de ${total}</div>` : ''}
                 
@@ -4570,11 +4571,11 @@
                 ${pedido.metodoPago ? `<div style="text-align: center; margin-bottom: 0.75rem; font-size: 13px; color: #718096;">Método: <strong>${pedido.metodoPago === 'efectivo' ? '💵 Efectivo' : '📱 Transferencia'}</strong></div>` : ''}
 
                 ${isActive ? `
-                    <div style="display: grid; gap: 6px;">
-                        ${pedido.estado === 'pendiente' ? `<button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'preparando')" style="padding: 10px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px;">👨‍🍳 Preparando</button>` : ''}
-                        ${pedido.estado === 'preparando' ? `<button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'listo')" style="padding: 10px; background: linear-gradient(135deg, #48bb78, #38a169); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px;">✅ Listo</button>` : ''}
-                        ${pedido.estado === 'listo' ? `<button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'entregado')" style="padding: 10px; background: linear-gradient(135deg, #48bb78, #38a169); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px;">🎉 Pagado</button>` : ''}
-                        <button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'cancelado')" style="padding: 8px; background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 12px;">❌ Cancelar</button>
+                    <div style="display: grid; gap: 6px; position: relative; z-index: 10;">
+                        ${pedido.estado === 'pendiente' ? `<button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'preparando')" style="padding: 10px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px; width: 100%;">👨‍🍳 Preparando</button>` : ''}
+                        ${pedido.estado === 'preparando' ? `<button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'listo')" style="padding: 10px; background: linear-gradient(135deg, #48bb78, #38a169); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px; width: 100%;">✅ Listo</button>` : ''}
+                        ${pedido.estado === 'listo' ? `<button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'entregado')" style="padding: 10px; background: linear-gradient(135deg, #48bb78, #38a169); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px; width: 100%;">🎉 Pagado</button>` : ''}
+                        <button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'cancelado')" style="padding: 8px; background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 12px; width: 100%;">❌ Cancelar</button>
                     </div>
                 ` : ''}
             </div>
@@ -4592,9 +4593,11 @@
             card.addEventListener('touchstart', mesaHandleStart, { passive: true });
             card.addEventListener('touchmove', mesaHandleMove, { passive: false });
             card.addEventListener('touchend', mesaHandleEnd);
+            card.addEventListener('touchcancel', mesaHandleEnd);
             card.addEventListener('mousedown', mesaHandleStart);
             card.addEventListener('mousemove', mesaHandleMove);
             card.addEventListener('mouseup', mesaHandleEnd);
+            card.addEventListener('mouseleave', mesaHandleEnd);
         });
     }
 
@@ -4753,7 +4756,7 @@
     async function cambiarEstadoDesdeVistaMesa(orderId, nuevoEstado) {
         const token = localStorage.getItem('token');
         try {
-            const response = await fetch(`${API_URL}/orders/${orderId}/status`, {
+            const response = await fetch(`${API_URL}/orders/${orderId}/estado`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
