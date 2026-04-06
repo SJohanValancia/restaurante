@@ -1777,7 +1777,7 @@
             bottom: 0;
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(5px);
-            z-index: 10001;
+            z-index: 1050; /* Menor a 1060 para SWAL */
             align-items: center;
             justify-content: center;
             padding: 20px;
@@ -1797,7 +1797,24 @@
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
-            animation: slideUp 0.3s ease-out;
+            }
+
+        /* ANIMACIONES DE GESTOS IOS-STYLE */
+        @keyframes ios-jiggle {
+            0% { transform: rotate(-1.5deg) scale(1.03); }
+            50% { transform: rotate(1.5deg) scale(1.03); }
+            100% { transform: rotate(-1.5deg) scale(1.03); }
+        }
+        .gesture-active-jiggle {
+            animation: ios-jiggle 0.25s infinite ease-in-out !important;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15) !important;
+            z-index: 100;
+        }
+        .gesture-swipe-smooth {
+            transition: transform 0.1s cubic-bezier(0.1, 0.7, 0.1, 1), box-shadow 0.2s !important;
+        }
+        .gesture-return-smooth {
+            transition: transform 0.5s cubic-bezier(0.3, 1.2, 0.3, 1), background 0.3s !important;
         }
     </style>
 
@@ -2137,6 +2154,9 @@
                 isGestureStarted = false;
                 gestureType = null;
 
+                // Limpiar clases si quedaron
+                currentCard.classList.remove('gesture-active-jiggle', 'gesture-return-smooth', 'gesture-swipe-smooth');
+
                 // Verificar si es un pedido pagado (entregado) que no ha sido liquidado
                 const statusBadge = card.querySelector('.status-badge');
                 const isPagado = statusBadge && (statusBadge.classList.contains('status-entregado') || statusBadge.textContent.toLowerCase().includes('pagado'));
@@ -2144,23 +2164,19 @@
                 const reciboDia = card.dataset.recibo === 'true';
 
                 if (isPagado && !reciboDia) {
-                    // Para pedidos pagados NO liquidados, permitir cambio de método de pago
                     longPressTimer = setTimeout(() => {
                         isGestureStarted = true;
                         gestureType = 'change-payment';
-                        currentCard.classList.add('ready-to-change-payment');
+                        currentCard.classList.add('gesture-active-jiggle');
                         
-                        // Actualizar texto del indicador según el método actual
                         const indicador = currentCard.querySelector('.payment-method-indicator');
-                        const nuevoMetodo = metodoPago === 'efectivo' ? 'TRANSFERENCIA' : 'EFECTIVO';
                         if (indicador) {
                             indicador.innerHTML = metodoPago === 'efectivo' ? '💳 A TRANSFERENCIA' : '💵 A EFECTIVO';
                         }
                         
-                        if (window.navigator.vibrate) window.navigator.vibrate(50);
-                    }, 1500); // 1.5 segundos para cambiar método de pago
+                        if (window.navigator.vibrate) window.navigator.vibrate([30, 50, 30]);
+                    }, 600); 
                 } else if (!isPagado) {
-                    // Para pedidos NO pagados, permitir deshacer estado
                     if (statusBadge && statusBadge.classList.contains('status-cancelado')) {
                         return;
                     }
@@ -2168,9 +2184,9 @@
                     longPressTimer = setTimeout(() => {
                         isGestureStarted = true;
                         gestureType = 'undo';
-                        currentCard.classList.add('ready-to-undo');
-                        if (window.navigator.vibrate) window.navigator.vibrate(50);
-                    }, 1500); // 1.5 segundos para deshacer
+                        currentCard.classList.add('gesture-active-jiggle');
+                        if (window.navigator.vibrate) window.navigator.vibrate([30, 50, 30]);
+                    }, 600);
                 }
             };
 
@@ -2181,28 +2197,26 @@
                 const diffX = touch.clientX - touchStartX;
                 const diffY = touch.clientY - touchStartY;
 
-                // Si se mueve mucho verticalmente, cancelar para permitir scroll
                 if (Math.abs(diffY) > 50) {
                     handleEnd(e);
                     return;
                 }
 
-                if (gestureType === 'undo') {
-                    // Gesto hacia la derecha para deshacer
-                    if (diffX > 0) {
-                        currentCard.style.transform = `scale(1.02) translateX(${diffX}px)`;
-                        const opacity = Math.min(diffX / 150, 1);
-                        const indicator = currentCard.querySelector('.undo-indicator');
-                        if (indicator) indicator.style.opacity = opacity;
-                    }
-                } else if (gestureType === 'change-payment') {
-                    // Gesto hacia la izquierda para cambiar método de pago
-                    if (diffX < 0) {
-                        currentCard.style.transform = `scale(1.02) translateX(${diffX}px)`;
-                        const opacity = Math.min(Math.abs(diffX) / 150, 1);
-                        const indicator = currentCard.querySelector('.payment-method-indicator');
-                        if (indicator) indicator.style.opacity = opacity;
-                    }
+                if (e.cancelable) e.preventDefault();
+
+                currentCard.classList.remove('gesture-active-jiggle', 'gesture-return-smooth');
+                currentCard.classList.add('gesture-swipe-smooth');
+
+                if (gestureType === 'undo' && diffX > 0) {
+                    currentCard.style.transform = `translateX(${diffX}px) scale(1.02)`;
+                    const opacity = Math.min(diffX / 120, 1);
+                    const indicator = currentCard.querySelector('.undo-indicator');
+                    if (indicator) indicator.style.opacity = opacity;
+                } else if (gestureType === 'change-payment' && diffX < 0) {
+                    currentCard.style.transform = `translateX(${diffX}px) scale(1.02)`;
+                    const opacity = Math.min(Math.abs(diffX) / 120, 1);
+                    const indicator = currentCard.querySelector('.payment-method-indicator');
+                    if (indicator) indicator.style.opacity = opacity;
                 }
             };
 
@@ -2213,27 +2227,30 @@
                 const currentX = e.changedTouches ? e.changedTouches[0].clientX : (e.clientX || touchStartX);
                 const diffX = currentX - touchStartX;
 
-                if (gestureType === 'undo' && isGestureStarted && diffX > 150) {
-                    // Deshacer estado
+                if (gestureType === 'undo' && isGestureStarted && diffX > 120) {
                     const orderId = currentCard.dataset.id || currentCard.id.replace('order-card-', '');
                     await undoOrderState(orderId);
-                } else if (gestureType === 'change-payment' && isGestureStarted && diffX < -150) {
-                    // Cambiar método de pago
+                } else if (gestureType === 'change-payment' && isGestureStarted && diffX < -120) {
                     const orderId = currentCard.dataset.id || currentCard.id.replace('order-card-', '');
                     const metodoActual = currentCard.dataset.metodo;
                     await cambiarMetodoPago(orderId, metodoActual);
                 }
 
-                // Resetear estilos
-                currentCard.classList.remove('ready-to-undo', 'ready-to-change-payment');
-                currentCard.style.transform = '';
+                currentCard.classList.remove('gesture-active-jiggle', 'gesture-swipe-smooth');
+                currentCard.classList.add('gesture-return-smooth');
+                currentCard.style.transform = 'translateX(0) scale(1)';
                 
                 const undoIndicator = currentCard.querySelector('.undo-indicator');
-                if (undoIndicator) undoIndicator.style.opacity = '';
+                if (undoIndicator) undoIndicator.style.opacity = '0';
                 
                 const paymentIndicator = currentCard.querySelector('.payment-method-indicator');
-                if (paymentIndicator) paymentIndicator.style.opacity = '';
+                if (paymentIndicator) paymentIndicator.style.opacity = '0';
                 
+                const tempCard = currentCard;
+                setTimeout(() => {
+                    if (tempCard) tempCard.classList.remove('gesture-return-smooth');
+                }, 500);
+
                 currentCard = null;
                 isGestureStarted = false;
                 gestureType = null;
@@ -2729,6 +2746,10 @@
                     displayOrders(allLoadedOrders, reset);
                     document.getElementById('orderCount').textContent = data.total || allLoadedOrders.length;
                     currentPage++;
+                    
+                    // Señal para la vista de mesas
+                    window.ordersHaveLoaded = true;
+                    if (isTableView && mesasData.length > 0) renderMesas(mesasData);
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -4602,6 +4623,20 @@
     let keySequence = [];
     let keySequenceTimer = null;
 
+    // RESTAURAR MODO GUARDADO
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedMode = localStorage.getItem('tableViewMode');
+        if (savedMode === 'mesas') {
+            // Esperar a que los pedidos REALMENTE carguen
+            const waitForOrders = setInterval(() => {
+                if (window.ordersHaveLoaded) {
+                    clearInterval(waitForOrders);
+                    toggleTableView();
+                }
+            }, 300);
+        }
+    });
+
     // ATAJO DE TECLADO: Cmd/Ctrl + J → C
     document.addEventListener('keydown', (e) => {
         const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
@@ -4664,6 +4699,9 @@
             document.getElementById('viewModeText').textContent = 'Vista Mesas';
         }
 
+        // Guardar modo en localStorage
+        localStorage.setItem('tableViewMode', isTableView ? 'mesas' : 'normal');
+
         // Feedback visual
         mostrarNotificacionExito(isTableView ? '🪑 Vista de Mesas activada' : '📋 Vista Normal activada');
     }
@@ -4707,24 +4745,25 @@
         }
 
         grid.innerHTML = mesasFiltradas.map(mesa => {
-            // Determinar si la mesa tiene pedidos activos
-            const pedidoActivo = allLoadedOrders.find(o =>
-                o.mesa && o.mesa.toLowerCase().trim() === mesa.nombre.toLowerCase().trim() &&
+            // Contar TODOS los pedidos activos de esta mesa
+            const pedidosActivos = allLoadedOrders.filter(o =>
+                o.mesa && String(o.mesa).toLowerCase().trim() === mesa.nombre.toLowerCase().trim() &&
                 !['entregado', 'cancelado'].includes(o.estado)
             );
-            const isOcupada = !!pedidoActivo;
+            const isOcupada = pedidosActivos.length > 0;
             const estadoClass = isOcupada ? 'ocupada' : 'libre';
 
-            // Icono dentro del círculo (emoji mesa o primera letra)
+            // Icono dentro del círculo
             const iconContent = mesa.nombre.match(/\d+/) ? mesa.nombre.match(/\d+/)[0] : mesa.nombre.charAt(0).toUpperCase();
+            const badge = pedidosActivos.length > 1 ? `<div style="position:absolute;top:-4px;right:-4px;background:#e53e3e;color:white;font-size:10px;font-weight:800;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid white;">${pedidosActivos.length}</div>` : '';
 
             return `
-                <div class="mesa-circle" onclick="onMesaClick('${mesa._id}', '${mesa.nombre.replace(/'/g, "\\'")}',' ${isOcupada}')">
-                    <div class="mesa-icon ${estadoClass}">
-                        ${iconContent}
+                <div class="mesa-circle" onclick="onMesaClick('${mesa._id}', '${mesa.nombre.replace(/'/g, "\\'")}', '${isOcupada}')">
+                    <div class="mesa-icon ${estadoClass}" style="position:relative;">
+                        ${iconContent}${badge}
                     </div>
                     <div class="mesa-name">${mesa.nombre}</div>
-                    <div class="mesa-status-text ${estadoClass}">${isOcupada ? 'Ocupada' : 'Libre'}</div>
+                    <div class="mesa-status-text ${estadoClass}">${isOcupada ? (pedidosActivos.length > 1 ? pedidosActivos.length + ' pedidos' : 'Ocupada') : 'Libre'}</div>
                 </div>
             `;
         }).join('');
@@ -4745,11 +4784,79 @@
     });
 
     // CLICK EN MESA → ABRIR MODAL DE PEDIDO
+    let mesaEditingOrderId = null; // ID del pedido que se está editando
+
     function onMesaClick(mesaId, mesaNombre, isOcupada) {
         mesaSeleccionadaNombre = mesaNombre.trim();
+        mesaEditingOrderId = null;
+
+        // Buscar pedidos activos de esta mesa
+        const pedidosActivos = allLoadedOrders.filter(o =>
+            o.mesa && String(o.mesa).toLowerCase().trim() === mesaSeleccionadaNombre.toLowerCase().trim() &&
+            !['entregado', 'cancelado'].includes(o.estado)
+        );
+
+        if (pedidosActivos.length > 0) {
+            // Mesa ocupada → mostrar opciones
+            mostrarMenuMesaOcupada(mesaId, mesaSeleccionadaNombre, pedidosActivos);
+        } else {
+            // Mesa libre → nuevo pedido directamente
+            abrirModalNuevoPedidoMesa();
+        }
+    }
+
+    function mostrarMenuMesaOcupada(mesaId, mesaNombre, pedidosActivos) {
+        const estadoEmojis = { 'pendiente': '⏳', 'preparando': '👨‍🍳', 'listo': '✅' };
+        const estadoColors = { 'pendiente': '#f6ad55', 'preparando': '#667eea', 'listo': '#48bb78' };
+
+        const pedidosHTML = pedidosActivos.map((p, idx) => {
+            const totalItems = p.items.reduce((s, i) => s + i.cantidad, 0);
+            const productos = p.items.map(i => (i.productoInfo ? i.productoInfo.nombre : (i.nombreProducto || 'Producto'))).join(', ');
+            const truncProd = productos.length > 50 ? productos.substring(0, 50) + '...' : productos;
+
+            return `
+                <div style="background: ${estadoColors[p.estado]}12; border: 1px solid ${estadoColors[p.estado]}40; border-radius: 12px; padding: 14px; cursor: pointer; transition: all 0.2s; user-select: none; -webkit-user-select: none;" 
+                     onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'"
+                     onclick="editarPedidoExistente('${p._id}')">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <span style="font-weight: 700; color: #2d3748; font-size: 14px;">${estadoEmojis[p.estado] || ''} Pedido ${idx + 1}</span>
+                        <span style="font-size: 11px; font-weight: 600; color: ${estadoColors[p.estado]}; text-transform: uppercase; background: ${estadoColors[p.estado]}20; padding: 3px 8px; border-radius: 6px;">${p.estado}</span>
+                    </div>
+                    <div style="font-size: 12px; color: #718096; margin-bottom: 4px;">${totalItems} items — ${truncProd}</div>
+                    <div style="font-size: 15px; font-weight: 800; color: #48bb78;">$${p.total.toLocaleString('es-CO')}</div>
+                    ${p.notas ? `<div style="font-size: 11px; color: #92400e; margin-top: 4px;">📝 ${p.notas}</div>` : ''}
+                    <div style="font-size: 11px; color: #667eea; margin-top: 6px; font-weight: 600;">✏️ Toca para editar</div>
+                </div>
+            `;
+        }).join('');
+
+        Swal.fire({
+            title: `🪑 ${mesaNombre}`,
+            html: `
+                <div style="text-align: left; margin-bottom: 1rem;">
+                    <p style="font-size: 13px; color: #718096; margin-bottom: 12px;">${pedidosActivos.length} pedido${pedidosActivos.length > 1 ? 's' : ''} activo${pedidosActivos.length > 1 ? 's' : ''}</p>
+                    <div style="display: grid; gap: 10px; max-height: 300px; overflow-y: auto;">${pedidosHTML}</div>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: '➕ Nuevo Pedido',
+            cancelButtonText: 'Cerrar',
+            confirmButtonColor: '#48bb78',
+            cancelButtonColor: '#e2e8f0',
+            reverseButtons: true,
+            customClass: { cancelButton: 'swal2-cancel-dark' }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                abrirModalNuevoPedidoMesa();
+            }
+        });
+    }
+
+    function abrirModalNuevoPedidoMesa() {
+        mesaEditingOrderId = null;
         mesaSelectedItems = [];
 
-        document.getElementById('modalPedidoMesaTitulo').textContent = `📝 Pedido - ${mesaSeleccionadaNombre}`;
+        document.getElementById('modalPedidoMesaTitulo').textContent = `📝 Nuevo Pedido - ${mesaSeleccionadaNombre}`;
         document.getElementById('mesaSeleccionadaLabel').textContent = `Mesa: ${mesaSeleccionadaNombre}`;
 
         // Resetear formulario
@@ -4757,6 +4864,7 @@
         document.getElementById('orderSummaryMesa').style.display = 'none';
         document.getElementById('btnSubmitMesa').disabled = true;
         document.getElementById('btnSubmitMesa').style.opacity = '0.5';
+        document.getElementById('btnSubmitMesa').textContent = '🍽️ Crear Pedido';
         const notasInput = document.getElementById('notasMesa');
         if (notasInput) notasInput.value = '';
 
@@ -4777,7 +4885,67 @@
             displayProductsMesa(filtered);
         });
 
-        // Abrir modal
+        document.getElementById('modalPedidoMesa').classList.add('active');
+    }
+
+    function editarPedidoExistente(orderId) {
+        Swal.close();
+
+        const pedido = allLoadedOrders.find(o => o._id === orderId);
+        if (!pedido) return;
+
+        mesaEditingOrderId = orderId;
+        mesaSelectedItems = [];
+
+        // Pre-cargar items del pedido existente
+        pedido.items.forEach(item => {
+            const productoEnCatalogo = availableProducts.find(p => p._id === (item.producto?._id || item.producto));
+            if (productoEnCatalogo) {
+                mesaSelectedItems.push({
+                    producto: productoEnCatalogo,
+                    cantidad: item.cantidad
+                });
+            } else {
+                // Producto no encontrado en catálogo, usar datos del pedido
+                mesaSelectedItems.push({
+                    producto: {
+                        _id: item.producto?._id || item.producto,
+                        nombre: item.productoInfo ? item.productoInfo.nombre : (item.nombreProducto || 'Producto'),
+                        categoria: item.productoInfo ? item.productoInfo.categoria : (item.categoriaProducto || ''),
+                        precio: item.precio,
+                        disponible: true
+                    },
+                    cantidad: item.cantidad
+                });
+            }
+        });
+
+        document.getElementById('modalPedidoMesaTitulo').textContent = `✏️ Editar Pedido - ${mesaSeleccionadaNombre}`;
+        document.getElementById('mesaSeleccionadaLabel').textContent = `Mesa: ${mesaSeleccionadaNombre} (Editando)`;
+        document.getElementById('btnSubmitMesa').textContent = '💾 Guardar Cambios';
+
+        // Mostrar productos
+        displayProductsMesa(availableProducts);
+        updateSelectedProductsMesa();
+
+        // Pre-cargar notas
+        const notasInput = document.getElementById('notasMesa');
+        if (notasInput) notasInput.value = pedido.notas || '';
+
+        // Configurar buscador
+        const searchInput = document.getElementById('searchProductMesa');
+        searchInput.value = '';
+        const newSearch = searchInput.cloneNode(true);
+        searchInput.parentNode.replaceChild(newSearch, searchInput);
+        document.getElementById('searchProductMesa').addEventListener('input', (e) => {
+            const search = e.target.value.toLowerCase();
+            const filtered = availableProducts.filter(p =>
+                p.nombre.toLowerCase().includes(search) ||
+                p.categoria.toLowerCase().includes(search)
+            );
+            displayProductsMesa(filtered);
+        });
+
         document.getElementById('modalPedidoMesa').classList.add('active');
     }
 
@@ -4785,6 +4953,7 @@
         document.getElementById('modalPedidoMesa').classList.remove('active');
         mesaSelectedItems = [];
         mesaSeleccionadaNombre = '';
+        mesaEditingOrderId = null;
     }
 
     function displayProductsMesa(products) {
@@ -4874,33 +5043,43 @@
         updateSelectedProductsMesa();
     }
 
-    // CREAR PEDIDO DESDE MESA
+    // CREAR O EDITAR PEDIDO DESDE MESA
     async function crearPedidoMesa() {
         if (mesaSelectedItems.length === 0) return;
 
         const btnSubmit = document.getElementById('btnSubmitMesa');
         btnSubmit.disabled = true;
         btnSubmit.style.opacity = '0.6';
-        btnSubmit.textContent = '⏳ Creando...';
+        btnSubmit.textContent = mesaEditingOrderId ? '⏳ Guardando...' : '⏳ Creando...';
 
         const notas = document.getElementById('notasMesa').value.trim();
+
+        const isEditing = !!mesaEditingOrderId;
 
         const orderData = {
             mesa: mesaSeleccionadaNombre,
             items: mesaSelectedItems.map(item => ({
                 producto: item.producto._id,
+                nombreProducto: item.producto.nombre,
+                categoriaProducto: item.producto.categoria || '',
                 cantidad: item.cantidad,
                 precio: item.producto.precio
             })),
-            notas: notas,
-            userId: currentUser._id
+            notas: notas
         };
+
+        if (!isEditing) {
+            orderData.userId = currentUser._id;
+        }
 
         const token = localStorage.getItem('token');
 
         try {
-            const response = await fetch(`${API_URL}/orders`, {
-                method: 'POST',
+            const url = isEditing ? `${API_URL}/orders/${mesaEditingOrderId}` : `${API_URL}/orders`;
+            const method = isEditing ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method: method,
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
@@ -4912,19 +5091,21 @@
 
             if (data.success) {
                 cerrarModalPedidoMesa();
-                mostrarNotificacionExito('✅ Pedido creado para ' + mesaSeleccionadaNombre);
+                mostrarNotificacionExito(isEditing 
+                    ? '✅ Pedido editado en ' + mesaSeleccionadaNombre 
+                    : '✅ Pedido creado para ' + mesaSeleccionadaNombre);
                 await loadOrders(true);
-                renderMesas(mesasData); // Actualizar colores de mesas
+                renderMesas(mesasData);
             } else {
                 Swal.fire({ icon: 'error', text: 'Error: ' + data.message, timer: 3000, showConfirmButton: false });
             }
         } catch (error) {
             console.error('Error:', error);
-            Swal.fire({ icon: 'error', text: 'Error al crear el pedido', timer: 3000, showConfirmButton: false });
+            Swal.fire({ icon: 'error', text: 'Error al guardar el pedido', timer: 3000, showConfirmButton: false });
         } finally {
             btnSubmit.disabled = false;
             btnSubmit.style.opacity = '1';
-            btnSubmit.textContent = '🍽️ Crear Pedido';
+            btnSubmit.textContent = mesaEditingOrderId ? '💾 Guardar Cambios' : '🍽️ Crear Pedido';
         }
     }
 

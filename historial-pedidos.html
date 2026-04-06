@@ -456,6 +456,8 @@
             border-radius: 12px;
             padding: 1.5rem;
             transition: all 0.2s;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .order-card:hover {
@@ -1367,7 +1369,7 @@
             top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(5px);
-            z-index: 10001;
+            z-index: 1050; /* Menor a 1060 (Swal2) */
             align-items: center;
             justify-content: center;
             padding: 20px;
@@ -1400,6 +1402,24 @@
         @media (max-width: 480px) {
             .mesas-grid-hist { grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
             .mesa-icon-hist { width: 60px; height: 60px; font-size: 20px; }
+        }
+
+        /* ANIMACIONES DE GESTOS IOS-STYLE */
+        @keyframes ios-jiggle {
+            0% { transform: rotate(-1.5deg) scale(1.03); }
+            50% { transform: rotate(1.5deg) scale(1.03); }
+            100% { transform: rotate(-1.5deg) scale(1.03); }
+        }
+        .gesture-active-jiggle {
+            animation: ios-jiggle 0.25s infinite ease-in-out !important;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15) !important;
+            z-index: 100;
+        }
+        .gesture-swipe-smooth {
+            transition: transform 0.1s cubic-bezier(0.1, 0.7, 0.1, 1), box-shadow 0.2s !important;
+        }
+        .gesture-return-smooth {
+            transition: transform 0.5s cubic-bezier(0.3, 1.2, 0.3, 1), background 0.3s !important;
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -1505,9 +1525,6 @@
                 <h1 class="page-title" id="pageTitleHistorial">📜 Historial Completo de Pedidos</h1>
                 <p class="page-subtitle">Gestiona todos los pedidos de tu restaurante en un solo lugar</p>
             </div>
-
-            <!-- ===== VISTA POR DEFECTO HISTORIAL ===== -->
-            <div class="default-view-hist" id="defaultViewHist">
 
             <!-- Estadísticas -->
             <div class="stats-grid">
@@ -1626,23 +1643,24 @@
                 </div>
             </div>
 
-            <!-- Lista de Pedidos -->
-            <div class="orders-header">
-                <h2 class="orders-title">
-                    📋 Lista de Pedidos
-                    <span class="order-count" id="orderCount">0</span>
-                </h2>
-            </div>
-
-            <div class="orders-grid" id="ordersGrid">
-                <div class="empty-state">
-                    <div class="empty-icon">📋</div>
-                    <p>Cargando pedidos...</p>
+            <!-- Lista de Pedidos (VISTA NORMAL) -->
+            <div class="default-view-hist" id="defaultViewHist">
+                <div class="orders-header">
+                    <h2 class="orders-title">
+                        📋 Lista de Pedidos
+                        <span class="order-count" id="orderCount">0</span>
+                    </h2>
                 </div>
-            </div>
-            <div id="loadingMoreOrders" style="display: none; text-align: center; padding: 20px; color: #667eea;">
-                <span>Cargando más pedidos...</span>
-            </div>
+
+                <div class="orders-grid" id="ordersGrid">
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <p>Cargando pedidos...</p>
+                    </div>
+                </div>
+                <div id="loadingMoreOrders" style="display: none; text-align: center; padding: 20px; color: #667eea;">
+                    <span>Cargando más pedidos...</span>
+                </div>
             </div> <!-- /default-view-hist -->
 
             <!-- ===== VISTA DE MESAS HISTORIAL ===== -->
@@ -2030,6 +2048,10 @@
                     
                     applyFilters(needsFullReset, !!hasSearch);
                     currentPage++;
+                    
+                    // Señal para la vista de mesas
+                    window.ordersHaveLoadedHist = true;
+                    if (isTableViewHist && mesasDataHist.length > 0) renderMesasHist(mesasDataHist);
                 }
             } catch (error) {
                 console.error('Error al cargar pedidos:', error);
@@ -3923,6 +3945,9 @@
             isLongPressed = false;
             gestureType = null;
 
+            // Limpiar clases por si acaso
+            activeCard.classList.remove('gesture-active-jiggle', 'gesture-return-smooth', 'gesture-swipe-smooth');
+
             // Verificar si es un pedido pagado (entregado) que no ha sido liquidado
             const statusBadge = card.querySelector('.status-badge');
             const isPagado = statusBadge && (statusBadge.classList.contains('status-entregado') || statusBadge.textContent.toLowerCase().includes('pagado'));
@@ -3930,23 +3955,19 @@
             const reciboDia = card.dataset.recibo === 'true';
 
             if (isPagado && !reciboDia) {
-                // Para pedidos pagados NO liquidados, permitir cambio de método de pago
                 longPressTimer = setTimeout(() => {
                     isLongPressed = true;
                     gestureType = 'change-payment';
-                    activeCard.classList.add('ready-to-change-payment');
+                    activeCard.classList.add('gesture-active-jiggle');
                     
-                    // Actualizar texto del indicador según el método actual
                     const indicador = activeCard.querySelector('.payment-method-indicator');
-                    const nuevoMetodo = metodoPago === 'efectivo' ? 'TRANSFERENCIA' : 'EFECTIVO';
                     if (indicador) {
                         indicador.innerHTML = metodoPago === 'efectivo' ? '💳 A TRANSFERENCIA' : '💵 A EFECTIVO';
                     }
                     
-                    if (window.navigator.vibrate) window.navigator.vibrate(50);
-                }, 1500); // 1.5 segundos para cambiar método de pago
+                    if (window.navigator.vibrate) window.navigator.vibrate([30, 50, 30]);
+                }, 600); // Rebajado a 600ms
             } else if (!isPagado) {
-                // Para pedidos NO pagados, permitir deshacer estado
                 if (statusBadge && statusBadge.classList.contains('status-cancelado')) {
                     return;
                 }
@@ -3954,9 +3975,9 @@
                 longPressTimer = setTimeout(() => {
                     isLongPressed = true;
                     gestureType = 'undo';
-                    activeCard.classList.add('ready-to-undo');
-                    if (window.navigator.vibrate) window.navigator.vibrate(50);
-                }, 1500); // 1.5 segundos para deshacer
+                    activeCard.classList.add('gesture-active-jiggle');
+                    if (window.navigator.vibrate) window.navigator.vibrate([30, 50, 30]);
+                }, 600); // Rebajado a 600ms
             }
         }
 
@@ -3967,28 +3988,27 @@
             const deltaX = touch.clientX - touchStartX;
             const deltaY = touch.clientY - touchStartY;
 
-            // Si se mueve mucho verticalmente, cancelar para permitir scroll
             if (Math.abs(deltaY) > 50) {
                 handleEnd(e);
                 return;
             }
 
-            if (gestureType === 'undo') {
-                // Gesto hacia la derecha para deshacer
-                if (deltaX > 0) {
-                    activeCard.style.transform = `scale(1.02) translateX(${deltaX}px)`;
-                    const opacity = Math.min(deltaX / 150, 1);
-                    const indicator = activeCard.querySelector('.undo-indicator');
-                    if (indicator) indicator.style.opacity = opacity;
-                }
-            } else if (gestureType === 'change-payment') {
-                // Gesto hacia la izquierda para cambiar método de pago
-                if (deltaX < 0) {
-                    activeCard.style.transform = `scale(1.02) translateX(${deltaX}px)`;
-                    const opacity = Math.min(Math.abs(deltaX) / 150, 1);
-                    const indicator = activeCard.querySelector('.payment-method-indicator');
-                    if (indicator) indicator.style.opacity = opacity;
-                }
+            if (e.cancelable) e.preventDefault();
+
+            // Al mover, quitamos el jiggle y ponemos la transición suave de swipe
+            activeCard.classList.remove('gesture-active-jiggle', 'gesture-return-smooth');
+            activeCard.classList.add('gesture-swipe-smooth');
+
+            if (gestureType === 'undo' && deltaX > 0) {
+                activeCard.style.transform = `translateX(${deltaX}px) scale(1.02)`;
+                const opacity = Math.min(deltaX / 120, 1);
+                const indicator = activeCard.querySelector('.undo-indicator');
+                if (indicator) indicator.style.opacity = opacity;
+            } else if (gestureType === 'change-payment' && deltaX < 0) {
+                activeCard.style.transform = `translateX(${deltaX}px) scale(1.02)`;
+                const opacity = Math.min(Math.abs(deltaX) / 120, 1);
+                const indicator = activeCard.querySelector('.payment-method-indicator');
+                if (indicator) indicator.style.opacity = opacity;
             }
         }
 
@@ -3999,12 +4019,10 @@
                 const touch = e.changedTouches ? e.changedTouches[0] : e;
                 const deltaX = touch.clientX - touchStartX;
 
-                if (gestureType === 'undo' && deltaX > 150) {
-                    // Acción confirmada para deshacer
+                if (gestureType === 'undo' && deltaX > 120) {
                     const orderId = activeCard.dataset.id;
                     undoOrderState(orderId);
-                } else if (gestureType === 'change-payment' && deltaX < -150) {
-                    // Acción confirmada para cambiar método de pago
+                } else if (gestureType === 'change-payment' && deltaX < -120) {
                     const orderId = activeCard.dataset.id;
                     const metodoActual = activeCard.dataset.metodo;
                     cambiarMetodoPago(orderId, metodoActual);
@@ -4012,12 +4030,19 @@
             }
 
             if (activeCard) {
-                activeCard.classList.remove('ready-to-undo', 'ready-to-change-payment');
-                activeCard.style.transform = '';
+                activeCard.classList.remove('gesture-active-jiggle', 'gesture-swipe-smooth');
+                activeCard.classList.add('gesture-return-smooth');
+                activeCard.style.transform = 'translateX(0) scale(1)';
+                
                 const undoIndicator = activeCard.querySelector('.undo-indicator');
-                if (undoIndicator) undoIndicator.style.opacity = '';
+                if (undoIndicator) undoIndicator.style.opacity = '0';
                 const paymentIndicator = activeCard.querySelector('.payment-method-indicator');
-                if (paymentIndicator) paymentIndicator.style.opacity = '';
+                if (paymentIndicator) paymentIndicator.style.opacity = '0';
+
+                // Limpiar la clase return después de la animación para no afectar otros estilos
+                setTimeout(() => {
+                    if (activeCard) activeCard.classList.remove('gesture-return-smooth');
+                }, 500);
             }
 
             activeCard = null;
@@ -4273,6 +4298,19 @@
     let keySequenceHist = [];
     let keySequenceTimerHist = null;
 
+    // RESTAURAR MODO GUARDADO
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedMode = localStorage.getItem('tableViewModeHist');
+        if (savedMode === 'mesas') {
+            const waitForOrders = setInterval(() => {
+                if (window.ordersHaveLoadedHist) {
+                    clearInterval(waitForOrders);
+                    toggleTableViewHist();
+                }
+            }, 300);
+        }
+    });
+
     // ATAJO DE TECLADO: Cmd/Ctrl + J → C
     document.addEventListener('keydown', (e) => {
         const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
@@ -4344,6 +4382,9 @@
             document.getElementById('viewModeTextHist').textContent = 'Vista Mesas';
         }
 
+        // Guardar modo en localStorage
+        localStorage.setItem('tableViewModeHist', isTableViewHist ? 'mesas' : 'normal');
+
         // Feedback
         const notif = document.createElement('div');
         notif.textContent = isTableViewHist ? '🪑 Vista de Mesas activada' : '📋 Vista Normal activada';
@@ -4388,35 +4429,35 @@
         }
 
         grid.innerHTML = mesasFiltradas.map(mesa => {
-            const pedidoActivo = allLoadedOrders.find(o =>
-                o.mesa && o.mesa.toLowerCase().trim() === mesa.nombre.toLowerCase().trim() &&
+            // Contar TODOS los pedidos activos de esta mesa
+            const pedidosActivos = allLoadedOrders.filter(o =>
+                o.mesa && String(o.mesa).toLowerCase().trim() === mesa.nombre.toLowerCase().trim() &&
                 !['entregado', 'cancelado'].includes(o.estado)
             );
-            const isOcupada = !!pedidoActivo;
+            const isOcupada = pedidosActivos.length > 0;
             const estadoClass = isOcupada ? 'ocupada' : 'libre';
             const iconContent = mesa.nombre.match(/\d+/) ? mesa.nombre.match(/\d+/)[0] : mesa.nombre.charAt(0).toUpperCase();
+            const badge = pedidosActivos.length > 1 ? `<div style="position:absolute;top:-4px;right:-4px;background:#e53e3e;color:white;font-size:10px;font-weight:800;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid white;">${pedidosActivos.length}</div>` : '';
 
             return `
                 <div class="mesa-circle-hist" onclick="onMesaClickHist('${mesa.nombre.replace(/'/g, "\\\'")}')">
-                    <div class="mesa-icon-hist ${estadoClass}">${iconContent}</div>
+                    <div class="mesa-icon-hist ${estadoClass}" style="position:relative;">${iconContent}${badge}</div>
                     <div class="mesa-name-hist">${mesa.nombre}</div>
-                    <div class="mesa-status-text-hist ${estadoClass}">${isOcupada ? 'Ocupada' : 'Libre'}</div>
+                    <div class="mesa-status-text-hist ${estadoClass}">${isOcupada ? (pedidosActivos.length > 1 ? pedidosActivos.length + ' pedidos' : 'Ocupada') : 'Libre'}</div>
                 </div>
             `;
         }).join('');
     }
 
     function onMesaClickHist(mesaNombre) {
-        // Buscar el último pedido de esta mesa
-        const pedido = allLoadedOrders.find(o =>
-            o.mesa && o.mesa.toLowerCase().trim() === mesaNombre.toLowerCase().trim()
+        const todosLosPedidos = allLoadedOrders.filter(o =>
+            o.mesa && String(o.mesa).toLowerCase().trim() === mesaNombre.toLowerCase().trim()
         );
 
         document.getElementById('detalleMesaTitulo').textContent = `📝 ${mesaNombre}`;
-
         const contenido = document.getElementById('detalleMesaContenido');
 
-        if (!pedido) {
+        if (todosLosPedidos.length === 0) {
             contenido.innerHTML = `
                 <div style="text-align: center; padding: 2rem;">
                     <div style="font-size: 48px; margin-bottom: 1rem;">💭</div>
@@ -4424,37 +4465,92 @@
                 </div>
             `;
         } else {
-            const estadoColors = {
-                'pendiente': '#f6ad55',
-                'preparando': '#667eea',
-                'listo': '#48bb78',
-                'entregado': '#38a169',
-                'cancelado': '#e53e3e'
-            };
-            const estadoEmojis = {
-                'pendiente': '⏳',
-                'preparando': '👨\u200d🍳',
-                'listo': '✅',
-                'entregado': '🎉',
-                'cancelado': '❌'
-            };
+            // Separar activos de pagados/cancelados
+            const activos = todosLosPedidos.filter(p => !['entregado', 'cancelado'].includes(p.estado));
+            const finalizados = todosLosPedidos.filter(p => ['entregado', 'cancelado'].includes(p.estado));
 
-            const fecha = new Date(pedido.createdAt).toLocaleString('es-CO', {
-                day: '2-digit', month: '2-digit', year: 'numeric',
-                hour: '2-digit', minute: '2-digit'
-            });
+            let html = '';
 
-            contenido.innerHTML = `
-                <div style="background: ${estadoColors[pedido.estado]}15; border: 1px solid ${estadoColors[pedido.estado]}40; border-radius: 10px; padding: 12px; margin-bottom: 1rem; text-align: center;">
+            // Mostrar activos primero
+            if (activos.length > 0) {
+                html += `<div style="font-size: 12px; font-weight: 700; color: #667eea; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">🔵 Pedidos Activos (${activos.length})</div>`;
+                html += activos.map((pedido, idx) => renderPedidoCard(pedido, idx, activos.length, true)).join('');
+            }
+
+            // Botón "Ver pagos" + sección colapsable
+            if (finalizados.length > 0) {
+                html += `
+                    <button id="btnVerPagos" onclick="togglePagosSection()" style="width: 100%; margin-top: ${activos.length > 0 ? '1.5rem' : '0'}; padding: 12px; background: linear-gradient(135deg, rgba(56,161,105,0.1), rgba(72,187,120,0.1)); border: 1px solid rgba(56,161,105,0.3); border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px; color: #38a169; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s;">
+                        <span id="iconVerPagos">▶</span>
+                        <span>Ver pagados/cancelados (${finalizados.length})</span>
+                    </button>
+                    <div id="seccionPagos" style="display: none; margin-top: 1rem; animation: fadeInTableView 0.3s ease-out;">
+                        ${finalizados.map((pedido, idx) => renderPedidoCard(pedido, idx, finalizados.length, false)).join('')}
+                    </div>
+                `;
+            }
+
+            if (activos.length === 0 && finalizados.length > 0) {
+                html = `<div style="text-align: center; padding: 1rem; margin-bottom: 1rem;">
+                    <div style="font-size: 32px; margin-bottom: 8px;">✅</div>
+                    <p style="color: #38a169; font-weight: 600; font-size: 14px;">Mesa libre — sin pedidos activos</p>
+                </div>` + html;
+            }
+
+            contenido.innerHTML = html;
+        }
+
+        document.getElementById('modalDetalleMesaHist').classList.add('active');
+
+        // Activar swipe gestures en las tarjetas del popup
+        setTimeout(() => initMesaPopupGestures(), 100);
+    }
+
+    function togglePagosSection() {
+        const seccion = document.getElementById('seccionPagos');
+        const icon = document.getElementById('iconVerPagos');
+        if (seccion.style.display === 'none') {
+            seccion.style.display = 'block';
+            icon.textContent = '▼';
+        } else {
+            seccion.style.display = 'none';
+            icon.textContent = '▶';
+        }
+    }
+
+    function renderPedidoCard(pedido, idx, total, isActive) {
+        const estadoColors = {
+            'pendiente': '#f6ad55', 'preparando': '#667eea', 'listo': '#48bb78',
+            'entregado': '#38a169', 'cancelado': '#e53e3e'
+        };
+        const estadoEmojis = {
+            'pendiente': '⏳', 'preparando': '👨\u200d🍳', 'listo': '✅',
+            'entregado': '🎉', 'cancelado': '❌'
+        };
+        const fecha = new Date(pedido.createdAt).toLocaleString('es-CO', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
+
+        return `
+            <div class="mesa-pedido-card" data-id="${pedido._id}" data-estado="${pedido.estado}" data-metodo="${pedido.metodoPago || ''}" 
+                 style="position: relative; overflow: hidden; margin-bottom: 1rem; transition: transform 0.2s; touch-action: pan-y; user-select: none; -webkit-user-select: none; ${!isActive ? 'opacity: 0.8;' : ''}">
+                <!-- Indicador Undo (derecha) -->
+                <div class="mesa-undo-indicator" style="position: absolute; left: 0; top: 0; bottom: 0; width: 60px; background: linear-gradient(90deg, #4299e1, #3182ce); display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; font-weight: 800; opacity: 0; transition: opacity 0.2s; border-radius: 10px 0 0 10px; z-index: 1;">↩️</div>
+                <!-- Indicador Cambio Pago (izquierda) -->
+                <div class="mesa-payment-indicator" style="position: absolute; right: 0; top: 0; bottom: 0; width: 60px; background: linear-gradient(270deg, #ed8936, #dd6b20); display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; font-weight: 800; opacity: 0; transition: opacity 0.2s; border-radius: 0 10px 10px 0; z-index: 1;">💳</div>
+                
+                ${total > 1 ? `<div style="font-size: 11px; font-weight: 700; color: #667eea; margin-bottom: 6px;">Pedido ${idx + 1} de ${total}</div>` : ''}
+                
+                <div style="background: ${estadoColors[pedido.estado]}15; border: 1px solid ${estadoColors[pedido.estado]}40; border-radius: 10px; padding: 12px; margin-bottom: 0.75rem; text-align: center;">
                     <span style="font-size: 20px;">${estadoEmojis[pedido.estado] || ''}</span>
                     <span style="font-size: 14px; font-weight: 700; color: ${estadoColors[pedido.estado]}; text-transform: uppercase;"> ${pedido.estado}</span>
                     <div style="font-size: 11px; color: #718096; margin-top: 4px;">${fecha}</div>
                 </div>
 
-                <div style="margin-bottom: 1rem;">
-                    <h4 style="font-size: 13px; font-weight: 700; color: #718096; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Productos</h4>
+                <div style="margin-bottom: 0.75rem;">
                     ${pedido.items.map(item => `
-                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0;">
+                        <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f0f0f0;">
                             <div>
                                 <span style="font-weight: 600; color: #2d3748; font-size: 13px;">${item.productoInfo ? item.productoInfo.nombre : (item.nombreProducto || 'Producto')}</span>
                                 <span style="color: #718096; font-size: 12px;"> x${item.cantidad}</span>
@@ -4464,34 +4560,190 @@
                     `).join('')}
                 </div>
 
-                <div style="display: flex; justify-content: space-between; padding: 12px; background: #f7fafc; border-radius: 10px; margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; padding: 10px; background: #f7fafc; border-radius: 10px; margin-bottom: 0.75rem;">
                     <span style="font-weight: 700; color: #2d3748;">Total</span>
                     <span style="font-weight: 800; font-size: 18px; color: #48bb78;">$${pedido.total.toLocaleString('es-CO')}</span>
                 </div>
 
-                ${pedido.notas ? `<div style="padding: 10px; background: #fffbeb; border: 1px solid #fbbf24; border-radius: 8px; margin-bottom: 1rem; font-size: 13px; color: #92400e;">📝 ${pedido.notas}</div>` : ''}
+                ${pedido.notas ? `<div style="padding: 8px 10px; background: #fffbeb; border: 1px solid #fbbf24; border-radius: 8px; margin-bottom: 0.75rem; font-size: 13px; color: #92400e;">📝 ${pedido.notas}</div>` : ''}
 
-                ${pedido.metodoPago ? `<div style="text-align: center; margin-bottom: 1rem; font-size: 13px; color: #718096;">Método: <strong>${pedido.metodoPago === 'efectivo' ? '💵 Efectivo' : '📱 Transferencia'}</strong></div>` : ''}
+                ${pedido.metodoPago ? `<div style="text-align: center; margin-bottom: 0.75rem; font-size: 13px; color: #718096;">Método: <strong>${pedido.metodoPago === 'efectivo' ? '💵 Efectivo' : '📱 Transferencia'}</strong></div>` : ''}
 
-                <!-- Botones de acción -->
-                ${pedido.estado !== 'entregado' && pedido.estado !== 'cancelado' ? `
-                    <div style="display: grid; gap: 8px;">
-                        ${pedido.estado === 'pendiente' ? `
-                            <button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'preparando')" style="padding: 12px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 14px;">👨‍🍳 Marcar Preparando</button>
-                        ` : ''}
-                        ${pedido.estado === 'preparando' ? `
-                            <button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'listo')" style="padding: 12px; background: linear-gradient(135deg, #48bb78, #38a169); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 14px;">✅ Marcar Listo</button>
-                        ` : ''}
-                        ${pedido.estado === 'listo' ? `
-                            <button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'entregado')" style="padding: 12px; background: linear-gradient(135deg, #48bb78, #38a169); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 14px;">🎉 Marcar Pagado</button>
-                        ` : ''}
-                        <button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'cancelado')" style="padding: 10px; background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 13px;">❌ Cancelar Pedido</button>
+                ${isActive ? `
+                    <div style="display: grid; gap: 6px;">
+                        ${pedido.estado === 'pendiente' ? `<button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'preparando')" style="padding: 10px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px;">👨‍🍳 Preparando</button>` : ''}
+                        ${pedido.estado === 'preparando' ? `<button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'listo')" style="padding: 10px; background: linear-gradient(135deg, #48bb78, #38a169); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px;">✅ Listo</button>` : ''}
+                        ${pedido.estado === 'listo' ? `<button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'entregado')" style="padding: 10px; background: linear-gradient(135deg, #48bb78, #38a169); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px;">🎉 Pagado</button>` : ''}
+                        <button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'cancelado')" style="padding: 8px; background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 12px;">❌ Cancelar</button>
                     </div>
                 ` : ''}
-            `;
-        }
+            </div>
+        `;
+    }
 
-        document.getElementById('modalDetalleMesaHist').classList.add('active');
+    // SISTEMA DE GESTOS PARA POPUP DE MESAS
+    let mesaTouchStartX = 0, mesaTouchStartY = 0;
+    let mesaLongPressTimer = null, mesaActiveCard = null;
+    let mesaIsLongPressed = false, mesaGestureType = null;
+
+    function initMesaPopupGestures() {
+        const cards = document.querySelectorAll('.mesa-pedido-card');
+        cards.forEach(card => {
+            card.addEventListener('touchstart', mesaHandleStart, { passive: true });
+            card.addEventListener('touchmove', mesaHandleMove, { passive: false });
+            card.addEventListener('touchend', mesaHandleEnd);
+            card.addEventListener('mousedown', mesaHandleStart);
+            card.addEventListener('mousemove', mesaHandleMove);
+            card.addEventListener('mouseup', mesaHandleEnd);
+        });
+    }
+
+    function mesaHandleStart(e) {
+        mesaActiveCard = e.currentTarget;
+        const touch = e.touches ? e.touches[0] : e;
+        mesaTouchStartX = touch.clientX;
+        mesaTouchStartY = touch.clientY;
+        mesaIsLongPressed = false;
+        mesaGestureType = null;
+
+        // Limpiar clases si quedaron pegadas
+        mesaActiveCard.classList.remove('gesture-active-jiggle', 'gesture-swipe-smooth', 'gesture-return-smooth');
+
+        const estado = mesaActiveCard.dataset.estado;
+        const metodo = mesaActiveCard.dataset.metodo;
+        const isPagado = estado === 'entregado';
+        const isCancelado = estado === 'cancelado';
+
+        if (isCancelado) return;
+
+        if (isPagado && metodo) {
+            mesaLongPressTimer = setTimeout(() => {
+                mesaIsLongPressed = true;
+                mesaGestureType = 'change-payment';
+                mesaActiveCard.classList.add('gesture-active-jiggle');
+                if (window.navigator.vibrate) window.navigator.vibrate([30, 50, 30]);
+            }, 600);
+        } else if (!isPagado) {
+            mesaLongPressTimer = setTimeout(() => {
+                mesaIsLongPressed = true;
+                mesaGestureType = 'undo';
+                mesaActiveCard.classList.add('gesture-active-jiggle');
+                if (window.navigator.vibrate) window.navigator.vibrate([30, 50, 30]);
+            }, 600);
+        }
+    }
+
+    function mesaHandleMove(e) {
+        if (!mesaActiveCard || !mesaIsLongPressed) return;
+        const touch = e.touches ? e.touches[0] : e;
+        const deltaX = touch.clientX - mesaTouchStartX;
+        const deltaY = touch.clientY - mesaTouchStartY;
+
+        if (Math.abs(deltaY) > 50) { mesaHandleEnd(e); return; }
+        if (e.cancelable) e.preventDefault();
+
+        // Aplicamos transición suave y quitamos shake al mover
+        mesaActiveCard.classList.remove('gesture-active-jiggle', 'gesture-return-smooth');
+        mesaActiveCard.classList.add('gesture-swipe-smooth');
+
+        if (mesaGestureType === 'undo' && deltaX > 0) {
+            mesaActiveCard.style.transform = `translateX(${deltaX}px) scale(1.02)`;
+            const indicator = mesaActiveCard.querySelector('.mesa-undo-indicator');
+            if (indicator) indicator.style.opacity = Math.min(deltaX / 120, 1);
+        } else if (mesaGestureType === 'change-payment' && deltaX < 0) {
+            mesaActiveCard.style.transform = `translateX(${deltaX}px) scale(1.02)`;
+            const indicator = mesaActiveCard.querySelector('.mesa-payment-indicator');
+            if (indicator) indicator.style.opacity = Math.min(Math.abs(deltaX) / 120, 1);
+        }
+    }
+
+    function mesaHandleEnd(e) {
+        clearTimeout(mesaLongPressTimer);
+        if (mesaActiveCard && mesaIsLongPressed) {
+            const touch = e.changedTouches ? e.changedTouches[0] : e;
+            const deltaX = touch.clientX - mesaTouchStartX;
+
+            if (mesaGestureType === 'undo' && deltaX > 120) {
+                const orderId = mesaActiveCard.dataset.id;
+                undoFromMesa(orderId);
+            } else if (mesaGestureType === 'change-payment' && deltaX < -120) {
+                const orderId = mesaActiveCard.dataset.id;
+                const metodo = mesaActiveCard.dataset.metodo;
+                cambiarMetodoPagoDesdeVistaMesa(orderId, metodo);
+            }
+        }
+        if (mesaActiveCard) {
+            // Aplicar transición suave al volver a la pos inicial
+            mesaActiveCard.classList.remove('gesture-active-jiggle', 'gesture-swipe-smooth');
+            mesaActiveCard.classList.add('gesture-return-smooth');
+            mesaActiveCard.style.transform = 'translateX(0) scale(1)';
+            
+            const undo = mesaActiveCard.querySelector('.mesa-undo-indicator');
+            if (undo) undo.style.opacity = '0';
+            const pay = mesaActiveCard.querySelector('.mesa-payment-indicator');
+            if (pay) pay.style.opacity = '0';
+
+            setTimeout(() => {
+                if (mesaActiveCard) mesaActiveCard.classList.remove('gesture-return-smooth');
+            }, 500);
+        }
+        mesaActiveCard = null;
+        mesaIsLongPressed = false;
+        mesaGestureType = null;
+    }
+
+    async function undoFromMesa(orderId) {
+        const order = allLoadedOrders.find(o => o._id === orderId);
+        if (!order) return;
+        const flow = ['pendiente', 'preparando', 'listo', 'entregado'];
+        const idx = flow.indexOf(order.estado);
+        if (idx <= 0) return;
+        const prev = flow[idx - 1];
+
+        const result = await Swal.fire({
+            title: '↩️ Deshacer estado?',
+            text: `De "${order.estado}" a "${prev}"`,
+            icon: 'warning', showCancelButton: true,
+            confirmButtonText: 'Sí', cancelButtonText: 'No',
+            confirmButtonColor: '#4299e1'
+        });
+
+        if (result.isConfirmed) {
+            await cambiarEstadoDesdeVistaMesa(orderId, prev);
+        }
+    }
+
+    async function cambiarMetodoPagoDesdeVistaMesa(orderId, metodoActual) {
+        const nuevo = metodoActual === 'efectivo' ? 'transferencia' : 'efectivo';
+        const result = await Swal.fire({
+            title: '💳 Cambiar método?',
+            text: `De ${metodoActual} a ${nuevo}`,
+            icon: 'question', showCancelButton: true,
+            confirmButtonText: 'Sí', cancelButtonText: 'No',
+            confirmButtonColor: '#ed8936'
+        });
+
+        if (result.isConfirmed) {
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch(`${API_URL}/orders/${orderId}/metodo-pago`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ metodoPago: nuevo })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    cerrarDetalleMesaHist();
+                    const notif = document.createElement('div');
+                    notif.textContent = `✅ Método cambiado a ${nuevo}`;
+                    notif.style.cssText = 'position:fixed;top:80px;right:20px;background:linear-gradient(135deg,#ed8936,#dd6b20);color:white;padding:1rem 1.5rem;border-radius:12px;font-weight:600;font-size:14px;box-shadow:0 4px 12px rgba(237,137,54,0.4);z-index:10000;';
+                    document.body.appendChild(notif);
+                    setTimeout(() => notif.remove(), 2500);
+                    await loadOrders(true);
+                    renderMesasHist(mesasDataHist);
+                }
+            } catch (e) { console.error(e); }
+        }
     }
 
     function cerrarDetalleMesaHist() {
