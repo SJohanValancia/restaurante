@@ -1742,7 +1742,7 @@
                     .map(p => {
                         if (!p) return null;
                         if (typeof p === 'string') return { _id: p };
-                        if (p._id) return p;
+                        if (p._id) return { _id: p._id };
                         if (p.id) return { _id: p.id };
                         return p;
                     })
@@ -1752,7 +1752,7 @@
                     .map(g => {
                         if (!g) return null;
                         if (typeof g === 'string') return { _id: g };
-                        if (g._id) return g;
+                        if (g._id) return { _id: g._id };
                         if (g.id) return { _id: g.id };
                         return g;
                     })
