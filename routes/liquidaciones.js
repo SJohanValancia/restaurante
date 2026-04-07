@@ -236,7 +236,15 @@ router.get('/stats/resumen', protect, async (req, res) => {
 
     const totalMovimientos = stats.totalAportes - stats.totalRetiros;
     const cajaTransferencias = stats.totalTransferenciasIngresos - stats.totalTransferenciasGastos;
-    const cajaFinalTotal = stats.totalIngresos - stats.totalEgresos + totalMovimientos;
+
+    // Obtener el cajaFinal de la última liquidación (la más reciente)
+    // Este valor ya incluye el arrastre de saldo (cajaInicial) correctamente
+    const ultimaLiquidacion = await Liquidacion.findOne(query)
+      .sort({ fecha: -1 })
+      .select('cajaFinal')
+      .lean();
+
+    const cajaFinalTotal = ultimaLiquidacion ? ultimaLiquidacion.cajaFinal : 0;
 
     res.json({
       success: true,
@@ -244,6 +252,7 @@ router.get('/stats/resumen', protect, async (req, res) => {
         ...stats,
         cajaTransferencias,
         cajaFinalTotal,
+        totalMovimientos,
         promedioIngresosPorDia: stats.totalLiquidaciones > 0
           ? stats.totalIngresos / stats.totalLiquidaciones
           : 0,
