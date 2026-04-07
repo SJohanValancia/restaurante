@@ -1102,9 +1102,9 @@
                     document.getElementById('cajaTransferencias').textContent =
                         `$${(stats.cajaTransferencias || 0).toLocaleString('es-CO')}`;
 
-                    // Calcular caja efectivo correctamente
-                    const ingresosEfectivo = (stats.totalIngresos || 0) - (stats.totalTransferenciasIngresos || 0);
-                    const cajaEfectivo = ingresosEfectivo - (stats.totalGastosEfectivo || 0);
+                    // Calcular caja efectivo: CajaFinalTotal - CajaTransferencias
+                    // Así siempre se cumple: CajaEfectivo + CajaTransferencias = CajaFinalTotal
+                    const cajaEfectivo = (stats.cajaFinalTotal || 0) - (stats.cajaTransferencias || 0);
 
                     document.getElementById('cajaEfectivo').textContent =
                         `$${cajaEfectivo.toLocaleString('es-CO')}`;
