@@ -1213,8 +1213,17 @@
 
             if (liquidacion.ingresos && liquidacion.ingresos.pedidos) {
                 liquidacion.ingresos.pedidos.forEach(pedido => {
-                    if (pedido && pedido.metodoPago === 'transferencia') {
-                        transferenciasPedidos += pedido.total;
+                    if (pedido) {
+                        // Si tiene pagos parciales, desglosar
+                        if (pedido.pagos && pedido.pagos.length > 0) {
+                            pedido.pagos.forEach(pago => {
+                                if (pago.metodo === 'transferencia') {
+                                    transferenciasPedidos += pago.monto;
+                                }
+                            });
+                        } else if (pedido.metodoPago === 'transferencia') {
+                            transferenciasPedidos += pedido.total;
+                        }
                     }
                 });
             }
@@ -1358,8 +1367,16 @@
 
             if (liquidacion.ingresos && liquidacion.ingresos.pedidos) {
                 liquidacion.ingresos.pedidos.forEach(pedido => {
-                    if (pedido && pedido.metodoPago === 'transferencia') {
-                        transferenciasPedidos += pedido.total;
+                    if (pedido) {
+                        if (pedido.pagos && pedido.pagos.length > 0) {
+                            pedido.pagos.forEach(pago => {
+                                if (pago.metodo === 'transferencia') {
+                                    transferenciasPedidos += pago.monto;
+                                }
+                            });
+                        } else if (pedido.metodoPago === 'transferencia') {
+                            transferenciasPedidos += pedido.total;
+                        }
                     }
                 });
             }
@@ -1457,19 +1474,41 @@
                                     <th>Mesa</th>
                                     <th>Fecha</th>
                                     <th>Estado</th>
+                                    <th>Método</th>
                                     <th>Total</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                ${liquidacion.ingresos.pedidos.map(pedido => `
+                                ${liquidacion.ingresos.pedidos.map(pedido => {
+                                    let metodoBadge = '';
+                                    if (pedido.pagos && pedido.pagos.length > 0) {
+                                        const pagosEf = pedido.pagos.filter(pg => pg.metodo === 'efectivo').reduce((s, pg) => s + pg.monto, 0);
+                                        const pagosTr = pedido.pagos.filter(pg => pg.metodo === 'transferencia').reduce((s, pg) => s + pg.monto, 0);
+                                        const partes = [];
+                                        if (pagosEf > 0) partes.push('EF: $' + pagosEf.toLocaleString('es-CO'));
+                                        if (pagosTr > 0) partes.push('TR: $' + pagosTr.toLocaleString('es-CO'));
+                                        metodoBadge = partes.join('<br>');
+                                    } else if (pedido.metodoPago === 'transferencia') {
+                                        metodoBadge = '<span style="color:#667eea;font-weight:600;">Transferencia</span>';
+                                    } else if (pedido.metodoPago === 'mixto') {
+                                        metodoBadge = '<span style="color:#805ad5;font-weight:600;">Mixto</span>';
+                                    } else if (pedido.metodoPago) {
+                                        metodoBadge = 'Efectivo';
+                                    } else {
+                                        metodoBadge = 'N/A';
+                                    }
+                                    
+                                    return `
                                     <tr>
                                         <td>#${pedido._id.slice(-6).toUpperCase()}</td>
                                         <td>Mesa ${pedido.mesa}</td>
                                         <td>${new Date(pedido.createdAt).toLocaleDateString('es-CO')}</td>
                                         <td>${pedido.estado || 'N/A'}</td>
+                                        <td style="font-size:11px;">${metodoBadge}</td>
                                         <td style="font-weight: 700;">$${pedido.total.toLocaleString('es-CO')}</td>
                                     </tr>
-                                `).join('')}
+                                    `;
+                                }).join('')}
                             </tbody>
                         </table>
                     </div>
@@ -1607,8 +1646,16 @@
 
                     if (liq.ingresos && liq.ingresos.pedidos) {
                         liq.ingresos.pedidos.forEach(pedido => {
-                            if (pedido && pedido.metodoPago === 'transferencia') {
-                                transferenciasPedidos += pedido.total;
+                            if (pedido) {
+                                if (pedido.pagos && pedido.pagos.length > 0) {
+                                    pedido.pagos.forEach(pago => {
+                                        if (pago.metodo === 'transferencia') {
+                                            transferenciasPedidos += pago.monto;
+                                        }
+                                    });
+                                } else if (pedido.metodoPago === 'transferencia') {
+                                    transferenciasPedidos += pedido.total;
+                                }
                             }
                         });
                     }

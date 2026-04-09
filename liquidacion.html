@@ -1413,11 +1413,22 @@
                 if (data.success) {
                     datosPendientes = data.data;
 
-                    // Calcular transferencias de PEDIDOS
-                    const pedidosTransferencia = datosPendientes.pedidos.filter(p =>
-                        p.estado !== 'cancelado' && p.metodoPago === 'transferencia'
-                    );
-                    const totalTransferencias = pedidosTransferencia.reduce((sum, p) => sum + p.total, 0);
+                    // Calcular transferencias de PEDIDOS (soporta pagos mixtos)
+                    let totalTransferencias = 0;
+                    let countConTransferencia = 0;
+                    datosPendientes.pedidos.forEach(p => {
+                        if (p.estado === 'cancelado') return;
+                        if (p.pagos && p.pagos.length > 0) {
+                            const transfMonto = p.pagos.filter(pg => pg.metodo === 'transferencia').reduce((s, pg) => s + pg.monto, 0);
+                            if (transfMonto > 0) {
+                                totalTransferencias += transfMonto;
+                                countConTransferencia++;
+                            }
+                        } else if (p.metodoPago === 'transferencia') {
+                            totalTransferencias += p.total;
+                            countConTransferencia++;
+                        }
+                    });
 
                     // Actualizar UI de transferencias de pedidos
                     const elemTransferencias = document.getElementById('totalTransferencias');
@@ -1427,7 +1438,7 @@
                         elemTransferencias.textContent = `$${totalTransferencias.toLocaleString('es-CO')}`;
                     }
                     if (elemCantTransferencias) {
-                        elemCantTransferencias.textContent = `${pedidosTransferencia.length} pedidos`;
+                        elemCantTransferencias.textContent = `${countConTransferencia} pedidos`;
                     }
 
                     // Calcular transferencias de GASTOS
@@ -1474,21 +1485,46 @@
                 return;
             }
 
-            lista.innerHTML = datosPendientes.pedidos.map(pedido => `
+            lista.innerHTML = datosPendientes.pedidos.map(pedido => {
+                let metodoBadge = '';
+                let metodoDetalle = '';
+                if (pedido.pagos && pedido.pagos.length > 0) {
+                    const pagosEf = pedido.pagos.filter(pg => pg.metodo === 'efectivo').reduce((s, pg) => s + pg.monto, 0);
+                    const pagosTr = pedido.pagos.filter(pg => pg.metodo === 'transferencia').reduce((s, pg) => s + pg.monto, 0);
+                    const partes = [];
+                    if (pagosEf > 0) partes.push('EFECTIVO: $' + pagosEf.toLocaleString('es-CO'));
+                    if (pagosTr > 0) partes.push('TRANSF: $' + pagosTr.toLocaleString('es-CO'));
+                    metodoDetalle = partes.join(' | ');
+
+                    if (pagosEf > 0 && pagosTr > 0) {
+                        metodoBadge = '<span style="display: inline-block; margin-left: 8px; padding: 4px 8px; background: linear-gradient(135deg, #805ad5 0%, #6b46c1 100%); color: white; border-radius: 6px; font-size: 11px; font-weight: 700;">MIXTO</span>';
+                    } else if (pagosTr > 0) {
+                        metodoBadge = '<span style="display: inline-block; margin-left: 8px; padding: 4px 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 6px; font-size: 11px; font-weight: 700;">TRANSFERENCIA</span>';
+                    }
+                } else if (pedido.metodoPago === 'transferencia') {
+                    metodoBadge = '<span style="display: inline-block; margin-left: 8px; padding: 4px 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 6px; font-size: 11px; font-weight: 700;">TRANSFERENCIA</span>';
+                    metodoDetalle = 'Transferencia';
+                } else if (pedido.metodoPago === 'mixto') {
+                    metodoBadge = '<span style="display: inline-block; margin-left: 8px; padding: 4px 8px; background: linear-gradient(135deg, #805ad5 0%, #6b46c1 100%); color: white; border-radius: 6px; font-size: 11px; font-weight: 700;">MIXTO</span>';
+                    metodoDetalle = 'Mixto';
+                } else if (pedido.metodoPago) {
+                    metodoDetalle = 'Efectivo';
+                }
+
+                return `
         <div class="item-row">
             <div class="item-info">
                 <h4>
                     Pedido #${pedido._id.slice(-6).toUpperCase()} - Mesa ${pedido.mesa}
-                    ${pedido.metodoPago === 'transferencia' ?
-                    '<span style="display: inline-block; margin-left: 8px; padding: 4px 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 6px; font-size: 11px; font-weight: 700;">📱 TRANSFERENCIA</span>'
-                    : ''}
+                    ${metodoBadge}
                 </h4>
                 <p>${new Date(pedido.createdAt).toLocaleString('es-CO')} | 
-                   ${pedido.items.length} producto(s)${pedido.metodoPago ? ` | ${pedido.metodoPago === 'transferencia' ? '📱 Transferencia' : '💵 Efectivo'}` : ''}</p>
+                   ${pedido.items.length} producto(s)${metodoDetalle ? ` | ${metodoDetalle}` : ''}</p>
             </div>
             <div class="item-value">$${pedido.total.toLocaleString('es-CO')}</div>
         </div>
-    `).join('');
+    `;
+            }).join('');
         }
         function mostrarGastos() {
             const lista = document.getElementById('listaGastos');
@@ -1549,11 +1585,16 @@
                 return mov.tipo === 'ingreso' ? sum + mov.monto : sum - mov.monto;
             }, 0);
 
-            // Calcular transferencias de PEDIDOS
-            const pedidosTransferencia = datosPendientes.pedidos.filter(p =>
-                p.estado !== 'cancelado' && p.metodoPago === 'transferencia'
-            );
-            const totalTransferencias = pedidosTransferencia.reduce((sum, p) => sum + p.total, 0);
+            // Calcular transferencias de PEDIDOS (soporta pagos mixtos)
+            let totalTransferencias = 0;
+            datosPendientes.pedidos.forEach(p => {
+                if (p.estado === 'cancelado') return;
+                if (p.pagos && p.pagos.length > 0) {
+                    totalTransferencias += p.pagos.filter(pg => pg.metodo === 'transferencia').reduce((s, pg) => s + pg.monto, 0);
+                } else if (p.metodoPago === 'transferencia') {
+                    totalTransferencias += p.total;
+                }
+            });
 
             // Calcular transferencias de GASTOS
             let totalGastosTransferencia = 0;

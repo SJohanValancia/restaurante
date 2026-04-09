@@ -4880,16 +4880,45 @@
 
                 ${pedido.notas ? `<div style="padding: 8px 10px; background: #fffbeb; border: 1px solid #fbbf24; border-radius: 8px; margin-bottom: 0.75rem; font-size: 13px; color: #92400e;">📝 ${pedido.notas}</div>` : ''}
 
-                ${pedido.metodoPago ? `<div style="text-align: center; margin-bottom: 0.75rem; font-size: 13px; color: #718096;">Método: <strong>${pedido.metodoPago === 'efectivo' ? '💵 Efectivo' : '📱 Transferencia'}</strong></div>` : ''}
+                ${(() => {
+                    // Pagos parciales display
+                    let pagosHTML = '';
+                    if (pedido.pagos && pedido.pagos.length > 0) {
+                        const totalPagado = pedido.totalPagado || 0;
+                        const porcentaje = Math.round((totalPagado / pedido.total) * 100);
+                        const pagosEfectivo = pedido.pagos.filter(p => p.metodo === 'efectivo').reduce((s, p) => s + p.monto, 0);
+                        const pagosTransf = pedido.pagos.filter(p => p.metodo === 'transferencia').reduce((s, p) => s + p.monto, 0);
+                        pagosHTML = `<div style="background: linear-gradient(135deg, #f0fff4, #ebf8ff); border: 1px solid #c6f6d5; border-radius: 8px; padding: 8px 10px; margin-bottom: 0.75rem;">
+                            <div style="font-size: 10px; font-weight: 700; color: #2d3748; margin-bottom: 4px; text-transform: uppercase;">Pagos</div>
+                            ${pagosEfectivo > 0 ? '<div style="display:flex;justify-content:space-between;font-size:12px;color:#38a169;"><span>Efectivo</span><span style="font-weight:700;">$' + pagosEfectivo.toLocaleString('es-CO') + '</span></div>' : ''}
+                            ${pagosTransf > 0 ? '<div style="display:flex;justify-content:space-between;font-size:12px;color:#667eea;"><span>Transferencia</span><span style="font-weight:700;">$' + pagosTransf.toLocaleString('es-CO') + '</span></div>' : ''}
+                            <div style="background:#e2e8f0;border-radius:6px;height:6px;margin:4px 0;overflow:hidden;"><div style="background:linear-gradient(90deg,#48bb78,#38a169);height:100%;width:${porcentaje}%;border-radius:6px;"></div></div>
+                            <div style="font-size:10px;color:#718096;text-align:center;">${porcentaje}% pagado</div>
+                        </div>`;
+                    }
+                    // Metodo display
+                    let metodoHTML = '';
+                    if (pedido.metodoPago) {
+                        const mc = pedido.metodoPago === 'transferencia' ? '#667eea' : pedido.metodoPago === 'mixto' ? '#805ad5' : '#48bb78';
+                        const ml = pedido.metodoPago === 'transferencia' ? 'Transferencia' : pedido.metodoPago === 'mixto' ? 'Mixto' : 'Efectivo';
+                        metodoHTML = '<div style="text-align:center;margin-bottom:0.75rem;font-size:13px;color:#718096;">Pago: <strong style="color:' + mc + ';">' + ml + '</strong></div>';
+                    }
+                    return pagosHTML + metodoHTML;
+                })()}
 
-                ${isActive ? `
+                ${isActive ? (() => {
+                    const tienePP = pedido.pagos && pedido.pagos.length > 0 && (pedido.totalPagado || 0) < pedido.total;
+                    const sr = tienePP ? pedido.total - (pedido.totalPagado || 0) : pedido.total;
+                    const ptxt = tienePP ? 'Pagar Restante: $' + sr.toLocaleString('es-CO') : 'Pagar';
+                    const bgPagar = tienePP ? '#ed8936, #dd6b20' : '#48bb78, #38a169';
+                    return `
                     <div style="display: grid; gap: 6px; position: relative; z-index: 10;">
-                        ${pedido.estado === 'pendiente' ? `<button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'preparando')" style="padding: 10px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px; width: 100%;">👨‍🍳 Preparando</button>` : ''}
-                        ${pedido.estado === 'preparando' ? `<button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'listo')" style="padding: 10px; background: linear-gradient(135deg, #48bb78, #38a169); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px; width: 100%;">✅ Listo</button>` : ''}
-                        ${pedido.estado === 'listo' ? `<button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'entregado')" style="padding: 10px; background: linear-gradient(135deg, #48bb78, #38a169); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px; width: 100%;">🎉 Pagado</button>` : ''}
-                        <button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'cancelado')" style="padding: 8px; background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 12px; width: 100%;">❌ Cancelar</button>
-                    </div>
-                ` : ''}
+                        ${pedido.estado === 'pendiente' ? '<button onclick="cambiarEstadoDesdeVistaMesa(\'' + pedido._id + '\', \'preparando\')" style="padding: 10px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px; width: 100%;">Preparando</button>' : ''}
+                        ${pedido.estado === 'preparando' ? '<button onclick="cambiarEstadoDesdeVistaMesa(\'' + pedido._id + '\', \'listo\')" style="padding: 10px; background: linear-gradient(135deg, #48bb78, #38a169); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px; width: 100%;">Listo</button>' : ''}
+                        <button onclick="pagarDesdeVistaMesa('${pedido._id}')" style="padding: 10px; background: linear-gradient(135deg, ${bgPagar}); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px; width: 100%;">${ptxt}</button>
+                        <button onclick="cambiarEstadoDesdeVistaMesa('${pedido._id}', 'cancelado')" style="padding: 8px; background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 12px; width: 100%;">Cancelar</button>
+                    </div>`;
+                })() : ''}
             </div>
         `;
     }
@@ -5029,6 +5058,11 @@
     }
 
     async function cambiarMetodoPagoDesdeVistaMesa(orderId, metodoActual) {
+        const order = allLoadedOrders.find(o => o._id === orderId);
+        if (metodoActual === 'mixto' || (order && order.pagos && order.pagos.length > 1)) {
+            Swal.fire({ icon: 'info', title: 'Pago Mixto', text: 'No se puede cambiar el método en pedidos con pagos mixtos', timer: 3000, showConfirmButton: false });
+            return;
+        }
         const nuevo = metodoActual === 'efectivo' ? 'transferencia' : 'efectivo';
         const result = await Swal.fire({
             title: '💳 Cambiar método?',
@@ -5063,6 +5097,22 @@
 
     function cerrarDetalleMesaHist() {
         document.getElementById('modalDetalleMesaHist').classList.remove('active');
+    }
+
+    async function pagarDesdeVistaMesa(orderId) {
+        console.log('💰 Pagar desde vista mesa:', orderId);
+        // Cerrar el modal de mesa
+        cerrarDetalleMesaHist();
+
+        // Si no está en 'listo', cambiar a listo primero
+        const order = allLoadedOrders.find(o => o._id === orderId);
+        if (order && order.estado !== 'listo') {
+            await actualizarEstadoPedido(orderId, 'listo', null);
+        }
+
+        // Abrir flujo de pago
+        currentOrderIdForPayment = orderId;
+        mostrarModalMetodoPago();
     }
 
     async function cambiarEstadoDesdeVistaMesa(orderId, nuevoEstado) {
