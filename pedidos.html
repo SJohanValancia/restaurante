@@ -2358,71 +2358,97 @@
         }
 
         async function cambiarMetodoPago(orderId, metodoActual) {
-            const order = allLoadedOrders.find(o => o._id === orderId);
+            const orderList = typeof allLoadedOrders !== 'undefined' ? allLoadedOrders : [];
+            const order = orderList.find(o => o._id === orderId);
             if (!order) return;
 
-            const nuevoMetodo = metodoActual === 'efectivo' ? 'transferencia' : 'efectivo';
-            const metodoActualTexto = metodoActual === 'efectivo' ? 'Efectivo' : 'Transferencia';
+            const pagos = (order.pagos && order.pagos.length > 0) ? order.pagos : [{metodo: order.metodoPago || 'efectivo', monto: order.total}];
+            let pagoIndex = 0;
+
+            if (pagos.length > 1) {
+                const pagosOptions = pagos.reduce((acc, p, idx) => {
+                    acc[idx] = `${p.metodo === 'efectivo' ? '💵 Efectivo' : '📱 Transferencia'} - $${p.monto.toLocaleString('es-CO')}`;
+                    return acc;
+                }, {});
+                
+                const { value: indexSeleccionado } = await Swal.fire({
+                    title: 'Seleccionar pago',
+                    text: 'Este es un pago mixto. ¿Cuál de los pagos deseas modificar?',
+                    input: 'select',
+                    inputOptions: pagosOptions,
+                    inputPlaceholder: 'Selecciona un pago',
+                    showCancelButton: true,
+                    confirmButtonText: 'Siguiente'
+                });
+                
+                if (!indexSeleccionado) return;
+                pagoIndex = parseInt(indexSeleccionado);
+            }
+            
+            const pagoTarget = pagos[pagoIndex];
+            const nuevoMetodo = pagoTarget.metodo === 'efectivo' ? 'transferencia' : 'efectivo';
+            const metodoTargetTexto = pagoTarget.metodo === 'efectivo' ? 'Efectivo' : 'Transferencia';
             const nuevoMetodoTexto = nuevoMetodo === 'efectivo' ? 'Efectivo' : 'Transferencia';
 
+            const rawHtml = `
+                <div style="margin-bottom: 1rem;">
+                    Pago actual: <strong>$${pagoTarget.monto.toLocaleString('es-CO')} (${metodoTargetTexto})</strong>
+                </div>
+                <div style="display:flex; flex-direction:column; gap: 10px; margin-top:20px;">
+                    <label style="font-size:14px; font-weight:600; text-align:left;">Cambiar monto parcial:</label>
+                    <input type="number" id="swal-input-monto" class="swal2-input" placeholder="Vacío = mover el total de este pago" style="margin-top:0;">
+                </div>
+            `;
+
             Swal.fire({
-                title: '¿Cambiar método de pago?',
-                text: `Cambiar de "${metodoActualTexto}" a "${nuevoMetodoTexto}"`,
+                title: `¿Pasar a ${nuevoMetodoTexto}?`,
+                html: rawHtml,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#48bb78',
                 cancelButtonColor: '#718096',
                 confirmButtonText: 'Sí, cambiar',
-                cancelButtonText: 'Cancelar'
+                cancelButtonText: 'Cancelar',
+                preConfirm: () => {
+                    const montoInput = document.getElementById('swal-input-monto').value;
+                    let monto = parseInt(montoInput);
+                    if (montoInput && (isNaN(monto) || monto <= 0 || monto > pagoTarget.monto)) {
+                        Swal.showValidationMessage('El monto parcial debe ser válido (no mayor al pago original)');
+                        return false;
+                    }
+                    return { montoParcial: isNaN(monto) ? null : monto };
+                }
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     try {
                         const token = localStorage.getItem('token');
+                        const bodyData = { 
+                            metodoPago: nuevoMetodo,
+                            pagoIndex: pagoIndex
+                        };
+                        if (result.value.montoParcial) {
+                            bodyData.montoParcial = result.value.montoParcial;
+                        }
+
                         const response = await fetch(`${API_URL}/orders/${orderId}/metodo-pago`, {
                             method: 'PATCH',
                             headers: {
                                 'Content-Type': 'application/json',
                                 'Authorization': `Bearer ${token}`
                             },
-                            body: JSON.stringify({ metodoPago: nuevoMetodo })
+                            body: JSON.stringify(bodyData)
                         });
 
                         const data = await response.json();
 
                         if (data.success) {
-                            // Actualizar la UI con borde verde
-                            const card = document.getElementById(`order-card-${orderId}`);
-                            if (card) {
-                                card.classList.add('payment-method-selected');
-                                card.dataset.metodo = nuevoMetodo;
-                                
-                                // Actualizar el texto del método en la tarjeta
-                                const metaElement = card.querySelector('.order-meta');
-                                if (metaElement) {
-                                    metaElement.innerHTML = metaElement.innerHTML.replace(
-                                        /💳 (Efectivo|Transferencia)/g,
-                                        `💳 ${nuevoMetodoTexto}`
-                                    );
-                                }
-
-                                // Quitar el borde verde después de 3 segundos
-                                setTimeout(() => {
-                                    card.classList.remove('payment-method-selected');
-                                }, 3000);
-                            }
-
-                            // Actualizar en allLoadedOrders
-                            const orderIndex = allLoadedOrders.findIndex(o => o._id === orderId);
-                            if (orderIndex !== -1) {
-                                allLoadedOrders[orderIndex].metodoPago = nuevoMetodo;
-                            }
-
                             Swal.fire({ 
                                 icon: 'success', 
-                                text: `Método cambiado a ${nuevoMetodoTexto}`, 
+                                text: `Método actualizado exitosamente`, 
                                 timer: 1500, 
                                 showConfirmButton: false 
                             });
+                            if (typeof loadRecents === 'function') loadRecents();
                         } else {
                             throw new Error(data.message || 'Error al cambiar método');
                         }

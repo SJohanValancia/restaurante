@@ -1321,7 +1321,7 @@ router.patch('/:id/item/:itemIndex/estado', protect, checkPermission('editarPedi
 // NUEVA RUTA: Cambiar método de pago
 router.patch('/:id/metodo-pago', protect, checkPermission('editarPedidos'), async (req, res) => {
   try {
-    const { metodoPago } = req.body;
+    const { metodoPago, montoParcial, pagoIndex } = req.body;
     const validMethods = ['efectivo', 'transferencia'];
     
     if (!metodoPago || !validMethods.includes(metodoPago)) {
@@ -1356,28 +1356,61 @@ router.patch('/:id/metodo-pago', protect, checkPermission('editarPedidos'), asyn
       });
     }
 
-    // No permitir cambio en pedidos con pagos mixtos
-    if (order.metodoPago === 'mixto' || (order.pagos && order.pagos.length > 1)) {
-      return res.status(400).json({
-        success: false,
-        message: 'No se puede cambiar el método de pago de un pedido con pagos mixtos'
-      });
+    // Asegurar que el array pagos exista (retrocompatibilidad)
+    if (!order.pagos || order.pagos.length === 0) {
+      order.pagos = [{ metodo: order.metodoPago || 'efectivo', monto: order.total }];
     }
 
-    const metodoAnterior = order.metodoPago;
-    order.metodoPago = metodoPago;
+    const isParcial = montoParcial !== undefined && montoParcial !== null && montoParcial > 0;
+    const targetIndex = pagoIndex !== undefined ? parseInt(pagoIndex) : 0;
 
-    // También actualizar el array de pagos si existe
-    if (order.pagos && order.pagos.length > 0) {
-      order.pagos.forEach(p => { p.metodo = metodoPago; });
+    if (targetIndex < 0 || targetIndex >= order.pagos.length) {
+      return res.status(400).json({ success: false, message: 'Índice de pago inválido' });
     }
+
+    const targetPago = order.pagos[targetIndex];
+
+    if (isParcial) {
+        if (montoParcial > targetPago.monto) {
+            return res.status(400).json({ success: false, message: 'El monto a cambiar excede el pago actual' });
+        }
+        if (montoParcial === targetPago.monto) {
+            targetPago.metodo = metodoPago;
+        } else {
+            targetPago.monto -= montoParcial;
+            order.pagos.push({ metodo: metodoPago, monto: montoParcial });
+        }
+    } else {
+        targetPago.metodo = metodoPago;
+    }
+
+    // Consolidar pagos del mismo método
+    const mergedPagos = [];
+    order.pagos.forEach(p => {
+        const existing = mergedPagos.find(mp => mp.metodo === p.metodo);
+        if (existing) {
+            existing.monto += p.monto;
+        } else {
+            mergedPagos.push({ metodo: p.metodo, monto: p.monto });
+        }
+    });
+
+    order.pagos = mergedPagos.filter(p => p.monto > 0);
+
+    // Actualizar el campo legacy 'metodoPago'
+    if (order.pagos.length > 1) {
+        order.metodoPago = 'mixto';
+    } else if (order.pagos.length === 1) {
+        order.metodoPago = order.pagos[0].metodo;
+    }
+
     await order.save();
-
-    console.log('✅ Método de pago actualizado:', order._id, 'de', metodoAnterior, '→', metodoPago);
+    
+    console.log('✅ Método de pago actualizado:', order._id, '→', order.metodoPago);
 
     res.json({
       success: true,
-      message: `Método de pago cambiado de ${metodoAnterior} a ${metodoPago}`,
+      message: `Método de pago actualizado a ${order.metodoPago}`,
       data: order
     });
   } catch (error) {
