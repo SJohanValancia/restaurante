@@ -2884,7 +2884,7 @@
                         </div>
                         <div class="order-meta">
                             ${new Date(order.createdAt).toLocaleString('es-CO')}
-                            ${order.metodoPago ? `<br><strong style="color: ${order.metodoPago === 'transferencia' ? '#667eea' : '#48bb78'};">💳 ${order.metodoPago === 'transferencia' ? 'Transferencia' : 'Efectivo'}</strong>` : ''}
+                            ${order.metodoPago ? `<br><strong style="color: ${order.metodoPago === 'transferencia' ? '#667eea' : order.metodoPago === 'mixto' ? '#805ad5' : '#48bb78'};">💳 ${order.metodoPago === 'transferencia' ? 'Transferencia' : order.metodoPago === 'mixto' ? 'Mixto' : 'Efectivo'}</strong>` : ''}
                         </div>
                     </div>
                     <div style="display: flex; gap: 8px; align-items: center;">
@@ -2905,16 +2905,45 @@
                     <span>Total:</span>
                     <span>$${order.total.toLocaleString('es-CO')}</span>
                 </div>
+                ${renderPagosInfo(order)}
                 ${getOrderActions(order)}
             </div>
         `;
             }).join('');
         }
 
+        // ✅ RENDERIZAR INFO DE PAGOS PARCIALES
+        function renderPagosInfo(order) {
+            if (!order.pagos || order.pagos.length === 0) return '';
+            const totalPagado = order.totalPagado || 0;
+            const saldoRestante = order.total - totalPagado;
+            const porcentaje = Math.round((totalPagado / order.total) * 100);
+
+            const pagosEfectivo = order.pagos.filter(p => p.metodo === 'efectivo').reduce((s, p) => s + p.monto, 0);
+            const pagosTransferencia = order.pagos.filter(p => p.metodo === 'transferencia').reduce((s, p) => s + p.monto, 0);
+
+            return `
+                <div style="background: linear-gradient(135deg, #f0fff4, #ebf8ff); border: 1px solid #c6f6d5; border-radius: 10px; padding: 10px 12px; margin: 8px 0;">
+                    <div style="font-size: 11px; font-weight: 700; color: #2d3748; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">💰 Pagos Realizados</div>
+                    ${pagosEfectivo > 0 ? `<div style="display: flex; justify-content: space-between; font-size: 12px; color: #38a169; margin-bottom: 3px;"><span>💵 Efectivo</span><span style="font-weight: 700;">$${pagosEfectivo.toLocaleString('es-CO')}</span></div>` : ''}
+                    ${pagosTransferencia > 0 ? `<div style="display: flex; justify-content: space-between; font-size: 12px; color: #667eea; margin-bottom: 3px;"><span>📱 Transferencia</span><span style="font-weight: 700;">$${pagosTransferencia.toLocaleString('es-CO')}</span></div>` : ''}
+                    <div style="background: #e2e8f0; border-radius: 6px; height: 8px; margin: 6px 0 4px; overflow: hidden;">
+                        <div style="background: linear-gradient(90deg, #48bb78, #38a169); height: 100%; width: ${porcentaje}%; border-radius: 6px; transition: width 0.5s ease;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; color: #718096;">
+                        <span>Pagado: $${totalPagado.toLocaleString('es-CO')} (${porcentaje}%)</span>
+                        ${saldoRestante > 0 ? `<span style="color: #e53e3e; font-weight: 700;">Falta: $${saldoRestante.toLocaleString('es-CO')}</span>` : '<span style="color: #38a169; font-weight: 700;">✅ Completo</span>'}
+                    </div>
+                </div>
+            `;
+        }
+
         function getOrderActions(order) {
             if (order.estado === 'entregado' || order.estado === 'cancelado') return '';
 
             const isMandao = order.source === 'mandao';
+            const tienePagosParciales = order.pagos && order.pagos.length > 0 && (order.totalPagado || 0) < order.total;
+            const saldoRestante = tienePagosParciales ? order.total - (order.totalPagado || 0) : order.total;
             let actions = '<div class="order-actions">';
 
             if (order.estado === 'pendiente') {
@@ -2933,12 +2962,15 @@
                 }
             }
 
-            // Botón de Pagar siempre visible para pedidos activos
+            // Botón de Pagar - muestra saldo restante si hay pagos parciales
+            const pagarTexto = tienePagosParciales 
+                ? `💳 Pagar Restante: $${saldoRestante.toLocaleString('es-CO')}` 
+                : '💳 Pagar';
+
             if (order.estado === 'listo') {
-                actions += `<button class="btn-action btn-entregar" onclick="updateOrderStatus('${order._id}', 'entregado')">💳 Pagar</button>`;
+                actions += `<button class="btn-action btn-entregar" onclick="updateOrderStatus('${order._id}', 'entregado')">${pagarTexto}</button>`;
             } else {
-                // Si no está listo, el botón de pagar ejecutará el cambio a listo primero
-                actions += `<button class="btn-action btn-entregar" onclick="pagarDirecto('${order._id}')">💳 Pagar</button>`;
+                actions += `<button class="btn-action btn-entregar" onclick="pagarDirecto('${order._id}')">${pagarTexto}</button>`;
             }
 
             if (order.estado !== 'entregado' && order.estado !== 'cancelado') {
@@ -3007,7 +3039,7 @@
 
             if (!currentOrderIdForPayment) {
                 console.error('❌ No hay orderId guardado');
-                Swal.fire({ icon: (('Error: No se encontró el ID del pedido').toLowerCase().includes("error") || ('Error: No se encontró el ID del pedido').toLowerCase().includes("falla") || ('Error: No se encontró el ID del pedido').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error: No se encontró el ID del pedido', timer: 3000, showConfirmButton: false });
+                Swal.fire({ icon: 'error', text: 'Error: No se encontró el ID del pedido', timer: 3000, showConfirmButton: false });
                 return;
             }
 
@@ -3017,15 +3049,175 @@
             // Cerrar modal de método de pago
             document.getElementById('modalMetodoPago').style.display = 'none';
 
-            // Limpiar inputs de datos de cliente
-            document.getElementById('clienteNombre').value = '';
-            document.getElementById('clienteCcNit').value = '';
+            // Obtener datos del pedido para mostrar el monto
+            const order = allLoadedOrders.find(o => o._id === currentOrderIdForPayment);
+            const totalPedido = order ? order.total : 0;
+            const totalPagado = order ? (order.totalPagado || 0) : 0;
+            const saldoRestante = totalPedido - totalPagado;
 
-            // Mostrar modal de datos del cliente
-            document.getElementById('modalDatosCliente').style.display = 'flex';
+            // Configurar modal de monto
+            document.getElementById('montoTotalPedido').textContent = `$${totalPedido.toLocaleString('es-CO')}`;
+            document.getElementById('montoSaldoRestante').textContent = `$${saldoRestante.toLocaleString('es-CO')}`;
+            document.getElementById('pagoMetodoSeleccionado').textContent = metodoPago === 'efectivo' ? '💵 Efectivo' : '📱 Transferencia';
+            document.getElementById('inputMontoPago').value = '';
+            document.getElementById('inputMontoPago').max = saldoRestante;
+            document.getElementById('inputMontoPago').placeholder = `Máximo: $${saldoRestante.toLocaleString('es-CO')}`;
+            document.getElementById('porcentajePago').textContent = '';
+            document.getElementById('btnPagoCompleto').textContent = `Pago Completo ($${saldoRestante.toLocaleString('es-CO')})`;
 
-            // Cargar sugerencias de clientes previos
-            await cargarSugerenciasClientes();
+            // Si hay pagos previos, mostrar resumen
+            const resumenPagos = document.getElementById('resumenPagosPrevios');
+            if (totalPagado > 0 && order.pagos && order.pagos.length > 0) {
+                const pagosHTML = order.pagos.map(p => 
+                    `<div style="display: flex; justify-content: space-between; font-size: 12px; padding: 2px 0;">
+                        <span>${p.metodo === 'efectivo' ? '💵' : '📱'} ${p.metodo === 'efectivo' ? 'Efectivo' : 'Transferencia'}</span>
+                        <span style="font-weight: 600;">$${p.monto.toLocaleString('es-CO')}</span>
+                    </div>`
+                ).join('');
+                resumenPagos.innerHTML = `
+                    <div style="background: #f0fff4; border: 1px solid #c6f6d5; border-radius: 8px; padding: 8px 10px; margin-bottom: 12px;">
+                        <div style="font-size: 11px; font-weight: 700; color: #38a169; margin-bottom: 4px;">💰 Pagos anteriores</div>
+                        ${pagosHTML}
+                        <div style="border-top: 1px solid #c6f6d5; margin-top: 4px; padding-top: 4px; display: flex; justify-content: space-between; font-size: 12px;">
+                            <span style="font-weight: 700;">Pagado</span>
+                            <span style="font-weight: 700; color: #38a169;">$${totalPagado.toLocaleString('es-CO')}</span>
+                        </div>
+                    </div>
+                `;
+                resumenPagos.style.display = 'block';
+            } else {
+                resumenPagos.style.display = 'none';
+            }
+
+            // Mostrar modal de monto
+            document.getElementById('modalMontoPago').style.display = 'flex';
+        }
+
+        function actualizarPorcentajePago() {
+            const input = document.getElementById('inputMontoPago');
+            const monto = parseFloat(input.value) || 0;
+            const order = allLoadedOrders.find(o => o._id === currentOrderIdForPayment);
+            const totalPedido = order ? order.total : 0;
+            const saldoRestante = totalPedido - (order ? (order.totalPagado || 0) : 0);
+            
+            const porcentajeLabel = document.getElementById('porcentajePago');
+            
+            if (monto <= 0) {
+                porcentajeLabel.textContent = '';
+                return;
+            }
+
+            if (monto > saldoRestante) {
+                porcentajeLabel.textContent = `⚠️ Excede el saldo restante`;
+                porcentajeLabel.style.color = '#e53e3e';
+                return;
+            }
+
+            const porcentajeDelTotal = Math.round((monto / totalPedido) * 100);
+            const porcentajeDelRestante = Math.round((monto / saldoRestante) * 100);
+            
+            if (porcentajeDelRestante >= 100) {
+                porcentajeLabel.textContent = `✅ Paga el 100% del saldo restante`;
+                porcentajeLabel.style.color = '#38a169';
+            } else {
+                porcentajeLabel.textContent = `Paga ${porcentajeDelTotal}% del total (${porcentajeDelRestante}% del restante)`;
+                porcentajeLabel.style.color = '#667eea';
+            }
+        }
+
+        async function pagarMontoCompleto() {
+            const order = allLoadedOrders.find(o => o._id === currentOrderIdForPayment);
+            const saldoRestante = order ? order.total - (order.totalPagado || 0) : 0;
+            await registrarPagoParcial(saldoRestante);
+        }
+
+        async function pagarMontoParcial() {
+            const input = document.getElementById('inputMontoPago');
+            const monto = parseFloat(input.value);
+
+            if (!monto || monto <= 0) {
+                Swal.fire({ icon: 'error', text: 'Ingrese un monto válido', timer: 2000, showConfirmButton: false });
+                return;
+            }
+
+            const order = allLoadedOrders.find(o => o._id === currentOrderIdForPayment);
+            const saldoRestante = order ? order.total - (order.totalPagado || 0) : 0;
+
+            if (monto > saldoRestante) {
+                Swal.fire({ icon: 'error', text: `El monto excede el saldo restante ($${saldoRestante.toLocaleString('es-CO')})`, timer: 2000, showConfirmButton: false });
+                return;
+            }
+
+            await registrarPagoParcial(monto);
+        }
+
+        async function registrarPagoParcial(monto) {
+            const token = localStorage.getItem('token');
+            const orderId = currentOrderIdForPayment;
+            const order = allLoadedOrders.find(o => o._id === orderId);
+            const saldoRestante = order ? order.total - (order.totalPagado || 0) : 0;
+            const esPagoCompleto = monto >= saldoRestante;
+
+            // Cerrar modal de monto
+            document.getElementById('modalMontoPago').style.display = 'none';
+
+            if (esPagoCompleto) {
+                // Si es pago completo, seguir el flujo normal (datos cliente → imprimir)
+                // Pero primero guardar el monto para usarlo después
+                window._montoParaPago = monto;
+
+                // Limpiar inputs de datos de cliente
+                document.getElementById('clienteNombre').value = '';
+                document.getElementById('clienteCcNit').value = '';
+
+                // Mostrar modal de datos del cliente
+                document.getElementById('modalDatosCliente').style.display = 'flex';
+
+                // Cargar sugerencias de clientes previos
+                await cargarSugerenciasClientes();
+            } else {
+                // Pago parcial - registrar directamente sin datos de cliente
+                try {
+                    const response = await fetch(`${API_URL}/orders/${orderId}/pago-parcial`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            metodo: metodoPagoSeleccionado,
+                            monto: monto
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        const nuevoSaldo = data.saldoRestante;
+                        Swal.fire({
+                            icon: 'success',
+                            title: '💰 Pago registrado',
+                            html: `<div style="text-align: center;">
+                                <div style="font-size: 28px; font-weight: 800; color: #38a169; margin: 10px 0;">$${monto.toLocaleString('es-CO')}</div>
+                                <div style="font-size: 14px; color: #718096;">${metodoPagoSeleccionado === 'efectivo' ? '💵 Efectivo' : '📱 Transferencia'}</div>
+                                <div style="margin-top: 12px; padding: 8px; background: #fff5f5; border-radius: 8px; color: #e53e3e; font-weight: 600;">
+                                    Saldo restante: $${nuevoSaldo.toLocaleString('es-CO')}
+                                </div>
+                            </div>`,
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+
+                        currentOrderIdForPayment = null;
+                        await loadOrders(true);
+                    } else {
+                        Swal.fire({ icon: 'error', text: data.message, timer: 3000, showConfirmButton: false });
+                    }
+                } catch (error) {
+                    console.error('Error al registrar pago parcial:', error);
+                    Swal.fire({ icon: 'error', text: 'Error al registrar el pago', timer: 3000, showConfirmButton: false });
+                }
+            }
         }
 
         async function cargarSugerenciasClientes() {
@@ -3114,17 +3306,48 @@
                 }
             }
 
-            // Actualizar el pedido con el método de pago y datos de cliente
+            // Registrar el pago final usando pago-parcial API
             const orderIdTemp = currentOrderIdForPayment;
             const clienteNombreTemp = clienteNombreSeleccionado;
             const clienteCcNitTemp = clienteCcNitSeleccionado;
+            const montoFinal = window._montoParaPago || (pedidoParaImprimir ? pedidoParaImprimir.total : 0);
 
             currentOrderIdForPayment = null;
             pedidoParaImprimir = null;
             clienteNombreSeleccionado = '';
             clienteCcNitSeleccionado = '';
+            window._montoParaPago = null;
 
-            await actualizarEstadoPedido(orderIdTemp, 'entregado', metodoPagoSeleccionado, clienteNombreTemp, clienteCcNitTemp);
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_URL}/orders/${orderIdTemp}/pago-parcial`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        metodo: metodoPagoSeleccionado,
+                        monto: montoFinal,
+                        clienteNombre: clienteNombreTemp,
+                        clienteCcNit: clienteCcNitTemp
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    console.log('✅ Pago final registrado');
+                    await loadOrders(true);
+                } else {
+                    console.error('❌ Error registrando pago final:', data.message);
+                    Swal.fire({ icon: 'error', text: data.message, timer: 3000, showConfirmButton: false });
+                }
+            } catch (error) {
+                console.error('Error al registrar pago final:', error);
+                // Fallback al método antiguo
+                await actualizarEstadoPedido(orderIdTemp, 'entregado', metodoPagoSeleccionado, clienteNombreTemp, clienteCcNitTemp);
+            }
         }
 
 
@@ -4444,6 +4667,65 @@
             <button onclick="cerrarModalMetodoPago()"
                 style="width: 100%; padding: 0.75rem; background: #e2e8f0; color: #2d3748; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">
                 Cancelar
+            </button>
+        </div>
+    </div>
+
+    <!-- ✅ NUEVO Modal para seleccionar monto de pago -->
+    <div id="modalMontoPago"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center;">
+        <div
+            style="background: white; border-radius: 16px; padding: 2rem; max-width: 420px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <h3 style="font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 0.5rem; text-align: center;">💰
+                Monto a Pagar</h3>
+            
+            <div style="text-align: center; margin-bottom: 1rem;">
+                <span id="pagoMetodoSeleccionado" style="display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; background: #f0fff4; color: #38a169; border: 1px solid #c6f6d5;"></span>
+            </div>
+
+            <div id="resumenPagosPrevios" style="display: none;"></div>
+
+            <div style="display: flex; justify-content: space-between; padding: 8px 12px; background: #f7fafc; border-radius: 8px; margin-bottom: 1rem;">
+                <div>
+                    <div style="font-size: 11px; color: #718096; font-weight: 600;">Total del pedido</div>
+                    <div id="montoTotalPedido" style="font-size: 18px; font-weight: 800; color: #2d3748;"></div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 11px; color: #e53e3e; font-weight: 600;">Saldo restante</div>
+                    <div id="montoSaldoRestante" style="font-size: 18px; font-weight: 800; color: #e53e3e;"></div>
+                </div>
+            </div>
+
+            <button id="btnPagoCompleto" onclick="pagarMontoCompleto()"
+                style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; margin-bottom: 1rem; box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);">
+                Pago Completo
+            </button>
+
+            <div style="position: relative; text-align: center; margin-bottom: 1rem;">
+                <div style="border-top: 1px solid #e2e8f0; position: absolute; top: 50%; left: 0; right: 0;"></div>
+                <span style="background: white; padding: 0 12px; position: relative; font-size: 12px; color: #a0aec0; font-weight: 600;">O PAGAR UN MONTO PARCIAL</span>
+            </div>
+
+            <div style="margin-bottom: 0.5rem;">
+                <div style="position: relative;">
+                    <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; font-weight: 700; color: #2d3748;">$</span>
+                    <input type="number" id="inputMontoPago" 
+                        oninput="actualizarPorcentajePago()"
+                        style="width: 100%; padding: 14px 14px 14px 30px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 18px; font-weight: 700; transition: all 0.2s; box-sizing: border-box;"
+                        placeholder="0"
+                        min="1">
+                </div>
+                <div id="porcentajePago" style="font-size: 13px; font-weight: 600; margin-top: 6px; min-height: 20px; text-align: center;"></div>
+            </div>
+
+            <button onclick="pagarMontoParcial()"
+                style="width: 100%; padding: 0.85rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-bottom: 0.75rem;">
+                Confirmar Pago Parcial
+            </button>
+
+            <button onclick="document.getElementById('modalMontoPago').style.display = 'none'; document.getElementById('modalMetodoPago').style.display = 'flex';"
+                style="width: 100%; padding: 0.65rem; background: #f7fafc; color: #718096; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                ← Cambiar Método de Pago
             </button>
         </div>
     </div>

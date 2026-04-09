@@ -73,8 +73,30 @@ const orderSchema = new mongoose.Schema({
   },
   metodoPago: {
     type: String,
-    enum: ['efectivo', 'transferencia'],
+    enum: ['efectivo', 'transferencia', 'mixto'],
     default: null
+  },
+  // ✅ PAGOS PARCIALES/MIXTOS
+  pagos: [{
+    metodo: {
+      type: String,
+      enum: ['efectivo', 'transferencia'],
+      required: true
+    },
+    monto: {
+      type: Number,
+      required: true,
+      min: [0, 'El monto no puede ser negativo']
+    },
+    fecha: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+  totalPagado: {
+    type: Number,
+    default: 0,
+    min: 0
   },
   reciboDia: {
     type: Boolean,

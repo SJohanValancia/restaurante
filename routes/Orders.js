@@ -425,6 +425,8 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
       notas: 1,
       source: 1,
       metodoPago: 1,
+      pagos: 1,
+      totalPagado: 1,
       mandaoOrderId: 1,
       clienteNombre: 1,
       clienteCcNit: 1,
@@ -1081,6 +1083,139 @@ router.patch('/:id/estado', protect, checkPermission('editarPedidos'), async (re
   }
 });
 
+// ✅ NUEVA RUTA: Registrar pago parcial/completo
+router.post('/:id/pago-parcial', protect, checkPermission('editarPedidos'), async (req, res) => {
+  try {
+    const { metodo, monto, clienteNombre, clienteCcNit } = req.body;
+    const validMethods = ['efectivo', 'transferencia'];
+
+    if (!metodo || !validMethods.includes(metodo)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Método de pago inválido. Debe ser "efectivo" o "transferencia"'
+      });
+    }
+
+    if (!monto || monto <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'El monto debe ser mayor a 0'
+      });
+    }
+
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Pedido no encontrado'
+      });
+    }
+
+    if (order.estado === 'entregado') {
+      return res.status(400).json({
+        success: false,
+        message: 'Este pedido ya está completamente pagado'
+      });
+    }
+
+    if (order.estado === 'cancelado') {
+      return res.status(400).json({
+        success: false,
+        message: 'No se puede pagar un pedido cancelado'
+      });
+    }
+
+    const saldoRestante = order.total - (order.totalPagado || 0);
+
+    if (monto > saldoRestante + 1) {
+      return res.status(400).json({
+        success: false,
+        message: `El monto ($${monto.toLocaleString('es-CO')}) excede el saldo restante ($${saldoRestante.toLocaleString('es-CO')})`
+      });
+    }
+
+    // Registrar el pago
+    if (!order.pagos) order.pagos = [];
+    order.pagos.push({
+      metodo,
+      monto: Math.min(monto, saldoRestante),
+      fecha: new Date()
+    });
+
+    order.totalPagado = (order.totalPagado || 0) + Math.min(monto, saldoRestante);
+
+    const estaPagadoCompleto = order.totalPagado >= order.total;
+
+    if (estaPagadoCompleto) {
+      const metodos = [...new Set(order.pagos.map(p => p.metodo))];
+      if (metodos.length === 1) {
+        order.metodoPago = metodos[0];
+      } else {
+        order.metodoPago = 'mixto';
+      }
+
+      order.estado = 'entregado';
+
+      order.items.forEach(item => {
+        item.estadosIndividuales = [{
+          cantidad: item.cantidad,
+          estado: 'entregado'
+        }];
+      });
+
+      if (clienteNombre) order.clienteNombre = clienteNombre;
+      if (clienteCcNit) order.clienteCcNit = clienteCcNit;
+    }
+
+    // MULTI-LOCAL HUB: Propagar si es hub mesero
+    if (req.isHubMesero && order.hubOrderGroup && estaPagadoCompleto) {
+      const groupOrders = await Order.find({
+        hubOrderGroup: order.hubOrderGroup,
+        _id: { $ne: order._id }
+      });
+
+      for (const siblingOrder of groupOrders) {
+        siblingOrder.estado = 'entregado';
+        siblingOrder.metodoPago = order.metodoPago;
+        siblingOrder.pagos = order.pagos;
+        siblingOrder.totalPagado = siblingOrder.total;
+        siblingOrder.items.forEach(item => {
+          item.estadosIndividuales = [{
+            cantidad: item.cantidad,
+            estado: 'entregado'
+          }];
+        });
+        if (clienteNombre) siblingOrder.clienteNombre = clienteNombre;
+        if (clienteCcNit) siblingOrder.clienteCcNit = clienteCcNit;
+        await siblingOrder.save();
+      }
+    }
+
+    await order.save();
+    await order.populate('items.producto', 'nombre categoria precio');
+
+    console.log(`✅ Pago registrado: $${monto} (${metodo}) en pedido ${order._id}. Total pagado: $${order.totalPagado}/${order.total}`);
+
+    res.json({
+      success: true,
+      message: estaPagadoCompleto
+        ? 'Pedido pagado completamente'
+        : `Pago parcial registrado. Saldo restante: $${(order.total - order.totalPagado).toLocaleString('es-CO')}`,
+      data: order,
+      pagadoCompleto: estaPagadoCompleto,
+      saldoRestante: order.total - order.totalPagado
+    });
+  } catch (error) {
+    console.error('Error al registrar pago parcial:', error);
+    res.status(400).json({
+      success: false,
+      message: 'Error al registrar el pago',
+      error: error.message
+    });
+  }
+});
+
 // âœ… NUEVA RUTA: Actualizar estado individual de un producto
 router.patch('/:id/item/:itemIndex/estado', protect, checkPermission('editarPedidos'), async (req, res) => {
   try {
@@ -1221,8 +1356,21 @@ router.patch('/:id/metodo-pago', protect, checkPermission('editarPedidos'), asyn
       });
     }
 
+    // No permitir cambio en pedidos con pagos mixtos
+    if (order.metodoPago === 'mixto' || (order.pagos && order.pagos.length > 1)) {
+      return res.status(400).json({
+        success: false,
+        message: 'No se puede cambiar el método de pago de un pedido con pagos mixtos'
+      });
+    }
+
     const metodoAnterior = order.metodoPago;
     order.metodoPago = metodoPago;
+
+    // También actualizar el array de pagos si existe
+    if (order.pagos && order.pagos.length > 0) {
+      order.pagos.forEach(p => { p.metodo = metodoPago; });
+    }
     await order.save();
 
     console.log('✅ Método de pago actualizado:', order._id, 'de', metodoAnterior, '→', metodoPago);

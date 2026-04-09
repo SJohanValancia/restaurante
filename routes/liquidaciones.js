@@ -114,14 +114,30 @@ router.get('/stats/resumen', protect, async (req, res) => {
 
       {
         $addFields: {
-          // Transferencias de ingresos
+          // Transferencias de ingresos (soporta pagos mixtos)
           totalTransferenciasIngresos: {
             $sum: {
               $map: {
                 input: '$pedidosPopulados',
                 as: 'p',
                 in: {
-                  $cond: [{ $eq: ['$$p.metodoPago', 'transferencia'] }, '$$p.total', 0]
+                  $cond: [
+                    // Si tiene pagos parciales (array pagos), sumar solo los de transferencia
+                    { $and: [{ $isArray: '$$p.pagos' }, { $gt: [{ $size: '$$p.pagos' }, 0] }] },
+                    {
+                      $sum: {
+                        $map: {
+                          input: '$$p.pagos',
+                          as: 'pago',
+                          in: {
+                            $cond: [{ $eq: ['$$pago.metodo', 'transferencia'] }, '$$pago.monto', 0]
+                          }
+                        }
+                      }
+                    },
+                    // Fallback: si no tiene pagos parciales, usar metodoPago clásico
+                    { $cond: [{ $eq: ['$$p.metodoPago', 'transferencia'] }, '$$p.total', 0] }
+                  ]
                 }
               }
             }
@@ -362,7 +378,7 @@ router.get('/', protect, async (req, res) => {
       Liquidacion.find(query)
         .populate({
           path: 'ingresos.pedidos',
-          select: 'mesa total createdAt estado metodoPago'
+          select: 'mesa total createdAt estado metodoPago pagos totalPagado'
         })
         .populate({
           path: 'egresos.gastos',
@@ -409,7 +425,7 @@ router.get('/:id', protect, async (req, res) => {
     const liquidacion = await Liquidacion.findById(req.params.id)
       .populate({
         path: 'ingresos.pedidos',
-        select: 'mesa total createdAt estado metodoPago items'
+        select: 'mesa total createdAt estado metodoPago pagos totalPagado items'
       })
       .populate({
         path: 'egresos.gastos',
