@@ -59,7 +59,15 @@ const orderSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       default: null
-    }
+    },
+    // ✅ Alimentos excluidos (no descontar del inventario)
+    alimentosExcluidos: [{
+      alimentoId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Alimento'
+      },
+      nombre: String
+    }]
   }],
   total: {
     type: Number,

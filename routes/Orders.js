@@ -47,16 +47,14 @@ async function descontarStockAlimentos(items, userId, ignorarStock = false) {
     alimentos.forEach(alimento => {
       const productoId = alimento.productos.productoId.toString();
       if (!alimentosMap.has(productoId)) {
-        alimentosMap.set(productoId, {
-          _id: alimento._id,
-          stock: alimento.stock,
-          nombre: alimento.nombre,
-          productos: [alimento.productos]
-        });
-      } else {
-        const existing = alimentosMap.get(productoId);
-        existing.productos.push(alimento.productos);
+        alimentosMap.set(productoId, []);
       }
+      alimentosMap.get(productoId).push({
+        _id: alimento._id,
+        stock: alimento.stock,
+        nombre: alimento.nombre,
+        cantidadRequerida: alimento.productos.cantidadRequerida
+      });
     });
 
     const operaciones = [];
@@ -65,41 +63,49 @@ async function descontarStockAlimentos(items, userId, ignorarStock = false) {
       const productoId = item.producto.toString();
       const cantidadPedida = item.cantidad;
 
+      // ✅ Obtener IDs de alimentos excluidos para este item
+      const excluidos = new Set(
+        (item.alimentosExcluidos || []).map(e => (e.alimentoId || e).toString())
+      );
+
       if (alimentosMap.has(productoId)) {
-        const alimentoData = alimentosMap.get(productoId);
-        let cantidadADescontar = 0;
+        const alimentosDelProducto = alimentosMap.get(productoId);
 
-        // Calcular cantidad total requerida
-        alimentoData.productos.forEach(config => {
-          const productoConfig = config;
-          cantidadADescontar += productoConfig.cantidadRequerida * cantidadPedida;
-        });
+        for (const alimentoData of alimentosDelProducto) {
+          // ✅ Si el alimento está excluido, no descontar
+          if (excluidos.has(alimentoData._id.toString())) {
+            console.log(`⏭️ Alimento "${alimentoData.nombre}" excluido del descuento para este item`);
+            continue;
+          }
 
-        if (ignorarStock) {
-          if (alimentoData.stock > 0) {
-            const descontado = Math.min(alimentoData.stock, cantidadADescontar);
+          const cantidadADescontar = alimentoData.cantidadRequerida * cantidadPedida;
+
+          if (ignorarStock) {
+            if (alimentoData.stock > 0) {
+              const descontado = Math.min(alimentoData.stock, cantidadADescontar);
+              operaciones.push({
+                updateOne: {
+                  filter: { _id: alimentoData._id },
+                  update: { $inc: { stock: -descontado } }
+                }
+              });
+              console.log(`📦 Descontando ${descontado} de "${alimentoData.nombre}" (ignorar stock)`);
+            }
+          } else {
+            if (alimentoData.stock < cantidadADescontar) {
+              throw new Error(
+                `Stock insuficiente de "${alimentoData.nombre}". ` +
+                `Disponible: ${alimentoData.stock}, Requerido: ${cantidadADescontar}`
+              );
+            }
             operaciones.push({
               updateOne: {
                 filter: { _id: alimentoData._id },
-                update: { $inc: { stock: -descontado } }
+                update: { $inc: { stock: -cantidadADescontar } }
               }
             });
-            console.log(`📦 Descontando ${descontado} de "${alimentoData.nombre}" (ignorar stock)`);
+            console.log(`📦 Descontando ${cantidadADescontar} de "${alimentoData.nombre}"`);
           }
-        } else {
-          if (alimentoData.stock < cantidadADescontar) {
-            throw new Error(
-              `Stock insuficiente de "${alimentoData.nombre}". ` +
-              `Disponible: ${alimentoData.stock}, Requerido: ${cantidadADescontar}`
-            );
-          }
-          operaciones.push({
-            updateOne: {
-              filter: { _id: alimentoData._id },
-              update: { $inc: { stock: -cantidadADescontar } }
-            }
-          });
-          console.log(`📦 Descontando ${cantidadADescontar} de "${alimentoData.nombre}"`);
         }
       }
     }
@@ -780,7 +786,8 @@ router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
         categoriaProducto: producto.categoria,
         cantidad: item.cantidad,
         precio: item.precio,
-        ownerUserId: producto.userId // Dueño del producto (local)
+        ownerUserId: producto.userId, // Dueño del producto (local)
+        alimentosExcluidos: item.alimentosExcluidos || [] // ✅ Alimentos excluidos del descuento
       };
     }));
 

@@ -1860,6 +1860,210 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
             margin: 0 2px;
         }
+
+        /* ==================== POPUP ALIMENTOS ==================== */
+        .alimentos-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            animation: alimentosFadeIn 0.25s ease;
+        }
+
+        @keyframes alimentosFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .alimentos-popup {
+            background: #ffffff;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 420px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: alimentosSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow: hidden;
+        }
+
+        @keyframes alimentosSlideUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .alimentos-popup-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .alimentos-popup-header h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .alimentos-popup-header p {
+            font-size: 12px;
+            opacity: 0.85;
+        }
+
+        .alimentos-popup-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.75rem 1.25rem;
+        }
+
+        .alimento-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .alimento-row:last-child {
+            border-bottom: none;
+        }
+
+        .alimento-checkbox {
+            width: 22px;
+            height: 22px;
+            accent-color: #48bb78;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .alimento-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .alimento-nombre {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .alimento-detalle {
+            font-size: 11px;
+            color: #718096;
+            margin-top: 2px;
+        }
+
+        .alimento-stock-badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 12px;
+            flex-shrink: 0;
+        }
+
+        .alimento-stock-ok {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .alimento-stock-bajo {
+            background: #feebc8;
+            color: #7c2d12;
+        }
+
+        .alimento-stock-agotado {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .alimentos-popup-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 8px;
+        }
+
+        .alimentos-popup-footer button {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-alimentos-confirmar {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+
+        .btn-alimentos-confirmar:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+        }
+
+        .btn-alimentos-cancelar {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 1px solid #e2e8f0 !important;
+        }
+
+        .btn-alimentos-cancelar:hover {
+            background: #edf2f7;
+        }
+
+        .alimento-excluded {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+
+        .btn-ver-alimentos {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .btn-ver-alimentos:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-ver-alimentos.has-exclusions {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .alimentos-empty {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #a0aec0;
+        }
+
+        .alimentos-empty span {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
     </style>
 
 
@@ -2097,6 +2301,7 @@
         let selectedItems = [];
         let allProducts = [];
         let allProductsCache = [];
+        let allAlimentosCache = []; // ✅ Cache de alimentos para popup
         let pedidoParaImprimir = null;
         let metodoPagoSeleccionado = null;
         let clienteNombreSeleccionado = '';
@@ -2479,6 +2684,7 @@
 
                     if (alimentosData.success) {
                         const alimentos = alimentosData.data;
+                        allAlimentosCache = alimentos; // ✅ Guardar en cache para popup
 
                         // Verificar cada producto contra los alimentos
                         availableProducts = data.data.map(producto => {
@@ -2626,28 +2832,36 @@
 
             container.innerHTML = `
         <label class="form-label">Productos Seleccionados</label>
-        ${selectedItems.map((item, index) => `
+        ${selectedItems.map((item, index) => {
+            const tieneAlimentos = allAlimentosCache.some(a => a.productos.some(p => p.productoId._id === item.producto._id));
+            const tieneExclusiones = item.alimentosExcluidos && item.alimentosExcluidos.length > 0;
+            return `
             <div class="selected-item">
                 <div class="selected-item-info">
                     <h4>${item.producto.nombre}</h4>
                     <div class="quantity-controls">
                         <button type="button" class="qty-btn" onclick="changeQuantity(${index}, -1)">-</button>
                         <input 
-<input 
-    type="number" 
-    min="1"
-    value="${item.cantidad}" 
-    onchange="setQuantity(${index}, this.value)"
+                            type="number" 
+                            min="1"
+                            value="${item.cantidad}" 
+                            onchange="setQuantity(${index}, this.value)"
                             onclick="this.select()"
                             style="width: 60px; text-align: center; font-weight: 600; font-size: 14px; border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px;"
                         >
                         <button type="button" class="qty-btn" onclick="changeQuantity(${index}, 1)">+</button>
                         <span class="item-price">$${(item.producto.precio * item.cantidad).toLocaleString('es-CO')}</span>
                     </div>
+                    ${tieneAlimentos ? `
+                        <button type="button" class="btn-ver-alimentos ${tieneExclusiones ? 'has-exclusions' : ''}" onclick="mostrarAlimentosPopup('${item.producto._id}', ${index}, 'default')">
+                            🥩 Ver Alimentos ${tieneExclusiones ? '(' + item.alimentosExcluidos.length + ' excl.)' : ''}
+                        </button>
+                    ` : ''}
                 </div>
                 <button type="button" class="btn-remove" onclick="removeItem(${index})">Eliminar</button>
             </div>
-        `).join('')}
+        `;
+        }).join('')}
     `;
 
             const totalItems = selectedItems.reduce((sum, item) => sum + item.cantidad, 0);
@@ -2680,6 +2894,111 @@
         function removeItem(index) {
             selectedItems.splice(index, 1);
             updateSelectedProducts();
+        }
+
+        // ✅ POPUP DE ALIMENTOS
+        function mostrarAlimentosPopup(productoId, itemIndex, vista) {
+            // Buscar alimentos vinculados a este producto
+            const alimentosDelProducto = allAlimentosCache.filter(a =>
+                a.productos.some(p => p.productoId._id === productoId)
+            );
+
+            if (alimentosDelProducto.length === 0) {
+                Swal.fire({ icon: 'info', text: 'Este producto no tiene alimentos vinculados', timer: 2000, showConfirmButton: false });
+                return;
+            }
+
+            // Obtener exclusiones actuales
+            const itemsArray = vista === 'default' ? selectedItems : mesaSelectedItems;
+            const currentExclusions = (itemsArray[itemIndex].alimentosExcluidos || []).map(e => e.alimentoId);
+
+            const overlay = document.createElement('div');
+            overlay.className = 'alimentos-overlay';
+            overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+
+            const productoNombre = itemsArray[itemIndex].producto.nombre;
+
+            overlay.innerHTML = `
+                <div class="alimentos-popup">
+                    <div class="alimentos-popup-header">
+                        <h3>🥩 Alimentos del Plato</h3>
+                        <p>${productoNombre}</p>
+                    </div>
+                    <div class="alimentos-popup-body">
+                        <p style="font-size: 12px; color: #718096; margin-bottom: 8px; padding: 8px; background: #f7fafc; border-radius: 8px; border-left: 3px solid #667eea;">
+                            Desmarca los alimentos que el cliente <b>no quiere</b>. Esos ingredientes <b>no se descontarán</b> del inventario.
+                        </p>
+                        ${alimentosDelProducto.map(alimento => {
+                            const config = alimento.productos.find(p => p.productoId._id === productoId);
+                            const cantidadReq = config ? config.cantidadRequerida : 1;
+                            const isExcluded = currentExclusions.includes(alimento._id);
+                            let stockClass = 'alimento-stock-ok';
+                            let stockLabel = 'Stock: ' + alimento.stock;
+                            if (alimento.stock <= 0) {
+                                stockClass = 'alimento-stock-agotado';
+                                stockLabel = 'Agotado';
+                            } else if (alimento.stock < cantidadReq) {
+                                stockClass = 'alimento-stock-bajo';
+                                stockLabel = 'Stock bajo: ' + alimento.stock;
+                            }
+                            return `
+                                <div class="alimento-row">
+                                    <input type="checkbox" class="alimento-checkbox" 
+                                        data-alimento-id="${alimento._id}" 
+                                        data-alimento-nombre="${alimento.nombre}"
+                                        ${!isExcluded ? 'checked' : ''}
+                                    >
+                                    <div class="alimento-info">
+                                        <div class="alimento-nombre">${alimento.nombre}</div>
+                                        <div class="alimento-detalle">Req: ${cantidadReq} por unidad</div>
+                                    </div>
+                                    <span class="alimento-stock-badge ${stockClass}">${stockLabel}</span>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    <div class="alimentos-popup-footer">
+                        <button class="btn-alimentos-cancelar" onclick="this.closest('.alimentos-overlay').remove()">Cancelar</button>
+                        <button class="btn-alimentos-confirmar" onclick="confirmarAlimentos(this, ${itemIndex}, '${vista}')">✅ Confirmar</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(overlay);
+        }
+
+        function confirmarAlimentos(btn, itemIndex, vista) {
+            const overlay = btn.closest('.alimentos-overlay');
+            const checkboxes = overlay.querySelectorAll('.alimento-checkbox');
+            const excluidos = [];
+
+            checkboxes.forEach(cb => {
+                if (!cb.checked) {
+                    excluidos.push({
+                        alimentoId: cb.dataset.alimentoId,
+                        nombre: cb.dataset.alimentoNombre
+                    });
+                }
+            });
+
+            if (vista === 'default') {
+                selectedItems[itemIndex].alimentosExcluidos = excluidos;
+                updateSelectedProducts();
+            } else {
+                mesaSelectedItems[itemIndex].alimentosExcluidos = excluidos;
+                updateSelectedProductsMesa();
+            }
+
+            overlay.remove();
+
+            if (excluidos.length > 0) {
+                Swal.fire({ 
+                    icon: 'info', 
+                    text: `${excluidos.length} alimento(s) excluido(s). No se descontarán del inventario.`, 
+                    timer: 2500, 
+                    showConfirmButton: false 
+                });
+            }
         }
 
         // Reemplaza tu función del formulario actual con esta versión mejorada:
@@ -2733,7 +3052,8 @@
                 items: selectedItems.map(item => ({
                     producto: item.producto._id,
                     cantidad: item.cantidad,
-                    precio: item.producto.precio
+                    precio: item.producto.precio,
+                    alimentosExcluidos: item.alimentosExcluidos || []
                 })),
                 notas: notas,
                 userId: currentUser._id,
@@ -5364,7 +5684,10 @@
 
         container.innerHTML = `
             <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px;">Productos Seleccionados</label>
-            ${mesaSelectedItems.map((item, index) => `
+            ${mesaSelectedItems.map((item, index) => {
+                const tieneAlimentos = allAlimentosCache.some(a => a.productos.some(p => p.productoId._id === item.producto._id));
+                const tieneExclusiones = item.alimentosExcluidos && item.alimentosExcluidos.length > 0;
+                return `
                 <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
                     <div style="flex: 1;">
                         <div style="font-size: 13px; font-weight: 600; color: #2d3748;">${item.producto.nombre}</div>
@@ -5374,10 +5697,16 @@
                             <button type="button" onclick="changeMesaQty(${index}, 1)" style="width: 26px; height: 26px; border: 1px solid #e2e8f0; background: white; border-radius: 6px; cursor: pointer; font-size: 14px;">+</button>
                             <span style="font-size: 13px; font-weight: 700; color: #2d3748; margin-left: 8px;">$${(item.producto.precio * item.cantidad).toLocaleString('es-CO')}</span>
                         </div>
+                        ${tieneAlimentos ? `
+                            <button type="button" class="btn-ver-alimentos ${tieneExclusiones ? 'has-exclusions' : ''}" onclick="mostrarAlimentosPopup('${item.producto._id}', ${index}, 'mesa')" style="margin-top: 6px;">
+                                🥩 Ver Alimentos ${tieneExclusiones ? '(' + item.alimentosExcluidos.length + ' excl.)' : ''}
+                            </button>
+                        ` : ''}
                     </div>
                     <button type="button" onclick="removeMesaItem(${index})" style="background: #fc8181; color: white; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">✕</button>
                 </div>
-            `).join('')}
+            `;
+            }).join('')}
         `;
 
         const totalItems = mesaSelectedItems.reduce((sum, item) => sum + item.cantidad, 0);
@@ -5417,7 +5746,8 @@
                 nombreProducto: item.producto.nombre,
                 categoriaProducto: item.producto.categoria || '',
                 cantidad: item.cantidad,
-                precio: item.producto.precio
+                precio: item.producto.precio,
+                alimentosExcluidos: item.alimentosExcluidos || []
             })),
             notas: notas
         };
