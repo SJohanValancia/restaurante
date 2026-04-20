@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" style="overflow-x: hidden;">
 
 <head>
     <meta charset="UTF-8">
@@ -17,6 +17,10 @@
             background: #f5f7fa;
             min-height: 100vh;
             color: #1a202c;
+            touch-action: manipulation;
+            overflow-x: hidden;
+            width: 100%;
+            position: relative;
         }
 
         /* SIDEBAR */
@@ -256,6 +260,40 @@
 
         .page-header {
             margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .page-title-container {
+            flex: 1;
+        }
+
+        .btn-change-view {
+            padding: 10px 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            white-space: nowrap;
+        }
+
+        .btn-change-view:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-change-view:active {
+            transform: translateY(0);
         }
 
         .page-title {
@@ -786,32 +824,42 @@
         @media (max-width: 480px) {
             .container {
                 padding: 1rem;
-                margin-top: 50px; /* Espacio para el botón de menú */
+                margin-top: 50px;
+                /* Espacio para el botón de menú */
             }
+
             .page-title {
                 font-size: 24px;
             }
+
             .order-card {
                 padding: 1rem;
             }
+
             .order-header {
                 flex-direction: column;
                 gap: 10px;
             }
+
             .order-total {
                 font-size: 16px;
             }
+
             .order-actions {
-                grid-template-columns: 1fr 1fr; /* 2 botones por fila para ahorrar espacio pero mantener usabilidad */
+                grid-template-columns: 1fr 1fr;
+                /* 2 botones por fila para ahorrar espacio pero mantener usabilidad */
                 gap: 6px;
             }
+
             .orders-title {
                 font-size: 18px;
             }
+
             .btn-action {
                 padding: 12px 8px;
                 font-size: 12px;
             }
+
             .menu-toggle {
                 top: 15px;
                 left: 15px;
@@ -913,9 +961,17 @@
         }
 
         @keyframes change-payment-pulse {
-            0% { box-shadow: 0 0 0 0 rgba(72, 187, 120, 0.4); }
-            70% { box-shadow: 0 0 0 15px rgba(72, 187, 120, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(72, 187, 120, 0); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(72, 187, 120, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(72, 187, 120, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(72, 187, 120, 0);
+            }
         }
 
         .payment-method-indicator {
@@ -1220,19 +1276,31 @@
             display: none;
             animation: fadeInTableView 0.4s ease-out;
         }
+
         .table-view-container-hist.active {
             display: block;
         }
+
         .default-view-hist {
             display: block;
         }
+
         .default-view-hist.hidden {
             display: none;
         }
+
         @keyframes fadeInTableView {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
+
         .table-view-header-hist {
             display: flex;
             align-items: center;
@@ -1240,6 +1308,7 @@
             margin-bottom: 1.5rem;
             flex-wrap: wrap;
         }
+
         .table-view-search-hist {
             flex: 1;
             min-width: 200px;
@@ -1250,16 +1319,19 @@
             transition: all 0.3s;
             background: white;
         }
+
         .table-view-search-hist:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
         }
+
         .table-view-search-wrapper-hist {
             position: relative;
             flex: 1;
             min-width: 200px;
         }
+
         .table-view-search-icon-hist {
             position: absolute;
             left: 14px;
@@ -1270,12 +1342,14 @@
             pointer-events: none;
             z-index: 1;
         }
+
         .mesas-grid-hist {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
             gap: 1.5rem;
             padding: 1rem 0;
         }
+
         .mesa-circle-hist {
             display: flex;
             flex-direction: column;
@@ -1285,8 +1359,15 @@
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             user-select: none;
         }
-        .mesa-circle-hist:hover { transform: scale(1.1); }
-        .mesa-circle-hist:active { transform: scale(0.95); }
+
+        .mesa-circle-hist:hover {
+            transform: scale(1.1);
+        }
+
+        .mesa-circle-hist:active {
+            transform: scale(0.95);
+        }
+
         .mesa-icon-hist {
             width: 80px;
             height: 80px;
@@ -1302,27 +1383,43 @@
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
             transition: all 0.3s;
         }
+
         .mesa-circle-hist:hover .mesa-icon-hist {
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
         }
+
         .mesa-icon-hist.libre {
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
         }
+
         .mesa-icon-hist.ocupada {
             background: linear-gradient(135deg, #fc8181 0%, #e53e3e 100%);
             animation: pulseOcupadaHist 2s ease-in-out infinite;
         }
+
         @keyframes pulseOcupadaHist {
-            0%, 100% { box-shadow: 0 6px 20px rgba(229, 62, 62, 0.3); }
-            50% { box-shadow: 0 6px 30px rgba(229, 62, 62, 0.6); }
+
+            0%,
+            100% {
+                box-shadow: 0 6px 20px rgba(229, 62, 62, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 6px 30px rgba(229, 62, 62, 0.6);
+            }
         }
+
         .mesa-icon-hist::after {
             content: '';
             position: absolute;
-            top: 3px; left: 3px; right: 3px; bottom: 3px;
+            top: 3px;
+            left: 3px;
+            right: 3px;
+            bottom: 3px;
             border-radius: 50%;
             border: 2px solid rgba(255, 255, 255, 0.3);
         }
+
         .mesa-name-hist {
             font-size: 13px;
             font-weight: 700;
@@ -1333,6 +1430,7 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
+
         .mesa-status-text-hist {
             font-size: 10px;
             font-weight: 600;
@@ -1340,41 +1438,40 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        .mesa-status-text-hist.libre { color: #38a169; }
-        .mesa-status-text-hist.ocupada { color: #e53e3e; }
+
+        .mesa-status-text-hist.libre {
+            color: #38a169;
+        }
+
+        .mesa-status-text-hist.ocupada {
+            color: #e53e3e;
+        }
 
         .view-mode-indicator-hist {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 10px 18px;
-            border-radius: 30px;
-            font-size: 12px;
-            font-weight: 700;
-            z-index: 998;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-            display: none;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
+            display: none !important;
         }
-        .view-mode-indicator-hist.show { display: flex; }
 
         /* Popup detalle de mesa */
         .modal-detalle-mesa-hist {
             display: none;
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(5px);
-            z-index: 1050; /* Menor a 1060 (Swal2) */
+            z-index: 1050;
+            /* Menor a 1060 (Swal2) */
             align-items: center;
             justify-content: center;
             padding: 20px;
         }
-        .modal-detalle-mesa-hist.active { display: flex; }
+
+        .modal-detalle-mesa-hist.active {
+            display: flex;
+        }
+
         .modal-detalle-content-hist {
             background: white;
             border-radius: 20px;
@@ -1386,50 +1483,119 @@
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
             animation: slideUp 0.3s ease-out;
         }
+
         @keyframes slideUp {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         @media (max-width: 1024px) {
-            .mesas-grid-hist { grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
+            .mesas-grid-hist {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1.25rem;
+            }
         }
+
         @media (max-width: 768px) {
-            .mesas-grid-hist { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
-            .mesa-icon-hist { width: 70px; height: 70px; font-size: 24px; }
-            .table-view-header-hist { flex-direction: column; align-items: stretch; }
+            .mesas-grid-hist {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1rem;
+            }
+
+            .mesa-icon-hist {
+                width: 70px;
+                height: 70px;
+                font-size: 24px;
+            }
+
+            .table-view-header-hist {
+                flex-direction: column;
+                align-items: stretch;
+            }
         }
+
         @media (max-width: 480px) {
-            .mesas-grid-hist { grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
-            .mesa-icon-hist { width: 60px; height: 60px; font-size: 20px; }
+            .mesas-grid-hist {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.75rem;
+            }
+
+            .mesa-icon-hist {
+                width: 60px;
+                height: 60px;
+                font-size: 20px;
+            }
         }
 
         /* ANIMACIONES DE GESTOS IOS-STYLE */
         @keyframes ios-jiggle {
-            0% { transform: rotate(-1.5deg) scale(1.03); }
-            50% { transform: rotate(1.5deg) scale(1.03); }
-            100% { transform: rotate(-1.5deg) scale(1.03); }
+            0% {
+                transform: rotate(-1.5deg) scale(1.03);
+            }
+
+            50% {
+                transform: rotate(1.5deg) scale(1.03);
+            }
+
+            100% {
+                transform: rotate(-1.5deg) scale(1.03);
+            }
         }
+
         .gesture-active-jiggle {
             animation: ios-jiggle 0.25s infinite ease-in-out !important;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.15) !important;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15) !important;
             z-index: 100;
         }
+
         .gesture-swipe-smooth {
             transition: transform 0.1s cubic-bezier(0.1, 0.7, 0.1, 1), box-shadow 0.2s !important;
         }
+
         /* ONBOARDING ANIMATIONS */
         @keyframes slideUpFadeBtn {
-            0% { transform: translate(-50%, 50px); opacity: 0; }
-            100% { transform: translate(-50%, 0); opacity: 1; }
+            0% {
+                transform: translate(-50%, 50px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
         }
+
         @keyframes slideDownFadeBtn {
-            0% { transform: translate(-50%, 0); opacity: 1; }
-            100% { transform: translate(-50%, 50px); opacity: 0; }
+            0% {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, 50px);
+                opacity: 0;
+            }
         }
+
         @keyframes bounceGlowIcon {
-            0%, 100% { transform: translateY(0); text-shadow: 0 0 10px rgba(255,255,255,0.5); }
-            50% { transform: translateY(-5px); text-shadow: 0 0 20px rgba(255,255,255,0.8); }
+
+            0%,
+            100% {
+                transform: translateY(0);
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            }
+
+            50% {
+                transform: translateY(-5px);
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+            }
         }
 
         .onboarding-shortcut-popup {
@@ -1441,12 +1607,12 @@
             color: white;
             padding: 18px 24px;
             border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.15);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             z-index: 10000;
             display: flex;
             align-items: center;
             gap: 16px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4), 0 0 0 1px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(99, 102, 241, 0.4);
             animation: slideUpFadeBtn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             pointer-events: auto;
             max-width: 90vw;
@@ -1462,7 +1628,7 @@
             font-family: monospace;
             font-weight: bold;
             border-bottom: 2px solid #0f172a;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             margin: 0 2px;
         }
     </style>
@@ -1566,8 +1732,14 @@
     <div class="content-wrapper">
         <div class="container">
             <div class="page-header">
-                <h1 class="page-title" id="pageTitleHistorial">📜 Historial Completo de Pedidos</h1>
-                <p class="page-subtitle">Gestiona todos los pedidos de tu restaurante en un solo lugar</p>
+                <div class="page-title-container">
+                    <h1 class="page-title" id="pageTitleHistorial">📜 Historial Completo de Pedidos</h1>
+                    <p class="page-subtitle">Gestiona todos los pedidos locales en un solo lugar</p>
+                </div>
+                <button class="btn-change-view" id="btnChangeViewHeaderHist" onclick="toggleTableViewHist()">
+                    <span id="viewModeIconHeaderHist">🪑</span>
+                    <span id="viewModeTextHeaderHist">Vista Mesas</span>
+                </button>
             </div>
 
             <!-- Estadísticas -->
@@ -1712,7 +1884,8 @@
                 <div class="table-view-header-hist">
                     <div class="table-view-search-wrapper-hist">
                         <span class="table-view-search-icon-hist">🔍</span>
-                        <input type="text" class="table-view-search-hist" id="mesaSearchInputHist" placeholder="Buscar mesa..." autocomplete="off">
+                        <input type="text" class="table-view-search-hist" id="mesaSearchInputHist"
+                            placeholder="Buscar mesa..." autocomplete="off">
                     </div>
                 </div>
                 <div class="mesas-grid-hist" id="mesasGridHist">
@@ -1737,7 +1910,8 @@
         <div class="modal-detalle-content-hist">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                 <h3 style="font-size: 20px; font-weight: 700; color: #1a202c;" id="detalleMesaTitulo">📝 Detalle</h3>
-                <button onclick="cerrarDetalleMesaHist()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #718096;">✕</button>
+                <button onclick="cerrarDetalleMesaHist()"
+                    style="background: none; border: none; font-size: 24px; cursor: pointer; color: #718096;">✕</button>
             </div>
             <div id="detalleMesaContenido">
                 <p style="text-align: center; color: #a0aec0; padding: 2rem;">Sin pedidos</p>
@@ -1988,7 +2162,7 @@
 
                 const data = await response.json();
                 currentUser = data.data;
-                
+
                 if (data.data) {
                     localStorage.setItem('usuario', JSON.stringify(data.data));
                 }
@@ -2086,13 +2260,13 @@
                     const hasMesa = document.getElementById('filterMesa').value.trim();
                     const hasEstado = document.getElementById('filterEstado').value;
                     const hasPlato = document.getElementById('filterPlato').value;
-                    
+
                     // Si hay filtros locales activos (estado, plato), forzamos reset para no duplicar ni ocultar
                     const needsFullReset = reset || hasEstado || hasPlato;
-                    
+
                     applyFilters(needsFullReset, !!hasSearch);
                     currentPage++;
-                    
+
                     // Señal para la vista de mesas
                     window.ordersHaveLoadedHist = true;
                     if (isTableViewHist && mesasDataHist.length > 0) renderMesasHist(mesasDataHist);
@@ -2424,8 +2598,8 @@
             }
 
             // Botón de Pagar - muestra saldo restante si hay pagos parciales
-            const pagarTexto = tienePagosParciales 
-                ? `💳 Pagar Restante: $${saldoRestante.toLocaleString('es-CO')}` 
+            const pagarTexto = tienePagosParciales
+                ? `💳 Pagar Restante: $${saldoRestante.toLocaleString('es-CO')}`
                 : '💳 Pagar';
 
             if (order.estado === 'pendiente' || order.estado === 'preparando' || order.estado === 'listo') {
@@ -2603,9 +2777,9 @@
             const order = allOrders.find(o => o._id === currentOrderIdForPayment);
             const totalPedido = order ? order.total : 0;
             const saldoRestante = totalPedido - (order ? (order.totalPagado || 0) : 0);
-            
+
             const porcentajeLabel = document.getElementById('porcentajePago');
-            
+
             if (monto <= 0) { porcentajeLabel.textContent = ''; return; }
             if (monto > saldoRestante) {
                 porcentajeLabel.textContent = '⚠️ Excede el saldo restante';
@@ -2615,7 +2789,7 @@
 
             const porcentajeDelTotal = Math.round((monto / totalPedido) * 100);
             const porcentajeDelRestante = Math.round((monto / saldoRestante) * 100);
-            
+
             if (porcentajeDelRestante >= 100) {
                 porcentajeLabel.textContent = '✅ Paga el 100% del saldo restante';
                 porcentajeLabel.style.color = '#38a169';
@@ -4199,19 +4373,19 @@
                     isLongPressed = true;
                     gestureType = 'change-payment';
                     activeCard.classList.add('gesture-active-jiggle');
-                    
+
                     const indicador = activeCard.querySelector('.payment-method-indicator');
                     if (indicador) {
                         indicador.innerHTML = metodoPago === 'efectivo' ? '💳 A TRANSFERENCIA' : '💵 A EFECTIVO';
                     }
-                    
+
                     if (window.navigator.vibrate) window.navigator.vibrate([30, 50, 30]);
                 }, 600); // Rebajado a 600ms
             } else if (!isPagado) {
                 if (statusBadge && statusBadge.classList.contains('status-cancelado')) {
                     return;
                 }
-                
+
                 longPressTimer = setTimeout(() => {
                     isLongPressed = true;
                     gestureType = 'undo';
@@ -4273,7 +4447,7 @@
                 activeCard.classList.remove('gesture-active-jiggle', 'gesture-swipe-smooth');
                 activeCard.classList.add('gesture-return-smooth');
                 activeCard.style.transform = 'translateX(0) scale(1)';
-                
+
                 const undoIndicator = activeCard.querySelector('.undo-indicator');
                 if (undoIndicator) undoIndicator.style.opacity = '0';
                 const paymentIndicator = activeCard.querySelector('.payment-method-indicator');
@@ -4327,7 +4501,7 @@
             const order = orderList.find(o => o._id === orderId);
             if (!order) return;
 
-            const pagos = (order.pagos && order.pagos.length > 0) ? order.pagos : [{metodo: order.metodoPago || 'efectivo', monto: order.total}];
+            const pagos = (order.pagos && order.pagos.length > 0) ? order.pagos : [{ metodo: order.metodoPago || 'efectivo', monto: order.total }];
             let pagoIndex = 0;
 
             if (pagos.length > 1) {
@@ -4335,7 +4509,7 @@
                     acc[idx] = `${p.metodo === 'efectivo' ? '💵 Efectivo' : '📱 Transferencia'} - $${p.monto.toLocaleString('es-CO')}`;
                     return acc;
                 }, {});
-                
+
                 const { value: indexSeleccionado } = await Swal.fire({
                     title: 'Seleccionar pago',
                     text: 'Este es un pago mixto. ¿Cuál de los pagos deseas modificar?',
@@ -4345,11 +4519,11 @@
                     showCancelButton: true,
                     confirmButtonText: 'Siguiente'
                 });
-                
+
                 if (!indexSeleccionado) return;
                 pagoIndex = parseInt(indexSeleccionado);
             }
-            
+
             const pagoTarget = pagos[pagoIndex];
             const nuevoMetodo = pagoTarget.metodo === 'efectivo' ? 'transferencia' : 'efectivo';
             const metodoTargetTexto = pagoTarget.metodo === 'efectivo' ? 'Efectivo' : 'Transferencia';
@@ -4387,7 +4561,7 @@
                 if (result.isConfirmed) {
                     try {
                         const token = localStorage.getItem('token');
-                        const bodyData = { 
+                        const bodyData = {
                             metodoPago: nuevoMetodo,
                             pagoIndex: pagoIndex
                         };
@@ -4407,13 +4581,13 @@
                         const data = await response.json();
 
                         if (data.success) {
-                            Swal.fire({ 
-                                icon: 'success', 
-                                text: `Método actualizado exitosamente`, 
-                                timer: 1500, 
-                                showConfirmButton: false 
+                            Swal.fire({
+                                icon: 'success',
+                                text: `Método actualizado exitosamente`,
+                                timer: 1500,
+                                showConfirmButton: false
                             });
-                            
+
                             // Call the refresh functions
                             if (typeof loadOrders === 'function') loadOrders(true);
                             if (typeof renderMesasHist === 'function' && typeof mesasDataHist !== 'undefined') renderMesasHist(mesasDataHist);
@@ -4522,14 +4696,16 @@
             style="background: white; border-radius: 16px; padding: 2rem; max-width: 420px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
             <h3 style="font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 0.5rem; text-align: center;">💰
                 Monto a Pagar</h3>
-            
+
             <div style="text-align: center; margin-bottom: 1rem;">
-                <span id="pagoMetodoSeleccionado" style="display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; background: #f0fff4; color: #38a169; border: 1px solid #c6f6d5;"></span>
+                <span id="pagoMetodoSeleccionado"
+                    style="display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; background: #f0fff4; color: #38a169; border: 1px solid #c6f6d5;"></span>
             </div>
 
             <div id="resumenPagosPrevios" style="display: none;"></div>
 
-            <div style="display: flex; justify-content: space-between; padding: 8px 12px; background: #f7fafc; border-radius: 8px; margin-bottom: 1rem;">
+            <div
+                style="display: flex; justify-content: space-between; padding: 8px 12px; background: #f7fafc; border-radius: 8px; margin-bottom: 1rem;">
                 <div>
                     <div style="font-size: 11px; color: #718096; font-weight: 600;">Total del pedido</div>
                     <div id="montoTotalPedido" style="font-size: 18px; font-weight: 800; color: #2d3748;"></div>
@@ -4547,19 +4723,22 @@
 
             <div style="position: relative; text-align: center; margin-bottom: 1rem;">
                 <div style="border-top: 1px solid #e2e8f0; position: absolute; top: 50%; left: 0; right: 0;"></div>
-                <span style="background: white; padding: 0 12px; position: relative; font-size: 12px; color: #a0aec0; font-weight: 600;">O PAGAR UN MONTO PARCIAL</span>
+                <span
+                    style="background: white; padding: 0 12px; position: relative; font-size: 12px; color: #a0aec0; font-weight: 600;">O
+                    PAGAR UN MONTO PARCIAL</span>
             </div>
 
             <div style="margin-bottom: 0.5rem;">
                 <div style="position: relative;">
-                    <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; font-weight: 700; color: #2d3748;">$</span>
-                    <input type="number" id="inputMontoPago" 
-                        oninput="actualizarPorcentajePago()"
+                    <span
+                        style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; font-weight: 700; color: #2d3748;">$</span>
+                    <input type="number" id="inputMontoPago" oninput="actualizarPorcentajePago()"
                         style="width: 100%; padding: 14px 14px 14px 30px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 18px; font-weight: 700; transition: all 0.2s; box-sizing: border-box;"
-                        placeholder="0"
-                        min="1">
+                        placeholder="0" min="1">
                 </div>
-                <div id="porcentajePago" style="font-size: 13px; font-weight: 600; margin-top: 6px; min-height: 20px; text-align: center;"></div>
+                <div id="porcentajePago"
+                    style="font-size: 13px; font-weight: 600; margin-top: 6px; min-height: 20px; text-align: center;">
+                </div>
             </div>
 
             <button onclick="pagarMontoParcial()"
@@ -4567,7 +4746,8 @@
                 Confirmar Pago Parcial
             </button>
 
-            <button onclick="document.getElementById('modalMontoPago').style.display = 'none'; document.getElementById('modalMetodoPago').style.display = 'flex';"
+            <button
+                onclick="document.getElementById('modalMontoPago').style.display = 'none'; document.getElementById('modalMetodoPago').style.display = 'flex';"
                 style="width: 100%; padding: 0.65rem; background: #f7fafc; color: #718096; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
                 ← Cambiar Método de Pago
             </button>
@@ -4616,67 +4796,55 @@
     <script src="scripts/restaurant-switcher.js"></script>
 
     <script>
-    // ============================================
-    // SISTEMA DE VISTA DE MESAS - HISTORIAL
-    // ============================================
+        // ============================================
+        // SISTEMA DE VISTA DE MESAS - HISTORIAL
+        // ============================================
 
-    let isTableViewHist = false;
-    let mesasDataHist = [];
-    let keySequenceHist = [];
-    let keySequenceTimerHist = null;
+        let isTableViewHist = false;
+        let mesasDataHist = [];
+        let keySequenceHist = [];
+        let keySequenceTimerHist = null;
 
-    // RESTAURAR MODO GUARDADO
-    document.addEventListener('DOMContentLoaded', () => {
-        const savedMode = localStorage.getItem('tableViewModeHist');
-        if (savedMode === 'mesas') {
-            const waitForOrders = setInterval(() => {
-                if (window.ordersHaveLoadedHist) {
-                    clearInterval(waitForOrders);
-                    toggleTableViewHist();
-                }
-            }, 300);
-        }
-    });
+        // RESTAURAR MODO GUARDADO
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedMode = localStorage.getItem('tableViewModeHist');
+            if (savedMode === 'mesas') {
+                const waitForOrders = setInterval(() => {
+                    if (window.ordersHaveLoadedHist) {
+                        clearInterval(waitForOrders);
+                        toggleTableViewHist();
+                    }
+                }, 300);
+            }
+        });
 
-    // ATAJO DE TECLADO: Cmd/Ctrl + J → C
-    document.addEventListener('keydown', (e) => {
-        const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-        const modKey = isMac ? e.metaKey : e.ctrlKey;
+        // ATAJO DE TECLADO: Cmd/Ctrl + J → C
+        document.addEventListener('keydown', (e) => {
+            const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+            const modKey = isMac ? e.metaKey : e.ctrlKey;
 
-        if (modKey && e.key.toLowerCase() === 'j') {
-            e.preventDefault();
-            keySequenceHist = ['j'];
-            clearTimeout(keySequenceTimerHist);
-            keySequenceTimerHist = setTimeout(() => { keySequenceHist = []; }, 800);
-            return;
-        }
+            if (modKey && e.key.toLowerCase() === 'j') {
+                e.preventDefault();
+                keySequenceHist = ['j'];
+                clearTimeout(keySequenceTimerHist);
+                keySequenceTimerHist = setTimeout(() => { keySequenceHist = []; }, 800);
+                return;
+            }
 
-        if (keySequenceHist.length === 1 && keySequenceHist[0] === 'j' && e.key.toLowerCase() === 'c') {
-            e.preventDefault();
-            keySequenceHist = [];
-            clearTimeout(keySequenceTimerHist);
-            toggleTableViewHist();
-            if (typeof dismissShortcutOnboarding === 'function') dismissShortcutOnboarding();
-        }
-    });
+            if (keySequenceHist.length === 1 && keySequenceHist[0] === 'j' && e.key.toLowerCase() === 'c') {
+                e.preventDefault();
+                keySequenceHist = [];
+                clearTimeout(keySequenceTimerHist);
+                toggleTableViewHist();
+                if (typeof dismissShortcutOnboarding === 'function') dismissShortcutOnboarding();
+            }
+        });
 
-    // DOBLE TAP en el título para móvil
-    let lastTapTimeHist = 0;
-    document.addEventListener('DOMContentLoaded', () => {
-        const pageTitle = document.getElementById('pageTitleHistorial');
-        if (pageTitle) {
-            pageTitle.addEventListener('touchend', (e) => {
-                const now = Date.now();
-                if (now - lastTapTimeHist < 400) {
-                    e.preventDefault();
-                    toggleTableViewHist();
-                    lastTapTimeHist = 0;
-                } else {
-                    lastTapTimeHist = now;
-                }
-            });
-            pageTitle.style.cursor = 'pointer';
-        }
+        // 4 TAPS en cualquier parte de la pantalla para móvil (Atajo rápido) — HISTORIAL
+        // ELIMINADO SEGÚN SOLICITUD DEL USUARIO EN FAVOR DEL BOTÓN SUPERIOR
+
+        // DOBLE TAP en el título para móvil
+        // ELIMINADO SEGÚN SOLICITUD DEL USUARIO PARA LIMPIAR LA INTERFAZ
 
         // Buscador de mesas
         const searchInput = document.getElementById('mesaSearchInputHist');
@@ -4687,127 +4855,126 @@
                 searchTimeout = setTimeout(() => renderMesasHist(mesasDataHist), 200);
             });
         }
-    });
 
-    function toggleTableViewHist() {
-        isTableViewHist = !isTableViewHist;
-        const defaultView = document.getElementById('defaultViewHist');
-        const tableView = document.getElementById('tableViewHist');
-        const indicator = document.getElementById('viewModeIndicatorHist');
 
-        if (isTableViewHist) {
-            defaultView.classList.add('hidden');
-            tableView.classList.add('active');
-            indicator.classList.add('show');
-            document.getElementById('viewModeIconHist').textContent = '📋';
-            document.getElementById('viewModeTextHist').textContent = 'Vista Normal';
-            loadMesasHist();
-        } else {
-            defaultView.classList.remove('hidden');
-            tableView.classList.remove('active');
-            indicator.classList.remove('show');
-            document.getElementById('viewModeIconHist').textContent = '🪑';
-            document.getElementById('viewModeTextHist').textContent = 'Vista Mesas';
-        }
+        function toggleTableViewHist() {
+            isTableViewHist = !isTableViewHist;
+            const defaultView = document.getElementById('defaultViewHist');
+            const tableView = document.getElementById('tableViewHist');
+            const headerIcon = document.getElementById('viewModeIconHeaderHist');
+            const headerText = document.getElementById('viewModeTextHeaderHist');
 
-        // Guardar modo en localStorage
-        localStorage.setItem('tableViewModeHist', isTableViewHist ? 'mesas' : 'normal');
-
-        // Feedback
-        const notif = document.createElement('div');
-        notif.textContent = isTableViewHist ? '🪑 Vista de Mesas activada' : '📋 Vista Normal activada';
-        notif.style.cssText = 'position:fixed;top:80px;right:20px;background:linear-gradient(135deg,#48bb78,#38a169);color:white;padding:1rem 1.5rem;border-radius:12px;font-weight:600;font-size:14px;box-shadow:0 4px 12px rgba(72,187,120,0.4);z-index:10000;animation:slideInRight 0.3s ease-out;';
-        document.body.appendChild(notif);
-        setTimeout(() => notif.remove(), 2500);
-    }
-
-    async function loadMesasHist() {
-        const token = localStorage.getItem('token');
-        try {
-            const response = await fetch(`${API_URL}/mesas`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const data = await response.json();
-            if (data.success) {
-                mesasDataHist = data.data;
-                renderMesasHist(mesasDataHist);
+            if (isTableViewHist) {
+                defaultView.classList.add('hidden');
+                tableView.classList.add('active');
+                if (headerIcon) headerIcon.textContent = '📋';
+                if (headerText) headerText.textContent = 'Vista Normal';
+                loadMesasHist();
+            } else {
+                defaultView.classList.remove('hidden');
+                tableView.classList.remove('active');
+                if (headerIcon) headerIcon.textContent = '🪑';
+                if (headerText) headerText.textContent = 'Vista Mesas';
             }
-        } catch (error) {
-            console.error('Error al cargar mesas:', error);
-        }
-    }
 
-    function renderMesasHist(mesas) {
-        const grid = document.getElementById('mesasGridHist');
-        const searchVal = document.getElementById('mesaSearchInputHist').value.toLowerCase().trim();
+            // Guardar modo en localStorage
+            localStorage.setItem('tableViewModeHist', isTableViewHist ? 'mesas' : 'normal');
 
-        let mesasFiltradas = mesas;
-        if (searchVal) {
-            mesasFiltradas = mesas.filter(m => m.nombre.toLowerCase().includes(searchVal));
+            // Feedback
+            const notif = document.createElement('div');
+            notif.textContent = isTableViewHist ? '🪑 Vista de Mesas activada' : '📋 Vista Normal activada';
+            notif.style.cssText = 'position:fixed;top:80px;right:20px;background:linear-gradient(135deg,#48bb78,#38a169);color:white;padding:1rem 1.5rem;border-radius:12px;font-weight:600;font-size:14px;box-shadow:0 4px 12px rgba(72,187,120,0.4);z-index:10000;animation:slideInRight 0.3s ease-out;';
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 2500);
         }
 
-        if (mesasFiltradas.length === 0) {
-            grid.innerHTML = `
+        async function loadMesasHist() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_URL}/mesas`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    mesasDataHist = data.data;
+                    renderMesasHist(mesasDataHist);
+                }
+            } catch (error) {
+                console.error('Error al cargar mesas:', error);
+            }
+        }
+
+        function renderMesasHist(mesas) {
+            const grid = document.getElementById('mesasGridHist');
+            const searchVal = document.getElementById('mesaSearchInputHist').value.toLowerCase().trim();
+
+            let mesasFiltradas = mesas;
+            if (searchVal) {
+                mesasFiltradas = mesas.filter(m => m.nombre.toLowerCase().includes(searchVal));
+            }
+
+            if (mesasFiltradas.length === 0) {
+                grid.innerHTML = `
                 <div class="empty-state" style="grid-column: 1/-1;">
                     <div class="empty-icon">🪑</div>
                     <p>${mesas.length === 0 ? 'No hay mesas registradas.' : 'No se encontraron mesas.'}</p>
                 </div>
             `;
-            return;
-        }
+                return;
+            }
 
-        grid.innerHTML = mesasFiltradas.map(mesa => {
-            // Contar TODOS los pedidos activos de esta mesa
-            const pedidosActivos = allLoadedOrders.filter(o =>
-                o.mesa && String(o.mesa).toLowerCase().trim() === mesa.nombre.toLowerCase().trim() &&
-                !['entregado', 'cancelado'].includes(o.estado)
-            );
-            const isOcupada = pedidosActivos.length > 0;
-            const estadoClass = isOcupada ? 'ocupada' : 'libre';
-            const iconContent = mesa.nombre.match(/\d+/) ? mesa.nombre.match(/\d+/)[0] : mesa.nombre.charAt(0).toUpperCase();
-            const badge = pedidosActivos.length > 1 ? `<div style="position:absolute;top:-4px;right:-4px;background:#e53e3e;color:white;font-size:10px;font-weight:800;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid white;">${pedidosActivos.length}</div>` : '';
+            grid.innerHTML = mesasFiltradas.map(mesa => {
+                // Contar TODOS los pedidos activos de esta mesa
+                const pedidosActivos = allLoadedOrders.filter(o =>
+                    o.mesa && String(o.mesa).toLowerCase().trim() === mesa.nombre.toLowerCase().trim() &&
+                    !['entregado', 'cancelado'].includes(o.estado)
+                );
+                const isOcupada = pedidosActivos.length > 0;
+                const estadoClass = isOcupada ? 'ocupada' : 'libre';
+                const iconContent = mesa.nombre.match(/\d+/) ? mesa.nombre.match(/\d+/)[0] : mesa.nombre.charAt(0).toUpperCase();
+                const badge = pedidosActivos.length > 1 ? `<div style="position:absolute;top:-4px;right:-4px;background:#e53e3e;color:white;font-size:10px;font-weight:800;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid white;">${pedidosActivos.length}</div>` : '';
 
-            return `
+                return `
                 <div class="mesa-circle-hist" onclick="onMesaClickHist('${mesa.nombre.replace(/'/g, "\\\'")}')">
                     <div class="mesa-icon-hist ${estadoClass}" style="position:relative;">${iconContent}${badge}</div>
                     <div class="mesa-name-hist">${mesa.nombre}</div>
                     <div class="mesa-status-text-hist ${estadoClass}">${isOcupada ? (pedidosActivos.length > 1 ? pedidosActivos.length + ' pedidos' : 'Ocupada') : 'Libre'}</div>
                 </div>
             `;
-        }).join('');
-    }
+            }).join('');
+        }
 
-    function onMesaClickHist(mesaNombre) {
-        const todosLosPedidos = allLoadedOrders.filter(o =>
-            o.mesa && String(o.mesa).toLowerCase().trim() === mesaNombre.toLowerCase().trim()
-        );
+        function onMesaClickHist(mesaNombre) {
+            const todosLosPedidos = allLoadedOrders.filter(o =>
+                o.mesa && String(o.mesa).toLowerCase().trim() === mesaNombre.toLowerCase().trim()
+            );
 
-        document.getElementById('detalleMesaTitulo').textContent = `📝 ${mesaNombre}`;
-        const contenido = document.getElementById('detalleMesaContenido');
+            document.getElementById('detalleMesaTitulo').textContent = `📝 ${mesaNombre}`;
+            const contenido = document.getElementById('detalleMesaContenido');
 
-        if (todosLosPedidos.length === 0) {
-            contenido.innerHTML = `
+            if (todosLosPedidos.length === 0) {
+                contenido.innerHTML = `
                 <div style="text-align: center; padding: 2rem;">
                     <div style="font-size: 48px; margin-bottom: 1rem;">💭</div>
                     <p style="color: #718096; font-size: 14px;">No hay pedidos para esta mesa</p>
                 </div>
             `;
-        } else {
-            // Separar activos de pagados/cancelados
-            const activos = todosLosPedidos.filter(p => !['entregado', 'cancelado'].includes(p.estado));
-            const finalizados = todosLosPedidos.filter(p => ['entregado', 'cancelado'].includes(p.estado));
+            } else {
+                // Separar activos de pagados/cancelados
+                const activos = todosLosPedidos.filter(p => !['entregado', 'cancelado'].includes(p.estado));
+                const finalizados = todosLosPedidos.filter(p => ['entregado', 'cancelado'].includes(p.estado));
 
-            let html = '';
+                let html = '';
 
-            // Mostrar activos primero
-            if (activos.length > 0) {
-                html += `<div style="font-size: 12px; font-weight: 700; color: #667eea; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">🔵 Pedidos Activos (${activos.length})</div>`;
-                html += activos.map((pedido, idx) => renderPedidoCard(pedido, idx, activos.length, true)).join('');
-            }
+                // Mostrar activos primero
+                if (activos.length > 0) {
+                    html += `<div style="font-size: 12px; font-weight: 700; color: #667eea; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">🔵 Pedidos Activos (${activos.length})</div>`;
+                    html += activos.map((pedido, idx) => renderPedidoCard(pedido, idx, activos.length, true)).join('');
+                }
 
-            // Botón "Ver pagos" + sección colapsable
-            if (finalizados.length > 0) {
-                html += `
+                // Botón "Ver pagos" + sección colapsable
+                if (finalizados.length > 0) {
+                    html += `
                     <button id="btnVerPagos" onclick="togglePagosSection()" style="width: 100%; margin-top: ${activos.length > 0 ? '1.5rem' : '0'}; padding: 12px; background: linear-gradient(135deg, rgba(56,161,105,0.1), rgba(72,187,120,0.1)); border: 1px solid rgba(56,161,105,0.3); border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px; color: #38a169; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s;">
                         <span id="iconVerPagos">▶</span>
                         <span>Ver pagados/cancelados (${finalizados.length})</span>
@@ -4816,51 +4983,51 @@
                         ${finalizados.map((pedido, idx) => renderPedidoCard(pedido, idx, finalizados.length, false)).join('')}
                     </div>
                 `;
-            }
+                }
 
-            if (activos.length === 0 && finalizados.length > 0) {
-                html = `<div style="text-align: center; padding: 1rem; margin-bottom: 1rem;">
+                if (activos.length === 0 && finalizados.length > 0) {
+                    html = `<div style="text-align: center; padding: 1rem; margin-bottom: 1rem;">
                     <div style="font-size: 32px; margin-bottom: 8px;">✅</div>
                     <p style="color: #38a169; font-weight: 600; font-size: 14px;">Mesa libre — sin pedidos activos</p>
                 </div>` + html;
+                }
+
+                contenido.innerHTML = html;
             }
 
-            contenido.innerHTML = html;
+            document.getElementById('modalDetalleMesaHist').classList.add('active');
+
+            // Activar swipe gestures en las tarjetas del popup
+            setTimeout(() => initMesaPopupGestures(), 100);
         }
 
-        document.getElementById('modalDetalleMesaHist').classList.add('active');
-
-        // Activar swipe gestures en las tarjetas del popup
-        setTimeout(() => initMesaPopupGestures(), 100);
-    }
-
-    function togglePagosSection() {
-        const seccion = document.getElementById('seccionPagos');
-        const icon = document.getElementById('iconVerPagos');
-        if (seccion.style.display === 'none') {
-            seccion.style.display = 'block';
-            icon.textContent = '▼';
-        } else {
-            seccion.style.display = 'none';
-            icon.textContent = '▶';
+        function togglePagosSection() {
+            const seccion = document.getElementById('seccionPagos');
+            const icon = document.getElementById('iconVerPagos');
+            if (seccion.style.display === 'none') {
+                seccion.style.display = 'block';
+                icon.textContent = '▼';
+            } else {
+                seccion.style.display = 'none';
+                icon.textContent = '▶';
+            }
         }
-    }
 
-    function renderPedidoCard(pedido, idx, total, isActive) {
-        const estadoColors = {
-            'pendiente': '#f6ad55', 'preparando': '#667eea', 'listo': '#48bb78',
-            'entregado': '#38a169', 'cancelado': '#e53e3e'
-        };
-        const estadoEmojis = {
-            'pendiente': '⏳', 'preparando': '👨\u200d🍳', 'listo': '✅',
-            'entregado': '🎉', 'cancelado': '❌'
-        };
-        const fecha = new Date(pedido.createdAt).toLocaleString('es-CO', {
-            day: '2-digit', month: '2-digit', year: 'numeric',
-            hour: '2-digit', minute: '2-digit'
-        });
+        function renderPedidoCard(pedido, idx, total, isActive) {
+            const estadoColors = {
+                'pendiente': '#f6ad55', 'preparando': '#667eea', 'listo': '#48bb78',
+                'entregado': '#38a169', 'cancelado': '#e53e3e'
+            };
+            const estadoEmojis = {
+                'pendiente': '⏳', 'preparando': '👨\u200d🍳', 'listo': '✅',
+                'entregado': '🎉', 'cancelado': '❌'
+            };
+            const fecha = new Date(pedido.createdAt).toLocaleString('es-CO', {
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
 
-        return `
+            return `
             <div class="mesa-pedido-card" data-id="${pedido._id}" data-estado="${pedido.estado}" data-metodo="${pedido.metodoPago || ''}" 
                  style="position: relative; overflow: hidden; margin-bottom: 1rem; transition: transform 0.2s; touch-action: pan-y; user-select: none; -webkit-user-select: none; ${!isActive ? 'opacity: 0.8;' : ''}">
                 <!-- Indicador Undo (derecha) -->
@@ -4936,210 +5103,210 @@
                 })() : ''}
             </div>
         `;
-    }
-
-    // SISTEMA DE GESTOS PARA POPUP DE MESAS
-    let mesaTouchStartX = 0, mesaTouchStartY = 0;
-    let mesaLongPressTimer = null, mesaActiveCard = null;
-    let mesaIsLongPressed = false, mesaGestureType = null;
-
-    function initMesaPopupGestures() {
-        const cards = document.querySelectorAll('.mesa-pedido-card');
-        cards.forEach(card => {
-            card.addEventListener('touchstart', mesaHandleStart, { passive: true });
-            card.addEventListener('touchmove', mesaHandleMove, { passive: false });
-            card.addEventListener('touchend', mesaHandleEnd);
-            card.addEventListener('touchcancel', mesaHandleEnd);
-            card.addEventListener('mousedown', mesaHandleStart);
-            card.addEventListener('mousemove', mesaHandleMove);
-            card.addEventListener('mouseup', mesaHandleEnd);
-            card.addEventListener('mouseleave', mesaHandleEnd);
-        });
-    }
-
-    function mesaHandleStart(e) {
-        mesaActiveCard = e.currentTarget;
-        const touch = e.touches ? e.touches[0] : e;
-        mesaTouchStartX = touch.clientX;
-        mesaTouchStartY = touch.clientY;
-        mesaIsLongPressed = false;
-        mesaGestureType = null;
-
-        // Limpiar clases si quedaron pegadas
-        mesaActiveCard.classList.remove('gesture-active-jiggle', 'gesture-swipe-smooth', 'gesture-return-smooth');
-
-        const estado = mesaActiveCard.dataset.estado;
-        const metodo = mesaActiveCard.dataset.metodo;
-        const isPagado = estado === 'entregado';
-        const isCancelado = estado === 'cancelado';
-
-        if (isCancelado) return;
-
-        if (isPagado && metodo) {
-            mesaLongPressTimer = setTimeout(() => {
-                mesaIsLongPressed = true;
-                mesaGestureType = 'change-payment';
-                mesaActiveCard.classList.add('gesture-active-jiggle');
-                if (window.navigator.vibrate) window.navigator.vibrate([30, 50, 30]);
-            }, 600);
-        } else if (!isPagado) {
-            mesaLongPressTimer = setTimeout(() => {
-                mesaIsLongPressed = true;
-                mesaGestureType = 'undo';
-                mesaActiveCard.classList.add('gesture-active-jiggle');
-                if (window.navigator.vibrate) window.navigator.vibrate([30, 50, 30]);
-            }, 600);
         }
-    }
 
-    function mesaHandleMove(e) {
-        if (!mesaActiveCard || !mesaIsLongPressed) return;
-        const touch = e.touches ? e.touches[0] : e;
-        const deltaX = touch.clientX - mesaTouchStartX;
-        const deltaY = touch.clientY - mesaTouchStartY;
+        // SISTEMA DE GESTOS PARA POPUP DE MESAS
+        let mesaTouchStartX = 0, mesaTouchStartY = 0;
+        let mesaLongPressTimer = null, mesaActiveCard = null;
+        let mesaIsLongPressed = false, mesaGestureType = null;
 
-        if (Math.abs(deltaY) > 50) { mesaHandleEnd(e); return; }
-        if (e.cancelable) e.preventDefault();
-
-        // Aplicamos transición suave y quitamos shake al mover
-        mesaActiveCard.classList.remove('gesture-active-jiggle', 'gesture-return-smooth');
-        mesaActiveCard.classList.add('gesture-swipe-smooth');
-
-        if (mesaGestureType === 'undo' && deltaX > 0) {
-            mesaActiveCard.style.transform = `translateX(${deltaX}px) scale(1.02)`;
-            const indicator = mesaActiveCard.querySelector('.mesa-undo-indicator');
-            if (indicator) indicator.style.opacity = Math.min(deltaX / 120, 1);
-        } else if (mesaGestureType === 'change-payment' && deltaX < 0) {
-            mesaActiveCard.style.transform = `translateX(${deltaX}px) scale(1.02)`;
-            const indicator = mesaActiveCard.querySelector('.mesa-payment-indicator');
-            if (indicator) indicator.style.opacity = Math.min(Math.abs(deltaX) / 120, 1);
+        function initMesaPopupGestures() {
+            const cards = document.querySelectorAll('.mesa-pedido-card');
+            cards.forEach(card => {
+                card.addEventListener('touchstart', mesaHandleStart, { passive: true });
+                card.addEventListener('touchmove', mesaHandleMove, { passive: false });
+                card.addEventListener('touchend', mesaHandleEnd);
+                card.addEventListener('touchcancel', mesaHandleEnd);
+                card.addEventListener('mousedown', mesaHandleStart);
+                card.addEventListener('mousemove', mesaHandleMove);
+                card.addEventListener('mouseup', mesaHandleEnd);
+                card.addEventListener('mouseleave', mesaHandleEnd);
+            });
         }
-    }
 
-    function mesaHandleEnd(e) {
-        clearTimeout(mesaLongPressTimer);
-        if (mesaActiveCard && mesaIsLongPressed) {
-            const touch = e.changedTouches ? e.changedTouches[0] : e;
-            const deltaX = touch.clientX - mesaTouchStartX;
+        function mesaHandleStart(e) {
+            mesaActiveCard = e.currentTarget;
+            const touch = e.touches ? e.touches[0] : e;
+            mesaTouchStartX = touch.clientX;
+            mesaTouchStartY = touch.clientY;
+            mesaIsLongPressed = false;
+            mesaGestureType = null;
 
-            if (mesaGestureType === 'undo' && deltaX > 120) {
-                const orderId = mesaActiveCard.dataset.id;
-                undoFromMesa(orderId);
-            } else if (mesaGestureType === 'change-payment' && deltaX < -120) {
-                const orderId = mesaActiveCard.dataset.id;
-                const metodo = mesaActiveCard.dataset.metodo;
-                cambiarMetodoPagoDesdeVistaMesa(orderId, metodo);
+            // Limpiar clases si quedaron pegadas
+            mesaActiveCard.classList.remove('gesture-active-jiggle', 'gesture-swipe-smooth', 'gesture-return-smooth');
+
+            const estado = mesaActiveCard.dataset.estado;
+            const metodo = mesaActiveCard.dataset.metodo;
+            const isPagado = estado === 'entregado';
+            const isCancelado = estado === 'cancelado';
+
+            if (isCancelado) return;
+
+            if (isPagado && metodo) {
+                mesaLongPressTimer = setTimeout(() => {
+                    mesaIsLongPressed = true;
+                    mesaGestureType = 'change-payment';
+                    mesaActiveCard.classList.add('gesture-active-jiggle');
+                    if (window.navigator.vibrate) window.navigator.vibrate([30, 50, 30]);
+                }, 600);
+            } else if (!isPagado) {
+                mesaLongPressTimer = setTimeout(() => {
+                    mesaIsLongPressed = true;
+                    mesaGestureType = 'undo';
+                    mesaActiveCard.classList.add('gesture-active-jiggle');
+                    if (window.navigator.vibrate) window.navigator.vibrate([30, 50, 30]);
+                }, 600);
             }
         }
-        if (mesaActiveCard) {
-            // Aplicar transición suave al volver a la pos inicial
-            mesaActiveCard.classList.remove('gesture-active-jiggle', 'gesture-swipe-smooth');
-            mesaActiveCard.classList.add('gesture-return-smooth');
-            mesaActiveCard.style.transform = 'translateX(0) scale(1)';
-            
-            const undo = mesaActiveCard.querySelector('.mesa-undo-indicator');
-            if (undo) undo.style.opacity = '0';
-            const pay = mesaActiveCard.querySelector('.mesa-payment-indicator');
-            if (pay) pay.style.opacity = '0';
+
+        function mesaHandleMove(e) {
+            if (!mesaActiveCard || !mesaIsLongPressed) return;
+            const touch = e.touches ? e.touches[0] : e;
+            const deltaX = touch.clientX - mesaTouchStartX;
+            const deltaY = touch.clientY - mesaTouchStartY;
+
+            if (Math.abs(deltaY) > 50) { mesaHandleEnd(e); return; }
+            if (e.cancelable) e.preventDefault();
+
+            // Aplicamos transición suave y quitamos shake al mover
+            mesaActiveCard.classList.remove('gesture-active-jiggle', 'gesture-return-smooth');
+            mesaActiveCard.classList.add('gesture-swipe-smooth');
+
+            if (mesaGestureType === 'undo' && deltaX > 0) {
+                mesaActiveCard.style.transform = `translateX(${deltaX}px) scale(1.02)`;
+                const indicator = mesaActiveCard.querySelector('.mesa-undo-indicator');
+                if (indicator) indicator.style.opacity = Math.min(deltaX / 120, 1);
+            } else if (mesaGestureType === 'change-payment' && deltaX < 0) {
+                mesaActiveCard.style.transform = `translateX(${deltaX}px) scale(1.02)`;
+                const indicator = mesaActiveCard.querySelector('.mesa-payment-indicator');
+                if (indicator) indicator.style.opacity = Math.min(Math.abs(deltaX) / 120, 1);
+            }
+        }
+
+        function mesaHandleEnd(e) {
+            clearTimeout(mesaLongPressTimer);
+            if (mesaActiveCard && mesaIsLongPressed) {
+                const touch = e.changedTouches ? e.changedTouches[0] : e;
+                const deltaX = touch.clientX - mesaTouchStartX;
+
+                if (mesaGestureType === 'undo' && deltaX > 120) {
+                    const orderId = mesaActiveCard.dataset.id;
+                    undoFromMesa(orderId);
+                } else if (mesaGestureType === 'change-payment' && deltaX < -120) {
+                    const orderId = mesaActiveCard.dataset.id;
+                    const metodo = mesaActiveCard.dataset.metodo;
+                    cambiarMetodoPagoDesdeVistaMesa(orderId, metodo);
+                }
+            }
+            if (mesaActiveCard) {
+                // Aplicar transición suave al volver a la pos inicial
+                mesaActiveCard.classList.remove('gesture-active-jiggle', 'gesture-swipe-smooth');
+                mesaActiveCard.classList.add('gesture-return-smooth');
+                mesaActiveCard.style.transform = 'translateX(0) scale(1)';
+
+                const undo = mesaActiveCard.querySelector('.mesa-undo-indicator');
+                if (undo) undo.style.opacity = '0';
+                const pay = mesaActiveCard.querySelector('.mesa-payment-indicator');
+                if (pay) pay.style.opacity = '0';
+
+                setTimeout(() => {
+                    if (mesaActiveCard) mesaActiveCard.classList.remove('gesture-return-smooth');
+                }, 500);
+            }
+            mesaActiveCard = null;
+            mesaIsLongPressed = false;
+            mesaGestureType = null;
+        }
+
+        async function undoFromMesa(orderId) {
+            const order = allLoadedOrders.find(o => o._id === orderId);
+            if (!order) return;
+            const flow = ['pendiente', 'preparando', 'listo', 'entregado'];
+            const idx = flow.indexOf(order.estado);
+            if (idx <= 0) return;
+            const prev = flow[idx - 1];
+
+            const result = await Swal.fire({
+                title: '↩️ Deshacer estado?',
+                text: `De "${order.estado}" a "${prev}"`,
+                icon: 'warning', showCancelButton: true,
+                confirmButtonText: 'Sí', cancelButtonText: 'No',
+                confirmButtonColor: '#4299e1'
+            });
+
+            if (result.isConfirmed) {
+                await cambiarEstadoDesdeVistaMesa(orderId, prev);
+            }
+        }
+
+        async function cambiarMetodoPagoDesdeVistaMesa(orderId, metodoActual) {
+            cerrarDetalleMesaHist();
+            // Reutilizamos la función principal que ahora soporta conversiones parciales y mixtas
+            await cambiarMetodoPago(orderId, metodoActual);
+        }
+
+        function cerrarDetalleMesaHist() {
+            document.getElementById('modalDetalleMesaHist').classList.remove('active');
+        }
+
+        async function pagarDesdeVistaMesa(orderId) {
+            console.log('💰 Pagar desde vista mesa:', orderId);
+            // Cerrar el modal de mesa
+            cerrarDetalleMesaHist();
+
+            // Si no está en 'listo', cambiar a listo primero
+            const order = allLoadedOrders.find(o => o._id === orderId);
+            if (order && order.estado !== 'listo') {
+                await actualizarEstadoPedido(orderId, 'listo', null);
+            }
+
+            // Abrir flujo de pago
+            currentOrderIdForPayment = orderId;
+            mostrarModalMetodoPago();
+        }
+
+        async function cambiarEstadoDesdeVistaMesa(orderId, nuevoEstado) {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_URL}/orders/${orderId}/estado`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ estado: nuevoEstado })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    cerrarDetalleMesaHist();
+                    const notif = document.createElement('div');
+                    notif.textContent = `✅ Pedido actualizado a ${nuevoEstado}`;
+                    notif.style.cssText = 'position:fixed;top:80px;right:20px;background:linear-gradient(135deg,#48bb78,#38a169);color:white;padding:1rem 1.5rem;border-radius:12px;font-weight:600;font-size:14px;box-shadow:0 4px 12px rgba(72,187,120,0.4);z-index:10000;';
+                    document.body.appendChild(notif);
+                    setTimeout(() => notif.remove(), 2500);
+                    await loadOrders(true);
+                    renderMesasHist(mesasDataHist);
+                } else {
+                    Swal.fire({ icon: 'error', text: data.message, timer: 3000, showConfirmButton: false });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({ icon: 'error', text: 'Error al cambiar estado', timer: 3000, showConfirmButton: false });
+            }
+        }
+
+        function checkAndShowShortcutOnboarding() {
+            if (localStorage.getItem('sawMinimalistShortcut')) return;
 
             setTimeout(() => {
-                if (mesaActiveCard) mesaActiveCard.classList.remove('gesture-return-smooth');
-            }, 500);
-        }
-        mesaActiveCard = null;
-        mesaIsLongPressed = false;
-        mesaGestureType = null;
-    }
+                const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+                const keyPrefix = isMac ? '⌘ Cmd' : 'Ctrl';
 
-    async function undoFromMesa(orderId) {
-        const order = allLoadedOrders.find(o => o._id === orderId);
-        if (!order) return;
-        const flow = ['pendiente', 'preparando', 'listo', 'entregado'];
-        const idx = flow.indexOf(order.estado);
-        if (idx <= 0) return;
-        const prev = flow[idx - 1];
-
-        const result = await Swal.fire({
-            title: '↩️ Deshacer estado?',
-            text: `De "${order.estado}" a "${prev}"`,
-            icon: 'warning', showCancelButton: true,
-            confirmButtonText: 'Sí', cancelButtonText: 'No',
-            confirmButtonColor: '#4299e1'
-        });
-
-        if (result.isConfirmed) {
-            await cambiarEstadoDesdeVistaMesa(orderId, prev);
-        }
-    }
-
-    async function cambiarMetodoPagoDesdeVistaMesa(orderId, metodoActual) {
-        cerrarDetalleMesaHist();
-        // Reutilizamos la función principal que ahora soporta conversiones parciales y mixtas
-        await cambiarMetodoPago(orderId, metodoActual);
-    }
-
-    function cerrarDetalleMesaHist() {
-        document.getElementById('modalDetalleMesaHist').classList.remove('active');
-    }
-
-    async function pagarDesdeVistaMesa(orderId) {
-        console.log('💰 Pagar desde vista mesa:', orderId);
-        // Cerrar el modal de mesa
-        cerrarDetalleMesaHist();
-
-        // Si no está en 'listo', cambiar a listo primero
-        const order = allLoadedOrders.find(o => o._id === orderId);
-        if (order && order.estado !== 'listo') {
-            await actualizarEstadoPedido(orderId, 'listo', null);
-        }
-
-        // Abrir flujo de pago
-        currentOrderIdForPayment = orderId;
-        mostrarModalMetodoPago();
-    }
-
-    async function cambiarEstadoDesdeVistaMesa(orderId, nuevoEstado) {
-        const token = localStorage.getItem('token');
-        try {
-            const response = await fetch(`${API_URL}/orders/${orderId}/estado`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ estado: nuevoEstado })
-            });
-            const data = await response.json();
-
-            if (data.success) {
-                cerrarDetalleMesaHist();
-                const notif = document.createElement('div');
-                notif.textContent = `✅ Pedido actualizado a ${nuevoEstado}`;
-                notif.style.cssText = 'position:fixed;top:80px;right:20px;background:linear-gradient(135deg,#48bb78,#38a169);color:white;padding:1rem 1.5rem;border-radius:12px;font-weight:600;font-size:14px;box-shadow:0 4px 12px rgba(72,187,120,0.4);z-index:10000;';
-                document.body.appendChild(notif);
-                setTimeout(() => notif.remove(), 2500);
-                await loadOrders(true);
-                renderMesasHist(mesasDataHist);
-            } else {
-                Swal.fire({ icon: 'error', text: data.message, timer: 3000, showConfirmButton: false });
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            Swal.fire({ icon: 'error', text: 'Error al cambiar estado', timer: 3000, showConfirmButton: false });
-        }
-    }
-
-    function checkAndShowShortcutOnboarding() {
-        if (localStorage.getItem('sawMinimalistShortcut')) return;
-
-        setTimeout(() => {
-            const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-            const keyPrefix = isMac ? '⌘ Cmd' : 'Ctrl';
-            
-            const onboarding = document.createElement('div');
-            onboarding.className = 'onboarding-shortcut-popup';
-            onboarding.id = 'shortcutOnboarding';
-            onboarding.innerHTML = `
+                const onboarding = document.createElement('div');
+                onboarding.className = 'onboarding-shortcut-popup';
+                onboarding.id = 'shortcutOnboarding';
+                onboarding.innerHTML = `
                 <div style="font-size: 32px; animation: bounceGlowIcon 2s infinite;">✨</div>
                 <div>
                     <p style="margin: 0 0 6px 0; font-weight: 800; font-size: 16px; color: #e2e8f0;">¡Prueba la nueva vista de mesas!</p>
@@ -5147,22 +5314,22 @@
                 </div>
                 <button onclick="dismissShortcutOnboarding()" style="background: rgba(99, 102, 241, 0.2); border: 1px solid rgba(99, 102, 241, 0.5); color: #818cf8; padding: 10px 16px; border-radius: 12px; cursor: pointer; font-weight: 700; transition: all 0.2s; white-space: nowrap; margin-left: auto;">¡Entendido!</button>
             `;
-            document.body.appendChild(onboarding);
-        }, 1500); 
-    }
-
-    function dismissShortcutOnboarding() {
-        const el = document.getElementById('shortcutOnboarding');
-        if (el) {
-            el.style.animation = 'slideDownFadeBtn 0.4s ease-in forwards';
-            setTimeout(() => el.remove(), 400);
+                document.body.appendChild(onboarding);
+            }, 1500);
         }
-        localStorage.setItem('sawMinimalistShortcut', 'true');
-    }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        checkAndShowShortcutOnboarding();
-    });
+        function dismissShortcutOnboarding() {
+            const el = document.getElementById('shortcutOnboarding');
+            if (el) {
+                el.style.animation = 'slideDownFadeBtn 0.4s ease-in forwards';
+                setTimeout(() => el.remove(), 400);
+            }
+            localStorage.setItem('sawMinimalistShortcut', 'true');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAndShowShortcutOnboarding();
+        });
     </script>
 </body>
 

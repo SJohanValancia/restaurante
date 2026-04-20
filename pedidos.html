@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" style="overflow-x: hidden;">
 
 <head>
     <meta charset="UTF-8">
@@ -17,6 +17,10 @@
             background: #f5f7fa;
             min-height: 100vh;
             color: #1a202c;
+            touch-action: manipulation;
+            overflow-x: hidden;
+            width: 100%;
+            position: relative;
         }
 
         /* SIDEBAR */
@@ -276,6 +280,40 @@
 
         .page-header {
             margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .page-title-container {
+            flex: 1;
+        }
+
+        .btn-change-view {
+            padding: 10px 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            white-space: nowrap;
+        }
+
+        .btn-change-view:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-change-view:active {
+            transform: translateY(0);
         }
 
         .page-title {
@@ -1634,26 +1672,7 @@
 
         /* Indicador de modo */
         .view-mode-indicator {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 10px 18px;
-            border-radius: 30px;
-            font-size: 12px;
-            font-weight: 700;
-            z-index: 998;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-            display: none;
-            align-items: center;
-            gap: 6px;
-            animation: slideInRight 0.3s ease-out;
-            cursor: pointer;
-        }
-
-        .view-mode-indicator.show {
-            display: flex;
+            display: none !important;
         }
 
         /* Responsive mesas */
@@ -2229,8 +2248,14 @@
     <div class="content-wrapper" id="contentWrapper">
         <div class="container">
             <div class="page-header">
-                <h1 class="page-title" id="pageTitlePedidos">🍽️ Gestión de Pedidos</h1>
-                <p class="page-subtitle">Administra los pedidos de tu restaurante</p>
+                <div class="page-title-container">
+                    <h1 class="page-title" id="pageTitlePedidos">🍽️ Gestión de Pedidos</h1>
+                    <p class="page-subtitle">Administra los pedidos de tu restaurante</p>
+                </div>
+                <button class="btn-change-view" id="btnChangeViewHeader" onclick="toggleTableView()">
+                    <span id="viewModeIconHeader">🪑</span>
+                    <span id="viewModeTextHeader">Vista Mesas</span>
+                </button>
             </div>
 
             <!-- ===== VISTA POR DEFECTO ===== -->
@@ -5431,52 +5456,36 @@
         }
     });
 
-    // DOBLE TAP en el título para móvil
-    let lastTapTime = 0;
-    document.addEventListener('DOMContentLoaded', () => {
-        const pageTitle = document.getElementById('pageTitlePedidos');
-        if (pageTitle) {
-            pageTitle.addEventListener('touchend', (e) => {
-                const now = Date.now();
-                if (now - lastTapTime < 400) {
-                    e.preventDefault();
-                    toggleTableView();
-                    lastTapTime = 0;
-                } else {
-                    lastTapTime = now;
-                }
-            });
-            // visual feedback que es tapeable
-            pageTitle.style.cursor = 'pointer';
-        }
-    });
-
+    // Lógica de cambio de vista
     function toggleTableView() {
         isTableView = !isTableView;
         const defaultView = document.getElementById('defaultView');
         const tableView = document.getElementById('tableView');
-        const indicator = document.getElementById('viewModeIndicator');
+        const headerIcon = document.getElementById('viewModeIconHeader');
+        const headerText = document.getElementById('viewModeTextHeader');
 
         if (isTableView) {
             defaultView.classList.add('hidden');
             tableView.classList.add('active');
-            indicator.classList.add('show');
-            document.getElementById('viewModeIcon').textContent = '📋';
-            document.getElementById('viewModeText').textContent = 'Vista Normal';
+            if (headerIcon) headerIcon.textContent = '📋';
+            if (headerText) headerText.textContent = 'Vista Normal';
             loadMesas();
         } else {
             defaultView.classList.remove('hidden');
             tableView.classList.remove('active');
-            indicator.classList.remove('show');
-            document.getElementById('viewModeIcon').textContent = '🪑';
-            document.getElementById('viewModeText').textContent = 'Vista Mesas';
+            if (headerIcon) headerIcon.textContent = '🪑';
+            if (headerText) headerText.textContent = 'Vista Mesas';
         }
 
         // Guardar modo en localStorage
         localStorage.setItem('tableViewMode', isTableView ? 'mesas' : 'normal');
 
-        // Feedback visual
-        mostrarNotificacionExito(isTableView ? '🪑 Vista de Mesas activada' : '📋 Vista Normal activada');
+        // Feedback
+        const notif = document.createElement('div');
+        notif.textContent = isTableView ? '🪑 Vista de Mesas activada' : '📋 Vista Normal activada';
+        notif.style.cssText = 'position:fixed;top:80px;right:20px;background:linear-gradient(135deg,#48bb78,#38a169);color:white;padding:1rem 1.5rem;border-radius:12px;font-weight:600;font-size:14px;box-shadow:0 4px 12px rgba(72,187,120,0.4);z-index:10000;animation:slideInRight 0.3s ease-out;';
+        document.body.appendChild(notif);
+        setTimeout(() => notif.remove(), 2500);
     }
 
     // CARGAR MESAS
