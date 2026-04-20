@@ -68,17 +68,35 @@ async function descontarStockAlimentos(items, userId, ignorarStock = false) {
         (item.alimentosExcluidos || []).map(e => (e.alimentoId || e).toString())
       );
 
+      // ✅ Obtener ajustes de alimentos para este item
+      const ajustesMap = new Map();
+      (item.alimentosAjustados || []).forEach(a => {
+        const id = (a.alimentoId || a._id || a).toString();
+        ajustesMap.set(id, Number(a.cantidadAjuste) || 0);
+      });
+
       if (alimentosMap.has(productoId)) {
         const alimentosDelProducto = alimentosMap.get(productoId);
 
         for (const alimentoData of alimentosDelProducto) {
+          const alimentoIdStr = alimentoData._id.toString();
+
           // ✅ Si el alimento está excluido, no descontar
-          if (excluidos.has(alimentoData._id.toString())) {
+          if (excluidos.has(alimentoIdStr)) {
             console.log(`⏭️ Alimento "${alimentoData.nombre}" excluido del descuento para este item`);
             continue;
           }
 
-          const cantidadADescontar = alimentoData.cantidadRequerida * cantidadPedida;
+          // ✅ Calcular deducción: (base * cantidad) + ajuste
+          const ajuste = ajustesMap.get(alimentoIdStr) || 0;
+          let cantidadADescontar = (alimentoData.cantidadRequerida * cantidadPedida) + ajuste;
+
+          // No permitir deducciones negativas
+          if (cantidadADescontar < 0) cantidadADescontar = 0;
+
+          if (ajuste !== 0) {
+            console.log(`⚖️ Ajuste de ${ajuste} aplicado a "${alimentoData.nombre}". Deducción total: ${cantidadADescontar}`);
+          }
 
           if (ignorarStock) {
             if (alimentoData.stock > 0) {
@@ -787,7 +805,8 @@ router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
         cantidad: item.cantidad,
         precio: item.precio,
         ownerUserId: producto.userId, // Dueño del producto (local)
-        alimentosExcluidos: item.alimentosExcluidos || [] // ✅ Alimentos excluidos del descuento
+        alimentosExcluidos: item.alimentosExcluidos || [], // ✅ Alimentos excluidos del descuento
+        alimentosAjustados: item.alimentosAjustados || [] // ✅ Ajustes personalizados (más/menos)
       };
     }));
 
@@ -945,7 +964,9 @@ router.post('/public', async (req, res) => {
         nombreProducto: producto.nombre,
         categoriaProducto: producto.categoria,
         cantidad: item.cantidad,
-        precio: producto.precio
+        precio: producto.precio,
+        alimentosExcluidos: item.alimentosExcluidos || [],
+        alimentosAjustados: item.alimentosAjustados || []
       };
     }));
 
@@ -967,7 +988,7 @@ router.post('/public', async (req, res) => {
       notas,
       userId: userId,
       estado: 'pendiente',
-      origenPedido: 'cliente' // Marca para identificar pedidos hechos por el cliente
+      origenPedido: 'cliente'
     };
 
     const order = await Order.create(orderData);

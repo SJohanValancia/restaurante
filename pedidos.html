@@ -1926,11 +1926,16 @@
         }
 
         .alimento-row {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 10px 0;
-            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.2s;
+        }
+
+        .alimento-row:hover {
+            background: #f8fafc;
         }
 
         .alimento-row:last-child {
@@ -1938,16 +1943,14 @@
         }
 
         .alimento-checkbox {
-            width: 22px;
-            height: 22px;
-            accent-color: #48bb78;
+            width: 20px;
+            height: 20px;
             cursor: pointer;
-            flex-shrink: 0;
+            accent-color: #667eea;
         }
 
         .alimento-info {
             flex: 1;
-            min-width: 0;
         }
 
         .alimento-nombre {
@@ -1964,10 +1967,65 @@
 
         .alimento-stock-badge {
             font-size: 11px;
-            font-weight: 600;
-            padding: 3px 8px;
-            border-radius: 12px;
-            flex-shrink: 0;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        /* Estilos para el Ajuste Manual */
+        .alimento-ajuste {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #edf2f7;
+            padding: 4px;
+            border-radius: 8px;
+            margin-left: 8px;
+        }
+
+        .alimento-input-ajuste {
+            width: 45px;
+            padding: 4px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #2d3748;
+            -moz-appearance: textfield;
+        }
+
+        .alimento-input-ajuste::-webkit-outer-spin-button,
+        .alimento-input-ajuste::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .adj-btn {
+            width: 26px;
+            height: 26px;
+            border: none;
+            background: white;
+            color: #4a5568;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+
+        .adj-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .adj-btn.minus:hover {
+            background: #f56565;
         }
 
         .alimento-stock-ok {
@@ -2853,8 +2911,8 @@
                         <span class="item-price">$${(item.producto.precio * item.cantidad).toLocaleString('es-CO')}</span>
                     </div>
                     ${tieneAlimentos ? `
-                        <button type="button" class="btn-ver-alimentos ${tieneExclusiones ? 'has-exclusions' : ''}" onclick="mostrarAlimentosPopup('${item.producto._id}', ${index}, 'default')">
-                            🥩 Ver Alimentos ${tieneExclusiones ? '(' + item.alimentosExcluidos.length + ' excl.)' : ''}
+                        <button type="button" class="btn-ver-alimentos ${tieneExclusiones || item.alimentosAjustados?.some(a => a.cantidadAjuste !== 0) ? 'has-exclusions' : ''}" onclick="mostrarAlimentosPopup('${item.producto._id}', ${index}, 'default')">
+                            🥩 Ver Alimentos ${tieneExclusiones ? '(' + item.alimentosExcluidos.length + ' excl.)' : ''}${item.alimentosAjustados?.some(a => a.cantidadAjuste !== 0) ? '(ajustado)' : ''}
                         </button>
                     ` : ''}
                 </div>
@@ -2908,9 +2966,12 @@
                 return;
             }
 
-            // Obtener exclusiones actuales
+            // Obtener exclusiones y ajustes actuales
             const itemsArray = vista === 'default' ? selectedItems : mesaSelectedItems;
             const currentExclusions = (itemsArray[itemIndex].alimentosExcluidos || []).map(e => e.alimentoId);
+            const currentAdjustments = (itemsArray[itemIndex].alimentosAjustados || []);
+            const adjustmentsMap = new Map();
+            currentAdjustments.forEach(a => adjustmentsMap.set(a.alimentoId, a.cantidadAjuste));
 
             const overlay = document.createElement('div');
             overlay.className = 'alimentos-overlay';
@@ -2950,9 +3011,20 @@
                                     >
                                     <div class="alimento-info">
                                         <div class="alimento-nombre">${alimento.nombre}</div>
-                                        <div class="alimento-detalle">Req: ${cantidadReq} por unidad</div>
+                                        <div class="alimento-detalle">Bas: ${cantidadReq} x unidad</div>
                                     </div>
                                     <span class="alimento-stock-badge ${stockClass}">${stockLabel}</span>
+                                    
+                                    <div class="alimento-ajuste">
+                                        <button type="button" class="adj-btn minus" onclick="cambiarAjusteAlimento(this, -1)">-</button>
+                                        <input type="number" class="alimento-input-ajuste" 
+                                            data-alimento-id="${alimento._id}"
+                                            data-alimento-nombre="${alimento.nombre}"
+                                            value="${adjustmentsMap.get(alimento._id) || 0}"
+                                            title="Ajuste manual de cantidad"
+                                        >
+                                        <button type="button" class="adj-btn plus" onclick="cambiarAjusteAlimento(this, 1)">+</button>
+                                    </div>
                                 </div>
                             `;
                         }).join('')}
@@ -2967,10 +3039,19 @@
             document.body.appendChild(overlay);
         }
 
+        function cambiarAjusteAlimento(btn, delta) {
+            const input = btn.parentElement.querySelector('.alimento-input-ajuste');
+            let val = parseInt(input.value) || 0;
+            input.value = val + delta;
+        }
+
         function confirmarAlimentos(btn, itemIndex, vista) {
             const overlay = btn.closest('.alimentos-overlay');
             const checkboxes = overlay.querySelectorAll('.alimento-checkbox');
+            const inputsAjuste = overlay.querySelectorAll('.alimento-input-ajuste');
+            
             const excluidos = [];
+            const ajustados = [];
 
             checkboxes.forEach(cb => {
                 if (!cb.checked) {
@@ -2981,20 +3062,37 @@
                 }
             });
 
+            inputsAjuste.forEach(input => {
+                const val = parseInt(input.value) || 0;
+                if (val !== 0) {
+                    ajustados.push({
+                        alimentoId: input.dataset.alimentoId,
+                        nombre: input.dataset.alimentoNombre,
+                        cantidadAjuste: val
+                    });
+                }
+            });
+
             if (vista === 'default') {
                 selectedItems[itemIndex].alimentosExcluidos = excluidos;
+                selectedItems[itemIndex].alimentosAjustados = ajustados;
                 updateSelectedProducts();
             } else {
                 mesaSelectedItems[itemIndex].alimentosExcluidos = excluidos;
+                mesaSelectedItems[itemIndex].alimentosAjustados = ajustados;
                 updateSelectedProductsMesa();
             }
 
             overlay.remove();
 
-            if (excluidos.length > 0) {
+            if (excluidos.length > 0 || ajustados.length > 0) {
+                let msg = '';
+                if (excluidos.length > 0) msg += `${excluidos.length} excluido(s). `;
+                if (ajustados.length > 0) msg += `${ajustados.length} ajustado(s). `;
+                
                 Swal.fire({ 
                     icon: 'info', 
-                    text: `${excluidos.length} alimento(s) excluido(s). No se descontarán del inventario.`, 
+                    text: msg + "Se ha modificado el descuento de inventario para este plato.", 
                     timer: 2500, 
                     showConfirmButton: false 
                 });
@@ -3053,7 +3151,8 @@
                     producto: item.producto._id,
                     cantidad: item.cantidad,
                     precio: item.producto.precio,
-                    alimentosExcluidos: item.alimentosExcluidos || []
+                    alimentosExcluidos: item.alimentosExcluidos || [],
+                    alimentosAjustados: item.alimentosAjustados || []
                 })),
                 notas: notas,
                 userId: currentUser._id,
@@ -5747,7 +5846,8 @@
                 categoriaProducto: item.producto.categoria || '',
                 cantidad: item.cantidad,
                 precio: item.producto.precio,
-                alimentosExcluidos: item.alimentosExcluidos || []
+                alimentosExcluidos: item.alimentosExcluidos || [],
+                alimentosAjustados: item.alimentosAjustados || []
             })),
             notas: notas
         };

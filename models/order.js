@@ -67,6 +67,18 @@ const orderSchema = new mongoose.Schema({
         ref: 'Alimento'
       },
       nombre: String
+    }],
+    // ✅ Ajustes personalizados de alimentos (agregar o quitar cantidad)
+    alimentosAjustados: [{
+      alimentoId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Alimento'
+      },
+      nombre: String,
+      cantidadAjuste: {
+        type: Number,
+        default: 0
+      }
     }]
   }],
   total: {
