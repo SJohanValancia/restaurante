@@ -118,7 +118,7 @@ router.get('/:id', protect, async (req, res) => {
 // Crear un nuevo alimento
 router.post('/', protect, async (req, res) => {
   try {
-    const { nombre, stock, valor, productos } = req.body;
+    const { nombre, stock, valor, productos, medida } = req.body;
 
     // ✅ VALIDAR que stock y valor sean números válidos
     const stockNumero = Number(stock);
@@ -161,6 +161,7 @@ const alimentoData = {
     nombre: nombre.trim(),
     stock: stockNumero,
     valor: valorNumero || 0,  // ✅ Valor por defecto 0 si no se proporciona
+    medida: medida || 'uds',
     productos: productos.map(p => ({
         productoId: p.productoId,
         cantidadRequerida: Number(p.cantidadRequerida)
@@ -193,13 +194,14 @@ const alimentoData = {
 // Actualizar un alimento
 router.put('/:id', protect, async (req, res) => {
   try {
-    const { nombre, stock, valor, productos } = req.body;
+    const { nombre, stock, valor, productos, medida } = req.body;
 
     // ✅ VALIDAR números si vienen en el body
     const updateData = {
       nombre: nombre ? nombre.trim() : undefined,
       stock: stock !== undefined ? Number(stock) : undefined,
       valor: valor !== undefined ? Number(valor) : undefined,
+      medida: medida ? medida.trim() : undefined,
       productos: productos ? productos.map(p => ({
         productoId: p.productoId,
         cantidadRequerida: Number(p.cantidadRequerida)

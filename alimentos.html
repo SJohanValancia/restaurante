@@ -800,6 +800,15 @@
             font-size: 14px;
             animation: fadeIn 0.3s ease;
         }
+        /* Ocultar flechas en inputs de numero */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -932,10 +941,17 @@
                                     placeholder="Precio por unidad">
                             </div>
 
-                            <div class="form-group">
-                                <label class="form-label" for="stock">Stock Disponible *</label>
-                                <input type="number" id="stock" class="form-input" min="0"
-                                    placeholder="Cantidad en inventario" required>
+                            <div class="form-group" style="display: flex; gap: 10px;">
+                                <div style="flex: 1;">
+                                    <label class="form-label" for="stock">Stock Disponible *</label>
+                                    <input type="number" id="stock" class="form-input" min="0" step="any"
+                                        placeholder="Cantidad en inventario" required>
+                                </div>
+                                <div style="flex: 1;">
+                                    <label class="form-label" for="medida">Unidad de Medida *</label>
+                                    <input type="text" id="medida" class="form-input"
+                                        placeholder="Ej: g, kg, ml, uds" required>
+                                </div>
                             </div>
 
 
@@ -1122,14 +1138,14 @@
             </div>
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.2); padding: 6px 10px; border-radius: 8px;">
-                    <button onclick="cambiarCantidad(${index}, -1)" 
+                    <button type="button" onclick="cambiarCantidad(${index}, -1)" 
                             style="width: 28px; height: 28px; background: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.5); border-radius: 6px; color: white; cursor: pointer; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;"
                             onmouseover="this.style.background='rgba(255,255,255,0.4)'"
                             onmouseout="this.style.background='rgba(255,255,255,0.3)'">
                         −
                     </button>
-                    <span style="min-width: 35px; text-align: center; font-weight: 800; font-size: 16px;">${prod.cantidadRequerida}</span>
-                    <button onclick="cambiarCantidad(${index}, 1)" 
+                    <input type="number" value="${prod.cantidadRequerida}" onchange="cambiarCantidadManual(${index}, this.value)" style="width: 50px; text-align: center; border-radius: 6px; border: 1px solid rgba(255,255,255,0.5); background: rgba(255,255,255,0.2); color: white; font-weight: 800; font-size: 16px; padding: 4px; /* remove arrows */ -moz-appearance: textfield;" min="0" step="any">
+                    <button type="button" onclick="cambiarCantidad(${index}, 1)" 
                             style="width: 28px; height: 28px; background: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.5); border-radius: 6px; color: white; cursor: pointer; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;"
                             onmouseover="this.style.background='rgba(255,255,255,0.4)'"
                             onmouseout="this.style.background='rgba(255,255,255,0.3)'">
@@ -1149,12 +1165,17 @@
 
         // CAMBIAR CANTIDAD REQUERIDA
         function cambiarCantidad(index, delta) {
-            productosSeleccionados[index].cantidadRequerida += delta;
-
-            if (productosSeleccionados[index].cantidadRequerida < 1) {
-                productosSeleccionados[index].cantidadRequerida = 1;
+            productosSeleccionados[index].cantidadRequerida = parseFloat((productosSeleccionados[index].cantidadRequerida + delta).toFixed(4));
+            if (productosSeleccionados[index].cantidadRequerida < 0) {
+                productosSeleccionados[index].cantidadRequerida = 0;
             }
+            actualizarListaProductosSeleccionados();
+        }
 
+        function cambiarCantidadManual(index, value) {
+            let val = parseFloat(value);
+            if (isNaN(val) || val < 0) val = 0;
+            productosSeleccionados[index].cantidadRequerida = val;
             actualizarListaProductosSeleccionados();
         }
 
@@ -1250,7 +1271,7 @@
             <div class="alimento-info">
                 <div class="info-item">
                     <div class="info-label">Stock Disponible</div>
-                    <div class="info-value">${alimento.stock || 0} unidades</div>
+                    <div class="info-value">${alimento.stock || 0} ${alimento.medida || 'unidades'}</div>
                 </div>
 
             </div>
@@ -1280,7 +1301,7 @@
                                 ${productoCategoria ? `<br><small style="color: #4299e1; font-size: 11px;">${productoCategoria}</small>` : ''}
                             </div>
                             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; white-space: nowrap;">
-                                x${prod.cantidadRequerida}
+                                x${prod.cantidadRequerida} ${alimento.medida || 'uds'}
                             </div>
                         </div>
 
@@ -1312,20 +1333,22 @@
 
             const nombre = document.getElementById('nombre').value.trim();
             const stock = document.getElementById('stock').value;
+            const medida = document.getElementById('medida').value.trim();
             const valor = document.getElementById('valor').value;
 
-            if (!nombre || stock === '') {
+            if (!nombre || stock === '' || !medida) {
                 Swal.fire({ icon: (('⚠️ Por favor complete todos los campos obligatorios').toLowerCase().includes("error") || ('⚠️ Por favor complete todos los campos obligatorios').toLowerCase().includes("falla") || ('⚠️ Por favor complete todos los campos obligatorios').toLowerCase().includes("incorrect")) ? "error" : "success", text: '⚠️ Por favor complete todos los campos obligatorios', timer: 3000, showConfirmButton: false });
                 return;
             }
 
             const alimentoData = {
                 nombre: nombre,
-                stock: parseInt(stock),
+                stock: parseFloat(stock),
+                medida: medida,
                 valor: valor ? parseFloat(valor) : 0,
                 productos: productosSeleccionados.map(p => ({
                     productoId: p.productoId,
-                    cantidadRequerida: p.cantidadRequerida
+                    cantidadRequerida: parseFloat(p.cantidadRequerida)
                 }))
             };
 
@@ -1379,7 +1402,8 @@
                     document.getElementById('alimentoId').value = alimento._id;
                     document.getElementById('nombre').value = alimento.nombre;
                     document.getElementById('stock').value = alimento.stock;
-                    document.getElementById('valor').value = alimento.valor;
+                    document.getElementById('medida').value = alimento.medida || 'uds';
+                    document.getElementById('valor').value = alimento.valor || '';
 
                     // ✅ CORREGIDO: Extraer solo el ID del producto
                     productosSeleccionados = alimento.productos.map(prod => {
@@ -1447,6 +1471,7 @@
         function limpiarFormulario() {
             document.getElementById('alimentoForm').reset();
             document.getElementById('alimentoId').value = '';
+            document.getElementById('medida').value = '';
             productosSeleccionados = [];
             actualizarListaProductosSeleccionados();
             document.getElementById('formTitle').textContent = '➕ Agregar Alimento';

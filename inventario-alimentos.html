@@ -974,7 +974,7 @@
                     <div class="alimento-info">
                         <div class="info-item">
                             <div class="info-label">Stock Disponible</div>
-                            <div class="info-value">${stock} unidades</div>
+                            <div class="info-value">${stock} ${alimento.medida || 'unidades'}</div>
                         </div>
 
 
@@ -1002,7 +1002,7 @@
                                             ${productoCategoria ? `<div style="color: #4299e1; font-size: 11px; margin-top: 2px;">${productoCategoria}</div>` : ''}
                                         </div>
                                         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; white-space: nowrap; margin-left: 10px;">
-                                            x${consumoPorPlato}
+                                            x${consumoPorPlato} ${alimento.medida || 'uds'}
                                         </div>
                                     </div>
                                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #e2e8f0;">

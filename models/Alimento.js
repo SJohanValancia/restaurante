@@ -18,6 +18,11 @@ const alimentoSchema = new mongoose.Schema({
     required: [true, 'El valor es obligatorio'],
     min: [0, 'El valor no puede ser negativo']
   },
+  medida: {
+    type: String,
+    trim: true,
+    default: 'uds'
+  },
   // ✅ CAMBIO: Ahora es un array de productos
   productos: [{
     productoId: {
@@ -28,7 +33,7 @@ const alimentoSchema = new mongoose.Schema({
     cantidadRequerida: {
       type: Number,
       required: [true, 'La cantidad requerida es obligatoria'],
-      min: [1, 'La cantidad debe ser al menos 1']
+      min: [0, 'La cantidad debe ser al menos 0']
     }
   }],
   userId: {
