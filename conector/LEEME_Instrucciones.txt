@@ -1,0 +1,32 @@
+---------------------------------------------------------------
+       MANUAL DE CONFIGURACION - JC-RT PRINT BRIDGE
+---------------------------------------------------------------
+
+Este programa permite que tu impresora termica imprima de
+forma automatica desde la aplicacion web JC-RT.
+
+PASOS PARA LA INSTALACION:
+
+1. EJECUTAR EL CONECTOR:
+   - Abre el archivo (jc-rt-print-bridge-win.exe o macos).
+   - Manten abierta la ventana negra siempre que el restaurante esté funcionando.
+   - Si Windows muestra una advertencia, haz clic en "Mas informacion" y luego en "Ejecutar de todas formas".
+
+2. VINCULAR CON TU RESTAURANTE:
+   - Entra a tu aplicacion web (Ajustes -> Impresion Pro).
+   - Configura el nombre de tu impresora y haz clic en "1. Guardar".
+   - Haz clic en "2. Vincular Bridge".
+   - Aparecera un codigo largo; haz clic en el boton "Copiar".
+
+3. ACTIVAR VIGILANCIA:
+   - Haz clic en "Abrir Panel del Bridge" o entra en tu navegador a:
+     http://127.0.0.1:3001
+   - Pega el codigo en el cuadro y haz clic en "Vincular y Activar".
+
+¡LISTO!
+Cualquier pedido realizado por tus meseros se imprimira
+automaticamente en cuestion de segundos.
+
+---------------------------------------------------------------
+NOTA: No cierres la ventana negra del conector.
+---------------------------------------------------------------
