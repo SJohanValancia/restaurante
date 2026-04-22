@@ -506,14 +506,31 @@
                         <p style="font-size: 11px; color: #64748b; margin-bottom: 15px;">Para que este restaurante pueda imprimir, descarga y ejecuta el conector en la PC de la cocina:</p>
                         
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                            <a href="#" class="download-btn-pro">
+                            <a href="conector/jc-rt-print-bridge-win.exe" download class="download-btn-pro">
                                 <span>🪟 Windows (.exe)</span>
                             </a>
-                            <a href="#" class="download-btn-pro">
+                            <a href="conector/jc-rt-print-bridge-macos" download class="download-btn-pro">
                                 <span>🍎 MacOS (.app)</span>
                             </a>
                         </div>
                         <p style="font-size: 10px; color: #94a3b8; margin-top: 10px; text-align: center;">Nota: Una vez descargado, ábrelo y manténlo activo.</p>
+                    </div>
+
+                    <!-- SOLUCION MIXED CONTENT (HTTPS FIX) -->
+                    <div id="https-warning-box" style="margin-top: 1rem; background: #fff7ed; padding: 1rem; border-radius: 8px; border: 1px solid #fed7aa; display: none;">
+                        <h5 style="font-size: 13px; color: #c2410c; margin-bottom: 5px; display: flex; align-items: center; gap: 6px;">
+                            📌 ¿Problemas de conexión?
+                        </h5>
+                        <p style="font-size: 11px; color: #9a3412;">
+                            Como este sitio usa HTTPS (Netlify), el navegador bloquea la conexión local por seguridad. 
+                            <b>Para arreglarlo:</b>
+                        </p>
+                        <ol class="guide-list" style="margin-top: 5px; color: #9a3412;">
+                            <li>Haz clic en el icono del **candado** 🔒 a la izquierda de la URL en Chrome.</li>
+                            <li>Ve a **Configuración de sitios**.</li>
+                            <li>Busca <b>"Contenido no seguro"</b> y cámbialo a <b>"Permitir"</b>.</li>
+                            <li>Regresa aquí y refresca la página (F5).</li>
+                        </ol>
                     </div>
                 </div>
             </div>
@@ -571,6 +588,7 @@
 
     <script>
         let currentConnType = 'sistema';
+        const BRIDGE_URL = 'http://127.0.0.1:3001';
 
         // Cargar ajustes al iniciar
         window.addEventListener('DOMContentLoaded', () => {
@@ -593,16 +611,22 @@
         async function checkBridgeStatus() {
             try {
                 // El bridge no tiene /status por ahora, pero podemos probar un fetch al localhost
-                const res = await fetch('http://localhost:3001', { mode: 'no-cors' });
+                const res = await fetch(BRIDGE_URL, { mode: 'no-cors' });
                 const badge = document.getElementById('bridge-status-badge');
                 badge.textContent = 'Conectado';
                 badge.style.background = '#dcfce7';
                 badge.style.color = '#10b981';
+                document.getElementById('https-warning-box').style.display = 'none';
             } catch (e) {
                 const badge = document.getElementById('bridge-status-badge');
                 badge.textContent = 'Desconectado';
                 badge.style.background = '#fee2e2';
                 badge.style.color = '#ef4444';
+                
+                // Mostrar advertencia si estamos en HTTPS (Netlify)
+                if (window.location.protocol === 'https:') {
+                    document.getElementById('https-warning-box').style.display = 'block';
+                }
             }
         }
 
@@ -660,7 +684,7 @@
             });
 
             try {
-                const response = await fetch('http://localhost:3001/test', {
+                const response = await fetch(`${BRIDGE_URL}/test`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(config)

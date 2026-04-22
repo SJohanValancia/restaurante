@@ -2,7 +2,7 @@
     console.log("🛠️ JC-RT Print Monitor PRO inicializado.");
 
     const API_URL_MONITOR = 'https://restaurante-co77.onrender.com/api';
-    const BRIDGE_URL = 'http://localhost:3001';
+    const BRIDGE_URL = 'http://127.0.0.1:3001';
     let monitorInterval = null;
 
     // 1. Crear Indicador Visual del Monitor Pro

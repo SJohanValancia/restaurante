@@ -25,6 +25,9 @@ print-bridge/node_modules/
 print-bridge/dist/
 print-bridge/npm-debug.log*
 
+# Carpeta de distribución pública (IMPORTANTE: NO IGNORAR)
+!conector/
+
 # Archivos temporales de edición (Antigravity/Gemini)
 .gemini/
 .antigravity/
