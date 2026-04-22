@@ -448,8 +448,8 @@
 
                 <div class="setting-item">
                     <div class="setting-info">
-                        <div class="setting-name">Impresión Automática</div>
-                        <div class="setting-description">Lanzar ticket a cocina automáticamente al crear el pedido.</div>
+                        <div class="setting-name">Estación de Impresión Central</div>
+                        <div class="setting-description">Activa esta opción SOLAMENTE en la computadora conectada a la impresora de cocina. Imprimirá automáticamente todos los pedidos que hagan los meseros.</div>
                     </div>
                     <label class="switch">
                         <input type="checkbox" id="autoPrintSwitch">
@@ -493,7 +493,7 @@
 
                     <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed #cbd5e1;">
                         <p style="font-size: 12px; font-weight: 600; color: var(--text);">⚠️ IMPORTANTE:</p>
-                        <p style="font-size: 12px;">Asegúrate de que tu térmica USB esté configurada como la <b>impresora predeterminada</b> en el Panel de Control de tu computadora.</p>
+                        <p style="font-size: 12px;">Para que funcione, mantén abierta la pestaña de <b>Pedidos</b> en esta computadora. El sistema "vigilará" los pedidos nuevos y los imprimirá por ti.</p>
                     </div>
                 </div>
             </div>
@@ -613,6 +613,7 @@
             display: none;
         }
     </style>
+<script src="scripts/print-monitor.js"></script>
 </body>
 
 </html>

@@ -4349,14 +4349,13 @@
                         displayOrders(newOrders);
                         document.getElementById('orderCount').textContent = data.count;
 
-                        // Detectar nuevo pedido
+                        // Detectar nuevo pedido (Lógica original de notificación)
                         if (!isFirstLoadPedidos && newOrders.length > lastOrderCountPedidos) {
                             const newestOrder = newOrders[0];
                             playNotificationSoundPedidos();
 
                             if (newestOrder.source === 'mandao') {
                                 mostrarNotificacionExito('🚲 ¡TIENES UN MANDAO!');
-                                // Alerta visual más fuerte para Mandao
                                 if (typeof alertarNuevoPedidoMandao === 'function') {
                                     alertarNuevoPedidoMandao();
                                 }
@@ -6107,6 +6106,7 @@
         checkAndShowShortcutOnboarding();
     });
     </script>
+<script src="scripts/print-monitor.js"></script>
 </body>
 
 </html>
