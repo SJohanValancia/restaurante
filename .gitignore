@@ -1,1 +1,31 @@
-node_modules
+# Archivos de Dependencias
+node_modules/
+dist/
+build/
+
+# Archivos de Configuración Sensible (Seguridad)
+.env
+*.pem
+*.key
+
+# Logs y Cache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.eslintcache
+.cache/
+
+# Archivos del Sistema Operativo
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Archivos específicos del Print Bridge
+print-bridge/node_modules/
+print-bridge/dist/
+print-bridge/npm-debug.log*
+
+# Archivos temporales de edición (Antigravity/Gemini)
+.gemini/
+.antigravity/
+.!*

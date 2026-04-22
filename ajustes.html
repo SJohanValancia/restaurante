@@ -439,17 +439,22 @@
         </div>
 
         <div class="settings-grid">
-            <!-- IMPRESION -->
+            <!-- IMPRESION PRO -->
             <div class="card">
                 <div class="card-header">
                     <div class="card-icon">🖨️</div>
-                    <h3>Impresión de Comandas</h3>
+                    <div style="flex: 1;">
+                        <h3 style="display: flex; align-items: center; gap: 8px;">
+                            Impresión Profesional (Pro)
+                            <span id="bridge-status-badge" style="font-size: 10px; background: #fee2e2; color: #ef4444; padding: 2px 8px; border-radius: 10px;">Desconectado</span>
+                        </h3>
+                    </div>
                 </div>
 
                 <div class="setting-item">
                     <div class="setting-info">
-                        <div class="setting-name">Estación de Impresión Central</div>
-                        <div class="setting-description">Activa esta opción SOLAMENTE en la computadora conectada a la impresora de cocina. Imprimirá automáticamente todos los pedidos que hagan los meseros.</div>
+                        <div class="setting-name">Activar Estación de Impresión</div>
+                        <div class="setting-description">Habilita esta PC para procesar y enviar comandas automáticamente.</div>
                     </div>
                     <label class="switch">
                         <input type="checkbox" id="autoPrintSwitch">
@@ -457,171 +462,225 @@
                     </label>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Nombre de la Impresora (Referencia)</label>
-                    <input type="text" id="printerNameInput" class="form-input" placeholder="Ej: Impresora Cocina USB">
-                    <p style="font-size: 11px; color: var(--text-light); margin-top: 4px;">Nota: El sistema usará siempre la impresora configurada como <b>Predeterminada</b> en tu computadora.</p>
+                <div id="print-config-section" style="margin-top: 1rem; border-top: 1px solid #f1f5f9; padding-top: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Conexión</label>
+                        <div style="display: flex; gap: 10px;">
+                            <button id="btn-conn-sistema" class="conn-type-btn active" onclick="setConnType('sistema')">USB / Bluetooth</button>
+                            <button id="btn-conn-red" class="conn-type-btn" onclick="setConnType('red')">WiFi / Red (IP)</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="group-interface-sistema">
+                        <label class="form-label">Nombre de la Impresora en el Sistema</label>
+                        <input type="text" id="printerInterfaceSistema" class="form-input" placeholder="Ej: Epson_TM_T20">
+                    </div>
+
+                    <div class="form-group" id="group-interface-red" style="display: none;">
+                        <label class="form-label">Dirección IP de la Impresora</label>
+                        <input type="text" id="printerInterfaceRed" class="form-input" placeholder="Ej: 192.168.1.100">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Marca/Modelo de Impresora</label>
+                        <select id="printerModel" class="form-input">
+                            <option value="epson">Epson (O Genérica ESC/POS)</option>
+                            <option value="star">Star / Otros</option>
+                        </select>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-top: 1.5rem;">
+                        <button class="btn-save" onclick="saveSettings()" style="flex: 2; margin-top: 0;">
+                            <span>💾</span> Guardar Configuración
+                        </button>
+                        <button class="btn-save" onclick="testPrintPro()" style="flex: 1; margin-top: 0; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; box-shadow: none;">
+                            <span>⚡</span> Probar
+                        </button>
+                    </div>
                 </div>
 
-                <button class="btn-save" onclick="testPrint()" style="margin-top: 1rem; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; box-shadow: none;">
-                    <span>🖨️</span> Probar Impresión
-                </button>
-
-                <div class="guide-box">
-                    <h4>🚀 Guía de Configuración Automática</h4>
-                    <p>Para que la comanda se imprima al instante sin pedir confirmación, sigue estos pasos según tu sistema:</p>
-                    
-                    <div style="margin-top: 1rem;">
-                        <h5 style="font-size: 13px; color: var(--primary); margin-bottom: 5px;">💻 En Windows (Chrome/Edge)</h5>
-                        <ol class="guide-list" style="margin-left: 10px;">
-                            <li>Haz clic derecho en tu acceso directo de Chrome y selecciona <b>Propiedades</b>.</li>
-                            <li>En el campo <b>Destino (Target)</b>, ve al final de la línea.</li>
-                            <li>Añade un espacio y pega lo siguiente: <code>--kiosk-printing</code></li>
-                            <li>Haz clic en Aceptar. Cierra Chrome completamente y vuelve a abrirlo con ese acceso.</li>
-                        </ol>
-                    </div>
-
-                    <div style="margin-top: 1.5rem;">
-                        <h5 style="font-size: 13px; color: var(--primary); margin-bottom: 5px;">🍎 En Mac (Chrome)</h5>
-                        <ol class="guide-list" style="margin-left: 10px;">
-                            <li>Cierra Chrome completamente.</li>
-                            <li>Abre la aplicación <b>Terminal</b>.</li>
-                            <li>Copia y pega el siguiente comando: <br> <code>open -a "Google Chrome" --args --kiosk-printing</code></li>
-                            <li>Presiona Enter. Chrome se abrirá listo para imprimir automáticamente.</li>
-                        </ol>
-                    </div>
-
-                    <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed #cbd5e1;">
-                        <p style="font-size: 12px; font-weight: 600; color: var(--text);">⚠️ IMPORTANTE:</p>
-                        <p style="font-size: 12px;">Para que funcione, mantén abierta la pestaña de <b>Pedidos</b> en esta computadora. El sistema "vigilará" los pedidos nuevos y los imprimirá por ti.</p>
+                    <div style="margin-top: 1.5rem; background: #fff; padding: 1rem; border-radius: 8px; border: 1px solid #dbeafe;">
+                        <h5 style="font-size: 13px; color: #1d4ed8; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                            📥 Descarga para Clientes
+                        </h5>
+                        <p style="font-size: 11px; color: #64748b; margin-bottom: 15px;">Para que este restaurante pueda imprimir, descarga y ejecuta el conector en la PC de la cocina:</p>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <a href="#" class="download-btn-pro">
+                                <span>🪟 Windows (.exe)</span>
+                            </a>
+                            <a href="#" class="download-btn-pro">
+                                <span>🍎 MacOS (.app)</span>
+                            </a>
+                        </div>
+                        <p style="font-size: 10px; color: #94a3b8; margin-top: 10px; text-align: center;">Nota: Una vez descargado, ábrelo y manténlo activo.</p>
                     </div>
                 </div>
             </div>
 
-            <!-- OTROS AJUSTES (PLaceholder) -->
+            <!-- MANUAL O INVISIBLE (Placeholder) -->
             <div class="card" style="opacity: 0.6; pointer-events: none;">
                 <div class="card-header">
-                    <div class="card-icon">🔐</div>
-                    <h3>Seguridad y Privacidad</h3>
+                    <div class="card-icon">🔒</div>
+                    <h3>Seguridad Avanzada</h3>
                 </div>
-                <p style="font-size: 13px; color: var(--text-light);">Próximamente más opciones de configuración.</p>
+                <p style="font-size: 13px; color: var(--text-light);">Restricción de impresión por usuario.</p>
             </div>
         </div>
-
-        <button class="btn-save" onclick="saveSettings()">
-            <span>💾</span> Guardar Ajustes
-        </button>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .conn-type-btn {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .conn-type-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .download-btn-pro {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            background: #f8fafc;
+            border: 1.5px solid #3b82f6;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #1e40af;
+            font-size: 13px;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+        .download-btn-pro:hover {
+            background: #3b82f6;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+    </style>
+
     <script>
+        let currentConnType = 'sistema';
+
         // Cargar ajustes al iniciar
         window.addEventListener('DOMContentLoaded', () => {
             const autoPrint = localStorage.getItem('autoPrintComanda') === 'true';
-            const printerName = localStorage.getItem('printerName') || '';
+            currentConnType = localStorage.getItem('printerConnType') || 'sistema';
+            const printerIntSistema = localStorage.getItem('printerInterfaceSistema') || '';
+            const printerIntRed = localStorage.getItem('printerInterfaceRed') || '';
+            const printerModel = localStorage.getItem('printerModel') || 'epson';
 
             document.getElementById('autoPrintSwitch').checked = autoPrint;
-            document.getElementById('printerNameInput').value = printerName;
+            document.getElementById('printerInterfaceSistema').value = printerIntSistema;
+            document.getElementById('printerInterfaceRed').value = printerIntRed;
+            document.getElementById('printerModel').value = printerModel;
+
+            setConnType(currentConnType);
+            checkBridgeStatus();
+            setInterval(checkBridgeStatus, 10000);
         });
+
+        async function checkBridgeStatus() {
+            try {
+                // El bridge no tiene /status por ahora, pero podemos probar un fetch al localhost
+                const res = await fetch('http://localhost:3001', { mode: 'no-cors' });
+                const badge = document.getElementById('bridge-status-badge');
+                badge.textContent = 'Conectado';
+                badge.style.background = '#dcfce7';
+                badge.style.color = '#10b981';
+            } catch (e) {
+                const badge = document.getElementById('bridge-status-badge');
+                badge.textContent = 'Desconectado';
+                badge.style.background = '#fee2e2';
+                badge.style.color = '#ef4444';
+            }
+        }
+
+        function setConnType(type) {
+            currentConnType = type;
+            document.getElementById('btn-conn-sistema').classList.toggle('active', type === 'sistema');
+            document.getElementById('btn-conn-red').classList.toggle('active', type === 'red');
+            document.getElementById('group-interface-sistema').style.display = type === 'sistema' ? 'block' : 'none';
+            document.getElementById('group-interface-red').style.display = type === 'red' ? 'block' : 'none';
+        }
 
         function saveSettings() {
             const autoPrint = document.getElementById('autoPrintSwitch').checked;
-            const printerName = document.getElementById('printerNameInput').value;
+            const printerIntSistema = document.getElementById('printerInterfaceSistema').value;
+            const printerIntRed = document.getElementById('printerInterfaceRed').value;
+            const printerModel = document.getElementById('printerModel').value;
 
-            // Si se activa la estación, guardamos la fecha y hora actual como punto de inicio
             if (autoPrint) {
-                const activationTime = new Date().toISOString();
-                localStorage.setItem('printActivationTime', activationTime);
-                console.log("🕒 Estación activada el:", activationTime);
-            } else {
-                localStorage.removeItem('printActivationTime');
+                localStorage.setItem('printActivationTime', new Date().toISOString());
             }
 
             localStorage.setItem('autoPrintComanda', autoPrint);
-            localStorage.setItem('printerName', printerName);
+            localStorage.setItem('printerConnType', currentConnType);
+            localStorage.setItem('printerInterfaceSistema', printerIntSistema);
+            localStorage.setItem('printerInterfaceRed', printerIntRed);
+            localStorage.setItem('printerModel', printerModel);
 
             Swal.fire({
                 icon: 'success',
                 title: 'Ajustes guardados',
-                text: 'La configuración se ha guardado correctamente.',
+                text: 'Configuración de Impresión Pro actualizada.',
                 timer: 2000,
-                showConfirmButton: false,
-                background: '#ffffff',
-                color: '#1e293b'
+                showConfirmButton: false
             });
         }
 
-        function testPrint() {
-            console.log("🖨️ Ejecutando impresión de prueba...");
-            
-            let printContainer = document.getElementById('comandaPrintContainer');
-            if (!printContainer) {
-                printContainer = document.createElement('div');
-                printContainer.id = 'comandaPrintContainer';
-                document.body.appendChild(printContainer);
+        async function testPrintPro() {
+            const config = {
+                tipo: document.getElementById('printerModel').value,
+                conexion: currentConnType,
+                interface: currentConnType === 'sistema' ? 
+                           document.getElementById('printerInterfaceSistema').value : 
+                           document.getElementById('printerInterfaceRed').value
+            };
+
+            if (!config.interface) {
+                Swal.fire('Error', 'Debes ingresar el Nombre o IP de la impresora.', 'error');
+                return;
             }
 
-            const now = new Date();
-            const fechaStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+            Swal.fire({
+                title: 'Enviando prueba...',
+                didOpen: () => Swal.showLoading(),
+                allowOutsideClick: false
+            });
 
-            printContainer.innerHTML = `
-                <div class="comanda-header">
-                    <p>JC-RT Restaurante</p>
-                    <h1>TEST DE CONEXIIÓN</h1>
-                    <p>${fechaStr}</p>
-                </div>
-                <div class="comanda-mesa" style="font-size: 20pt; font-weight: bold; text-align: center; margin: 15px 0; border: 2px solid #000; padding: 5px;">
-                    IMPRESORA OK ✅
-                </div>
-                <div class="comanda-body" style="text-align: center;">
-                    <p>Si estás leyendo esto, tu impresora térmica está correctamente vinculada al sistema JC-RT.</p>
-                </div>
-                <div class="comanda-footer" style="margin-top: 20px; text-align: center; font-size: 10pt; border-top: 1px dashed #000; padding-top: 10px;">
-                    <p>¡Listo para trabajar!</p>
-                </div>
-            `;
-
-            window.print();
+            try {
+                const response = await fetch('http://localhost:3001/test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    Swal.fire('¡Éxito!', 'Mensaje "prueba de impresion JC-RT" enviado.', 'success');
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                Swal.fire('Error de Conector', 'No se pudo contactar con el Print Bridge. ¿Está encendido?', 'error');
+            }
         }
 
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');
         }
     </script>
-
-    <style>
-        /* Estilos específicos para la impresión de prueba */
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-
-            #comandaPrintContainer,
-            #comandaPrintContainer * {
-                visibility: visible;
-            }
-
-            #comandaPrintContainer {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                padding: 10px;
-                font-family: 'Courier New', Courier, monospace;
-            }
-
-            .comanda-header {
-                text-align: center;
-                border-bottom: 2px dashed #000;
-                padding-bottom: 10px;
-                margin-bottom: 15px;
-            }
-        }
-        
-        #comandaPrintContainer {
-            display: none;
-        }
-    </style>
 <script src="scripts/print-monitor.js"></script>
 </body>
 
