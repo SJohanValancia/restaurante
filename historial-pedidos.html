@@ -1686,10 +1686,6 @@
                     <span class="nav-icon">🥘</span>
                     <span>Alimentos</span>
                 </a>
-                <a href="inventario-alimentos.html" class="nav-item ">
-                    <span class="nav-icon">📋</span>
-                    <span>Inventario Alimentos</span>
-                </a>
             </div>
 
             <!-- SOLO PARA ADMINISTRADORES -->
@@ -2420,15 +2416,25 @@
                 return;
             }
 
-            const activos = filteredOrders.filter(o => !['entregado', 'cancelado', 'pagado'].includes(o.estado));
+            const pendientesPreparando = filteredOrders.filter(o => ['pendiente', 'preparando'].includes(o.estado));
+            const listos = filteredOrders.filter(o => o.estado === 'listo');
             const cancelados = filteredOrders.filter(o => o.estado === 'cancelado');
             const entregados = filteredOrders.filter(o => o.estado === 'entregado' || o.estado === 'pagado');
 
-            activos.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+            pendientesPreparando.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+            listos.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
             cancelados.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
             entregados.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
-            const orderedOrders = [...activos, ...cancelados, ...entregados];
+            const orderedOrders = [...pendientesPreparando, ...listos, ...cancelados, ...entregados];
+            
+            // Consistencia para pedidos sin estados claros (retrocompatibilidad)
+            const otrosActivos = filteredOrders.filter(o => 
+                !['pendiente', 'preparando', 'listo', 'entregado', 'cancelado', 'pagado'].includes(o.estado)
+            );
+            if (otrosActivos.length > 0) {
+                orderedOrders.unshift(...otrosActivos);
+            }
 
             if (reset) {
                 list.innerHTML = '';
@@ -2586,6 +2592,7 @@
                     actions += `<button class="btn-action" style="background: #f59e0b; color: white;" onclick="updateOrderStatus('${order._id}', 'preparando')">✅ Aceptar Mandao</button>`;
                 } else {
                     actions += `<button class="btn-action btn-preparar" onclick="updateOrderStatus('${order._id}', 'preparando')">👨‍🍳 Preparar</button>`;
+                    actions += `<button class="btn-action btn-listo" onclick="updateOrderStatus('${order._id}', 'listo')">✅ Listo</button>`;
                 }
             }
 

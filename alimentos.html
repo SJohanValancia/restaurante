@@ -288,7 +288,7 @@
         /* LAYOUT */
         .layout {
             display: grid;
-            grid-template-columns: 400px 1fr;
+            grid-template-columns: 1fr;
             gap: 2rem;
             align-items: start;
         }
@@ -658,17 +658,76 @@
             animation: spin 0.8s linear infinite;
         }
 
-        /* ANIMACIONES */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
+        /* ESTADÍSTICAS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-4px);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #718096;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1a202c;
+            margin: 0.5rem 0;
+        }
+
+        .stat-description {
+            font-size: 12px;
+            color: #a0aec0;
         }
 
         @keyframes fadeInDown {
@@ -809,6 +868,102 @@
         input[type=number] {
             -moz-appearance: textfield;
         }
+
+        /* ESTILOS CARGA MASIVA */
+        .bulk-add-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px dashed #e2e8f0;
+        }
+
+        .bulk-add-container {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            margin-top: 0.5rem;
+        }
+
+        .bulk-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 8px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .bulk-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .bulk-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-add-more {
+            width: 100%;
+            padding: 10px;
+            background: #edf2f7;
+            color: #4a5568;
+            border: 1px dashed #cbd5e0;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-add-more:hover {
+            background: #e2e8f0;
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .bulk-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .btn-bulk-save {
+            flex: 2;
+            padding: 8px;
+            background: #48bb78;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-bulk-cancel {
+            flex: 1;
+            padding: 8px;
+            background: #a0aec0;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .badge-stock {
+            font-weight: 700;
+            color: #2d3748;
+            background: #edf2f7;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -867,10 +1022,6 @@
                     <span class="nav-icon">🥘</span>
                     <span>Alimentos</span>
                 </a>
-                <a href="inventario-alimentos.html" class="nav-item ">
-                    <span class="nav-icon">📋</span>
-                    <span>Inventario Alimentos</span>
-                </a>
             </div>
 
             <!-- SOLO PARA ADMINISTRADORES -->
@@ -915,71 +1066,47 @@
         <div class="container">
             <div class="page-header">
                 <h1 class="page-title">🥘 Gestión de Alimentos</h1>
-                <p class="page-subtitle">Administra los ingredientes y alimentos para tus productos</p>
+                <p class="page-subtitle">Configura tus recetas y monitorea tu inventario en un solo lugar</p>
+            </div>
+
+            <!-- Estadísticas Consolidadas -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">🥘</div>
+                    </div>
+                    <div class="stat-label">Total Ingredientes</div>
+                    <div class="stat-value" id="totalAlimentos">0</div>
+                    <div class="stat-description">Registrados en el sistema</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">✅</div>
+                    </div>
+                    <div class="stat-label">En Stock</div>
+                    <div class="stat-value" id="alimentosEnStock">0</div>
+                    <div class="stat-description">Disponibilidad normal</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">⚠️</div>
+                    </div>
+                    <div class="stat-label">Stock Bajo</div>
+                    <div class="stat-value" id="alimentosStockBajo">0</div>
+                    <div class="stat-description">Requieren reposición inmediata</div>
+                </div>
             </div>
 
             <div class="layout">
-                <!-- Formulario de alimentos -->
+                <!-- Lista de alimentos (Centrada en platos) -->
                 <div class="card">
                     <div class="card-header">
-                        <h2 id="formTitle">➕ Agregar Alimento</h2>
-                    </div>
-                    <div class="card-body">
-                        <form id="alimentoForm">
-                            <input type="hidden" id="alimentoId">
-
-                            <div class="form-group">
-                                <label class="form-label" for="nombre">Nombre del Alimento *</label>
-                                <input type="text" id="nombre" class="form-input"
-                                    placeholder="Ej: Carne molida, Patacón, Arroz" required>
-                            </div>
-
-                            <div style="display: none;" class="form-group">
-                                <label class="form-label" for="valor">Valor Unitario (COP) <small
-                                        style="color: #a0aec0;">(Opcional)</small></label>
-                                <input type="number" id="valor" class="form-input" min="0" step="0.01"
-                                    placeholder="Precio por unidad">
-                            </div>
-
-                            <div class="form-group" style="display: flex; gap: 10px;">
-                                <div style="flex: 1;">
-                                    <label class="form-label" for="stock">Stock Disponible *</label>
-                                    <input type="number" id="stock" class="form-input" min="0" step="any"
-                                        placeholder="Cantidad en inventario" required>
-                                </div>
-                                <div style="flex: 1;">
-                                    <label class="form-label" for="medida">Unidad de Medida *</label>
-                                    <input type="text" id="medida" class="form-input"
-                                        placeholder="Ej: g, kg, ml, uds" required>
-                                </div>
-                            </div>
-
-
-                            <div class="form-group">
-                                <label class="form-label">Productos donde se usa *</label>
-                                <p style="font-size: 13px; color: #718096; margin-bottom: 10px;">
-                                    Busca y selecciona los platos que usan este alimento. Ajusta la cantidad necesaria
-                                    para cada uno.
-                                </p>
-                                <div class="select-search-wrapper">
-                                    <input type="text" class="form-input" id="productoSearch"
-                                        placeholder="🔍 Buscar producto para agregar...">
-                                    <div class="producto-list" id="productoList"></div>
-                                    <div id="selectedProducto" style="margin-top: 12px;"></div>
-                                </div>
-                            </div>
-
-                            <button type="submit" class="btn-primary">💾 Guardar Alimento</button>
-                            <button type="button" class="btn-secondary" id="btnCancelar" style="display: none;">✖
-                                Cancelar</button>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Lista de alimentos -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2>📋 Lista de Alimentos</h2>
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                            <h2>Recetario por Platos</h2>
+                            <input type="text" id="alimentoSearch" class="form-input" placeholder="🔍 Buscar plato o ingrediente..." style="max-width: 300px;">
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="alimentos-grid" id="alimentosGrid">
@@ -997,7 +1124,8 @@
         const API_URL = 'https://restaurante-co77.onrender.com/api';
         let currentUser = null;
         let productos = [];
-        let productosSeleccionados = [];
+        let editState = { id: null, cardId: null };
+        window.dataCache = { alimentos: [] };
 
         // CARGA INICIAL
         window.addEventListener('DOMContentLoaded', async () => {
@@ -1057,6 +1185,20 @@
                 Swal.fire({ icon: (('Error de conexión. Recargue la página.').toLowerCase().includes("error") || ('Error de conexión. Recargue la página.').toLowerCase().includes("falla") || ('Error de conexión. Recargue la página.').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error de conexión. Recargue la página.', timer: 3000, showConfirmButton: false });
             }
         });
+
+        // ACTUALIZAR ESTADÍSTICAS
+        function actualizarEstadisticas(alimentos) {
+            const totalAlimentos = alimentos.length;
+            const alimentosEnStock = alimentos.filter(a => (a.stock || 0) > 10).length;
+            const alimentosStockBajo = alimentos.filter(a => {
+                const stock = a.stock || 0;
+                return stock > 0 && stock <= 10;
+            }).length;
+
+            document.getElementById('totalAlimentos').textContent = totalAlimentos;
+            document.getElementById('alimentosEnStock').textContent = alimentosEnStock;
+            document.getElementById('alimentosStockBajo').textContent = alimentosStockBajo;
+        }
 
         // CARGAR PRODUCTOS
         async function cargarProductos() {
@@ -1163,54 +1305,6 @@
     `).join('');
         }
 
-        // CAMBIAR CANTIDAD REQUERIDA
-        function cambiarCantidad(index, delta) {
-            productosSeleccionados[index].cantidadRequerida = parseFloat((productosSeleccionados[index].cantidadRequerida + delta).toFixed(4));
-            if (productosSeleccionados[index].cantidadRequerida < 0) {
-                productosSeleccionados[index].cantidadRequerida = 0;
-            }
-            actualizarListaProductosSeleccionados();
-        }
-
-        function cambiarCantidadManual(index, value) {
-            let val = parseFloat(value);
-            if (isNaN(val) || val < 0) val = 0;
-            productosSeleccionados[index].cantidadRequerida = val;
-            actualizarListaProductosSeleccionados();
-        }
-
-        // ELIMINAR PRODUCTO SELECCIONADO
-        function eliminarProductoSeleccionado(index) {
-            if (confirm('¿Quitar este producto de la lista?')) {
-                productosSeleccionados.splice(index, 1);
-                actualizarListaProductosSeleccionados();
-            }
-        }
-
-        // BUSCAR PRODUCTOS
-        document.getElementById('productoSearch').addEventListener('input', (e) => {
-            const busqueda = e.target.value.toLowerCase();
-            const productosFiltrados = productos.filter(p =>
-                p.nombre.toLowerCase().includes(busqueda) ||
-                p.categoria.toLowerCase().includes(busqueda)
-            );
-            mostrarProductos(productosFiltrados);
-            document.getElementById('productoList').classList.add('show');
-        });
-
-        // MOSTRAR/OCULTAR LISTA
-        document.getElementById('productoSearch').addEventListener('focus', () => {
-            document.getElementById('productoList').classList.add('show');
-            mostrarProductos(productos);
-        });
-
-        // OCULTAR LISTA AL HACER CLIC FUERA
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.select-search-wrapper')) {
-                document.getElementById('productoList').classList.remove('show');
-            }
-        });
-
         // CARGAR ALIMENTOS
         async function cargarAlimentos() {
             const token = localStorage.getItem('token');
@@ -1223,9 +1317,9 @@
 
                 const result = await response.json();
                 if (result.success) {
-                    // Actualizar caché
-                    if (window.dataCache) window.dataCache.alimentos = result.data;
+                    window.dataCache.alimentos = result.data;
                     mostrarAlimentos(result.data);
+                    actualizarEstadisticas(result.data);
                 }
             } catch (error) {
                 console.error('Error al cargar alimentos:', error);
@@ -1244,199 +1338,319 @@
         function mostrarAlimentos(alimentos) {
             const grid = document.getElementById('alimentosGrid');
 
-            if (alimentos.length === 0) {
+            if (!productos || productos.length === 0) {
                 grid.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">🥘</div>
-                <p style="font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem;">No hay alimentos registrados</p>
-                <p>Comienza agregando tu primer alimento</p>
-            </div>
-        `;
+                    <div class="empty-state">
+                        <div class="empty-icon">📦</div>
+                        <p style="font-size: 1.2rem; font-weight: 600;">Cargando platos...</p>
+                    </div>`;
                 return;
             }
 
-            grid.innerHTML = alimentos.map(alimento => {
-                const totalProductos = alimento.productos?.length || 0;
-                const costoTotalPorPlato = alimento.productos?.reduce((sum, prod) => {
-                    return sum + (alimento.valor * prod.cantidadRequerida);
-                }, 0) || 0;
+            // Agrupar alimentos por producto
+            const recetas = {};
+            productos.forEach(p => {
+                recetas[p._id] = {
+                    producto: p,
+                    ingredientes: alimentos.filter(a => 
+                        a.productos && a.productos.some(ap => (ap.productoId?._id || ap.productoId) === p._id)
+                    )
+                };
+            });
 
-                return `
-        <div class="alimento-card">
-            <div class="alimento-header">
-                <h3 class="alimento-title">${alimento.nombre}</h3>
-                <span class="alimento-badge">🥘</span>
-            </div>
+            // Alimentos sin plato
+            const alimentosSinPlato = alimentos.filter(a => !a.productos || a.productos.length === 0);
 
-            <div class="alimento-info">
-                <div class="info-item">
-                    <div class="info-label">Stock Disponible</div>
-                    <div class="info-value">${alimento.stock || 0} ${alimento.medida || 'unidades'}</div>
-                </div>
+            let html = '';
 
-            </div>
-
-            ${totalProductos > 0 ? `
-                <div style="background: #f0f4ff; padding: 10px; border-radius: 8px; margin-bottom: 1rem; border-left: 3px solid #667eea;">
-                    <div style="font-size: 12px; color: #4a5568; margin-bottom: 4px;">📊 Resumen</div>
-                    <div style="font-size: 14px; color: #2d3748;">
-                        Usado en <strong>${totalProductos}</strong> ${totalProductos === 1 ? 'plato' : 'platos'}
+            // Renderizar tarjetas de Platos
+            Object.values(recetas).forEach(receta => {
+                const p = receta.producto;
+                html += `
+                <div class="alimento-card" id="card-${p._id}">
+                    <div class="alimento-header">
+                        <h3 class="alimento-title">${p.nombre}</h3>
+                        <span class="alimento-badge">🍽️ PLATO</span>
                     </div>
-                </div>
-            ` : ''}
+                    
+                    <div class="alimento-producto-title" style="margin-top: 10px; color: #718096; font-size: 12px; text-transform: uppercase;">Ingredientes:</div>
+                    <div class="recipe-list" style="margin: 10px 0;">
+                        ${receta.ingredientes.length > 0 ? receta.ingredientes.map(a => {
+                            const rel = a.productos.find(ap => (ap.productoId?._id || ap.productoId) === p._id);
+                            const isEditing = editState.id === a._id && editState.cardId === p._id;
 
-            <div class="alimento-producto">
-                <div class="alimento-producto-title">🍽️ Usado en:</div>
-                ${alimento.productos && alimento.productos.length > 0 ? alimento.productos.map(prod => {
-                    // ✅ VALIDAR que productoId exista antes de usarlo
-                    const productoNombre = prod.productoId?.nombre || 'Producto no disponible';
-                    const productoCategoria = prod.productoId?.categoria || '';
-                    const costoPlato = alimento.valor * prod.cantidadRequerida;
+                            if (isEditing) {
+                                return `
+                                <div style="padding: 12px; background: #fff; border: 2px solid #667eea; border-radius: 10px; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(102,126,234,0.1);">
+                                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-bottom: 8px;">
+                                        <input type="text" id="edit-nombre-${a._id}" class="bulk-input" value="${a.nombre}" placeholder="Nombre">
+                                        <input type="text" id="edit-medida-${a._id}" class="bulk-input" value="${a.medida || ''}" placeholder="g, kg, ml">
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                                        <div>
+                                            <div style="font-size: 10px; color: #718096; margin-left: 4px;">STOCK</div>
+                                            <input type="number" id="edit-stock-${a._id}" class="bulk-input" value="${a.stock}" step="any">
+                                        </div>
+                                        <div>
+                                            <div style="font-size: 10px; color: #718096; margin-left: 4px;">USA EN PLATO</div>
+                                            <input type="number" id="edit-uso-${a._id}" class="bulk-input" value="${rel.cantidadRequerida}" step="any">
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 6px;">
+                                        <button onclick="saveEditInline('${a._id}', '${p._id}')" class="btn-bulk-save" style="font-size: 12px; padding: 6px;">✅ Guardar</button>
+                                        <button onclick="cancelarEditInline()" class="btn-bulk-cancel" style="font-size: 12px; padding: 6px;">❌</button>
+                                    </div>
+                                </div>`;
+                            }
 
-                    return `
-                    <div style="margin-top: 8px; padding: 10px; background: white; border-radius: 8px; border-left: 3px solid #4299e1; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 6px;">
-                            <div class="alimento-producto-name" style="flex: 1;">
-                                ${productoNombre}
-                                ${productoCategoria ? `<br><small style="color: #4299e1; font-size: 11px;">${productoCategoria}</small>` : ''}
-                            </div>
-                            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; white-space: nowrap;">
-                                x${prod.cantidadRequerida} ${alimento.medida || 'uds'}
-                            </div>
-                        </div>
-
+                            return `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f8fafc; border-radius: 8px; margin-bottom: 6px; border-left: 3px solid #667eea;">
+                                <div style="flex: 1;">
+                                    <div style="font-size: 14px; font-weight: 600;">${a.nombre}</div>
+                                    <div style="font-size: 11px; color: #718096;">Stock: ${a.stock} ${a.medida || ''}</div>
+                                </div>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <div style="font-size: 13px; color: #667eea; font-weight: 800;">x${rel.cantidadRequerida} ${a.medida || ''}</div>
+                                    <div style="display: flex; gap: 4px;">
+                                        <button onclick="editarAlimentoInline('${a._id}', '${p._id}')" style="background: #ebf4ff; color: #3182ce; border: none; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center;">✏️</button>
+                                        <button onclick="eliminarAlimento('${a._id}', '${a.nombre}')" style="background: #fff5f5; color: #e53e3e; border: none; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center;">🗑️</button>
+                                    </div>
+                                </div>
+                            </div>`;
+                        }).join('') : '<p style="color: #a0aec0; font-size: 13px; font-style: italic;">Sin ingredientes asignados</p>'}
                     </div>
-                `}).join('') : '<p style="color: #a0aec0; font-size: 14px; margin-top: 8px; text-align: center; padding: 1rem; background: #f7fafc; border-radius: 6px;">No vinculado a productos</p>'}
-            </div>
 
-            <div class="alimento-actions">
-                <button class="btn-edit" onclick="editarAlimento('${alimento._id}')">
-                    ✏️ Editar
-                </button>
-                <button class="btn-delete" onclick="eliminarAlimento('${alimento._id}', '${alimento.nombre}')">
-                    🗑️ Eliminar
-                </button>
-            </div>
-        </div>
-    `}).join('');
+                    <div class="bulk-add-section" id="bulk-section-${p._id}">
+                        <button class="btn-add-more" onclick="expandirCargaMasiva('${p._id}')">
+                            ➕ Agregar más alimentos
+                        </button>
+                    </div>
+                </div>`;
+            });
+
+            // Sección opcional para alimentos huérfanos
+            if (alimentosSinPlato.length > 0) {
+                html += `
+                <div class="alimento-card" style="grid-column: 1 / -1; background: #f1f5f9; border: 2px dashed #cbd5e0;">
+                    <h3 class="alimento-title" style="margin-bottom: 1rem;">🥘 Alimentos sin asignar a un plato</h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                        ${alimentosSinPlato.map(a => `
+                            <div style="background: white; padding: 8px 15px; border-radius: 20px; border: 1px solid #e2e8f0; display: flex; gap: 10px; align-items: center;">
+                                <strong>${a.nombre}</strong>
+                                <span style="font-size: 12px; color: #718096;">Stock: ${a.stock} ${a.medida || ''}</span>
+                                <div style="display: flex; gap: 5px;">
+                                    <button onclick="editarAlimentoInline('${a._id}', 'orphans')" style="background: none; border: none; cursor: pointer; font-size: 14px;">✏️</button>
+                                    <button onclick="eliminarAlimento('${a._id}', '${a.nombre}')" style="background: none; border: none; cursor: pointer; font-size: 14px;">🗑️</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>`;
+            }
+
+            grid.innerHTML = html;
         }
 
-        // ENVIAR FORMULARIO
-        document.getElementById('alimentoForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        // FUNCIONES PARA CARGA MASIVA
+        function expandirCargaMasiva(productId) {
+            const container = document.getElementById(`bulk-section-${productId}`);
+            container.innerHTML = `
+                <div class="bulk-add-container">
+                    <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">¿Cuántos ingredientes nuevos quieres agregar?</div>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="number" id="count-${productId}" class="bulk-input" min="1" max="10" value="1" style="width: 80px;">
+                        <button class="btn-bulk-save" onclick="generarInputsMasivos('${productId}')" style="background: #667eea;">Generar</button>
+                        <button class="btn-bulk-cancel" onclick="restaurarBotonAdd('${productId}')">❌</button>
+                    </div>
+                    <div id="inputs-container-${productId}" style="margin-top: 15px;"></div>
+                </div>`;
+        }
 
-            if (productosSeleccionados.length === 0) {
-                Swal.fire({ icon: (('⚠️ Debe seleccionar al menos un producto donde se usa este alimento').toLowerCase().includes("error") || ('⚠️ Debe seleccionar al menos un producto donde se usa este alimento').toLowerCase().includes("falla") || ('⚠️ Debe seleccionar al menos un producto donde se usa este alimento').toLowerCase().includes("incorrect")) ? "error" : "success", text: '⚠️ Debe seleccionar al menos un producto donde se usa este alimento', timer: 3000, showConfirmButton: false });
-                document.getElementById('productoSearch').focus();
+        function generarInputsMasivos(productId) {
+            const count = parseInt(document.getElementById(`count-${productId}`).value);
+            const container = document.getElementById(`inputs-container-${productId}`);
+            
+            if (count < 1 || count > 10) {
+                Swal.fire({ icon: 'warning', text: 'Elige un número entre 1 y 10' });
                 return;
             }
 
-            const nombre = document.getElementById('nombre').value.trim();
-            const stock = document.getElementById('stock').value;
-            const medida = document.getElementById('medida').value.trim();
-            const valor = document.getElementById('valor').value;
+            let html = `
+                <div class="bulk-row" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; margin-bottom: 10px;">
+                    <div style="font-size: 11px; font-weight: 700; color: #718096;">NOMBRE</div>
+                    <div style="font-size: 11px; font-weight: 700; color: #718096; text-align: center;">STOCK</div>
+                    <div style="font-size: 11px; font-weight: 700; color: #718096; text-align: center;">UNIDAD</div>
+                    <div style="font-size: 11px; font-weight: 700; color: #718096; text-align: center;">USA</div>
+                </div>`;
 
-            if (!nombre || stock === '' || !medida) {
-                Swal.fire({ icon: (('⚠️ Por favor complete todos los campos obligatorios').toLowerCase().includes("error") || ('⚠️ Por favor complete todos los campos obligatorios').toLowerCase().includes("falla") || ('⚠️ Por favor complete todos los campos obligatorios').toLowerCase().includes("incorrect")) ? "error" : "success", text: '⚠️ Por favor complete todos los campos obligatorios', timer: 3000, showConfirmButton: false });
+            for (let i = 0; i < count; i++) {
+                html += `
+                <div class="bulk-row">
+                    <input type="text" class="bulk-input name-input-${productId}" placeholder="Nombre">
+                    <input type="number" class="bulk-input stock-input-${productId}" value="0" step="any">
+                    <input type="text" class="bulk-input measure-input-${productId}" placeholder="g, kg..." value="uds">
+                    <input type="number" class="bulk-input usage-input-${productId}" value="0" step="any">
+                </div>`;
+            }
+
+            html += `
+                <div class="bulk-actions">
+                    <button class="btn-bulk-save" onclick="guardarCargaMasiva('${productId}')">💾 Guardar ${count} Ingredientes</button>
+                    <button class="btn-bulk-cancel" onclick="restaurarBotonAdd('${productId}')">Cancelar</button>
+                </div>`;
+            
+            container.innerHTML = html;
+        }
+
+        function restaurarBotonAdd(productId) {
+            const container = document.getElementById(`bulk-section-${productId}`);
+            container.innerHTML = `
+                <button class="btn-add-more" onclick="expandirCargaMasiva('${productId}')">
+                    ➕ Agregar más alimentos
+                </button>`;
+        }
+
+        async function guardarCargaMasiva(productId) {
+            const names = document.querySelectorAll(`.name-input-${productId}`);
+            const stocks = document.querySelectorAll(`.stock-input-${productId}`);
+            const measures = document.querySelectorAll(`.measure-input-${productId}`);
+            const usages = document.querySelectorAll(`.usage-input-${productId}`);
+            
+            const ingredientes = [];
+            for (let i = 0; i < names.length; i++) {
+                const nombre = names[i].value.trim();
+                const stock = parseFloat(stocks[i].value) || 0;
+                const medida = measures[i].value.trim() || 'uds';
+                const usage = parseFloat(usages[i].value) || 0;
+
+                if (!nombre) continue;
+
+                ingredientes.push({
+                    nombre: nombre,
+                    stock: stock,
+                    medida: medida,
+                    valor: 0,
+                    productos: productId !== 'orphans' ? [{
+                        productoId: productId,
+                        cantidadRequerida: usage
+                    }] : []
+                });
+            }
+
+            if (ingredientes.length === 0) {
+                Swal.fire({ icon: 'warning', text: 'Ingresa al menos un nombre de ingrediente' });
                 return;
             }
 
-            const alimentoData = {
-                nombre: nombre,
-                stock: parseFloat(stock),
-                medida: medida,
-                valor: valor ? parseFloat(valor) : 0,
-                productos: productosSeleccionados.map(p => ({
-                    productoId: p.productoId,
-                    cantidadRequerida: parseFloat(p.cantidadRequerida)
-                }))
-            };
-
-            console.log('📤 Enviando datos:', alimentoData);
-
-            const alimentoId = document.getElementById('alimentoId').value;
-            const url = alimentoId ? `${API_URL}/alimentos/${alimentoId}` : `${API_URL}/alimentos`;
-            const method = alimentoId ? 'PUT' : 'POST';
+            Swal.fire({
+                title: 'Guardando ingredientes...',
+                didOpen: () => Swal.showLoading()
+            });
 
             try {
-                const response = await fetch(url, {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    },
-                    body: JSON.stringify(alimentoData)
-                });
+                const token = localStorage.getItem('token');
+                const promesas = ingredientes.map(data => 
+                    fetch(`${API_URL}/alimentos`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(data)
+                    })
+                );
 
-                const result = await response.json();
+                const resultados = await Promise.all(promesas);
+                const errores = resultados.filter(r => !r.ok);
 
-                console.log('📥 Respuesta del servidor:', result);
-
-                if (result.success) {
-                    Swal.fire({ icon: (('✅ ' + result.message).toLowerCase().includes("error") || ('✅ ' + result.message).toLowerCase().includes("falla") || ('✅ ' + result.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: '✅ ' + result.message, timer: 3000, showConfirmButton: false });
-                    limpiarFormulario();
-                    await cargarAlimentos();
+                if (errores.length > 0) {
+                    Swal.fire({ icon: 'error', text: `Se guardaron ${ingredientes.length - errores.length} ingredientes, pero hubo errores en ${errores.length}.` });
                 } else {
-                    Swal.fire({ icon: (('❌ ' + (result.message || result.error || 'Error al guardar el alimento')).toLowerCase().includes("error") || ('❌ ' + (result.message || result.error || 'Error al guardar el alimento')).toLowerCase().includes("falla") || ('❌ ' + (result.message || result.error || 'Error al guardar el alimento')).toLowerCase().includes("incorrect")) ? "error" : "success", text: '❌ ' + (result.message || result.error || 'Error al guardar el alimento'), timer: 3000, showConfirmButton: false });
+                    Swal.fire({ icon: 'success', text: `✅ Se agregaron ${ingredientes.length} ingredientes correctamente`, timer: 2000, showConfirmButton: false });
+                    await cargarAlimentos();
                 }
             } catch (error) {
-                console.error('❌ Error completo:', error);
-                Swal.fire({ icon: (('❌ Error de conexión al guardar el alimento').toLowerCase().includes("error") || ('❌ Error de conexión al guardar el alimento').toLowerCase().includes("falla") || ('❌ Error de conexión al guardar el alimento').toLowerCase().includes("incorrect")) ? "error" : "success", text: '❌ Error de conexión al guardar el alimento', timer: 3000, showConfirmButton: false });
+                console.error('Error en carga masiva:', error);
+                Swal.fire({ icon: 'error', text: 'Error de conexión' });
             }
-        });
+        }
 
-        // EDITAR ALIMENTO
-        // EDITAR ALIMENTO
-        async function editarAlimento(id) {
-            const token = localStorage.getItem('token');
+        // INLINE EDITING FUNCTIONS
+        function editarAlimentoInline(id, cardId) {
+            editState = { id, cardId };
+            mostrarAlimentos(window.dataCache.alimentos);
+        }
+
+        function cancelarEditInline() {
+            editState = { id: null, cardId: null };
+            mostrarAlimentos(window.dataCache.alimentos);
+        }
+
+        async function saveEditInline(id, productId) {
+            const nombre = document.getElementById(`edit-nombre-${id}`).value.trim();
+            const stock = parseFloat(document.getElementById(`edit-stock-${id}`).value);
+            const medida = document.getElementById(`edit-medida-${id}`).value.trim();
+            const uso = parseFloat(document.getElementById(`edit-uso-${id}`).value);
+
+            if (!nombre) {
+                Swal.fire({ icon: 'warning', text: 'El nombre es obligatorio' });
+                return;
+            }
+
+            Swal.fire({ title: 'Guardando...', didOpen: () => Swal.showLoading() });
 
             try {
-                const response = await fetch(`${API_URL}/alimentos/${id}`, {
+                // Primero obtener el alimento actual para no perder otros productos vinculados
+                const token = localStorage.getItem('token');
+                const responseGet = await fetch(`${API_URL}/alimentos/${id}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
+                const currentData = await responseGet.json();
+                
+                if (!currentData.success) throw new Error('No se pudo obtener el dato actual');
 
-                const result = await response.json();
-                if (result.success) {
-                    const alimento = result.data;
+                const alimento = currentData.data;
+                
+                // Actualizar info básica
+                const updateData = {
+                    nombre,
+                    stock,
+                    medida,
+                    valor: alimento.valor || 0,
+                    productos: [...alimento.productos]
+                };
 
-                    document.getElementById('alimentoId').value = alimento._id;
-                    document.getElementById('nombre').value = alimento.nombre;
-                    document.getElementById('stock').value = alimento.stock;
-                    document.getElementById('medida').value = alimento.medida || 'uds';
-                    document.getElementById('valor').value = alimento.valor || '';
+                // Actualizar uso en este producto específico
+                if (productId !== 'orphans') {
+                    const prodIndex = updateData.productos.findIndex(p => (p.productoId?._id || p.productoId) === productId);
+                    if (prodIndex >= 0) {
+                        updateData.productos[prodIndex].cantidadRequerida = uso;
+                    } else {
+                        // Si era huérfano o no estaba en este plato, lo añadimos
+                        updateData.productos.push({ productoId: productId, cantidadRequerida: uso });
+                    }
+                }
 
-                    // ✅ CORREGIDO: Extraer solo el ID del producto
-                    productosSeleccionados = alimento.productos.map(prod => {
-                        // Manejar tanto si productoId es objeto o string
-                        const prodId = typeof prod.productoId === 'object'
-                            ? prod.productoId._id
-                            : prod.productoId;
+                const responsePut = await fetch(`${API_URL}/alimentos/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(updateData)
+                });
 
-                        const prodNombre = typeof prod.productoId === 'object'
-                            ? prod.productoId.nombre
-                            : 'Producto';
-
-                        const prodCategoria = typeof prod.productoId === 'object'
-                            ? prod.productoId.categoria
-                            : '';
-
-                        return {
-                            productoId: prodId,
-                            nombre: prodNombre,
-                            categoria: prodCategoria,
-                            cantidadRequerida: prod.cantidadRequerida
-                        };
-                    });
-
-                    actualizarListaProductosSeleccionados();
-
-                    document.getElementById('formTitle').textContent = '✏️ Editar Alimento';
-                    document.getElementById('btnCancelar').style.display = 'block';
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                if (responsePut.ok) {
+                    Swal.fire({ icon: 'success', text: 'Actualizado correctamente', timer: 1500, showConfirmButton: false });
+                    editState = { id: null, cardId: null };
+                    await cargarAlimentos();
+                } else {
+                    const err = await responsePut.json();
+                    throw new Error(err.message || 'Error al actualizar');
                 }
             } catch (error) {
-                console.error('Error:', error);
-                Swal.fire({ icon: (('❌ Error al cargar el alimento').toLowerCase().includes("error") || ('❌ Error al cargar el alimento').toLowerCase().includes("falla") || ('❌ Error al cargar el alimento').toLowerCase().includes("incorrect")) ? "error" : "success", text: '❌ Error al cargar el alimento', timer: 3000, showConfirmButton: false });
+                console.error('Error al editar inline:', error);
+                Swal.fire({ icon: 'error', text: error.message });
             }
         }
 
@@ -1456,47 +1670,30 @@
 
                 const result = await response.json();
                 if (result.success) {
-                    Swal.fire({ icon: (('✅ ' + result.message).toLowerCase().includes("error") || ('✅ ' + result.message).toLowerCase().includes("falla") || ('✅ ' + result.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: '✅ ' + result.message, timer: 3000, showConfirmButton: false });
+                    Swal.fire({ icon: 'success', text: 'Alimento eliminado', timer: 1500, showConfirmButton: false });
                     await cargarAlimentos();
                 } else {
-                    Swal.fire({ icon: (('❌ ' + (result.message || 'Error al eliminar el alimento')).toLowerCase().includes("error") || ('❌ ' + (result.message || 'Error al eliminar el alimento')).toLowerCase().includes("falla") || ('❌ ' + (result.message || 'Error al eliminar el alimento')).toLowerCase().includes("incorrect")) ? "error" : "success", text: '❌ ' + (result.message || 'Error al eliminar el alimento'), timer: 3000, showConfirmButton: false });
+                    Swal.fire({ icon: 'error', text: result.message || 'Error al eliminar' });
                 }
             } catch (error) {
                 console.error('Error:', error);
-                Swal.fire({ icon: (('❌ Error al eliminar el alimento').toLowerCase().includes("error") || ('❌ Error al eliminar el alimento').toLowerCase().includes("falla") || ('❌ Error al eliminar el alimento').toLowerCase().includes("incorrect")) ? "error" : "success", text: '❌ Error al eliminar el alimento', timer: 3000, showConfirmButton: false });
+                Swal.fire({ icon: 'error', text: 'Error de conexión' });
             }
         }
 
-        // LIMPIAR FORMULARIO
-        function limpiarFormulario() {
-            document.getElementById('alimentoForm').reset();
-            document.getElementById('alimentoId').value = '';
-            document.getElementById('medida').value = '';
-            productosSeleccionados = [];
-            actualizarListaProductosSeleccionados();
-            document.getElementById('formTitle').textContent = '➕ Agregar Alimento';
-            document.getElementById('btnCancelar').style.display = 'none';
-        }
-
-        // BOTÓN CANCELAR
-        document.getElementById('btnCancelar').addEventListener('click', limpiarFormulario);
-
-        // MENU TOGGLE
+        // LOGOUT Y MENU (Simplificados)
         function toggleMenu() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
             const contentWrapper = document.getElementById('contentWrapper');
-
             sidebar.classList.toggle('active');
             overlay.classList.toggle('active');
-
             if (window.innerWidth > 1024) {
                 sidebar.classList.toggle('collapsed');
                 contentWrapper.classList.toggle('expanded');
             }
         }
 
-        // LOGOUT
         function logout() {
             if (confirm('¿Cerrar sesión?')) {
                 localStorage.removeItem('token');
@@ -1505,11 +1702,20 @@
             }
         }
 
-        // Cerrar menú móvil al cambiar tamaño
         window.addEventListener('resize', () => {
             if (window.innerWidth > 1024) {
                 document.getElementById('sidebarOverlay').classList.remove('active');
             }
+        });
+
+        // Búsqueda local
+        document.getElementById('alimentoSearch').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = window.dataCache.alimentos.filter(a => 
+                a.nombre.toLowerCase().includes(term) || 
+                (a.productos && a.productos.some(p => p.productoId?.nombre?.toLowerCase().includes(term)))
+            );
+            mostrarAlimentos(filtered);
         });
     </script>
 </body>

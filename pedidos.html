@@ -2201,10 +2201,6 @@
                     <span class="nav-icon">🥑</span>
                     <span>Alimentos</span>
                 </a>
-                <a href="inventario-alimentos.html" class="nav-item ">
-                    <span class="nav-icon">📦</span>
-                    <span>Inventario Alimentos</span>
-                </a>
             </div>
 
             <!-- SOLO PARA ADMINISTRADORES -->
@@ -3289,17 +3285,17 @@
             }
 
             // ORDENAR: Separar en tres grupos
-            const activos = orders.filter(o => !['entregado', 'cancelado'].includes(o.estado));
+            const pendientesPreparando = orders.filter(o => ['pendiente', 'preparando'].includes(o.estado));
+            const listos = orders.filter(o => o.estado === 'listo');
             const cancelados = orders.filter(o => o.estado === 'cancelado');
             const entregados = orders.filter(o => o.estado === 'entregado');
 
-            // Ordenar por fecha ASCENDENTE (más antiguo primero = orden de llegada)
-            activos.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+            pendientesPreparando.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+            listos.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
             cancelados.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
             entregados.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
-            // Combinar: activos arriba, cancelados en medio, entregados abajo
-            const orderedOrders = [...activos, ...cancelados, ...entregados];
+            const orderedOrders = [...pendientesPreparando, ...listos, ...cancelados, ...entregados];
 
             // Filtrar por origen si se selecciona "mandao"
             const filtroEstado = document.getElementById('filterEstado').value;
@@ -3421,6 +3417,7 @@
                     actions += `<button class="btn-action" style="background: #f59e0b; color: white;" onclick="updateOrderStatus('${order._id}', 'preparando')">✅ Aceptar Mandao</button>`;
                 } else {
                     actions += `<button class="btn-action btn-preparar" onclick="updateOrderStatus('${order._id}', 'preparando')">👨‍🍳 Preparar</button>`;
+                    actions += `<button class="btn-action btn-listo" onclick="updateOrderStatus('${order._id}', 'listo')">✅ Listo</button>`;
                 }
             }
 
@@ -5054,6 +5051,11 @@
                     mostrarNotificacionExito('✅ Pedido actualizado correctamente');
                     cerrarModalEditar();
                     await loadOrders(true);
+                    
+                    // ✅ SINCRONIZAR VISTA DE MESAS SI EXISTE
+                    if (typeof renderMesas === 'function' && mesasData && mesasData.length > 0) {
+                        renderMesas(mesasData);
+                    }
                 } else {
                     Swal.fire({ icon: (('Error: ' + data.message).toLowerCase().includes("error") || ('Error: ' + data.message).toLowerCase().includes("falla") || ('Error: ' + data.message).toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error: ' + data.message, timer: 3000, showConfirmButton: false });
                 }
@@ -5367,8 +5369,10 @@
                 <button onclick="cerrarModalPedidoMesa()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #718096;">✕</button>
             </div>
 
-            <div style="padding: 12px; background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1)); border-radius: 10px; margin-bottom: 1.5rem; text-align: center;">
-                <span style="font-size: 14px; font-weight: 700; color: #667eea;" id="mesaSeleccionadaLabel">Mesa seleccionada</span>
+            <div style="padding: 12px; background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1)); border-radius: 10px; margin-bottom: 1.5rem;">
+                <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px; text-align: center;">Mesa / Ubicación</label>
+                <input type="text" id="inputMesaMesa" style="width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; text-align: center; font-weight: 700; color: #667eea;" placeholder="Ej: Mesa 5">
+                <span style="display: none; font-size: 14px; font-weight: 700; color: #667eea;" id="mesaSeleccionadaLabel">Mesa seleccionada</span>
             </div>
 
             <form id="orderFormMesa">
@@ -5639,7 +5643,7 @@
         mesaSelectedItems = [];
 
         document.getElementById('modalPedidoMesaTitulo').textContent = `📝 Nuevo Pedido - ${mesaSeleccionadaNombre}`;
-        document.getElementById('mesaSeleccionadaLabel').textContent = `Mesa: ${mesaSeleccionadaNombre}`;
+        document.getElementById('inputMesaMesa').value = mesaSeleccionadaNombre;
 
         // Resetear formulario
         document.getElementById('selectedProductsMesa').innerHTML = '';
@@ -5703,7 +5707,7 @@
         });
 
         document.getElementById('modalPedidoMesaTitulo').textContent = `✏️ Editar Pedido - ${mesaSeleccionadaNombre}`;
-        document.getElementById('mesaSeleccionadaLabel').textContent = `Mesa: ${mesaSeleccionadaNombre} (Editando)`;
+        document.getElementById('inputMesaMesa').value = mesaSeleccionadaNombre;
         document.getElementById('btnSubmitMesa').textContent = '💾 Guardar Cambios';
 
         // Mostrar productos
@@ -5847,8 +5851,10 @@
 
         const isEditing = !!mesaEditingOrderId;
 
+        const mesaActualizada = document.getElementById('inputMesaMesa').value.trim() || mesaSeleccionadaNombre;
+        
         const orderData = {
-            mesa: mesaSeleccionadaNombre,
+            mesa: mesaActualizada,
             items: mesaSelectedItems.map(item => ({
                 producto: item.producto._id,
                 nombreProducto: item.producto.nombre,
@@ -5885,10 +5891,15 @@
             if (data.success) {
                 cerrarModalPedidoMesa();
                 mostrarNotificacionExito(isEditing 
-                    ? '✅ Pedido editado en ' + mesaSeleccionadaNombre 
-                    : '✅ Pedido creado para ' + mesaSeleccionadaNombre);
+                    ? '✅ Pedido actualizado: ' + mesaActualizada 
+                    : '✅ Pedido creado para ' + mesaActualizada);
+                
+                // ✅ RECARGAR TODO PARA ACTUALIZAR ESTADO DE MESAS Y PEDIDOS
                 await loadOrders(true);
-                renderMesas(mesasData);
+                // Si hay mesas cargadas, volver a renderizarlas para que se vea la vieja libre y la nueva ocupada
+                if (mesasData && mesasData.length > 0) {
+                    renderMesas(mesasData);
+                }
             } else {
                 Swal.fire({ icon: 'error', text: 'Error: ' + data.message, timer: 3000, showConfirmButton: false });
             }
