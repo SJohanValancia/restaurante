@@ -107,6 +107,9 @@
         if (!token || !user._id) return;
 
         try {
+            const activationTimeStr = localStorage.getItem('printActivationTime');
+            const activationTime = activationTimeStr ? new Date(activationTimeStr) : null;
+            
             // Buscamos pedidos pendientes o preparando
             const response = await fetch(`${API_URL_MONITOR}/orders?userId=${user._id}&estado=pendiente`, {
                 headers: { 'Authorization': `Bearer ${token}`, 'Cache-Control': 'no-cache' }
@@ -116,7 +119,13 @@
             if (data.success && data.data.length > 0) {
                 const newOrders = data.data;
                 let printedIds = JSON.parse(localStorage.getItem('printedOrderIds') || '[]');
-                const ordersToPrint = newOrders.filter(o => !printedIds.includes(o._id));
+                
+                // Filtrar por ID y por FECHA/HORA
+                const ordersToPrint = newOrders.filter(o => {
+                    const isNewId = !printedIds.includes(o._id);
+                    const isAfterActivation = activationTime ? (new Date(o.createdAt) >= activationTime) : true;
+                    return isNewId && isAfterActivation;
+                });
 
                 if (ordersToPrint.length > 0) {
                     for (const order of ordersToPrint) {
@@ -136,7 +145,12 @@
             if (dataPrep.success && dataPrep.data.length > 0) {
                 const preppingOrders = dataPrep.data;
                 let printedIds = JSON.parse(localStorage.getItem('printedOrderIds') || '[]');
-                const ordersToPrintPrep = preppingOrders.filter(o => !printedIds.includes(o._id));
+                
+                const ordersToPrintPrep = preppingOrders.filter(o => {
+                    const isNewId = !printedIds.includes(o._id);
+                    const isAfterActivation = activationTime ? (new Date(o.createdAt) >= activationTime) : true;
+                    return isNewId && isAfterActivation;
+                });
 
                 if (ordersToPrintPrep.length > 0) {
                     for (const order of ordersToPrintPrep) {

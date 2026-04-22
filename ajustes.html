@@ -528,6 +528,15 @@
             const autoPrint = document.getElementById('autoPrintSwitch').checked;
             const printerName = document.getElementById('printerNameInput').value;
 
+            // Si se activa la estación, guardamos la fecha y hora actual como punto de inicio
+            if (autoPrint) {
+                const activationTime = new Date().toISOString();
+                localStorage.setItem('printActivationTime', activationTime);
+                console.log("🕒 Estación activada el:", activationTime);
+            } else {
+                localStorage.removeItem('printActivationTime');
+            }
+
             localStorage.setItem('autoPrintComanda', autoPrint);
             localStorage.setItem('printerName', printerName);
 
