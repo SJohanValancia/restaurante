@@ -490,14 +490,23 @@
                     </div>
 
                     <div style="display: flex; gap: 10px; margin-top: 1.5rem;">
-                        <button class="btn-save" onclick="saveSettings()" style="flex: 2; margin-top: 0;">
-                            <span>💾</span> Guardar Configuración
+                        <button class="btn-save" onclick="saveSettings()" style="flex: 2; margin-top: 0; background: var(--success);">
+                            <span>💾</span> 1. Guardar Configuración
                         </button>
-                        <button class="btn-save" onclick="testPrintPro()" style="flex: 1; margin-top: 0; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; box-shadow: none;">
-                            <span>⚡</span> Probar
+                        <button class="btn-save" onclick="generateLinkCode()" style="flex: 2; margin-top: 0;">
+                            <span>🔗</span> 2. Vincular Bridge
                         </button>
                     </div>
-                </div>
+
+                    <!-- CODIGO DE VINCULACION -->
+                    <div id="link-code-box" style="margin-top: 1.5rem; background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px dashed #cbd5e1; display: none;">
+                        <h5 style="font-size: 13px; color: #1e293b; margin-bottom: 8px;">🔑 Código de Vinculación</h5>
+                        <textarea id="linkCodeText" readonly style="width: 100%; height: 60px; font-size: 10px; padding: 8px; border-radius: 4px; border: 1px solid #e2e8f0; background: #fff;"></textarea>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <button class="btn-save" onclick="copyLinkCode()" style="flex: 1; margin-top: 0; padding: 8px; font-size: 12px;">📋 Copiar</button>
+                            <a href="http://127.0.0.1:3001" target="_blank" class="download-btn-pro" style="flex: 2; padding: 8px; font-size: 12px; border-color: #10b981; color: #059669;">⚡ Abrir Panel del Bridge</a>
+                        </div>
+                    </div>
 
                     <div style="margin-top: 1.5rem; background: #fff; padding: 1rem; border-radius: 8px; border: 1px solid #dbeafe;">
                         <h5 style="font-size: 13px; color: #1d4ed8; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
@@ -638,27 +647,48 @@
             document.getElementById('group-interface-red').style.display = type === 'red' ? 'block' : 'none';
         }
 
-        function saveSettings() {
-            const autoPrint = document.getElementById('autoPrintSwitch').checked;
-            const printerIntSistema = document.getElementById('printerInterfaceSistema').value;
-            const printerIntRed = document.getElementById('printerInterfaceRed').value;
-            const printerModel = document.getElementById('printerModel').value;
-
-            if (autoPrint) {
-                localStorage.setItem('printActivationTime', new Date().toISOString());
+        function generateLinkCode() {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('usuario') || '{}');
+            
+            if (!token || !user._id) {
+                Swal.fire('Atención', 'Debes iniciar sesión para generar el código.', 'warning');
+                return;
             }
 
-            localStorage.setItem('autoPrintComanda', autoPrint);
-            localStorage.setItem('printerConnType', currentConnType);
-            localStorage.setItem('printerInterfaceSistema', printerIntSistema);
-            localStorage.setItem('printerInterfaceRed', printerIntRed);
-            localStorage.setItem('printerModel', printerModel);
+            const config = {
+                userId: user._id,
+                token: token,
+                printer: {
+                    tipo: document.getElementById('printerModel').value,
+                    conexion: currentConnType,
+                    interface: currentConnType === 'sistema' ? 
+                               document.getElementById('printerInterfaceSistema').value : 
+                               document.getElementById('printerInterfaceRed').value
+                }
+            };
 
+            const base64 = btoa(JSON.stringify(config));
+            document.getElementById('linkCodeText').value = base64;
+            document.getElementById('link-code-box').style.display = 'block';
+            
+            Swal.fire({
+                icon: 'info',
+                title: 'Código Generado',
+                text: 'Copia el código de abajo y pégalo en el panel del Bridge.',
+                confirmButtonText: 'Entendido'
+            });
+        }
+
+        function copyLinkCode() {
+            const text = document.getElementById('linkCodeText');
+            text.select();
+            document.execCommand('copy');
             Swal.fire({
                 icon: 'success',
-                title: 'Ajustes guardados',
-                text: 'Configuración de Impresión Pro actualizada.',
-                timer: 2000,
+                title: 'Copiado',
+                text: 'Código copiado al portapapeles.',
+                timer: 1500,
                 showConfirmButton: false
             });
         }
