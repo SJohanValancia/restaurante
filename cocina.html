@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Historial de Pedidos</title>
+    <title>Cocina</title>
     <style>
         * {
             margin: 0;
@@ -485,7 +485,20 @@
 
         .orders-grid {
             display: grid;
+            grid-template-columns: 1fr;
             gap: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .orders-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .orders-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
 
         .order-card {
@@ -712,11 +725,11 @@
         }
 
         .btn-action {
-            padding: 10px;
+            padding: 15px;
             border: none;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 600;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -1270,7 +1283,7 @@
     </style>
     <style>
         /* ============================================
-           VISTA DE MESAS - HISTORIAL
+           VISTA DE MESAS - COCINA
            ============================================ */
         .table-view-container-hist {
             display: none;
@@ -1674,9 +1687,9 @@
                     <span class="nav-icon">📊</span>
                     <span>Reportes</span>
                 </a>
-                <a href="historial-pedidos.html" class="nav-item active">
-                    <span class="nav-icon">📜</span>
-                    <span>Historial</span>
+                <a href="cocina.html" class="nav-item active">
+                    <span class="nav-icon">👨‍🍳</span>
+                    <span>Cocina</span>
                 </a>
                 <a href="catalogo-productos.html" class="nav-item">
                     <span class="nav-icon">📜📦</span>
@@ -1733,8 +1746,8 @@
         <div class="container">
             <div class="page-header">
                 <div class="page-title-container">
-                    <h1 class="page-title" id="pageTitleHistorial">📜 Historial Completo de Pedidos</h1>
-                    <p class="page-subtitle">Gestiona todos los pedidos locales en un solo lugar</p>
+                    <h1 class="page-title" id="pageTitleCocina">👨‍🍳 Cocina</h1>
+                    <p class="page-subtitle">Gestiona los pedidos activos de la cocina</p>
                 </div>
                 <button class="btn-change-view" id="btnChangeViewHeaderHist" onclick="toggleTableViewHist()">
                     <span id="viewModeIconHeaderHist">🪑</span>
@@ -1742,90 +1755,23 @@
                 </button>
             </div>
 
-            <!-- Estadísticas -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-icon blue">📋</div>
-                    </div>
-                    <div class="stat-label">Total Pedidos</div>
-                    <div class="stat-value" id="statTotal">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-icon orange">⏳</div>
-                    </div>
-                    <div class="stat-label">Pendientes</div>
-                    <div class="stat-value" id="statPendientes">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-icon purple">👨‍🍳</div>
-                    </div>
-                    <div class="stat-label">Preparando</div>
-                    <div class="stat-value" id="statPreparando">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-icon green">✅</div>
-                    </div>
-                    <div class="stat-label">Pagados</div>
-                    <div class="stat-value" id="statCompletados">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-icon red">❌</div>
-                    </div>
-                    <div class="stat-label">Cancelados</div>
-                    <div class="stat-value" id="statCancelados">0</div>
-                </div>
-            </div>
+            <!-- Estadísticas eliminadas -->
 
             <!-- Filtros -->
             <!-- Filtros -->
             <div class="filters-card">
                 <div class="filters-header">
-                    <h2 class="filters-title">🔍 Filtros de Búsqueda</h2>
+                    <h2 class="filters-title">👨‍🍳 Filtros de Cocina</h2>
                     <button class="btn-clear" onclick="clearFilters()">Limpiar Filtros</button>
                 </div>
                 <div class="filters-grid">
-                    <div class="filter-group">
-                        <label class="filter-label">Estado</label>
-                        <select id="filterEstado" class="filter-select" onchange="loadOrders(true)">
-                            <option value="">Todos los estados</option>
-                            <option value="activos">📋 Activos (sin entregados)</option>
-                            <option value="pendiente">Pendientes</option>
-                            <option value="preparando">Preparando</option>
-                            <option value="listo">Listos</option>
-                            <option value="entregado">Pagado</option>
-                            <option value="cancelado">Cancelados</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label">Origen</label>
-                        <select id="filterOrigen" class="filter-select" onchange="loadOrders(true)">
-                            <option value="">Todos los orígenes</option>
-                            <option value="local">🏠 Local</option>
-                            <option value="mandao">🚲 Mandao</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label">Mesa</label>
-                        <input type="text" id="filterMesa" class="filter-input" placeholder="Nombre/Número de mesa"
-                            maxlength="20" oninput="handleSearchInput()" onchange="loadOrders(true)">
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label">Desde</label>
-                        <input type="date" id="filterFechaDesde" class="filter-input" onchange="loadOrders(true)">
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label">Hasta</label>
-                        <input type="date" id="filterFechaHasta" class="filter-input" onchange="loadOrders(true)">
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label">Buscar</label>
-                        <input type="text" id="filterSearch" class="filter-input" placeholder="Producto, notas..."
-                            oninput="handleSearchInput()">
+                    <div style="display: none;">
+                        <select id="filterEstado"><option value="activos">activos</option></select>
+                        <select id="filterOrigen"><option value="">Todos</option></select>
+                        <input type="text" id="filterMesa">
+                        <input type="date" id="filterFechaDesde">
+                        <input type="date" id="filterFechaHasta">
+                        <input type="text" id="filterSearch">
                     </div>
                 </div>
 
@@ -1879,7 +1825,7 @@
                 </div>
             </div> <!-- /default-view-hist -->
 
-            <!-- ===== VISTA DE MESAS HISTORIAL ===== -->
+            <!-- ===== VISTA DE MESAS COCINA ===== -->
             <div class="table-view-container-hist" id="tableViewHist">
                 <div class="table-view-header-hist">
                     <div class="table-view-search-wrapper-hist">
@@ -1899,7 +1845,7 @@
         </div>
     </div>
 
-    <!-- Indicador del modo vista historial -->
+    <!-- Indicador del modo vista cocina -->
     <div class="view-mode-indicator-hist" id="viewModeIndicatorHist" onclick="toggleTableViewHist()">
         <span id="viewModeIconHist">🪑</span>
         <span id="viewModeTextHist">Vista Mesas</span>
@@ -2388,17 +2334,8 @@
 
         function updateStatistics() {
             const total = filteredOrders.length;
-            const pendientes = filteredOrders.filter(o => o.estado === 'pendiente').length;
-            const preparando = filteredOrders.filter(o => o.estado === 'preparando').length;
-            const completados = filteredOrders.filter(o => o.estado === 'entregado').length;
-            const cancelados = filteredOrders.filter(o => o.estado === 'cancelado').length;
-
-            document.getElementById('statTotal').textContent = total;
-            document.getElementById('statPendientes').textContent = pendientes;
-            document.getElementById('statPreparando').textContent = preparando;
-            document.getElementById('statCompletados').textContent = completados;
-            document.getElementById('statCancelados').textContent = cancelados;
-            document.getElementById('orderCount').textContent = total;
+            const orderCountEl = document.getElementById('orderCount');
+            if (orderCountEl) orderCountEl.textContent = total;
         }
 
         let displayedOrderIds = [];
@@ -2518,14 +2455,15 @@
                                 <div style="flex: 1;">
                                     <span class="item-name" style="font-weight: 600; color: #2d3748;">${nombre}</span>
                                     <span class="item-qty" style="margin-left: 8px; color: #667eea; font-weight: 700;">x${grupo.cantidad}</span>
+                                    ${item.nota ? `<div style="font-size: 11px; color: #e53e3e; font-weight: 700; margin-top: 2px;">📝 ${item.nota}</div>` : ''}
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 8px;">
                                     <span style="font-size: 14px; font-weight: 700; color: #1a202c;">$${(item.precio * grupo.cantidad).toLocaleString('es-CO')}</span>
                                     ${order.estado !== 'entregado' && order.estado !== 'cancelado' ? `
                                         <span class="status-badge status-${grupo.estado}" style="font-size: 10px; padding: 4px 8px;">${grupo.estado}</span>
                                         <button onclick="cambiarEstadoProducto('${order._id}', ${itemIndex}, ${grupo.cantidad}, '${grupo.estado}')" 
-                                                style="padding: 4px 8px; background: #4299e1; color: white; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 600;">
-                                            ▶️
+                                                style="padding: 10px 15px; background: #4299e1; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: 700;">
+                                            ✅
                                         </button>
                                     ` : `
                                         <span class="status-badge status-${grupo.estado}" style="font-size: 10px; padding: 4px 8px;">${grupo.estado}</span>
@@ -2540,22 +2478,22 @@
                     <p>📝 ${order.notas}</p>
                 </div>
                 ` : ''}
-                <div class="order-total">
-                    <span>Total:</span>
-                    <span>$${order.total.toLocaleString('es-CO')}</span>
-                </div>
+                <!-- Total eliminado -->
                 ${renderPagosInfo(order)}
                 ${getOrderActions(order)}
             </div>
         `;
             }).join('');
 
+            const scrollPos = window.scrollY;
             if (reset) {
-                list.innerHTML = '';
+                list.innerHTML = html;
+                displayedOrderIds = ordersToRender.map(o => o._id);
+                window.scrollTo(0, scrollPos);
+            } else {
+                list.insertAdjacentHTML('beforeend', html);
+                displayedOrderIds = [...displayedOrderIds, ...ordersToRender.map(o => o._id)];
             }
-            list.insertAdjacentHTML('beforeend', html);
-
-            displayedOrderIds = [...displayedOrderIds, ...ordersToRender.map(o => o._id)];
         }
 
 
@@ -2591,20 +2529,11 @@
             const saldoRestante = tienePagosParciales ? order.total - (order.totalPagado || 0) : order.total;
             let actions = '<div class="order-actions">';
 
-            if (order.estado === 'pendiente') {
+            if (order.estado === 'pendiente' || order.estado === 'preparando') {
                 if (isMandao) {
-                    actions += `<button class="btn-action" style="background: #f59e0b; color: white;" onclick="updateOrderStatus('${order._id}', 'preparando')">✅ Aceptar Mandao</button>`;
+                    actions += `<button class="btn-action" style="background: #f59e0b; color: white;" onclick="updateOrderStatus('${order._id}', 'listo')">✅ Aceptar Cocinar</button>`;
                 } else {
-                    actions += `<button class="btn-action btn-preparar" onclick="updateOrderStatus('${order._id}', 'preparando')">👨‍🍳 Preparar</button>`;
-                    actions += `<button class="btn-action btn-listo" onclick="updateOrderStatus('${order._id}', 'listo')">✅ Listo</button>`;
-                }
-            }
-
-            if (order.estado === 'preparando') {
-                if (isMandao) {
-                    actions += `<button class="btn-action" style="background: #10b981; color: white;" onclick="updateOrderStatus('${order._id}', 'listo')">👨‍🍳 Marcar Listo</button>`;
-                } else {
-                    actions += `<button class="btn-action btn-listo" onclick="updateOrderStatus('${order._id}', 'listo')">✅ Listo</button>`;
+                    actions += `<button class="btn-action btn-listo" style="grid-column: span 2;" onclick="updateOrderStatus('${order._id}', 'listo')">✅ Marcar como Listo</button>`;
                 }
             }
 
@@ -2639,7 +2568,7 @@
         }
 
         async function pagarDirecto(orderId) {
-            console.log('💰 Pagar Directo (Historial):', orderId);
+            console.log('💰 Pagar Directo (Cocina):', orderId);
             try {
                 // 1. Cambiar a listo
                 await actualizarEstadoPedido(orderId, 'listo', null);
@@ -3808,8 +3737,9 @@
         }
 
         function obtenerSiguienteEstado(estadoActual) {
-            const flujo = ['pendiente', 'preparando', 'listo', 'entregado'];
+            const flujo = ['pendiente', 'listo', 'entregado'];
             const index = flujo.indexOf(estadoActual);
+            if (index === -1 && estadoActual === 'preparando') return 'listo';
             return flujo[index + 1] || 'entregado';
         }
 
@@ -4808,7 +4738,7 @@
 
     <script>
         // ============================================
-        // SISTEMA DE VISTA DE MESAS - HISTORIAL
+        // SISTEMA DE VISTA DE MESAS - COCINA
         // ============================================
 
         let isTableViewHist = false;
@@ -4851,7 +4781,7 @@
             }
         });
 
-        // 4 TAPS en cualquier parte de la pantalla para móvil (Atajo rápido) — HISTORIAL
+        // 4 TAPS en cualquier parte de la pantalla para móvil (Atajo rápido) — COCINA
         // ELIMINADO SEGÚN SOLICITUD DEL USUARIO EN FAVOR DEL BOTÓN SUPERIOR
 
         // DOBLE TAP en el título para móvil

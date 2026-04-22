@@ -2916,32 +2916,48 @@
             container.innerHTML = `
         <label class="form-label">Productos Seleccionados</label>
         ${selectedItems.map((item, index) => {
-            const tieneAlimentos = allAlimentosCache.some(a => a.productos.some(p => p.productoId._id === item.producto._id));
+            const tieneAlimentos = allAlimentosCache.some(a => a.productos.some(p => {
+                const prodId = p.productoId?._id || p.productoId;
+                return prodId === item.producto._id;
+            }));
             const tieneExclusiones = item.alimentosExcluidos && item.alimentosExcluidos.length > 0;
             return `
-            <div class="selected-item">
-                <div class="selected-item-info">
-                    <h4>${item.producto.nombre}</h4>
-                    <div class="quantity-controls">
-                        <button type="button" class="qty-btn" onclick="changeQuantity(${index}, -1)">-</button>
-                        <input 
-                            type="number" 
-                            min="1"
-                            value="${item.cantidad}" 
-                            onchange="setQuantity(${index}, this.value)"
-                            onclick="this.select()"
-                            style="width: 60px; text-align: center; font-weight: 600; font-size: 14px; border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px;"
+            <div class="selected-item" style="flex-direction: column; align-items: stretch;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="selected-item-info">
+                        <h4>${item.producto.nombre}</h4>
+                        <div class="quantity-controls">
+                            <button type="button" class="qty-btn" onclick="changeQuantity(${index}, -1)">-</button>
+                            <input 
+                                type="number" 
+                                min="1"
+                                value="${item.cantidad}" 
+                                onchange="setQuantity(${index}, this.value)"
+                                onclick="this.select()"
+                                style="width: 60px; text-align: center; font-weight: 600; font-size: 14px; border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px;"
+                            >
+                            <button type="button" class="qty-btn" onclick="changeQuantity(${index}, 1)">+</button>
+                            <span class="item-price">$${(item.producto.precio * item.cantidad).toLocaleString('es-CO')}</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-remove" onclick="removeItem(${index})">Eliminar</button>
+                </div>
+                
+                <div style="margin-top: 8px; display: flex; gap: 8px; align-items: center;">
+                    <div style="flex: 1;">
+                        <input type="text" 
+                            placeholder="📝 Nota para este plato (ej: sin cebolla, bien asado...)" 
+                            value="${item.nota || ''}" 
+                            oninput="setItemNote(${index}, this.value, 'default')"
+                            style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e0; border-radius: 8px; font-size: 13px; background: #fffaf0;"
                         >
-                        <button type="button" class="qty-btn" onclick="changeQuantity(${index}, 1)">+</button>
-                        <span class="item-price">$${(item.producto.precio * item.cantidad).toLocaleString('es-CO')}</span>
                     </div>
                     ${tieneAlimentos ? `
-                        <button type="button" class="btn-ver-alimentos ${tieneExclusiones || item.alimentosAjustados?.some(a => a.cantidadAjuste !== 0) ? 'has-exclusions' : ''}" onclick="mostrarAlimentosPopup('${item.producto._id}', ${index}, 'default')">
-                            🥩 Ver Alimentos ${tieneExclusiones ? '(' + item.alimentosExcluidos.length + ' excl.)' : ''}${item.alimentosAjustados?.some(a => a.cantidadAjuste !== 0) ? '(ajustado)' : ''}
+                        <button type="button" class="btn-ver-alimentos ${tieneExclusiones || item.alimentosAjustados?.some(a => a.cantidadAjuste !== 0) ? 'has-exclusions' : ''}" onclick="mostrarAlimentosPopup('${item.producto._id}', ${index}, 'default')" style="margin-top: 0; white-space: nowrap;">
+                            🥩 Alimentos
                         </button>
                     ` : ''}
                 </div>
-                <button type="button" class="btn-remove" onclick="removeItem(${index})">Eliminar</button>
             </div>
         `;
         }).join('')}
@@ -2977,6 +2993,14 @@
         function removeItem(index) {
             selectedItems.splice(index, 1);
             updateSelectedProducts();
+        }
+
+        function setItemNote(index, value, vista = 'default') {
+            if (vista === 'default') {
+                selectedItems[index].nota = value;
+            } else {
+                mesaSelectedItems[index].nota = value;
+            }
         }
 
         // ✅ POPUP DE ALIMENTOS
@@ -3177,7 +3201,8 @@
                     cantidad: item.cantidad,
                     precio: item.producto.precio,
                     alimentosExcluidos: item.alimentosExcluidos || [],
-                    alimentosAjustados: item.alimentosAjustados || []
+                    alimentosAjustados: item.alimentosAjustados || [],
+                    nota: item.nota || ''
                 })),
                 notas: notas,
                 userId: currentUser._id,
@@ -3324,6 +3349,7 @@
                     <div style="flex: 1;">
                         <span class="item-name" style="font-weight: 600; color: #2d3748;">${nombre}</span>
                         <span class="item-qty" style="margin-left: 8px; color: #667eea; font-weight: 700;">x${grupo.cantidad}</span>
+                        ${item.nota ? `<div style="font-size: 11px; color: #e53e3e; font-weight: 700; margin-top: 2px;">📝 ${item.nota}</div>` : ''}
                     </div>
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span style="font-size: 14px; font-weight: 700; color: #1a202c;">$${(item.precio * grupo.cantidad).toLocaleString('es-CO')}</span>
@@ -4696,7 +4722,8 @@
                             precio: item.precio,
                             categoria: item.productoInfo ? item.productoInfo.categoria : item.categoriaProducto
                         },
-                        cantidad: item.cantidad
+                        cantidad: item.cantidad,
+                        nota: item.nota || ''
                     }));
 
                     actualizarListaProductosEdicion();
@@ -4741,27 +4768,36 @@
             }
 
             container.innerHTML = editSelectedItems.map((item, index) => `
-        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
-            <div style="flex: 1;">
-                <div style="font-weight: 600; color: #2d3748; font-size: 14px;">${item.producto.nombre}</div>
-                <div style="font-size: 12px; color: #718096;">${item.producto.categoria}</div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <button onclick="cambiarCantidadEdicion(${index}, -1)" style="width: 28px; height: 28px; border: 1px solid #e2e8f0; background: white; border-radius: 6px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;">-</button>
-                <input 
-<input 
-    type="number" 
-    min="1"
-    value="${item.cantidad}" 
-    onchange="setCantidadEdicion(${index}, this.value)"
-                    onclick="this.select()"
-                    style="width: 60px; text-align: center; font-weight: 600; font-size: 14px; border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px;"
-                >
-                <button onclick="cambiarCantidadEdicion(${index}, 1)" style="width: 28px; height: 28px; border: 1px solid #e2e8f0; background: white; border-radius: 6px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;">+</button>
-                <span style="font-size: 14px; font-weight: 700; color: #2d3748; min-width: 80px; text-align: right;">$${(item.producto.precio * item.cantidad).toLocaleString('es-CO')}</span>
-                <button onclick="eliminarProductoEdicion(${index})" style="background: #fc8181; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">🗑️</button>
-            </div>
-        </div>
+                <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; color: #2d3748; font-size: 14px;">${item.producto.nombre}</div>
+                            <div style="font-size: 12px; color: #718096;">${item.producto.categoria}</div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <button type="button" onclick="cambiarCantidadEdicion(${index}, -1)" style="width: 28px; height: 28px; border: 1px solid #e2e8f0; background: white; border-radius: 6px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;">-</button>
+                            <input 
+                                type="number" 
+                                min="1"
+                                value="${item.cantidad}" 
+                                onchange="setCantidadEdicion(${index}, this.value)"
+                                onclick="this.select()"
+                                style="width: 60px; text-align: center; font-weight: 600; font-size: 14px; border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px;"
+                            >
+                            <button type="button" onclick="cambiarCantidadEdicion(${index}, 1)" style="width: 28px; height: 28px; border: 1px solid #e2e8f0; background: white; border-radius: 6px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;">+</button>
+                            <span style="font-size: 14px; font-weight: 700; color: #2d3748; min-width: 80px; text-align: right;">$${(item.producto.precio * item.cantidad).toLocaleString('es-CO')}</span>
+                            <button type="button" onclick="eliminarProductoEdicion(${index})" style="background: #fc8181; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">🗑️</button>
+                        </div>
+                    </div>
+                    <div style="margin-top: 8px;">
+                        <input type="text" 
+                            placeholder="Notas para este plato..." 
+                            value="${item.nota || ''}" 
+                            oninput="setItemNoteEdicion(${index}, this.value)"
+                            style="width: 100%; padding: 6px 10px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 12px; background: #fffaf0;"
+                        >
+                    </div>
+                </div>
     `).join('');
 
             const total = editSelectedItems.reduce((sum, item) => sum + (item.producto.precio * item.cantidad), 0);
@@ -4774,6 +4810,10 @@
                 editSelectedItems.splice(index, 1);
             }
             actualizarListaProductosEdicion();
+        }
+
+        function setItemNoteEdicion(index, value) {
+            editSelectedItems[index].nota = value;
         }
 
         function setCantidadEdicion(index, value) {
@@ -5031,7 +5071,8 @@
                     nombreProducto: item.producto.nombre,
                     categoriaProducto: item.producto.categoria,
                     cantidad: item.cantidad,
-                    precio: item.producto.precio
+                    precio: item.producto.precio,
+                    nota: item.nota || ''
                 })),
                 notas: notas
             };
@@ -5800,25 +5841,39 @@
         container.innerHTML = `
             <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px;">Productos Seleccionados</label>
             ${mesaSelectedItems.map((item, index) => {
-                const tieneAlimentos = allAlimentosCache.some(a => a.productos.some(p => p.productoId._id === item.producto._id));
+                const tieneAlimentos = allAlimentosCache.some(a => a.productos.some(p => {
+                    const prodId = p.productoId?._id || p.productoId;
+                    return prodId === item.producto._id;
+                }));
                 const tieneExclusiones = item.alimentosExcluidos && item.alimentosExcluidos.length > 0;
                 return `
-                <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
-                    <div style="flex: 1;">
-                        <div style="font-size: 13px; font-weight: 600; color: #2d3748;">${item.producto.nombre}</div>
-                        <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
-                            <button type="button" onclick="changeMesaQty(${index}, -1)" style="width: 26px; height: 26px; border: 1px solid #e2e8f0; background: white; border-radius: 6px; cursor: pointer; font-size: 14px;">-</button>
-                            <span style="min-width: 30px; text-align: center; font-weight: 600; font-size: 13px;">${item.cantidad}</span>
-                            <button type="button" onclick="changeMesaQty(${index}, 1)" style="width: 26px; height: 26px; border: 1px solid #e2e8f0; background: white; border-radius: 6px; cursor: pointer; font-size: 14px;">+</button>
-                            <span style="font-size: 13px; font-weight: 700; color: #2d3748; margin-left: 8px;">$${(item.producto.precio * item.cantidad).toLocaleString('es-CO')}</span>
+                <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 6px; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="flex: 1;">
+                            <div style="font-size: 13px; font-weight: 600; color: #2d3748;">${item.producto.nombre}</div>
+                            <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
+                                <button type="button" onclick="changeMesaQty(${index}, -1)" style="width: 26px; height: 26px; border: 1px solid #e2e8f0; background: white; border-radius: 6px; cursor: pointer; font-size: 14px;">-</button>
+                                <span style="min-width: 30px; text-align: center; font-weight: 600; font-size: 13px;">${item.cantidad}</span>
+                                <button type="button" onclick="changeMesaQty(${index}, 1)" style="width: 26px; height: 26px; border: 1px solid #e2e8f0; background: white; border-radius: 6px; cursor: pointer; font-size: 14px;">+</button>
+                                <span style="font-size: 13px; font-weight: 700; color: #2d3748; margin-left: 8px;">$${(item.producto.precio * item.cantidad).toLocaleString('es-CO')}</span>
+                            </div>
                         </div>
+                        <button type="button" onclick="removeMesaItem(${index})" style="background: #fc8181; color: white; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">✕</button>
+                    </div>
+                    
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                        <input type="text" 
+                            placeholder="Nota para este plato..." 
+                            value="${item.nota || ''}" 
+                            oninput="setItemNote(${index}, this.value, 'mesa')"
+                            style="flex: 1; padding: 6px 10px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 12px; background: #fffaf0;"
+                        >
                         ${tieneAlimentos ? `
-                            <button type="button" class="btn-ver-alimentos ${tieneExclusiones ? 'has-exclusions' : ''}" onclick="mostrarAlimentosPopup('${item.producto._id}', ${index}, 'mesa')" style="margin-top: 6px;">
-                                🥩 Ver Alimentos ${tieneExclusiones ? '(' + item.alimentosExcluidos.length + ' excl.)' : ''}
+                            <button type="button" class="btn-ver-alimentos ${tieneExclusiones ? 'has-exclusions' : ''}" onclick="mostrarAlimentosPopup('${item.producto._id}', ${index}, 'mesa')" style="margin-top: 0; padding: 6px; font-size: 11px;">
+                                🥩 Alimentos
                             </button>
                         ` : ''}
                     </div>
-                    <button type="button" onclick="removeMesaItem(${index})" style="background: #fc8181; color: white; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">✕</button>
                 </div>
             `;
             }).join('')}
@@ -5865,7 +5920,8 @@
                 cantidad: item.cantidad,
                 precio: item.producto.precio,
                 alimentosExcluidos: item.alimentosExcluidos || [],
-                alimentosAjustados: item.alimentosAjustados || []
+                alimentosAjustados: item.alimentosAjustados || [],
+                nota: item.nota || ''
             })),
             notas: notas
         };
