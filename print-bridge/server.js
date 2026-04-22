@@ -9,8 +9,10 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = 3001;
-const CONFIG_PATH = path.join(__dirname, 'config.json');
-const PRINTED_PATH = path.join(__dirname, 'printed.json');
+// Usamos process.execPath para que los archivos se guarden en la carpeta REAL del usuario, no dentro del ejecutable.
+const baseDir = path.dirname(process.execPath);
+const CONFIG_PATH = path.join(baseDir, 'config.json');
+const PRINTED_PATH = path.join(baseDir, 'printed.json');
 const API_BASE = 'https://restaurante-co77.onrender.com/api';
 
 let config = {
