@@ -177,16 +177,21 @@ app.get('/', (req, res) => {
 
 app.post('/save-config', (req, res) => {
     try {
-        const decoded = JSON.parse(Buffer.from(req.body.code, 'base64').toString());
+        const rawCode = req.body.code.trim();
+        const decodedStr = Buffer.from(rawCode, 'base64').toString('utf8');
+        const decoded = JSON.parse(decodedStr);
+        
         config.userId = decoded.userId;
         config.token = decoded.token;
         config.printer = decoded.printer;
         config.active = true;
         
         fs.writeFileSync(CONFIG_PATH, JSON.stringify(config));
+        console.log("✅ Configuración guardada correctamente.");
         res.json({ success: true, message: "Vinculación exitosa. Iniciando vigilancia..." });
     } catch (e) {
-        res.status(400).json({ success: false, message: "Código inválido. Asegúrate de copiarlo bien." });
+        console.error("❌ Error al decodificar código:", e.message);
+        res.status(400).json({ success: false, message: "Código inválido. Asegúrate de copiarlo completo y sin espacios extra." });
     }
 });
 

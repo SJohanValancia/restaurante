@@ -651,7 +651,8 @@
                 }
             };
 
-            const base64 = btoa(JSON.stringify(config));
+            const jsonStr = JSON.stringify(config);
+            const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
             document.getElementById('linkCodeText').value = base64;
             document.getElementById('link-code-box').style.display = 'block';
             
