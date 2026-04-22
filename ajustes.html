@@ -605,6 +605,31 @@
             document.getElementById('group-interface-red').style.display = type === 'red' ? 'block' : 'none';
         }
 
+        function saveSettings() {
+            const autoPrint = document.getElementById('autoPrintSwitch').checked;
+            const printerIntSistema = document.getElementById('printerInterfaceSistema').value;
+            const printerIntRed = document.getElementById('printerInterfaceRed').value;
+            const printerModel = document.getElementById('printerModel').value;
+
+            if (autoPrint) {
+                localStorage.setItem('printActivationTime', new Date().toISOString());
+            }
+
+            localStorage.setItem('autoPrintComanda', autoPrint);
+            localStorage.setItem('printerConnType', currentConnType);
+            localStorage.setItem('printerInterfaceSistema', printerIntSistema);
+            localStorage.setItem('printerInterfaceRed', printerIntRed);
+            localStorage.setItem('printerModel', printerModel);
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Ajustes guardados',
+                text: 'Configuración actualizada correctamente.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+
         function generateLinkCode() {
             const token = localStorage.getItem('token');
             const user = JSON.parse(localStorage.getItem('usuario') || '{}');
