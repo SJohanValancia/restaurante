@@ -1664,4 +1664,45 @@ router.delete('/:id', protect, checkPermission('cancelarPedidos'), async (req, r
   }
 });
 
+// ✅ RUTA PARA SINCRONIZAR NOMBRES DE MESEROS EN PEDIDOS ANTIGUOS
+router.post('/sync-meseros', protect, async (req, res) => {
+  try {
+    const userIds = req.userIdsRestaurante;
+
+    // 1. Obtener todos los pedidos
+    const orders = await Order.find({ userId: { $in: userIds } });
+
+    // 2. Obtener todos los usuarios del restaurante para un mapeo rápido
+    const usuarios = await User.find({ _id: { $in: userIds } });
+    const userMap = {};
+    usuarios.forEach(u => {
+      userMap[u._id.toString()] = u.nombre;
+    });
+
+    let actualizados = 0;
+
+    for (const order of orders) {
+      const nombreUsuario = userMap[order.userId.toString()];
+      if (nombreUsuario && order.mesero !== nombreUsuario) {
+        order.mesero = nombreUsuario;
+        await order.save();
+        actualizados++;
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `${actualizados} pedidos actualizados con nombres de mesero correctamente.`,
+      data: { actualizados }
+    });
+  } catch (error) {
+    console.error('❌ Error en sincronización de meseros:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al sincronizar nombres de meseros',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;

@@ -522,6 +522,26 @@
                 </div>
             </div>
 
+            <!-- MANTENIMIENTO -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🛠️</div>
+                    <div style="flex: 1;">
+                        <h3>Mantenimiento de Datos</h3>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-name">Sincronizar nombres en pedidos</div>
+                        <div class="setting-description">Actualiza los pedidos antiguos con el nombre del usuario que los creó para que aparezcan en las tarjetas.</div>
+                    </div>
+                    <button class="btn-save" onclick="sincronizarMeseros()" style="margin-top: 0; padding: 8px 15px; font-size: 13px; background: #667eea;">
+                        🔄 Sincronizar
+                    </button>
+                </div>
+            </div>
+
             <!-- MANUAL O INVISIBLE (Placeholder) -->
             <div class="card" style="opacity: 0.6; pointer-events: none;">
                 <div class="card-header">
@@ -708,6 +728,46 @@
                 }
             } catch (error) {
                 Swal.fire('Error de Conector', 'No se pudo contactar con el Print Bridge. ¿Está encendido?', 'error');
+            }
+        }
+
+        async function sincronizarMeseros() {
+            const { isConfirmed } = await Swal.fire({
+                title: '¿Sincronizar nombres?',
+                text: 'Esto buscará los nombres de los usuarios que crearon los pedidos antiguos para que aparezcan en las tarjetas de cocina y pedidos.',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, sincronizar',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (!isConfirmed) return;
+
+            Swal.fire({ title: 'Sincronizando...', didOpen: () => Swal.showLoading() });
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_URL}/orders/sync-meseros`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sincronización exitosa',
+                        text: result.message
+                    });
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({ icon: 'error', text: 'Error al sincronizar: ' + error.message });
             }
         }
 
