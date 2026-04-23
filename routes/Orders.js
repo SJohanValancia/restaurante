@@ -457,7 +457,7 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
       hubOrderGroup: 1,
       meseroHubId: 1
     })
-      .sort({ createdAt: 1 })
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limitNum)
       .lean();
@@ -585,8 +585,8 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
       });
 
       ordersNormalizados = [...mergedOrders, ...ungrouped];
-      // Re-ordenar por fecha ascendente (orden de llegada)
-      ordersNormalizados.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      // Re-ordenar por fecha descendente
+      ordersNormalizados.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
 
     res.json({
