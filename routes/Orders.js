@@ -910,6 +910,9 @@ router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
         estado: 'pendiente'
       };
 
+      console.log('📝 Creando pedido normal. Usuario:', req.user.nombre, 'ID:', req.user._id);
+      console.log('📝 Datos del mesero asignados:', orderData.mesero);
+
       const order = await Order.create(orderData);
       await order.populate('items.producto', 'nombre categoria precio');
 
@@ -1522,6 +1525,12 @@ router.put('/:id', protect, checkPermission('editarPedidos'), async (req, res) =
     order.mesa = mesa;
     order.notas = notas;
 
+    // Si el nombre del mesero es genérico, intentar actualizarlo con el usuario actual
+    const esGenerico = !order.mesero || order.mesero === 'Usuario' || order.mesero === 'Mesero' || order.mesero === 'Desconocido';
+    if (esGenerico && req.user.nombre) {
+      order.mesero = req.user.nombre;
+    }
+
     // Si hay items, actualizarlos preservando estadosIndividuales y notas existentes
     if (items && items.length > 0) {
       // Construir mapa de items originales para preservar estadosIndividuales existentes
@@ -1668,16 +1677,16 @@ router.delete('/:id', protect, checkPermission('cancelarPedidos'), async (req, r
 router.post('/sync-meseros', protect, async (req, res) => {
   try {
     const userIds = req.userIdsRestaurante;
-    console.log('🔄 Iniciando sincronización de nombres para userIds:', userIds.length);
-
-    // 1. Obtener todos los pedidos que NO tienen un nombre de mesero real o que dicen 'Usuario'
+    
+    // 1. Obtener todos los pedidos del restaurante
     const orders = await Order.find({ 
-      userId: { $in: userIds }
+      $or: [
+        { userId: { $in: userIds } },
+        { meseroHubId: { $in: userIds } }
+      ]
     });
     
-    console.log('📦 Pedidos totales encontrados para este restaurante:', orders.length);
-
-    // 2. Obtener mapeo de usuarios
+    // 2. Obtener mapeo de TODOS los usuarios posibles del restaurante
     const usuarios = await User.find({ _id: { $in: userIds } });
     const userMap = {};
     usuarios.forEach(u => {
@@ -1687,19 +1696,21 @@ router.post('/sync-meseros', protect, async (req, res) => {
     let actualizados = 0;
 
     for (const order of orders) {
-      const nombreUsuario = userMap[order.userId?.toString()];
+      // Prioridad: meseroHubId (quien creó el pedido) -> userId
+      const creatorId = order.meseroHubId || order.userId;
+      const nombreUsuario = userMap[creatorId?.toString()];
       
-      // Forzar actualización si el nombre actual es genérico o nulo
-      const esGenerico = !order.mesero || order.mesero === 'Usuario' || order.mesero === 'Mesero';
+      const esHub = !!order.meseroHubId;
+      const nombreActual = order.mesero;
+      const esGenerico = !nombreActual || nombreActual === 'Usuario' || nombreActual === 'Mesero' || nombreActual === 'Desconocido';
       
-      if (nombreUsuario && (esGenerico || order.mesero !== nombreUsuario)) {
+      if (nombreUsuario && (esGenerico || nombreActual !== nombreUsuario)) {
         order.mesero = nombreUsuario;
+        // Si no tiene userId (raro) o es diferente al dueño, asegurar consistencia
         await order.save();
         actualizados++;
       }
     }
-
-    console.log('✅ Sincronización finalizada. Actualizados:', actualizados);
 
     res.json({
       success: true,
