@@ -1668,11 +1668,16 @@ router.delete('/:id', protect, checkPermission('cancelarPedidos'), async (req, r
 router.post('/sync-meseros', protect, async (req, res) => {
   try {
     const userIds = req.userIdsRestaurante;
+    console.log('🔄 Iniciando sincronización de nombres para userIds:', userIds.length);
 
-    // 1. Obtener todos los pedidos
-    const orders = await Order.find({ userId: { $in: userIds } });
+    // 1. Obtener todos los pedidos que NO tienen un nombre de mesero real o que dicen 'Usuario'
+    const orders = await Order.find({ 
+      userId: { $in: userIds }
+    });
+    
+    console.log('📦 Pedidos totales encontrados para este restaurante:', orders.length);
 
-    // 2. Obtener todos los usuarios del restaurante para un mapeo rápido
+    // 2. Obtener mapeo de usuarios
     const usuarios = await User.find({ _id: { $in: userIds } });
     const userMap = {};
     usuarios.forEach(u => {
@@ -1682,18 +1687,24 @@ router.post('/sync-meseros', protect, async (req, res) => {
     let actualizados = 0;
 
     for (const order of orders) {
-      const nombreUsuario = userMap[order.userId.toString()];
-      if (nombreUsuario && order.mesero !== nombreUsuario) {
+      const nombreUsuario = userMap[order.userId?.toString()];
+      
+      // Forzar actualización si el nombre actual es genérico o nulo
+      const esGenerico = !order.mesero || order.mesero === 'Usuario' || order.mesero === 'Mesero';
+      
+      if (nombreUsuario && (esGenerico || order.mesero !== nombreUsuario)) {
         order.mesero = nombreUsuario;
         await order.save();
         actualizados++;
       }
     }
 
+    console.log('✅ Sincronización finalizada. Actualizados:', actualizados);
+
     res.json({
       success: true,
-      message: `${actualizados} pedidos actualizados con nombres de mesero correctamente.`,
-      data: { actualizados }
+      message: `${actualizados} pedidos actualizados. Total revisados: ${orders.length}`,
+      data: { actualizados, total: orders.length }
     });
   } catch (error) {
     console.error('❌ Error en sincronización de meseros:', error);
