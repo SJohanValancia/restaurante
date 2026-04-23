@@ -1657,23 +1657,23 @@
             <div class="nav-section">
                 <div class="nav-section-title">Principal</div>
                 <a href="productos.html" class="nav-item">
-                    <span class="nav-icon">📦</span>
+                    <span class="nav-icon">🍔</span>
                     <span>Platos</span>
                 </a>
                 <a href="pedidos.html" class="nav-item">
-                    <span class="nav-icon">🍽️</span>
+                    <span class="nav-icon">📝</span>
                     <span>Pedidos</span>
                 </a>
                 <a href="gastos.html" class="nav-item">
-                    <span class="nav-icon">🧾</span>
+                    <span class="nav-icon">💰</span>
                     <span>Gastos</span>
                 </a>
                 <a href="qr-generator.html" class="nav-item">
-                    <span class="nav-icon">📱</span>
+                    <span class="nav-icon">🔗</span>
                     <span>QR Generador</span>
                 </a>
                 <a href="reportes.html" class="nav-item">
-                    <span class="nav-icon">📊</span>
+                    <span class="nav-icon">📈</span>
                     <span>Reportes</span>
                 </a>
                 <a href="cocina.html" class="nav-item active">
@@ -1681,11 +1681,11 @@
                     <span>Cocina</span>
                 </a>
                 <a href="catalogo-productos.html" class="nav-item">
-                    <span class="nav-icon">📜📦</span>
+                    <span class="nav-icon">📋</span>
                     <span>Todos los platos</span>
                 </a>
                 <a href="alimentos.html" class="nav-item">
-                    <span class="nav-icon">🥘</span>
+                    <span class="nav-icon">🥑</span>
                     <span>Alimentos</span>
                 </a>
             </div>
@@ -1694,19 +1694,19 @@
             <div class="nav-section" id="adminSection" style="display: none;">
                 <div class="nav-section-title">Administración</div>
                 <a href="administrador.html" class="nav-item">
-                    <span class="nav-icon">👥</span>
+                    <span class="nav-icon">👔</span>
                     <span>Gestión de Meseros</span>
                 </a>
                 <a href="liquidacion.html" class="nav-item">
-                    <span class="nav-icon">💵</span>
+                    <span class="nav-icon">💎</span>
                     <span>Liquidación</span>
                 </a>
                 <a href="historial-liquidaciones.html" class="nav-item">
-                    <span class="nav-icon">📋</span>
+                    <span class="nav-icon">📓</span>
                     <span>Hist. Liquidaciones</span>
                 </a>
                 <a href="solicitudes.html" class="nav-item">
-                    <span class="nav-icon">👤✅</span>
+                    <span class="nav-icon">✔️</span>
                     <span>Aceptación de Empleados</span>
                 </a>
                 <a href="ajustes.html" class="nav-item">
@@ -1747,13 +1747,43 @@
             <!-- Estadísticas eliminadas -->
 
             <!-- Filtros -->
-            <!-- Filtros -->
             <div class="filters-card">
                 <div class="filters-header">
                     <h2 class="filters-title">👨‍🍳 Filtros de Cocina</h2>
                     <button class="btn-clear" onclick="clearFilters()">Limpiar Filtros</button>
                 </div>
                 <div class="filters-grid">
+                    <!-- Buscador de Mesas -->
+                    <div class="filter-group">
+                        <label class="filter-label">🪑 Buscar Mesa</label>
+                        <div style="position: relative;">
+                            <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #a0aec0; z-index: 1;">🔍</span>
+                            <input type="text" id="filterMesa" class="filter-input" 
+                                placeholder="Nombre o # de mesa..." 
+                                oninput="applyFilters()" 
+                                style="padding-left: 35px; width: 100%;"
+                                autocomplete="off">
+                        </div>
+                    </div>
+
+                    <!-- Filtro por Plato -->
+                    <div class="filter-group">
+                        <label class="filter-label">🍽️ Filtrar por Plato</label>
+                        <select id="filterPlato" class="filter-select" onchange="loadOrders(true)">
+                            <option value="">Todos los platos</option>
+                        </select>
+                    </div>
+
+                    <!-- Botón Estado Global -->
+                    <div class="filter-group" style="justify-content: flex-end;">
+                        <button id="btnCambiarEstadoGlobal" class="btn-cambiar-estado-global"
+                            onclick="cambiarEstadoGlobal()" disabled style="height: 44px; width: 100%;">
+                            <span>⚡</span>
+                            <span id="textoBotonGlobal">Estado Global</span>
+                        </button>
+                    </div>
+
+                    <!-- Filtros Ocultos Necesarios para la lógica -->
                     <div style="display: none;">
                         <select id="filterEstado">
                             <option value="activos">activos</option>
@@ -1761,27 +1791,9 @@
                         <select id="filterOrigen">
                             <option value="">Todos</option>
                         </select>
-                        <input type="text" id="filterMesa">
                         <input type="date" id="filterFechaDesde">
                         <input type="date" id="filterFechaHasta">
                         <input type="text" id="filterSearch">
-                    </div>
-                </div>
-
-                <!-- NUEVO: Filtro por plato -->
-                <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid #e2e8f0;">
-                    <div class="filter-platos-container">
-                        <div class="filter-group" style="flex: 1;">
-                            <label class="filter-label">🍽️ Filtrar por Plato</label>
-                            <select id="filterPlato" class="filter-select" onchange="loadOrders(true)">
-                                <option value="">Todos los platos</option>
-                            </select>
-                        </div>
-                        <button id="btnCambiarEstadoGlobal" class="btn-cambiar-estado-global"
-                            onclick="cambiarEstadoGlobal()" disabled>
-                            <span>⚡</span>
-                            <span id="textoBotonGlobal">Cambiar Estado Global</span>
-                        </button>
                     </div>
                 </div>
             </div>
