@@ -455,7 +455,8 @@ router.get('/', protect, checkPermission('verPedidos'), async (req, res) => {
       clienteNombre: 1,
       clienteCcNit: 1,
       hubOrderGroup: 1,
-      meseroHubId: 1
+      meseroHubId: 1,
+      mesero: 1
     })
       .sort({ createdAt: -1 })
       .skip(skip)
