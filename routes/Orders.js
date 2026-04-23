@@ -906,6 +906,7 @@ router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
         total,
         notas,
         userId: req.user._id,
+        mesero: req.user.nombre || 'Mesero',
         estado: 'pendiente'
       };
 
