@@ -60,8 +60,12 @@ exports.protect = async (req, res, next) => {
       query.sede = req.sede;
     }
 
-    const usuariosRestaurante = await User.find(query).select('_id');
+    const usuariosRestaurante = await User.find(query).select('_id rol');
     req.userIdsRestaurante = usuariosRestaurante.map(u => u._id);
+
+    // Identificar el ID del Administrador Principal (para centralizar mesas/inventario)
+    const adminPrincipal = usuariosRestaurante.find(u => u.rol === 'admin') || usuariosRestaurante[0];
+    req.mainAdminId = adminPrincipal ? adminPrincipal._id : req.user._id;
 
     // --- MULTI-LOCAL HUB: Si es mesero, expandir vista con todos los admins vinculados ---
     req.isHubMesero = false;

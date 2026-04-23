@@ -11,9 +11,21 @@ router.get('/', async (req, res) => {
       activa: true
     }).sort({ nombre: 1 }).lean();
 
+    // ✅ DEDUPLICACIÓN: Si hay mesas con el mismo nombre (por IDs distintos), unificarlas
+    const mesasUnicas = [];
+    const nombresVistos = new Set();
+    
+    for (const mesa of mesas) {
+      const nombreNorm = mesa.nombre.trim().toLowerCase();
+      if (!nombresVistos.has(nombreNorm)) {
+        mesasUnicas.push(mesa);
+        nombresVistos.add(nombreNorm);
+      }
+    }
+
     res.json({
       success: true,
-      data: mesas
+      data: mesasUnicas
     });
   } catch (error) {
     console.error('❌ Error al obtener mesas:', error);
@@ -37,22 +49,22 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Verificar si ya existe una mesa con ese nombre para este usuario
+    // Verificar si ya existe una mesa con ese nombre para este RESTAURANTE (usando mainAdminId)
     const existing = await Mesa.findOne({
-      userId: req.user._id,
+      userId: req.mainAdminId,
       nombre: nombre.trim()
     });
 
     if (existing) {
       return res.status(400).json({
         success: false,
-        message: 'Ya existe una mesa con ese nombre'
+        message: 'Ya existe una mesa con ese nombre en el restaurante'
       });
     }
 
     const mesa = await Mesa.create({
       nombre: nombre.trim(),
-      userId: req.user._id
+      userId: req.mainAdminId
     });
 
     res.status(201).json({
@@ -96,7 +108,7 @@ router.post('/bulk', async (req, res) => {
       try {
         const mesa = await Mesa.create({
           nombre,
-          userId: req.user._id
+          userId: req.mainAdminId
         });
         mesasCreadas.push(mesa);
       } catch (err) {
@@ -169,8 +181,8 @@ router.post('/seed', async (req, res) => {
 
       try {
         await Mesa.findOneAndUpdate(
-          { userId: req.user._id, nombre },
-          { userId: req.user._id, nombre, activa: true },
+          { userId: req.mainAdminId, nombre },
+          { userId: req.mainAdminId, nombre, activa: true },
           { upsert: true, new: true, setDefaultsOnInsert: true }
         );
         creadas++;

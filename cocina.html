@@ -2256,7 +2256,7 @@
             setTimeout(() => alert.remove(), 3000);
         }
 
-        function applyFilters(reset = false, skipSearchFilter = false) {
+        function applyFilters(reset = true, skipSearchFilter = false) {
             const estado = document.getElementById('filterEstado').value;
             const origen = document.getElementById('filterOrigen').value;
             const mesa = document.getElementById('filterMesa').value.trim();
@@ -2421,7 +2421,7 @@
                     <div class="order-info">
                         <div style="display: flex; align-items: center; gap: 8px;">
                             ${isMandao ? '<span class="source-badge source-mandao"><span class="mandao-icon">🚲</span> MANDAO</span>' : ''}
-                            <h3>Mesa ${order.mesa}</h3>
+                            <h3>${String(order.mesa).toLowerCase().trim().startsWith('mesa') ? order.mesa : 'Mesa ' + order.mesa}</h3>
                         </div>
                         <div class="order-meta">
                             <div class="meta-row">

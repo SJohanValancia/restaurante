@@ -882,8 +882,8 @@ router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
       if (mesa && mesa.trim()) {
         try {
           await Mesa.findOneAndUpdate(
-            { userId: req.user._id, nombre: mesa.trim() },
-            { userId: req.user._id, nombre: mesa.trim(), activa: true },
+            { userId: req.mainAdminId, nombre: mesa.trim() },
+            { userId: req.mainAdminId, nombre: mesa.trim(), activa: true },
             { upsert: true, new: true, setDefaultsOnInsert: true }
           );
         } catch (e) { /* Ignorar errores */ }
@@ -916,8 +916,8 @@ router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
       if (mesa && mesa.trim()) {
         try {
           await Mesa.findOneAndUpdate(
-            { userId: req.user._id, nombre: mesa.trim() },
-            { userId: req.user._id, nombre: mesa.trim(), activa: true },
+            { userId: req.mainAdminId, nombre: mesa.trim() },
+            { userId: req.mainAdminId, nombre: mesa.trim(), activa: true },
             { upsert: true, new: true, setDefaultsOnInsert: true }
           );
         } catch (e) { /* Ignorar errores de mesa duplicada */ }
