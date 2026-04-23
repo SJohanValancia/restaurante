@@ -31,6 +31,11 @@
             z-index: 1000;
             box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
+            transform: translateX(-280px);
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
         }
 
         .sidebar.collapsed {
@@ -213,7 +218,7 @@
 
         .menu-toggle {
             position: fixed;
-            left: 300px;
+            left: 20px;
             top: 20px;
             width: 45px;
             height: 45px;
@@ -253,7 +258,7 @@
 
         /* CONTENIDO PRINCIPAL */
         .content-wrapper {
-            margin-left: 280px;
+            margin-left: 0;
             transition: margin-left 0.3s ease;
             min-height: 100vh;
         }
@@ -603,22 +608,6 @@
         }
 
         @media (max-width: 1024px) {
-            .sidebar {
-                transform: translateX(-280px);
-            }
-
-            .sidebar.active {
-                transform: translateX(0);
-            }
-
-            .menu-toggle {
-                left: 20px;
-            }
-
-            .content-wrapper {
-                margin-left: 0;
-            }
-
             .products-table-container {
                 overflow-x: auto;
             }

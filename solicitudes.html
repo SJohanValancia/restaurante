@@ -29,6 +29,46 @@
             background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
             z-index: 1000;
             box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+            transform: translateX(-280px);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .menu-toggle {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
         }
 
         .sidebar-header {
@@ -76,7 +116,7 @@
         }
 
         .content-wrapper {
-            margin-left: 280px;
+            margin-left: 0;
             padding: 2rem;
         }
 
@@ -189,19 +229,17 @@
         }
 
         @media (max-width: 1024px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
             .content-wrapper {
-                margin-left: 0;
+                padding: 5rem 1rem 2rem;
             }
         }
     </style>
 </head>
 
 <body>
-    <aside class="sidebar">
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+    <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <a href="administrador.html" class="sidebar-brand">
                 <div style="font-size: 24px;">🛡️</div>
@@ -358,6 +396,11 @@
             } catch (error) {
                 Swal.fire('Error', 'Hubo un problema al procesar la solicitud', 'error');
             }
+        }
+
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
         }
 
         // Cargar al inicio

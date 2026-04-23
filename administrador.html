@@ -40,7 +40,7 @@
 
         /* BOTÓN HAMBURGUESA */
         .menu-toggle {
-            display: none;
+            display: flex;
             position: fixed;
             top: 1rem;
             left: 1rem;
@@ -53,10 +53,8 @@
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
             transition: transform 0.2s;
-        }
-
-        .menu-toggle:active {
-            transform: scale(0.95);
+            align-items: center;
+            justify-content: center;
         }
 
         .hamburger {
@@ -117,6 +115,11 @@
             z-index: 1000;
             box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
+            transform: translateX(-100%);
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
         }
 
         .sidebar-header {
@@ -290,7 +293,7 @@
         }
 
         .content-wrapper {
-            margin-left: 280px;
+            margin-left: 0;
             min-height: 100vh;
             transition: margin-left 0.3s ease;
         }
@@ -821,22 +824,6 @@
 
         /* RESPONSIVE */
         @media (max-width: 1024px) {
-            .menu-toggle {
-                display: block;
-            }
-
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .sidebar.active {
-                transform: translateX(0);
-            }
-
-            .content-wrapper {
-                margin-left: 0;
-            }
-
             .container {
                 padding: 5rem 1rem 2rem 1rem;
             }
