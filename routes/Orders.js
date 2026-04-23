@@ -342,7 +342,7 @@ router.get('/mesa/:numeroMesa', async (req, res) => {
         merged.estado = groupOrders.reduce((minEstado, o) => {
           return (estadoPrioridad[o.estado] || 0) < (estadoPrioridad[minEstado] || 0) ? o.estado : minEstado;
         }, groupOrders[0].estado);
-        
+
         // Mantener métodos de pago
         merged.metodoPago = groupOrders.find(o => o.metodoPago)?.metodoPago || null;
 
@@ -688,25 +688,29 @@ router.get('/stats/productos-mas-vendidos', protect, async (req, res) => {
       { $match: { estado: { $ne: 'cancelado' } } },
       { $unwind: '$items' },
       // Traer la información del producto asociado para poder validar su dueño
-      { $lookup: {
+      {
+        $lookup: {
           from: 'products',
           localField: 'items.producto',
           foreignField: '_id',
           as: 'productInfo'
-      }},
+        }
+      },
       // Filtrar items sin producto equivalente en la DB
       { $unwind: { path: '$productInfo', preserveNullAndEmptyArrays: false } },
       // ⭐ CLAVE: El verdadero filtro para que CADA LOCAL VEA SOLO LO SUYO
       // Revisamos que el ID del DUEÑO del producto esté dentro de mis objectIds permitidos
       { $match: { 'productInfo.userId': { $in: objectIds } } },
       // Agrupar y procesar resultado final
-      { $group: { 
-          _id: '$items.producto', 
+      {
+        $group: {
+          _id: '$items.producto',
           nombre: { $first: '$productInfo.nombre' },
           categoria: { $first: '$productInfo.categoria' },
-          cantidadTotal: { $sum: '$items.cantidad' }, 
-          ingresosTotales: { $sum: { $multiply: ['$items.cantidad', '$items.precio'] } } 
-      }},
+          cantidadTotal: { $sum: '$items.cantidad' },
+          ingresosTotales: { $sum: { $multiply: ['$items.cantidad', '$items.precio'] } }
+        }
+      },
       { $sort: { cantidadTotal: -1 } },
       { $limit: limitNum }
     ]);
@@ -806,7 +810,8 @@ router.post('/', protect, checkPermission('crearPedidos'), async (req, res) => {
         precio: item.precio,
         ownerUserId: producto.userId, // Dueño del producto (local)
         alimentosExcluidos: item.alimentosExcluidos || [], // ✅ Alimentos excluidos del descuento
-        alimentosAjustados: item.alimentosAjustados || [] // ✅ Ajustes personalizados (más/menos)
+        alimentosAjustados: item.alimentosAjustados || [], // ✅ Ajustes personalizados (más/menos)
+        nota: item.nota || '' // ✅ Nota por plato
       };
     }));
 
@@ -966,7 +971,8 @@ router.post('/public', async (req, res) => {
         cantidad: item.cantidad,
         precio: producto.precio,
         alimentosExcluidos: item.alimentosExcluidos || [],
-        alimentosAjustados: item.alimentosAjustados || []
+        alimentosAjustados: item.alimentosAjustados || [],
+        nota: item.nota || ''
       };
     }));
 
@@ -1351,7 +1357,7 @@ router.patch('/:id/metodo-pago', protect, checkPermission('editarPedidos'), asyn
   try {
     const { metodoPago, montoParcial, pagoIndex } = req.body;
     const validMethods = ['efectivo', 'transferencia'];
-    
+
     if (!metodoPago || !validMethods.includes(metodoPago)) {
       return res.status(400).json({
         success: false,
@@ -1399,41 +1405,41 @@ router.patch('/:id/metodo-pago', protect, checkPermission('editarPedidos'), asyn
     const targetPago = order.pagos[targetIndex];
 
     if (isParcial) {
-        if (montoParcial > targetPago.monto) {
-            return res.status(400).json({ success: false, message: 'El monto a cambiar excede el pago actual' });
-        }
-        if (montoParcial === targetPago.monto) {
-            targetPago.metodo = metodoPago;
-        } else {
-            targetPago.monto -= montoParcial;
-            order.pagos.push({ metodo: metodoPago, monto: montoParcial });
-        }
-    } else {
+      if (montoParcial > targetPago.monto) {
+        return res.status(400).json({ success: false, message: 'El monto a cambiar excede el pago actual' });
+      }
+      if (montoParcial === targetPago.monto) {
         targetPago.metodo = metodoPago;
+      } else {
+        targetPago.monto -= montoParcial;
+        order.pagos.push({ metodo: metodoPago, monto: montoParcial });
+      }
+    } else {
+      targetPago.metodo = metodoPago;
     }
 
     // Consolidar pagos del mismo método
     const mergedPagos = [];
     order.pagos.forEach(p => {
-        const existing = mergedPagos.find(mp => mp.metodo === p.metodo);
-        if (existing) {
-            existing.monto += p.monto;
-        } else {
-            mergedPagos.push({ metodo: p.metodo, monto: p.monto });
-        }
+      const existing = mergedPagos.find(mp => mp.metodo === p.metodo);
+      if (existing) {
+        existing.monto += p.monto;
+      } else {
+        mergedPagos.push({ metodo: p.metodo, monto: p.monto });
+      }
     });
 
     order.pagos = mergedPagos.filter(p => p.monto > 0);
 
     // Actualizar el campo legacy 'metodoPago'
     if (order.pagos.length > 1) {
-        order.metodoPago = 'mixto';
+      order.metodoPago = 'mixto';
     } else if (order.pagos.length === 1) {
-        order.metodoPago = order.pagos[0].metodo;
+      order.metodoPago = order.pagos[0].metodo;
     }
 
     await order.save();
-    
+
     console.log('✅ Método de pago actualizado:', order._id, '→', order.metodoPago);
 
     res.json({
@@ -1515,20 +1521,46 @@ router.put('/:id', protect, checkPermission('editarPedidos'), async (req, res) =
     order.mesa = mesa;
     order.notas = notas;
 
-    // Si hay items, actualizarlos con estadosIndividuales inicializados
+    // Si hay items, actualizarlos preservando estadosIndividuales y notas existentes
     if (items && items.length > 0) {
-      order.items = items.map(item => ({
-        producto: item.producto,
-        nombreProducto: item.nombreProducto,
-        categoriaProducto: item.categoriaProducto,
-        cantidad: item.cantidad,
-        precio: item.precio,
-        // ✅ INICIALIZAR ESTADOS INDIVIDUALES CORRECTAMENTE
-        estadosIndividuales: [{
+      // Construir mapa de items originales para preservar estadosIndividuales existentes
+      const itemsOriginalesMap = new Map();
+      order.items.forEach(existingItem => {
+        const key = existingItem.producto ? existingItem.producto.toString() : existingItem.nombreProducto;
+        itemsOriginalesMap.set(key, existingItem);
+      });
+
+      order.items = items.map(item => {
+        const key = item.producto ? item.producto.toString() : item.nombreProducto;
+        const itemOriginal = itemsOriginalesMap.get(key);
+
+        // Preservar estadosIndividuales si el item ya existía y la cantidad no cambió
+        let estadosIndividuales;
+        if (itemOriginal && itemOriginal.estadosIndividuales && itemOriginal.estadosIndividuales.length > 0) {
+          const cantidadOriginalTotal = itemOriginal.estadosIndividuales.reduce((s, e) => s + e.cantidad, 0);
+          if (cantidadOriginalTotal === item.cantidad) {
+            // Misma cantidad: preservar estados existentes
+            estadosIndividuales = itemOriginal.estadosIndividuales;
+          } else {
+            // Cantidad cambió: reiniciar a pendiente con nueva cantidad
+            estadosIndividuales = [{ cantidad: item.cantidad, estado: 'pendiente' }];
+          }
+        } else {
+          estadosIndividuales = [{ cantidad: item.cantidad, estado: 'pendiente' }];
+        }
+
+        return {
+          producto: item.producto,
+          nombreProducto: item.nombreProducto,
+          categoriaProducto: item.categoriaProducto,
           cantidad: item.cantidad,
-          estado: 'pendiente'
-        }]
-      }));
+          precio: item.precio,
+          alimentosExcluidos: item.alimentosExcluidos || [],
+          alimentosAjustados: item.alimentosAjustados || [],
+          nota: item.nota !== undefined ? item.nota : (itemOriginal ? itemOriginal.nota || '' : ''),
+          estadosIndividuales
+        };
+      });
 
       // Recalcular total
       order.total = items.reduce((sum, item) => {

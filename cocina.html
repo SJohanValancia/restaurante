@@ -1766,8 +1766,12 @@
                 </div>
                 <div class="filters-grid">
                     <div style="display: none;">
-                        <select id="filterEstado"><option value="activos">activos</option></select>
-                        <select id="filterOrigen"><option value="">Todos</option></select>
+                        <select id="filterEstado">
+                            <option value="activos">activos</option>
+                        </select>
+                        <select id="filterOrigen">
+                            <option value="">Todos</option>
+                        </select>
                         <input type="text" id="filterMesa">
                         <input type="date" id="filterFechaDesde">
                         <input type="date" id="filterFechaHasta">
@@ -2368,9 +2372,9 @@
             entregados.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
             const orderedOrders = [...pendientesPreparando, ...listos, ...cancelados, ...entregados];
-            
+
             // Consistencia para pedidos sin estados claros (retrocompatibilidad)
-            const otrosActivos = filteredOrders.filter(o => 
+            const otrosActivos = filteredOrders.filter(o =>
                 !['pendiente', 'preparando', 'listo', 'entregado', 'cancelado', 'pagado'].includes(o.estado)
             );
             if (otrosActivos.length > 0) {
@@ -3559,7 +3563,7 @@
                     // Actualizar lista si hay cambios
                     if (JSON.stringify(allOrders) !== JSON.stringify(newOrders)) {
                         allOrders = newOrders;
-                        applyFilters();
+                        applyFilters(true); // ✅ FIX: reset=true para re-renderizar en orden correcto
                     }
 
                     lastOrderCount = newOrders.length;
@@ -5294,7 +5298,7 @@
             checkAndShowShortcutOnboarding();
         });
     </script>
-<script src="scripts/print-monitor.js"></script>
+    <script src="scripts/print-monitor.js"></script>
 </body>
 
 </html>
