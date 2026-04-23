@@ -1841,6 +1841,7 @@
                         </div>
                         <span class="item-qty">x${grupo.cantidad}</span>
                         <span class="item-price">$${(item.precio * grupo.cantidad).toLocaleString('es-CO')}</span>
+                        ${item.nota ? `<div style="width: 100%; font-size: 11px; color: #e53e3e; font-weight: 700; margin-top: 4px; grid-column: span 3;">📝 ${item.nota}</div>` : ''}
                     </div>
                 `).join('');
             }).join('');

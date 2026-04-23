@@ -4231,6 +4231,7 @@
                     return; // Saltar este pedido
                 }
 
+                // Nota general del pedido
                 if (order.notas && order.notas.trim() !== '') {
                     notas.push({
                         mesa: order.mesa,
@@ -4239,6 +4240,27 @@
                         estado: order.estado // Para mostrar el estado
                     });
                 }
+
+                // ✅ NUEVO: Notas de platos individuales
+                (order.items || []).forEach(item => {
+                    if (item.nota && item.nota.trim() !== '') {
+                        let nombre = 'Producto';
+                        if (item.productoInfo) {
+                            nombre = item.productoInfo.nombre;
+                        } else if (item.producto && item.producto.nombre) {
+                            nombre = item.producto.nombre;
+                        } else if (item.nombreProducto) {
+                            nombre = item.nombreProducto;
+                        }
+
+                        notas.push({
+                            mesa: order.mesa,
+                            nota: `<span style="color: #667eea; font-weight: 700;">[${nombre}]</span> ${item.nota}`,
+                            fecha: new Date(order.createdAt),
+                            estado: order.estado
+                        });
+                    }
+                });
             });
 
             if (notas.length === 0) {

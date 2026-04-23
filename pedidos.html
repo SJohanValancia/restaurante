@@ -4723,6 +4723,8 @@
                             categoria: item.productoInfo ? item.productoInfo.categoria : item.categoriaProducto
                         },
                         cantidad: item.cantidad,
+                        alimentosExcluidos: item.alimentosExcluidos || [],
+                        alimentosAjustados: item.alimentosAjustados || [],
                         nota: item.nota || ''
                     }));
 
@@ -5072,6 +5074,8 @@
                     categoriaProducto: item.producto.categoria,
                     cantidad: item.cantidad,
                     precio: item.producto.precio,
+                    alimentosExcluidos: item.alimentosExcluidos || [],
+                    alimentosAjustados: item.alimentosAjustados || [],
                     nota: item.nota || ''
                 })),
                 notas: notas
