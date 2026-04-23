@@ -2169,9 +2169,15 @@
 
             const search = document.getElementById('filterSearch').value.trim();
             const mesaFilter = document.getElementById('filterMesa').value.trim();
-            let url = `${API_URL}/orders?userId=${currentUser._id}&page=${currentPage}&limit=30`;
+            const estado = document.getElementById('filterEstado').value;
+
+            // Para la cocina, si cargamos "activos", usamos un límite mayor para asegurar notas completas
+            const limit = (reset && (estado === 'activos' || !estado)) ? 100 : 30;
+
+            let url = `${API_URL}/orders?userId=${currentUser._id}&page=${currentPage}&limit=${limit}`;
             if (search) url += `&search=${encodeURIComponent(search)}`;
             if (mesaFilter) url += `&mesa=${encodeURIComponent(mesaFilter)}`;
+            if (estado && estado !== 'activos') url += `&estado=${estado}`;
 
             try {
                 const response = await fetch(url, {
@@ -2335,6 +2341,7 @@
 
         function displayOrders(reset = false) {
             const list = document.getElementById('ordersGrid');
+            const scrollPos = window.scrollY;
 
             if (filteredOrders.length === 0) {
                 // Solo mostrar empty-state si estamos en un reset completo o si no hay NADA que mostrar
@@ -2371,17 +2378,17 @@
             }
 
             if (reset) {
-                list.innerHTML = '';
+                // Ya no limpiamos aquí para evitar que el scroll salte a 0 prematuramente
                 displayedOrderIds = [];
             }
 
             const ordersToRender = orderedOrders.filter(order => !displayedOrderIds.includes(order._id));
 
-            if (ordersToRender.length === 0) {
+            if (ordersToRender.length === 0 && !reset) {
                 return;
             }
 
-            const html = ordersToRender.map(order => {
+            const html = (reset ? orderedOrders : ordersToRender).map(order => {
                 const isMandao = order.source === 'mandao';
                 const fecha = new Date(order.createdAt);
                 const fechaStr = fecha.toLocaleDateString('es-CO', {
@@ -2478,11 +2485,13 @@
         `;
             }).join('');
 
-            const scrollPos = window.scrollY;
             if (reset) {
                 list.innerHTML = html;
-                displayedOrderIds = ordersToRender.map(o => o._id);
-                window.scrollTo(0, scrollPos);
+                displayedOrderIds = orderedOrders.map(o => o._id);
+                // Restaurar scroll de forma asíncrona para asegurar que el DOM se ha actualizado
+                requestAnimationFrame(() => {
+                    window.scrollTo(0, scrollPos);
+                });
             } else {
                 list.insertAdjacentHTML('beforeend', html);
                 displayedOrderIds = [...displayedOrderIds, ...ordersToRender.map(o => o._id)];
@@ -3517,9 +3526,11 @@
         // Función de polling automático
         async function autoRefreshOrders() {
             const token = localStorage.getItem('token');
+            // Mantener el límite actual para no perder pedidos cargados por scroll infinito
+            const currentLimit = Math.max(30, allOrders.length);
 
             try {
-                const response = await fetch(`${API_URL}/orders?userId=${currentUser._id}`, {
+                const response = await fetch(`${API_URL}/orders?userId=${currentUser._id}&limit=${currentLimit}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
