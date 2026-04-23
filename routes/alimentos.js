@@ -115,7 +115,7 @@ router.get('/:id', protect, async (req, res) => {
   }
 });
 
-// Crear un nuevo alimento
+// Crear un nuevo alimento (o vincular a uno existente si el nombre coincide)
 router.post('/', protect, async (req, res) => {
   try {
     const { nombre, stock, valor, productos, medida } = req.body;
@@ -132,46 +132,73 @@ router.post('/', protect, async (req, res) => {
     }
 
     // Validar campos obligatorios
-if (!nombre || productos === undefined || productos.length === 0) {
-    return res.status(400).json({
+    if (!nombre || !productos || productos.length === 0) {
+      return res.status(400).json({
         success: false,
         message: 'Faltan campos obligatorios. Debe incluir al menos un producto.'
-    });
-}
-
-    // Validar que todos los productos existan
-    for (const prod of productos) {
-      const producto = await Product.findById(prod.productoId);
-      if (!producto) {
-        return res.status(404).json({
-          success: false,
-          message: `Producto no encontrado con ID: ${prod.productoId}`
-        });
-      }
-    }
-
-    if (!req.user || !req.user._id) {
-      return res.status(401).json({
-        success: false,
-        message: 'Usuario no autenticado correctamente'
       });
     }
 
-const alimentoData = {
-    nombre: nombre.trim(),
-    stock: stockNumero,
-    valor: valorNumero || 0,  // ✅ Valor por defecto 0 si no se proporciona
-    medida: medida || 'uds',
-    productos: productos.map(p => ({
+    const nombreNorm = nombre.trim();
+    // ✅ USAR req.mainAdminId para centralizar propiedad del restaurante
+    const ownerId = req.mainAdminId || req.user._id;
+
+    // --- LÓGICA DE COMPARTIR INGREDIENTE ---
+    // Buscar si ya existe un alimento con el mismo nombre para este restaurante
+    let alimento = await Alimento.findOne({
+      userId: ownerId,
+      nombre: { $regex: new RegExp(`^${nombreNorm}$`, 'i') }
+    });
+
+    if (alimento) {
+      // SI YA EXISTE: Vincular los nuevos productos al ingrediente existente
+      for (const prod of productos) {
+        // Verificar si el producto ya está vinculado
+        const prodExistente = alimento.productos.find(p => p.productoId.toString() === prod.productoId.toString());
+        
+        if (prodExistente) {
+          // Si ya existe, actualizamos la cantidad requerida
+          prodExistente.cantidadRequerida = Number(prod.cantidadRequerida);
+        } else {
+          // Si no existe, lo añadimos
+          alimento.productos.push({
+            productoId: prod.productoId,
+            cantidadRequerida: Number(prod.cantidadRequerida)
+          });
+        }
+      }
+      
+      // Opcionalmente actualizar stock y medida si se proporcionaron (prevalece lo último enviado)
+      if (stock !== undefined) alimento.stock = stockNumero;
+      if (medida) alimento.medida = medida;
+      if (valor !== undefined) alimento.valor = valorNumero;
+
+      await alimento.save();
+      
+      const alimentoCompleto = await Alimento.findById(alimento._id)
+        .populate('productos.productoId', 'nombre categoria');
+
+      return res.status(200).json({
+        success: true,
+        message: 'Producto vinculado al ingrediente existente',
+        data: alimentoCompleto
+      });
+    }
+
+    // SI NO EXISTE: Crear nuevo alimento con el owner centralizado
+    const alimentoData = {
+      nombre: nombreNorm,
+      stock: stockNumero,
+      valor: valorNumero || 0,
+      medida: medida || 'uds',
+      productos: productos.map(p => ({
         productoId: p.productoId,
         cantidadRequerida: Number(p.cantidadRequerida)
-    })),
-    userId: req.user._id
-};
+      })),
+      userId: ownerId
+    };
 
-    console.log('✅ Datos a guardar:', alimentoData);
-
-    const alimento = await Alimento.create(alimentoData);
+    alimento = await Alimento.create(alimentoData);
     
     const alimentoCompleto = await Alimento.findById(alimento._id)
       .populate('productos.productoId', 'nombre categoria');
@@ -264,6 +291,76 @@ router.delete('/:id', protect, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error al eliminar el alimento',
+      error: error.message
+    });
+  }
+});
+
+// ✅ RUTA PARA SINCRONIZAR/FUSIONAR DUPLICADOS
+router.post('/sync-duplicates', protect, async (req, res) => {
+  try {
+    const ownerId = req.mainAdminId || req.user._id;
+    const userIds = req.userIdsRestaurante;
+
+    // 1. Obtener todos los alimentos de este restaurante
+    const alimentos = await Alimento.find({ userId: { $in: userIds } });
+
+    // 2. Agrupar por nombre (normalizado)
+    const grupos = {};
+    alimentos.forEach(a => {
+      const nombreNorm = a.nombre.trim().toLowerCase();
+      if (!grupos[nombreNorm]) grupos[nombreNorm] = [];
+      grupos[nombreNorm].push(a);
+    });
+
+    let fusionados = 0;
+    let documentosEliminados = 0;
+
+    for (const nombre in grupos) {
+      const docs = grupos[nombre];
+      if (docs.length <= 1) continue;
+
+      // Ordenar por fecha de actualización (el más reciente es el máster)
+      docs.sort((a, b) => b.updatedAt - a.updatedAt);
+      
+      const master = docs[0];
+      const duplicados = docs.slice(1);
+
+      for (const dup of duplicados) {
+        // Mover productos vinculados al máster si no están ya
+        for (const pDup of dup.productos) {
+          const existeEnMaster = master.productos.find(
+            pm => (pm.productoId.toString() === (pDup.productoId._id || pDup.productoId).toString())
+          );
+          
+          if (!existeEnMaster) {
+            master.productos.push(pDup);
+          }
+        }
+        
+        // Conservar el stock más alto o el del máster? 
+        // El usuario quiere que "queden con el mismo stock", unificamos en el máster.
+        
+        await Alimento.findByIdAndDelete(dup._id);
+        documentosEliminados++;
+      }
+
+      // Asegurar que el máster tenga el owner correcto (el admin principal)
+      master.userId = ownerId;
+      await master.save();
+      fusionados++;
+    }
+
+    res.json({
+      success: true,
+      message: `Sincronización completada: ${fusionados} ingredientes unificados, ${documentosEliminados} duplicados eliminados.`,
+      data: { fusionados, documentosEliminados }
+    });
+  } catch (error) {
+    console.error('❌ Error en sincronización:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al sincronizar duplicados',
       error: error.message
     });
   }

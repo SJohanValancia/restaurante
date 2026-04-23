@@ -1090,7 +1090,10 @@
                     <div class="card-header">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                             <h2>Recetario por Platos</h2>
-                            <input type="text" id="alimentoSearch" class="form-input" placeholder="🔍 Buscar plato o ingrediente..." style="max-width: 300px;">
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <button class="btn-primary" onclick="sincronizarDuplicados()" style="padding: 8px 15px; font-size: 13px; width: auto; margin: 0; background: #48bb78; white-space: nowrap;">✨ Sincronizar Inventario</button>
+                                <input type="text" id="alimentoSearch" class="form-input" placeholder="🔍 Buscar plato o ingrediente..." style="max-width: 300px;">
+                            </div>
                         </div>
                     </div>
                     <div class="card-body">
@@ -1471,9 +1474,11 @@
             for (let i = 0; i < count; i++) {
                 html += `
                 <div class="bulk-row">
-                    <input type="text" class="bulk-input name-input-${productId}" placeholder="Nombre">
-                    <input type="number" class="bulk-input stock-input-${productId}" value="0" step="any">
-                    <input type="text" class="bulk-input measure-input-${productId}" placeholder="g, kg..." value="uds">
+                    <input type="text" class="bulk-input name-input-${productId}" 
+                           placeholder="Nombre" list="alimentosDataList"
+                           oninput="checkExistingAlimento(this, '${productId}', ${i})">
+                    <input type="number" id="stock-${productId}-${i}" class="bulk-input stock-input-${productId}" value="0" step="any">
+                    <input type="text" id="measure-${productId}-${i}" class="bulk-input measure-input-${productId}" placeholder="g, kg..." value="uds">
                     <input type="number" class="bulk-input usage-input-${productId}" value="0" step="any">
                 </div>`;
             }
@@ -1693,7 +1698,48 @@
             }
         });
 
-        // Búsqueda local
+        // ✅ FUNCIÓN PARA SINCRONIZAR DUPLICADOS
+        async function sincronizarDuplicados() {
+            const { isConfirmed } = await Swal.fire({
+                title: '¿Sincronizar Inventario?',
+                text: 'Esto unificará los ingredientes que tengan el mismo nombre para que compartan el mismo stock y medida. Se eliminarán los duplicados y se conservará el más reciente.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, sincronizar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#48bb78'
+            });
+
+            if (!isConfirmed) return;
+
+            Swal.fire({ title: 'Sincronizando...', didOpen: () => Swal.showLoading() });
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_URL}/alimentos/sync-duplicates`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Sincronizado!',
+                        text: result.message,
+                        timer: 3000
+                    });
+                    await cargarAlimentos();
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('Error al sincronizar:', error);
+                Swal.fire({ icon: 'error', text: 'Error al sincronizar: ' + error.message });
+            }
+        }
+
+        // Búsqueda local y actualización de datalist
         document.getElementById('alimentoSearch').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             const filtered = window.dataCache.alimentos.filter(a => 
@@ -1702,8 +1748,48 @@
             );
             mostrarAlimentos(filtered);
         });
-    </script>
-<script src="scripts/print-monitor.js"></script>
-</body>
 
+        // ✅ AUTO-RELLENO DE INGREDIENTES EXISTENTES
+        function checkExistingAlimento(input, productId, index) {
+            const nombre = input.value.trim().toLowerCase();
+            const alimento = window.dataCache.alimentos.find(a => a.nombre.toLowerCase() === nombre);
+            
+            if (alimento) {
+                const stockInput = document.getElementById(`stock-${productId}-${index}`);
+                const measureInput = document.getElementById(`measure-${productId}-${index}`);
+                
+                if (stockInput) stockInput.value = alimento.stock;
+                if (measureInput) measureInput.value = alimento.medida;
+                
+                // Feedback visual sutil
+                input.style.borderColor = '#48bb78';
+                input.style.background = '#f0fff4';
+            } else {
+                input.style.borderColor = '';
+                input.style.background = '';
+            }
+        }
+
+        function actualizarDataList() {
+            let datalist = document.getElementById('alimentosDataList');
+            if (!datalist) {
+                datalist = document.createElement('datalist');
+                datalist.id = 'alimentosDataList';
+                document.body.appendChild(datalist);
+            }
+            
+            const nombresUnicos = [...new Set(window.dataCache.alimentos.map(a => a.nombre))].sort();
+            datalist.innerHTML = nombresUnicos.map(n => `<option value="${n}">`).join('');
+        }
+
+        // Modificar cargarAlimentos para actualizar el datalist
+        const oldCargarAlimentos = cargarAlimentos;
+        cargarAlimentos = async function() {
+            await oldCargarAlimentos();
+            actualizarDataList();
+        };
+
+    </script>
+    <script src="scripts/print-monitor.js"></script>
+</body>
 </html>
