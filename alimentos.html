@@ -1778,8 +1778,21 @@
                 document.body.appendChild(datalist);
             }
             
-            const nombresUnicos = [...new Set(window.dataCache.alimentos.map(a => a.nombre))].sort();
-            datalist.innerHTML = nombresUnicos.map(n => `<option value="${n}">`).join('');
+            // ✅ Mostrar solo nombres únicos ignorando mayúsculas/minúsculas
+            const nombresVistos = new Set();
+            const nombresUnicos = [];
+            
+            if (window.dataCache && window.dataCache.alimentos) {
+                window.dataCache.alimentos.forEach(a => {
+                    const low = a.nombre.toLowerCase().trim();
+                    if (!nombresVistos.has(low)) {
+                        nombresVistos.add(low);
+                        nombresUnicos.push(a.nombre);
+                    }
+                });
+            }
+            
+            datalist.innerHTML = nombresUnicos.sort().map(n => `<option value="${n}">`).join('');
         }
 
         // Modificar cargarAlimentos para actualizar el datalist

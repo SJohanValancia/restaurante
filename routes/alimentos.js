@@ -242,6 +242,23 @@ router.put('/:id', protect, async (req, res) => {
       }
     });
 
+    // ✅ PREVENIR DUPLICADOS POR NOMBRE (ignore case) al actualizar
+    if (updateData.nombre) {
+      const ownerId = req.mainAdminId || req.user._id;
+      const existeRecienRenombrado = await Alimento.findOne({
+        userId: ownerId,
+        nombre: { $regex: new RegExp(`^${updateData.nombre}$`, 'i') },
+        _id: { $ne: req.params.id }
+      });
+
+      if (existeRecienRenombrado) {
+        return res.status(400).json({
+          success: false,
+          message: 'Ya existe un ingrediente con ese nombre (posible duplicado por mayúsculas/minúsculas)'
+        });
+      }
+    }
+
     const alimento = await Alimento.findByIdAndUpdate(
       req.params.id,
       updateData,
