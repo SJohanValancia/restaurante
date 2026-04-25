@@ -1323,8 +1323,9 @@
 
         // MOSTRAR ALIMENTOS
         // MOSTRAR ALIMENTOS
-        function mostrarAlimentos(alimentos) {
+        function mostrarAlimentos(alimentos, searchTerm = '') {
             const grid = document.getElementById('alimentosGrid');
+            const term = searchTerm.toLowerCase().trim();
 
             if (!productos || productos.length === 0) {
                 grid.innerHTML = `
@@ -1354,6 +1355,14 @@
             // Renderizar tarjetas de Platos
             Object.values(recetas).forEach(receta => {
                 const p = receta.producto;
+                
+                // Si hay búsqueda, solo mostrar si el plato coincide o tiene ingredientes que coincidan
+                if (term) {
+                    const nombrePlatoMatches = p.nombre.toLowerCase().includes(term);
+                    const tieneIngredientesMatch = receta.ingredientes.length > 0;
+                    if (!nombrePlatoMatches && !tieneIngredientesMatch) return;
+                }
+
                 html += `
                 <div class="alimento-card" id="card-${p._id}">
                     <div class="alimento-header">
@@ -1417,12 +1426,17 @@
             });
 
             // Sección opcional para alimentos huérfanos
-            if (alimentosSinPlato.length > 0) {
+            let orphansToDisplay = alimentosSinPlato;
+            if (term) {
+                orphansToDisplay = alimentosSinPlato.filter(a => a.nombre.toLowerCase().includes(term));
+            }
+
+            if (orphansToDisplay.length > 0) {
                 html += `
                 <div class="alimento-card" style="grid-column: 1 / -1; background: #f1f5f9; border: 2px dashed #cbd5e0;">
                     <h3 class="alimento-title" style="margin-bottom: 1rem;">🥘 Alimentos sin asignar a un plato</h3>
                     <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                        ${alimentosSinPlato.map(a => `
+                        ${orphansToDisplay.map(a => `
                             <div style="background: white; padding: 8px 15px; border-radius: 20px; border: 1px solid #e2e8f0; display: flex; gap: 10px; align-items: center;">
                                 <strong>${a.nombre}</strong>
                                 <span style="font-size: 12px; color: #718096;">Stock: ${a.stock} ${a.medida || ''}</span>
@@ -1744,9 +1758,12 @@
             const term = e.target.value.toLowerCase();
             const filtered = window.dataCache.alimentos.filter(a => 
                 a.nombre.toLowerCase().includes(term) || 
-                (a.productos && a.productos.some(p => p.productoId?.nombre?.toLowerCase().includes(term)))
+                (a.productos && a.productos.some(p => {
+                    const pNombre = p.productoId?.nombre || '';
+                    return pNombre.toLowerCase().includes(term);
+                }))
             );
-            mostrarAlimentos(filtered);
+            mostrarAlimentos(filtered, term);
         });
 
         // ✅ AUTO-RELLENO DE INGREDIENTES EXISTENTES

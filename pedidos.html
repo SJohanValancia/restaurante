@@ -2263,13 +2263,13 @@
                     <p class="page-subtitle">Administra los pedidos de tu restaurante</p>
                 </div>
                 <button class="btn-change-view" id="btnChangeViewHeader" onclick="toggleTableView()">
-                    <span id="viewModeIconHeader">🪑</span>
-                    <span id="viewModeTextHeader">Vista Mesas</span>
+                    <span id="viewModeIconHeader">📋</span>
+                    <span id="viewModeTextHeader">Vista Normal</span>
                 </button>
             </div>
 
             <!-- ===== VISTA POR DEFECTO ===== -->
-            <div class="default-view" id="defaultView">
+            <div class="default-view hidden" id="defaultView">
                 <div class="layout">
                     <!-- Formulario de nuevo pedido -->
                     <div class="card">
@@ -2360,7 +2360,7 @@
             </div>
 
             <!-- ===== VISTA DE MESAS ===== -->
-            <div class="table-view-container" id="tableView">
+            <div class="table-view-container active" id="tableView">
                 <div class="table-view-header">
                     <div class="table-view-search-wrapper">
                         <span class="table-view-search-icon">🔍</span>
@@ -5476,7 +5476,7 @@
     // SISTEMA DE VISTA DE MESAS
     // ============================================
     
-    let isTableView = false;
+    let isTableView = true;
     let mesasData = [];
     let mesaSelectedItems = [];
     let mesaSeleccionadaNombre = '';
@@ -5486,7 +5486,8 @@
     // RESTAURAR MODO GUARDADO
     document.addEventListener('DOMContentLoaded', () => {
         const savedMode = localStorage.getItem('tableViewMode');
-        if (savedMode === 'mesas') {
+        // Si el modo guardado es 'normal', cambiar a normal (porque ahora el default es mesas)
+        if (savedMode === 'normal') {
             // Esperar a que los pedidos REALMENTE carguen
             const waitForOrders = setInterval(() => {
                 if (window.ordersHaveLoaded) {

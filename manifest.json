@@ -1,13 +1,12 @@
 {
-    "name": "JC Restaurant",
-    "short_name": "JC Restaurant",
-    "description": "Seguimiento de pedidos en tiempo real",
-    "start_url": "/seguimiento.html",
+    "name": "Mandao",
+    "short_name": "Mandao",
+    "description": "Gestión de pedidos en tiempo real",
+    "start_url": "/",
     "display": "standalone",
-    "background_color": "#0f0f23",
-    "theme_color": "#667eea",
+    "background_color": "#ffffff",
+    "theme_color": "#FF6600",
     "orientation": "portrait-primary",
-    "gcm_sender_id": "475296003209",
     "icons": [
         {
             "src": "/icon-192.png",
