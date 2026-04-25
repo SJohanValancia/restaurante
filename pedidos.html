@@ -2783,13 +2783,13 @@
                         availableProducts = data.data.map(producto => {
                             // Buscar alimentos que usan este producto
                             const alimentosDelProducto = alimentos.filter(alimento =>
-                                alimento.productos.some(p => p.productoId._id === producto._id)
+                                alimento.productos.some(p => p.productoId && p.productoId._id === producto._id)
                             );
 
                             // Verificar si algún alimento está agotado
                             const alimentosAgotados = alimentosDelProducto.filter(alimento => {
-                                const config = alimento.productos.find(p => p.productoId._id === producto._id);
-                                return alimento.stock < config.cantidadRequerida;
+                                const config = alimento.productos.find(p => p.productoId && p.productoId._id === producto._id);
+                                return config && alimento.stock < config.cantidadRequerida;
                             });
 
                             return {
@@ -3015,9 +3015,8 @@
 
         // ✅ POPUP DE ALIMENTOS
         function mostrarAlimentosPopup(productoId, itemIndex, vista) {
-            // Buscar alimentos vinculados a este producto
             const alimentosDelProducto = allAlimentosCache.filter(a =>
-                a.productos.some(p => p.productoId._id === productoId)
+                a.productos.some(p => p.productoId && p.productoId._id === productoId)
             );
 
             if (alimentosDelProducto.length === 0) {
@@ -3049,7 +3048,7 @@
                             Desmarca los alimentos que el cliente <b>no quiere</b>. Esos ingredientes <b>no se descontarán</b> del inventario.
                         </p>
                         ${alimentosDelProducto.map(alimento => {
-                            const config = alimento.productos.find(p => p.productoId._id === productoId);
+                            const config = alimento.productos.find(p => p.productoId && p.productoId._id === productoId);
                             const cantidadReq = config ? config.cantidadRequerida : 1;
                             const isExcluded = currentExclusions.includes(alimento._id);
                             let stockClass = 'alimento-stock-ok';

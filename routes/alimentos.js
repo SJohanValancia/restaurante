@@ -346,8 +346,14 @@ router.post('/sync-duplicates', protect, async (req, res) => {
       for (const dup of duplicados) {
         // Mover productos vinculados al máster si no están ya
         for (const pDup of dup.productos) {
+          const productoIdDup = pDup.productoId?._id || pDup.productoId;
+          if (!productoIdDup) continue;
+
           const existeEnMaster = master.productos.find(
-            pm => (pm.productoId.toString() === (pDup.productoId._id || pDup.productoId).toString())
+            pm => {
+              const productoIdMaster = pm.productoId?._id || pm.productoId;
+              return productoIdMaster && productoIdMaster.toString() === productoIdDup.toString();
+            }
           );
           
           if (!existeEnMaster) {
