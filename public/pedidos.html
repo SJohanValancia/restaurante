@@ -4642,6 +4642,47 @@
                 });
             }
 
+        async function imprimirFacturaPOS() {
+            if (!pedidoActual) return;
+            
+            const btn = document.querySelector('.btn-primary[onclick*="imprimirFacturaPOS"]');
+            if(btn) btn.disabled = true;
+
+            mostrarModalImpresion();
+            actualizarEstadoImpresion('preparando', 'Generando factura...');
+
+            try {
+                // Preparamos los datos del pedido para el Bridge
+                const datosFactura = {
+                    _id: pedidoActual._id,
+                    mesa: pedidoActual.mesa,
+                    items: pedidoActual.items,
+                    total: pedidoActual.total,
+                    restauranteNombre: "NÁPOLES GASTRO-BAR" // Puedes hacerlo dinámico si quieres
+                };
+
+                const response = await fetch('http://127.0.0.1:3001/print-factura', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datosFactura)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    actualizarEstadoImpresion('exito', 'Factura impresa correctamente');
+                    setTimeout(cerrarModalImpresion, 2000);
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                actualizarEstadoImpresion('error', 'No se pudo imprimir. ¿El Bridge está abierto?');
+            } finally {
+                if(btn) btn.disabled = false;
+            }
+        }
+
             try {
                 const response = await fetch(`${API_URL}/orders/${orderId}/item/${itemIndex}/estado`, {
                     method: 'PATCH',

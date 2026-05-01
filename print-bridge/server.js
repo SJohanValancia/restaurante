@@ -9,7 +9,6 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = 3001;
-// Usamos process.pkg para detectar si estamos en el ejecutable o en desarrollo
 const baseDir = process.pkg ? path.dirname(process.execPath) : __dirname;
 const CONFIG_PATH = path.join(baseDir, 'config.json');
 const PRINTED_PATH = path.join(baseDir, 'printed.json');
@@ -18,6 +17,7 @@ const API_BASE = 'https://restaurante-co77.onrender.com/api';
 let config = {
     userId: '',
     token: '',
+    imprimirClon: false,
     printer: {
         tipo: 'epson',
         conexion: 'sistema',
@@ -26,39 +26,22 @@ let config = {
     active: false
 };
 
-// Cargar configuración inicial
+// Cargar configuración
 if (fs.existsSync(CONFIG_PATH)) {
-    try {
-        config = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
-    } catch (e) {
-        console.error("Error al cargar config.json:", e.message);
-    }
+    try { config = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8')); } catch (e) {}
 }
 
-// Cargar IDs ya impresos
 let printedIds = [];
 if (fs.existsSync(PRINTED_PATH)) {
-    try {
-        printedIds = JSON.parse(fs.readFileSync(PRINTED_PATH, 'utf8'));
-    } catch (e) {
-        console.error("Error al cargar printed.json:", e.message);
-    }
+    try { printedIds = JSON.parse(fs.readFileSync(PRINTED_PATH, 'utf8')); } catch (e) {}
 }
 
-/**
- * Función para inicializar la impresora
- */
 function initPrinter(pConfig) {
     const isNetwork = pConfig.conexion === 'red';
     const printerInterface = isNetwork ? `tcp://${pConfig.interface}` : `printer:${pConfig.interface}`;
-
     let driver = null;
     if (!isNetwork) {
-        try {
-            // 1. Intentamos cargar el driver nativo si existe
-            driver = require('printer');
-        } catch (e) {
-            // 2. Si no existe (común en Mac/Windows sin instalar nada), usamos el Driver Universal
+        try { driver = require('printer'); } catch (e) {
             driver = {
                 getPrinters: () => [],
                 getPrinter: (name) => ({ name, status: [] }),
@@ -66,13 +49,11 @@ function initPrinter(pConfig) {
                     const { spawnSync } = require('child_process');
                     try {
                         if (process.platform === 'darwin' || process.platform === 'linux') {
-                            // MacOS / Linux: Usar comando lp
                             const result = spawnSync('lp', ['-d', options.printer, '-o', 'raw'], { input: options.data });
                             if (result.status === 0) options.success?.("ok");
                             else options.error?.(result.stderr.toString());
                         } 
                         else if (process.platform === 'win32') {
-                            // Windows: Usar PowerShell para enviar datos RAW
                             const base64Data = options.data.toString('base64');
                             const psCommand = `
                                 $data = [System.Convert]::FromBase64String('${base64Data}');
@@ -82,81 +63,49 @@ function initPrinter(pConfig) {
                                 using System.Runtime.InteropServices;
                                 public class RawPrint {
                                     [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Ansi)]
-                                    public class DOCINFOA {
-                                        [MarshalAs(UnmanagedType.LPStr)] public string pDocName;
-                                        [MarshalAs(UnmanagedType.LPStr)] public string pOutputFile;
-                                        [MarshalAs(UnmanagedType.LPStr)] public string pDataType;
-                                    }
-                                    [DllImport("winspool.Drv", EntryPoint="OpenPrinterA", SetLastError=true, CharSet=CharSet.Ansi)]
-                                    public static extern bool OpenPrinter(string szPrinter, out IntPtr hPrinter, IntPtr pd);
-                                    [DllImport("winspool.Drv", EntryPoint="ClosePrinter", SetLastError=true)]
-                                    public static extern bool ClosePrinter(IntPtr hPrinter);
-                                    [DllImport("winspool.Drv", EntryPoint="StartDocPrinterA", SetLastError=true, CharSet=CharSet.Ansi)]
-                                    public static extern bool StartDocPrinter(IntPtr hPrinter, Int32 level, [In, MarshalAs(UnmanagedType.LPStruct)] DOCINFOA di);
-                                    [DllImport("winspool.Drv", EntryPoint="EndDocPrinter", SetLastError=true)]
-                                    public static extern bool EndDocPrinter(IntPtr hPrinter);
-                                    [DllImport("winspool.Drv", EntryPoint="WritePrinter", SetLastError=true)]
-                                    public static extern bool WritePrinter(IntPtr hPrinter, IntPtr pBytes, Int32 dwCount, out Int32 dwWritten);
+                                    public class DOCINFOA { [MarshalAs(UnmanagedType.LPStr)] public string pDocName; [MarshalAs(UnmanagedType.LPStr)] public string pOutputFile; [MarshalAs(UnmanagedType.LPStr)] public string pDataType; }
+                                    [DllImport("winspool.Drv", EntryPoint="OpenPrinterA", SetLastError=true, CharSet=CharSet.Ansi)] public static extern bool OpenPrinter(string szPrinter, out IntPtr hPrinter, IntPtr pd);
+                                    [DllImport("winspool.Drv", EntryPoint="ClosePrinter", SetLastError=true)] public static extern bool ClosePrinter(IntPtr hPrinter);
+                                    [DllImport("winspool.Drv", EntryPoint="StartDocPrinterA", SetLastError=true, CharSet=CharSet.Ansi)] public static extern bool StartDocPrinter(IntPtr hPrinter, Int32 level, [In, MarshalAs(UnmanagedType.LPStruct)] DOCINFOA di);
+                                    [DllImport("winspool.Drv", EntryPoint="EndDocPrinter", SetLastError=true)] public static extern bool EndDocPrinter(IntPtr hPrinter);
+                                    [DllImport("winspool.Drv", EntryPoint="WritePrinter", SetLastError=true)] public static extern bool WritePrinter(IntPtr hPrinter, IntPtr pBytes, Int32 dwCount, out Int32 dwWritten);
                                     public static void Send(string szPrinterName, byte[] pBytes) {
-                                        IntPtr hPrinter = new IntPtr(0);
-                                        DOCINFOA di = new DOCINFOA();
-                                        di.pDocName = "JC-RT Print"; di.pDataType = "RAW";
+                                        IntPtr hPrinter = new IntPtr(0); DOCINFOA di = new DOCINFOA(); di.pDocName = "JC-RT Print"; di.pDataType = "RAW";
                                         if (OpenPrinter(szPrinterName, out hPrinter, IntPtr.Zero)) {
                                             if (StartDocPrinter(hPrinter, 1, di)) {
-                                                IntPtr pUnmanagedBytes = Marshal.AllocCoTaskMem(pBytes.Length);
-                                                Marshal.Copy(pBytes, 0, pUnmanagedBytes, pBytes.Length);
-                                                Int32 dwWritten = 0;
-                                                WritePrinter(hPrinter, pUnmanagedBytes, pBytes.Length, out dwWritten);
-                                                EndDocPrinter(hPrinter);
-                                                Marshal.FreeCoTaskMem(pUnmanagedBytes);
+                                                IntPtr pUnmanagedBytes = Marshal.AllocCoTaskMem(pBytes.Length); Marshal.Copy(pBytes, 0, pUnmanagedBytes, pBytes.Length);
+                                                Int32 dwWritten = 0; WritePrinter(hPrinter, pUnmanagedBytes, pBytes.Length, out dwWritten);
+                                                EndDocPrinter(hPrinter); Marshal.FreeCoTaskMem(pUnmanagedBytes);
                                             }
                                             ClosePrinter(hPrinter);
                                         }
                                     }
                                 }
 "@
-                                Add-Type -TypeDefinition $code;
-                                [RawPrint]::Send($printer, $data);
+                                Add-Type -TypeDefinition $code; [RawPrint]::Send($printer, $data);
                             `;
                             const result = spawnSync('powershell', ['-Command', psCommand]);
                             if (result.status === 0) options.success?.("ok");
                             else options.error?.(result.stderr.toString());
                         }
-                    } catch (err) {
-                        options.error?.(err.message);
-                    }
+                    } catch (err) { options.error?.(err.message); }
                 }
             };
-            console.log(`ℹ️ Driver Universal activado (${process.platform})`);
         }
     }
-
-    try {
-        return new ThermalPrinter({
-            type: pConfig.tipo === 'epson' ? PrinterTypes.EPSON : PrinterTypes.STAR,
-            interface: printerInterface,
-            driver: driver,
-            characterSet: 'PC437_USA',
-            removeSpecialCharacters: false,
-            options: { timeout: 5000 }
-        });
-    } catch (error) {
-        if (error.message.includes("No driver set") && !isNetwork) {
-            throw new Error("No hay driver compatible para impresión USB. Verifica el nombre de la impresora.");
-        }
-        throw error;
-    }
+    return new ThermalPrinter({
+        type: pConfig.tipo === 'epson' ? PrinterTypes.EPSON : PrinterTypes.STAR,
+        interface: printerInterface,
+        driver: driver,
+        characterSet: 'PC437_USA',
+        removeSpecialCharacters: false,
+        options: { timeout: 5000 }
+    });
 }
 
-/**
- * BUCLE DE VIGILANCIA (POLLING)
- */
 async function startPolling() {
     setInterval(async () => {
         if (!config.active || !config.userId || !config.token) return;
-
-        console.log(`🔍 [${new Date().toLocaleTimeString()}] Buscando pedidos nuevos...`);
-        
         try {
             const states = ['pendiente', 'preparando'];
             for (const estado of states) {
@@ -164,45 +113,40 @@ async function startPolling() {
                     headers: { 'Authorization': `Bearer ${config.token}` }
                 });
                 const data = await response.json();
-
                 if (data.success && data.data.length > 0) {
                     const toPrint = data.data.filter(o => !printedIds.includes(o._id));
-                    
                     for (const order of toPrint) {
                         await imprimirPedido(order);
+                        if (config.imprimirClon) {
+                            console.log("📄 Imprimiendo CLON...");
+                            await imprimirPedido(order, true);
+                        }
                         printedIds.push(order._id);
                     }
-
                     if (toPrint.length > 0) {
-                        // Persistir IDs impresos
                         if (printedIds.length > 1000) printedIds = printedIds.slice(-500);
                         fs.writeFileSync(PRINTED_PATH, JSON.stringify(printedIds));
                     }
                 }
             }
-        } catch (error) {
-            console.error("❌ Error en polling:", error.message);
-        }
+        } catch (error) { console.error("❌ Error en polling:", error.message); }
     }, 5000);
 }
 
-async function imprimirPedido(order) {
-    console.log(`🖨️ Imprimiendo Pedido: Mesa ${order.mesa}`);
+async function imprimirPedido(order, isClon = false) {
     const printer = initPrinter(config.printer);
-    
     try {
         printer.alignCenter();
         printer.bold(true);
         printer.setTextSize(1, 1);
-        printer.println("JC-RT RESTAURANTE");
+        printer.println(isClon ? "--- CLON (COCINA) ---" : "JC-RT RESTAURANTE");
         printer.setTextSize(0, 0);
         printer.println("--------------------------------");
         printer.bold(true);
         printer.println(`COMANDA - MESA: ${order.mesa}`);
         printer.bold(false);
-        printer.println(`Fecha: ${new Date(order.createdAt).toLocaleString()}`);
+        printer.println(`Fecha: ${new Date().toLocaleString()}`);
         printer.println("--------------------------------");
-        
         printer.alignLeft();
         order.items.forEach(item => {
             const nombre = item.productoInfo ? item.productoInfo.nombre : (item.nombreProducto || 'Producto');
@@ -212,79 +156,100 @@ async function imprimirPedido(order) {
             if (item.notas) printer.println(`  Nota: ${item.notas}`);
             printer.println(""); 
         });
-
         printer.println("--------------------------------");
         printer.cut();
         await printer.execute();
         return true;
-    } catch (e) {
-        console.error("❌ Error físico de impresora:", e.message);
-        return false;
-    }
+    } catch (e) { console.error("❌ Error físico:", e.message); return false; }
 }
 
-/**
- * RUTAS DE CONFIGURACIÓN
- */
+// NUEVO ENDPOINT PARA FACTURAS (Arregla el problema de la "tinta")
+app.post('/print-factura', async (req, res) => {
+    const order = req.body;
+    const printer = initPrinter(config.printer);
+    try {
+        printer.alignCenter();
+        printer.bold(true);
+        printer.setTextSize(1, 1);
+        printer.println(order.restauranteNombre || "FACTURA DE VENTA");
+        printer.setTextSize(0, 0);
+        printer.bold(false);
+        printer.println("--------------------------------");
+        printer.println(`Fecha: ${new Date().toLocaleDateString()}`);
+        printer.println(`Hora: ${new Date().toLocaleTimeString()}`);
+        printer.println(`Mesa: ${order.mesa}`);
+        printer.println(`Pedido: #${order._id.slice(-6).toUpperCase()}`);
+        printer.println("--------------------------------");
+        printer.tableCustom([
+            { text: "Producto", align: "LEFT", width: 0.5, bold: true },
+            { text: "Cant", align: "CENTER", width: 0.2, bold: true },
+            { text: "Total", align: "RIGHT", width: 0.3, bold: true }
+        ]);
+        order.items.forEach(item => {
+            const nombre = item.productoInfo ? item.productoInfo.nombre : (item.nombreProducto || 'Producto');
+            printer.tableCustom([
+                { text: nombre, align: "LEFT", width: 0.5 },
+                { text: item.cantidad.toString(), align: "CENTER", width: 0.2 },
+                { text: `$${(item.precio * item.cantidad).toLocaleString()}`, align: "RIGHT", width: 0.3 }
+            ]);
+        });
+        printer.println("--------------------------------");
+        printer.bold(true);
+        printer.setTextSize(1, 1);
+        printer.println(`TOTAL: $${order.total.toLocaleString()}`);
+        printer.setTextSize(0, 0);
+        printer.bold(false);
+        printer.println("--------------------------------");
+        printer.println("¡Gracias por su compra!");
+        printer.println("Vuelva pronto");
+        printer.cut();
+        await printer.execute();
+        res.json({ success: true });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
 
 app.get('/', (req, res) => {
     res.send(`
     <html>
         <head>
-            <title>JC-RT Print Bridge Control</title>
+            <title>JC-RT Print Bridge</title>
             <style>
-                body { font-family: sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-                .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 400px; }
-                h2 { color: #1e293b; margin-top: 0; }
-                .status { padding: 8px; border-radius: 6px; margin-bottom: 1rem; font-weight: bold; text-align: center; }
-                .active { background: #dcfce7; color: #166534; }
-                .inactive { background: #fee2e2; color: #991b1b; }
-                textarea { width: 100%; height: 100px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px; box-sizing: border-box; }
+                body { font-family: sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+                .card { background: #1e293b; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); width: 400px; border: 1px solid #334155; }
+                .status { padding: 10px; border-radius: 6px; margin-bottom: 1rem; font-weight: bold; text-align: center; }
+                .active { background: #064e3b; color: #34d399; }
+                .inactive { background: #7f1d1d; color: #f87171; }
+                textarea { width: 100%; height: 80px; background: #0f172a; color: #38bdf8; border: 1px solid #334155; border-radius: 6px; padding: 10px; box-sizing: border-box; font-family: monospace; font-size: 11px; }
                 button { width: 100%; padding: 12px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; font-weight: bold; }
-                button:hover { background: #2563eb; }
+                #list { background: #0f172a; padding: 10px; border-radius: 6px; border: 1px solid #334155; margin-bottom: 10px; max-height: 100px; overflow-y: auto; }
             </style>
         </head>
         <body>
             <div class="card">
-                <h2>🛰️ JC-RT Print Bridge</h2>
+                <h2 style="margin-top:0">🛰️ Print Bridge</h2>
                 <div class="status ${config.active ? 'active' : 'inactive'}">
-                    Estado: ${config.active ? 'VIGILANDO PEDIDOS' : 'PAUSADO / SIN VINCULAR'}
+                    ${config.active ? '🟢 VIGILANDO PEDIDOS' : '🔴 SIN VINCULAR'}
                 </div>
-                
-                <div id="printers-list" style="margin-bottom: 1rem; padding: 10px; background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0;">
-                    <p style="font-size: 11px; font-weight: bold; margin: 0 0 5px 0; color: #64748b;">🖨️ Impresoras detectadas:</p>
-                    <div id="list" style="font-size: 10px; color: #1e293b;">Cargando impresoras...</div>
+                <div id="printers">
+                    <p style="font-size:11px; color:#94a3b8; margin:0 0 5px 0">🖨️ Impresoras detectadas:</p>
+                    <div id="list" style="font-size:10px; color:#38bdf8">Cargando...</div>
                 </div>
-
-                <p style="font-size: 13px; color: #64748b;">Pega aquí el código de vinculación:</p>
-                <textarea id="code" placeholder="Pega el código aquí..."></textarea>
+                <textarea id="code" placeholder="Pega el código de vinculación aquí..."></textarea>
                 <button onclick="save()">Vincular y Activar</button>
-                <div id="msg" style="margin-top: 10px; font-size: 12px; text-align: center;"></div>
+                <div id="msg" style="margin-top:10px; font-size:12px; text-align:center; color:#94a3b8"></div>
             </div>
             <script>
-                async function loadPrinters() {
-                    try {
-                        const res = await fetch('/printers');
-                        const data = await res.json();
-                        if(data.success) {
-                            document.getElementById('list').innerHTML = data.printers.map(p => "• " + p).join('<br>') || 'No se detectaron impresoras.';
-                        }
-                    } catch(e) {
-                        document.getElementById('list').innerText = 'Error al cargar impresoras.';
-                    }
+                async function load() {
+                    const res = await fetch('/printers');
+                    const data = await res.json();
+                    document.getElementById('list').innerHTML = data.printers.map(p => '• '+p).join('<br>') || 'Ninguna';
                 }
-                loadPrinters();
-
+                load();
                 async function save() {
-                    const code = document.getElementById('code').value;
-                    const res = await fetch('/save-config', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ code })
-                    });
+                    const res = await fetch('/save-config', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({code:document.getElementById('code').value}) });
                     const data = await res.json();
                     document.getElementById('msg').innerText = data.message;
-                    if(data.success) setTimeout(() => location.reload(), 1500);
+                    if(data.success) setTimeout(()=>location.reload(), 1500);
                 }
             </script>
         </body>
@@ -296,52 +261,21 @@ app.get('/printers', async (req, res) => {
     const { execSync } = require('child_process');
     let printers = [];
     try {
-        if (process.platform === 'darwin') {
-            const output = execSync('lpstat -e').toString();
-            printers = output.split('\n').filter(p => p.trim());
-        } else if (process.platform === 'win32') {
-            const output = execSync('wmic printer get name').toString();
-            printers = output.split('\n').map(p => p.trim()).filter(p => p && p !== 'Name');
-        }
+        if (process.platform === 'darwin') printers = execSync('lpstat -e').toString().split('\n').filter(p => p.trim());
+        else if (process.platform === 'win32') printers = execSync('wmic printer get name').toString().split('\n').map(p => p.trim()).filter(p => p && p !== 'Name');
         res.json({ success: true, printers });
-    } catch (e) {
-        res.json({ success: false, message: e.message });
-    }
+    } catch (e) { res.json({ success: false, message: e.message }); }
 });
 
 app.post('/save-config', (req, res) => {
     try {
-        const rawCode = req.body.code.trim();
-        const decodedStr = Buffer.from(rawCode, 'base64').toString('utf8');
-        const decoded = JSON.parse(decodedStr);
-        
-        config.userId = decoded.userId;
-        config.token = decoded.token;
-        config.printer = decoded.printer;
+        const decoded = JSON.parse(Buffer.from(req.body.code.trim(), 'base64').toString('utf8'));
+        config.userId = decoded.userId; config.token = decoded.token; config.printer = decoded.printer;
+        config.imprimirClon = decoded.imprimirClon || false;
         config.active = true;
-        
         fs.writeFileSync(CONFIG_PATH, JSON.stringify(config));
-        console.log("✅ Configuración guardada correctamente.");
-        res.json({ success: true, message: "Vinculación exitosa. Iniciando vigilancia..." });
-    } catch (e) {
-        console.error("❌ Error al decodificar código:", e.message);
-        res.status(400).json({ success: false, message: "Código inválido." });
-    }
+        res.json({ success: true, message: "Vinculación exitosa." });
+    } catch (e) { res.status(400).json({ success: false, message: "Código inválido." }); }
 });
 
-app.post('/test', async (req, res) => {
-    const printer = initPrinter(req.body);
-    try {
-        printer.println("Prueba de conexión JC-RT");
-        printer.cut();
-        await printer.execute();
-        res.json({ success: true });
-    } catch (e) {
-        res.status(500).json({ success: false, message: e.message });
-    }
-});
-
-app.listen(PORT, () => {
-    console.log(`🚀 JC-RT Print Bridge en http://localhost:${PORT}`);
-    startPolling();
-});
+app.listen(PORT, () => { console.log(`🚀 Bridge en http://localhost:${PORT}`); startPolling(); });

@@ -34,7 +34,6 @@
             min-height: 100vh;
         }
 
-        /* SIDEBAR (Copy from common style) */
         .sidebar {
             width: var(--sidebar-width);
             background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
@@ -120,7 +119,6 @@
             font-size: 18px;
         }
 
-        /* MAIN CONTENT */
         .content {
             margin-left: 0;
             flex: 1;
@@ -205,7 +203,6 @@
             margin-top: 2px;
         }
 
-        /* TOGGLE SWITCH */
         .switch {
             position: relative;
             display: inline-block;
@@ -251,7 +248,6 @@
             transform: translateX(24px);
         }
 
-        /* INPUTS */
         .form-group {
             margin-top: 1rem;
         }
@@ -279,7 +275,7 @@
         }
 
         .btn-save {
-            margin-top: 2rem;
+            margin-top: 1rem;
             padding: 12px 24px;
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
@@ -291,6 +287,7 @@
             transition: all 0.3s;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
         }
 
@@ -299,54 +296,44 @@
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
 
-        .btn-save:active {
-            transform: scale(0.98);
+        .conn-type-btn {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        /* GUIDE SECTION */
-        .guide-box {
-            background: #f1f5f9;
-            border-radius: 12px;
-            padding: 1.25rem;
-            margin-top: 1.5rem;
-            border-left: 4px solid var(--primary);
+        .conn-type-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
         }
 
-        .guide-box h4 {
-            font-size: 14px;
-            font-weight: 700;
-            margin-bottom: 8px;
+        .download-btn-pro {
             display: flex;
             align-items: center;
-            gap: 6px;
-        }
-
-        .guide-box p {
+            justify-content: center;
+            padding: 12px;
+            background: #f8fafc;
+            border: 1.5px solid #3b82f6;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #1e40af;
             font-size: 13px;
-            color: var(--text-light);
-            line-height: 1.5;
+            font-weight: 700;
+            transition: all 0.3s;
         }
 
-        .guide-list {
-            margin-top: 8px;
-            padding-left: 1rem;
+        .download-btn-pro:hover {
+            background: #3b82f6;
+            color: white;
         }
 
-        .guide-list li {
-            font-size: 12px;
-            margin-bottom: 4px;
-            color: var(--text-light);
-        }
-
-        code {
-            background: #e2e8f0;
-            padding: 2px 4px;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 11px;
-        }
-
-        /* MOBILE */
         .menu-toggle {
             display: block;
             position: fixed;
@@ -387,7 +374,6 @@
         </div>
 
         <nav class="sidebar-nav">
-            <!-- Los links se actualizarán dinámicamente o se mantendrán consistentes -->
             <div class="nav-section">
                 <div class="nav-section-title">Principal</div>
                 <a href="productos.html" class="nav-item">
@@ -435,24 +421,32 @@
         </div>
 
         <div class="settings-grid">
-            <!-- IMPRESION PRO -->
             <div class="card">
                 <div class="card-header">
                     <div class="card-icon">🖨️</div>
                     <div style="flex: 1;">
-                        <h3 style="display: flex; align-items: center; gap: 8px;">
-                            Impresión Profesional (Pro)
-                        </h3>
+                        <h3>Impresión Profesional (Pro)</h3>
                     </div>
                 </div>
 
                 <div class="setting-item">
                     <div class="setting-info">
                         <div class="setting-name">Activar Estación de Impresión</div>
-                        <div class="setting-description">Habilita esta PC para procesar y enviar comandas automáticamente.</div>
+                        <div class="setting-description">Habilita esta PC para enviar comandas automáticamente.</div>
                     </div>
                     <label class="switch">
                         <input type="checkbox" id="autoPrintSwitch">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item" style="border-top: 1px solid #f1f5f9; padding-top: 1rem; margin-top: 0.5rem;">
+                    <div class="setting-info">
+                        <div class="setting-name">🖨️ Imprimir Clon</div>
+                        <div class="setting-description">Imprime dos veces cada comanda automáticamente.</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="imprimirClon">
                         <span class="slider"></span>
                     </label>
                 </div>
@@ -485,131 +479,69 @@
                     </div>
 
                     <div style="display: flex; gap: 10px; margin-top: 1.5rem;">
-                        <button class="btn-save" onclick="saveSettings()" style="flex: 2; margin-top: 0; background: var(--success);">
-                            <span>💾</span> 1. Guardar Configuración
+                        <button class="btn-save" onclick="saveSettings()" style="flex: 2; background: var(--success);">
+                            <span>💾</span> Guardar Ajustes
                         </button>
-                        <button class="btn-save" onclick="generateLinkCode()" style="flex: 2; margin-top: 0;">
-                            <span>🔗</span> 2. Vincular Bridge
+                        <button class="btn-save" onclick="generateLinkCode()" style="flex: 2;">
+                            <span>🔗</span> Vincular Bridge
                         </button>
                     </div>
 
-                    <!-- CODIGO DE VINCULACION -->
                     <div id="link-code-box" style="margin-top: 1.5rem; background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px dashed #cbd5e1; display: none;">
                         <h5 style="font-size: 13px; color: #1e293b; margin-bottom: 8px;">🔑 Código de Vinculación</h5>
                         <textarea id="linkCodeText" readonly style="width: 100%; height: 60px; font-size: 10px; padding: 8px; border-radius: 4px; border: 1px solid #e2e8f0; background: #fff;"></textarea>
                         <div style="display: flex; gap: 10px; margin-top: 10px;">
                             <button class="btn-save" onclick="copyLinkCode()" style="flex: 1; margin-top: 0; padding: 8px; font-size: 12px;">📋 Copiar</button>
-                            <a href="http://127.0.0.1:3001" target="_blank" class="download-btn-pro" style="flex: 2; padding: 8px; font-size: 12px; border-color: #10b981; color: #059669;">⚡ Abrir Panel del Bridge</a>
+                            <a href="http://127.0.0.1:3001" target="_blank" class="download-btn-pro" style="flex: 2; padding: 8px; font-size: 12px; border-color: #10b981; color: #059669;">⚡ Abrir Bridge</a>
                         </div>
                     </div>
 
                     <div style="margin-top: 1.5rem; background: #fff; padding: 1rem; border-radius: 8px; border: 1px solid #dbeafe;">
-                        <h5 style="font-size: 13px; color: #1d4ed8; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
-                            📥 Descarga para Clientes
-                        </h5>
-                        <p style="font-size: 11px; color: #64748b; margin-bottom: 15px;">Para que este restaurante pueda imprimir, descarga y ejecuta el conector en la PC de la cocina:</p>
-                        
+                        <h5 style="font-size: 13px; color: #1d4ed8; margin-bottom: 10px;">📥 Descargar Conector</h5>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                             <a href="https://drive.google.com/file/d/1Ql8GuVm4gSaGkf7dIDKGe1MWYqNzcGnV/view?usp=sharing" target="_blank" class="download-btn-pro">
-                                <span>🪟 Windows (.zip)</span>
+                                <span>🪟 Windows</span>
                             </a>
                             <a href="TU_LINK_DE_DRIVE_AQUI" target="_blank" class="download-btn-pro">
-                                <span>🍎 MacOS (.zip)</span>
+                                <span>🍎 MacOS</span>
                             </a>
                         </div>
-                        <p style="font-size: 10px; color: #94a3b8; margin-top: 10px; text-align: center;">Nota: Una vez descargado, ábrelo y manténlo activo.</p>
                     </div>
                 </div>
             </div>
 
-            <!-- MANTENIMIENTO -->
             <div class="card">
                 <div class="card-header">
                     <div class="card-icon">🛠️</div>
-                    <div style="flex: 1;">
-                        <h3>Mantenimiento de Datos</h3>
-                    </div>
+                    <h3>Mantenimiento</h3>
                 </div>
-                
                 <div class="setting-item">
                     <div class="setting-info">
-                        <div class="setting-name">Sincronizar nombres en pedidos</div>
-                        <div class="setting-description">Actualiza los pedidos antiguos con el nombre del usuario que los creó para que aparezcan en las tarjetas.</div>
+                        <div class="setting-name">Sincronizar nombres</div>
+                        <div class="setting-description">Actualiza nombres de meseros en pedidos antiguos.</div>
                     </div>
-                    <button class="btn-save" onclick="sincronizarMeseros()" style="margin-top: 0; padding: 8px 15px; font-size: 13px; background: #667eea;">
-                        🔄 Sincronizar
-                    </button>
+                    <button class="btn-save" onclick="sincronizarMeseros()" style="margin-top: 0; padding: 8px 15px; font-size: 13px;">🔄 Sincronizar</button>
                 </div>
-            </div>
-
-            <!-- MANUAL O INVISIBLE (Placeholder) -->
-            <div class="card" style="opacity: 0.6; pointer-events: none;">
-                <div class="card-header">
-                    <div class="card-icon">🔒</div>
-                    <h3>Seguridad Avanzada</h3>
-                </div>
-                <p style="font-size: 13px; color: var(--text-light);">Restricción de impresión por usuario.</p>
             </div>
         </div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        .conn-type-btn {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #cbd5e1;
-            background: white;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .conn-type-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-        .download-btn-pro {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px;
-            background: #f8fafc;
-            border: 1.5px solid #3b82f6;
-            border-radius: 10px;
-            text-decoration: none;
-            color: #1e40af;
-            font-size: 13px;
-            font-weight: 700;
-            transition: all 0.3s;
-        }
-        .download-btn-pro:hover {
-            background: #3b82f6;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
-        }
-    </style>
-
     <script>
         const API_URL = 'https://restaurante-co77.onrender.com/api';
         let currentConnType = 'sistema';
         const BRIDGE_URL = 'http://127.0.0.1:3001';
 
-        // Cargar ajustes al iniciar
         window.addEventListener('DOMContentLoaded', () => {
             const autoPrint = localStorage.getItem('autoPrintComanda') === 'true';
+            const imprimirClon = localStorage.getItem('imprimirClon') === 'true';
             currentConnType = localStorage.getItem('printerConnType') || 'sistema';
-            const printerIntSistema = localStorage.getItem('printerInterfaceSistema') || '';
-            const printerIntRed = localStorage.getItem('printerInterfaceRed') || '';
-            const printerModel = localStorage.getItem('printerModel') || 'epson';
-
+            
             document.getElementById('autoPrintSwitch').checked = autoPrint;
-            document.getElementById('printerInterfaceSistema').value = printerIntSistema;
-            document.getElementById('printerInterfaceRed').value = printerIntRed;
-            document.getElementById('printerModel').value = printerModel;
+            document.getElementById('imprimirClon').checked = imprimirClon;
+            document.getElementById('printerInterfaceSistema').value = localStorage.getItem('printerInterfaceSistema') || '';
+            document.getElementById('printerInterfaceRed').value = localStorage.getItem('printerInterfaceRed') || '';
+            document.getElementById('printerModel').value = localStorage.getItem('printerModel') || 'epson';
 
             setConnType(currentConnType);
         });
@@ -623,152 +555,55 @@
         }
 
         function saveSettings() {
-            const autoPrint = document.getElementById('autoPrintSwitch').checked;
-            const printerIntSistema = document.getElementById('printerInterfaceSistema').value;
-            const printerIntRed = document.getElementById('printerInterfaceRed').value;
-            const printerModel = document.getElementById('printerModel').value;
-
-            if (autoPrint) {
-                localStorage.setItem('printActivationTime', new Date().toISOString());
-            }
-
-            localStorage.setItem('autoPrintComanda', autoPrint);
+            localStorage.setItem('autoPrintComanda', document.getElementById('autoPrintSwitch').checked);
+            localStorage.setItem('imprimirClon', document.getElementById('imprimirClon').checked);
             localStorage.setItem('printerConnType', currentConnType);
-            localStorage.setItem('printerInterfaceSistema', printerIntSistema);
-            localStorage.setItem('printerInterfaceRed', printerIntRed);
-            localStorage.setItem('printerModel', printerModel);
+            localStorage.setItem('printerInterfaceSistema', document.getElementById('printerInterfaceSistema').value);
+            localStorage.setItem('printerInterfaceRed', document.getElementById('printerInterfaceRed').value);
+            localStorage.setItem('printerModel', document.getElementById('printerModel').value);
 
-            Swal.fire({
-                icon: 'success',
-                title: 'Ajustes guardados',
-                text: 'Configuración actualizada correctamente.',
-                timer: 2000,
-                showConfirmButton: false
-            });
+            Swal.fire({ icon: 'success', title: 'Guardado', timer: 1500, showConfirmButton: false });
         }
 
         function generateLinkCode() {
             const token = localStorage.getItem('token');
             const user = JSON.parse(localStorage.getItem('usuario') || '{}');
             
-            if (!token || !user._id) {
-                Swal.fire('Atención', 'Debes iniciar sesión para generar el código.', 'warning');
-                return;
-            }
-
             const config = {
                 userId: user._id,
                 token: token,
+                imprimirClon: document.getElementById('imprimirClon').checked,
                 printer: {
                     tipo: document.getElementById('printerModel').value,
                     conexion: currentConnType,
-                    interface: currentConnType === 'sistema' ? 
-                               document.getElementById('printerInterfaceSistema').value : 
-                               document.getElementById('printerInterfaceRed').value
+                    interface: currentConnType === 'sistema' ? document.getElementById('printerInterfaceSistema').value : document.getElementById('printerInterfaceRed').value
                 }
             };
 
-            const jsonStr = JSON.stringify(config);
-            const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
+            const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(config))));
             document.getElementById('linkCodeText').value = base64;
             document.getElementById('link-code-box').style.display = 'block';
-            
-            Swal.fire({
-                icon: 'info',
-                title: 'Código Generado',
-                text: 'Copia el código de abajo y pégalo en el panel del Bridge.',
-                confirmButtonText: 'Entendido'
-            });
         }
 
         function copyLinkCode() {
             const text = document.getElementById('linkCodeText');
             text.select();
             document.execCommand('copy');
-            Swal.fire({
-                icon: 'success',
-                title: 'Copiado',
-                text: 'Código copiado al portapapeles.',
-                timer: 1500,
-                showConfirmButton: false
-            });
-        }
-
-        async function testPrintPro() {
-            const config = {
-                tipo: document.getElementById('printerModel').value,
-                conexion: currentConnType,
-                interface: currentConnType === 'sistema' ? 
-                           document.getElementById('printerInterfaceSistema').value : 
-                           document.getElementById('printerInterfaceRed').value
-            };
-
-            if (!config.interface) {
-                Swal.fire('Error', 'Debes ingresar el Nombre o IP de la impresora.', 'error');
-                return;
-            }
-
-            Swal.fire({
-                title: 'Enviando prueba...',
-                didOpen: () => Swal.showLoading(),
-                allowOutsideClick: false
-            });
-
-            try {
-                const response = await fetch(`${BRIDGE_URL}/test`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(config)
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    Swal.fire('¡Éxito!', 'Mensaje "prueba de impresion JC-RT" enviado.', 'success');
-                } else {
-                    throw new Error(data.message);
-                }
-            } catch (error) {
-                Swal.fire('Error de Conector', 'No se pudo contactar con el Print Bridge. ¿Está encendido?', 'error');
-            }
+            Swal.fire({ icon: 'success', title: 'Copiado', timer: 1000, showConfirmButton: false });
         }
 
         async function sincronizarMeseros() {
-            const { isConfirmed } = await Swal.fire({
-                title: '¿Sincronizar nombres?',
-                text: 'Esto buscará los nombres de los usuarios que crearon los pedidos antiguos para que aparezcan en las tarjetas de cocina y pedidos.',
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, sincronizar',
-                cancelButtonText: 'Cancelar'
-            });
-
-            if (!isConfirmed) return;
-
             Swal.fire({ title: 'Sincronizando...', didOpen: () => Swal.showLoading() });
-
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`${API_URL}/orders/sync-meseros`, {
+                const res = await fetch(`${API_URL}/orders/sync-meseros`, {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}` 
-                    }
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
-
-                const result = await response.json();
-                if (result.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Sincronización exitosa',
-                        text: result.message
-                    });
-                } else {
-                    throw new Error(result.message);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                Swal.fire({ icon: 'error', text: 'Error al sincronizar: ' + error.message });
+                const data = await res.json();
+                Swal.fire('Listo', data.message, 'success');
+            } catch (e) {
+                Swal.fire('Error', e.message, 'error');
             }
         }
 
@@ -776,7 +611,5 @@
             document.getElementById('sidebar').classList.toggle('active');
         }
     </script>
-<script src="scripts/print-monitor.js"></script>
 </body>
-
 </html>
