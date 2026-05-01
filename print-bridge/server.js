@@ -262,7 +262,7 @@ app.get('/printers', async (req, res) => {
     let printers = [];
     try {
         if (process.platform === 'darwin') printers = execSync('lpstat -e').toString().split('\n').filter(p => p.trim());
-        else if (process.platform === 'win32') printers = execSync('wmic printer get name').toString().split('\n').map(p => p.trim()).filter(p => p && p !== 'Name');
+        else if (process.platform === 'win32') printers = execSync('powershell "Get-Printer | Select-Object -ExpandProperty Name"').toString().split('\r\n').map(p => p.trim()).filter(p => p);
         res.json({ success: true, printers });
     } catch (e) { res.json({ success: false, message: e.message }); }
 });
