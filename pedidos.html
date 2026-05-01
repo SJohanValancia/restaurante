@@ -1374,6 +1374,7 @@
                 transform: rotate(360deg);
             }
         }
+
         /* ESTILOS PARA GESTO DESHACER */
         /* ESTILOS PARA GESTO DESHACER - ESTANDARIZADOS */
         .order-card.ready-to-undo {
@@ -1439,9 +1440,11 @@
             0% {
                 box-shadow: 0 0 0 0 rgba(72, 187, 120, 0.4);
             }
+
             70% {
                 box-shadow: 0 0 0 15px rgba(72, 187, 120, 0);
             }
+
             100% {
                 box-shadow: 0 0 0 0 rgba(72, 187, 120, 0);
             }
@@ -1506,6 +1509,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -1633,9 +1637,12 @@
         }
 
         @keyframes pulseOcupada {
-            0%, 100% {
+
+            0%,
+            100% {
                 box-shadow: 0 6px 20px rgba(229, 62, 62, 0.3);
             }
+
             50% {
                 box-shadow: 0 6px 30px rgba(229, 62, 62, 0.6);
             }
@@ -1806,7 +1813,8 @@
             bottom: 0;
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(5px);
-            z-index: 1050; /* Menor a 1060 para SWAL */
+            z-index: 1050;
+            /* Menor a 1060 para SWAL */
             align-items: center;
             justify-content: center;
             padding: 20px;
@@ -1826,34 +1834,70 @@
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
-            }
+        }
 
         /* ANIMACIONES DE GESTOS IOS-STYLE */
         @keyframes ios-jiggle {
-            0% { transform: rotate(-1.5deg) scale(1.03); }
-            50% { transform: rotate(1.5deg) scale(1.03); }
-            100% { transform: rotate(-1.5deg) scale(1.03); }
+            0% {
+                transform: rotate(-1.5deg) scale(1.03);
+            }
+
+            50% {
+                transform: rotate(1.5deg) scale(1.03);
+            }
+
+            100% {
+                transform: rotate(-1.5deg) scale(1.03);
+            }
         }
+
         .gesture-active-jiggle {
             animation: ios-jiggle 0.25s infinite ease-in-out !important;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.15) !important;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15) !important;
             z-index: 100;
         }
+
         .gesture-swipe-smooth {
             transition: transform 0.1s cubic-bezier(0.1, 0.7, 0.1, 1), box-shadow 0.2s !important;
         }
+
         /* ONBOARDING ANIMATIONS */
         @keyframes slideUpFadeBtn {
-            0% { transform: translate(-50%, 50px); opacity: 0; }
-            100% { transform: translate(-50%, 0); opacity: 1; }
+            0% {
+                transform: translate(-50%, 50px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
         }
+
         @keyframes slideDownFadeBtn {
-            0% { transform: translate(-50%, 0); opacity: 1; }
-            100% { transform: translate(-50%, 50px); opacity: 0; }
+            0% {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, 50px);
+                opacity: 0;
+            }
         }
+
         @keyframes bounceGlowIcon {
-            0%, 100% { transform: translateY(0); text-shadow: 0 0 10px rgba(255,255,255,0.5); }
-            50% { transform: translateY(-5px); text-shadow: 0 0 20px rgba(255,255,255,0.8); }
+
+            0%,
+            100% {
+                transform: translateY(0);
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            }
+
+            50% {
+                transform: translateY(-5px);
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+            }
         }
 
         .onboarding-shortcut-popup {
@@ -1865,12 +1909,12 @@
             color: white;
             padding: 18px 24px;
             border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.15);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             z-index: 10000;
             display: flex;
             align-items: center;
             gap: 16px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4), 0 0 0 1px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(99, 102, 241, 0.4);
             animation: slideUpFadeBtn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             pointer-events: auto;
             max-width: 90vw;
@@ -1886,7 +1930,7 @@
             font-family: monospace;
             font-weight: bold;
             border-bottom: 2px solid #0f172a;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             margin: 0 2px;
         }
 
@@ -1908,8 +1952,13 @@
         }
 
         @keyframes alimentosFadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         .alimentos-popup {
@@ -1926,8 +1975,15 @@
         }
 
         @keyframes alimentosSlideUp {
-            from { opacity: 0; transform: translateY(30px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         .alimentos-popup-header {
@@ -2044,7 +2100,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
             transition: all 0.2s;
         }
 
@@ -2274,7 +2330,9 @@
                     <!-- Formulario de nuevo pedido -->
                     <div class="card">
                         <div class="card-header">
-                            <h2>➕ Nuevo Pedido <button type="button" class="btn-submit" id="btnSubmit" onclick="document.getElementById('orderForm').requestSubmit()" disabled>Crear Pedido</button></h2>
+                            <h2>➕ Nuevo Pedido <button type="button" class="btn-submit" id="btnSubmit"
+                                    onclick="document.getElementById('orderForm').requestSubmit()" disabled>Crear
+                                    Pedido</button></h2>
                             <p>Complete los datos para crear un pedido</p>
                         </div>
                         <div class="card-body">
@@ -2328,7 +2386,8 @@
                                     <span class="order-count" id="orderCount">0</span>
                                 </div>
                                 <div class="filters">
-                                    <input type="text" id="orderSearch" class="filter-select" placeholder="🔍 Buscar mesa..." style="width: 150px;">
+                                    <input type="text" id="orderSearch" class="filter-select"
+                                        placeholder="🔍 Buscar mesa..." style="width: 150px;">
                                     <select id="filterEstado" class="filter-select" onchange="loadOrders(true)">
                                         <option value="">Todos los estados</option>
                                         <option value="pendiente">Pendientes</option>
@@ -2348,10 +2407,12 @@
                                     <p>Cargando pedidos...</p>
                                 </div>
                             </div>
-                            <div id="loadingMoreOrders" style="display: none; text-align: center; padding: 20px; color: #667eea;">
+                            <div id="loadingMoreOrders"
+                                style="display: none; text-align: center; padding: 20px; color: #667eea;">
                                 <span>Cargando más pedidos...</span>
                             </div>
-                            <div id="noMoreOrders" style="display: none; text-align: center; padding: 20px; color: #a0aec0;">
+                            <div id="noMoreOrders"
+                                style="display: none; text-align: center; padding: 20px; color: #a0aec0;">
                                 <span>No hay más pedidos</span>
                             </div>
                         </div>
@@ -2364,7 +2425,8 @@
                 <div class="table-view-header">
                     <div class="table-view-search-wrapper">
                         <span class="table-view-search-icon">🔍</span>
-                        <input type="text" class="table-view-search" id="mesaSearchInput" placeholder="Buscar mesa..." autocomplete="off">
+                        <input type="text" class="table-view-search" id="mesaSearchInput" placeholder="Buscar mesa..."
+                            autocomplete="off">
                     </div>
                     <button class="btn-gestionar-mesas" onclick="abrirGestionMesas()">
                         <span>⚙️</span>
@@ -2435,7 +2497,7 @@
                 }
                 const data = await response.json();
                 currentUser = data.data;
-                
+
                 if (data.data) {
                     localStorage.setItem('usuario', JSON.stringify(data.data));
                 }
@@ -2510,19 +2572,19 @@
                         isGestureStarted = true;
                         gestureType = 'change-payment';
                         currentCard.classList.add('gesture-active-jiggle');
-                        
+
                         const indicador = currentCard.querySelector('.payment-method-indicator');
                         if (indicador) {
                             indicador.innerHTML = metodoPago === 'efectivo' ? '💳 A TRANSFERENCIA' : '💵 A EFECTIVO';
                         }
-                        
+
                         if (window.navigator.vibrate) window.navigator.vibrate([30, 50, 30]);
-                    }, 600); 
+                    }, 600);
                 } else if (!isPagado) {
                     if (statusBadge && statusBadge.classList.contains('status-cancelado')) {
                         return;
                     }
-                    
+
                     longPressTimer = setTimeout(() => {
                         isGestureStarted = true;
                         gestureType = 'undo';
@@ -2534,7 +2596,7 @@
 
             const handleMove = (e) => {
                 if (!currentCard || !isGestureStarted) return;
-                
+
                 const touch = e.touches ? e.touches[0] : e;
                 const diffX = touch.clientX - touchStartX;
                 const diffY = touch.clientY - touchStartY;
@@ -2581,13 +2643,13 @@
                 currentCard.classList.remove('gesture-active-jiggle', 'gesture-swipe-smooth');
                 currentCard.classList.add('gesture-return-smooth');
                 currentCard.style.transform = 'translateX(0) scale(1)';
-                
+
                 const undoIndicator = currentCard.querySelector('.undo-indicator');
                 if (undoIndicator) undoIndicator.style.opacity = '0';
-                
+
                 const paymentIndicator = currentCard.querySelector('.payment-method-indicator');
                 if (paymentIndicator) paymentIndicator.style.opacity = '0';
-                
+
                 const tempCard = currentCard;
                 setTimeout(() => {
                     if (tempCard) tempCard.classList.remove('gesture-return-smooth');
@@ -2660,7 +2722,7 @@
             const order = orderList.find(o => o._id === orderId);
             if (!order) return;
 
-            const pagos = (order.pagos && order.pagos.length > 0) ? order.pagos : [{metodo: order.metodoPago || 'efectivo', monto: order.total}];
+            const pagos = (order.pagos && order.pagos.length > 0) ? order.pagos : [{ metodo: order.metodoPago || 'efectivo', monto: order.total }];
             let pagoIndex = 0;
 
             if (pagos.length > 1) {
@@ -2668,7 +2730,7 @@
                     acc[idx] = `${p.metodo === 'efectivo' ? '💵 Efectivo' : '📱 Transferencia'} - $${p.monto.toLocaleString('es-CO')}`;
                     return acc;
                 }, {});
-                
+
                 const { value: indexSeleccionado } = await Swal.fire({
                     title: 'Seleccionar pago',
                     text: 'Este es un pago mixto. ¿Cuál de los pagos deseas modificar?',
@@ -2678,11 +2740,11 @@
                     showCancelButton: true,
                     confirmButtonText: 'Siguiente'
                 });
-                
+
                 if (!indexSeleccionado) return;
                 pagoIndex = parseInt(indexSeleccionado);
             }
-            
+
             const pagoTarget = pagos[pagoIndex];
             const nuevoMetodo = pagoTarget.metodo === 'efectivo' ? 'transferencia' : 'efectivo';
             const metodoTargetTexto = pagoTarget.metodo === 'efectivo' ? 'Efectivo' : 'Transferencia';
@@ -2720,7 +2782,7 @@
                 if (result.isConfirmed) {
                     try {
                         const token = localStorage.getItem('token');
-                        const bodyData = { 
+                        const bodyData = {
                             metodoPago: nuevoMetodo,
                             pagoIndex: pagoIndex
                         };
@@ -2740,11 +2802,11 @@
                         const data = await response.json();
 
                         if (data.success) {
-                            Swal.fire({ 
-                                icon: 'success', 
-                                text: `Método actualizado exitosamente`, 
-                                timer: 1500, 
-                                showConfirmButton: false 
+                            Swal.fire({
+                                icon: 'success',
+                                text: `Método actualizado exitosamente`,
+                                timer: 1500,
+                                showConfirmButton: false
                             });
                             if (typeof loadRecents === 'function') loadRecents();
                         } else {
@@ -2776,19 +2838,30 @@
                     const alimentosData = await alimentosResponse.json();
 
                     if (alimentosData.success) {
-                        const alimentos = alimentosData.data;
+                        // ✅ Helper: soporta productoId como objeto populado o string plano
+                        const getProdId = (pid) => {
+                            if (!pid) return null;
+                            if (typeof pid === 'object') return (pid._id || pid).toString();
+                            return pid.toString();
+                        };
+
+                        // ✅ Limpiar datos: eliminar referencias a productos eliminados (productoId null o inválido)
+                        const alimentos = alimentosData.data.map(alimento => ({
+                            ...alimento,
+                            productos: (alimento.productos || []).filter(p => getProdId(p.productoId) != null)
+                        }));
                         allAlimentosCache = alimentos; // ✅ Guardar en cache para popup
 
                         // Verificar cada producto contra los alimentos
                         availableProducts = data.data.map(producto => {
                             // Buscar alimentos que usan este producto
                             const alimentosDelProducto = alimentos.filter(alimento =>
-                                alimento.productos.some(p => p.productoId && p.productoId._id === producto._id)
+                                alimento.productos.some(p => getProdId(p.productoId) === producto._id.toString())
                             );
 
                             // Verificar si algún alimento está agotado
                             const alimentosAgotados = alimentosDelProducto.filter(alimento => {
-                                const config = alimento.productos.find(p => p.productoId && p.productoId._id === producto._id);
+                                const config = alimento.productos.find(p => getProdId(p.productoId) === producto._id.toString());
                                 return config && alimento.stock < config.cantidadRequerida;
                             });
 
@@ -2926,12 +2999,12 @@
             container.innerHTML = `
         <label class="form-label">Productos Seleccionados</label>
         ${selectedItems.map((item, index) => {
-            const tieneAlimentos = allAlimentosCache.some(a => a.productos.some(p => {
-                const prodId = p.productoId?._id || p.productoId;
-                return prodId === item.producto._id;
-            }));
-            const tieneExclusiones = item.alimentosExcluidos && item.alimentosExcluidos.length > 0;
-            return `
+                const tieneAlimentos = allAlimentosCache.some(a => a.productos.some(p => {
+                    const prodId = p.productoId?._id || p.productoId;
+                    return prodId === item.producto._id;
+                }));
+                const tieneExclusiones = item.alimentosExcluidos && item.alimentosExcluidos.length > 0;
+                return `
             <div class="selected-item" style="flex-direction: column; align-items: stretch;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div class="selected-item-info">
@@ -2970,7 +3043,7 @@
                 </div>
             </div>
         `;
-        }).join('')}
+            }).join('')}
     `;
 
             const totalItems = selectedItems.reduce((sum, item) => sum + item.cantidad, 0);
@@ -3016,7 +3089,7 @@
         // ✅ POPUP DE ALIMENTOS
         function mostrarAlimentosPopup(productoId, itemIndex, vista) {
             const alimentosDelProducto = allAlimentosCache.filter(a =>
-                a.productos.some(p => p.productoId && p.productoId._id === productoId)
+                a.productos.some(p => { const pid = p.productoId; if (!pid) return false; const id = (typeof pid === 'object') ? (pid._id || pid).toString() : pid.toString(); return id === productoId.toString(); })
             );
 
             if (alimentosDelProducto.length === 0) {
@@ -3048,19 +3121,19 @@
                             Desmarca los alimentos que el cliente <b>no quiere</b>. Esos ingredientes <b>no se descontarán</b> del inventario.
                         </p>
                         ${alimentosDelProducto.map(alimento => {
-                            const config = alimento.productos.find(p => p.productoId && p.productoId._id === productoId);
-                            const cantidadReq = config ? config.cantidadRequerida : 1;
-                            const isExcluded = currentExclusions.includes(alimento._id);
-                            let stockClass = 'alimento-stock-ok';
-                            let stockLabel = 'Stock: ' + alimento.stock;
-                            if (alimento.stock <= 0) {
-                                stockClass = 'alimento-stock-agotado';
-                                stockLabel = 'Agotado';
-                            } else if (alimento.stock < cantidadReq) {
-                                stockClass = 'alimento-stock-bajo';
-                                stockLabel = 'Stock bajo: ' + alimento.stock;
-                            }
-                            return `
+                const config = alimento.productos.find(p => { const pid = p.productoId; if (!pid) return false; const id = (typeof pid === 'object') ? (pid._id || pid).toString() : pid.toString(); return id === productoId.toString(); });
+                const cantidadReq = config ? config.cantidadRequerida : 1;
+                const isExcluded = currentExclusions.includes(alimento._id);
+                let stockClass = 'alimento-stock-ok';
+                let stockLabel = 'Stock: ' + alimento.stock;
+                if (alimento.stock <= 0) {
+                    stockClass = 'alimento-stock-agotado';
+                    stockLabel = 'Agotado';
+                } else if (alimento.stock < cantidadReq) {
+                    stockClass = 'alimento-stock-bajo';
+                    stockLabel = 'Stock bajo: ' + alimento.stock;
+                }
+                return `
                                 <div class="alimento-row">
                                     <input type="checkbox" class="alimento-checkbox" 
                                         data-alimento-id="${alimento._id}" 
@@ -3085,7 +3158,7 @@
                                     </div>
                                 </div>
                             `;
-                        }).join('')}
+            }).join('')}
                     </div>
                     <div class="alimentos-popup-footer">
                         <button class="btn-alimentos-cancelar" onclick="this.closest('.alimentos-overlay').remove()">Cancelar</button>
@@ -3107,7 +3180,7 @@
             const overlay = btn.closest('.alimentos-overlay');
             const checkboxes = overlay.querySelectorAll('.alimento-checkbox');
             const inputsAjuste = overlay.querySelectorAll('.alimento-input-ajuste');
-            
+
             const excluidos = [];
             const ajustados = [];
 
@@ -3147,12 +3220,12 @@
                 let msg = '';
                 if (excluidos.length > 0) msg += `${excluidos.length} excluido(s). `;
                 if (ajustados.length > 0) msg += `${ajustados.length} ajustado(s). `;
-                
-                Swal.fire({ 
-                    icon: 'info', 
-                    text: msg + "Se ha modificado el descuento de inventario para este plato.", 
-                    timer: 2500, 
-                    showConfirmButton: false 
+
+                Swal.fire({
+                    icon: 'info',
+                    text: msg + "Se ha modificado el descuento de inventario para este plato.",
+                    timer: 2500,
+                    showConfirmButton: false
                 });
             }
         }
@@ -3285,17 +3358,17 @@
                 if (data.success) {
                     const newOrders = data.data;
                     hasMoreOrders = newOrders.length === 30;
-                    
+
                     if (reset) {
                         allLoadedOrders = newOrders;
                     } else {
                         allLoadedOrders = [...allLoadedOrders, ...newOrders];
                     }
-                    
+
                     displayOrders(allLoadedOrders, reset);
                     document.getElementById('orderCount').textContent = data.total || allLoadedOrders.length;
                     currentPage++;
-                    
+
                     // Señal para la vista de mesas
                     window.ordersHaveLoaded = true;
                     if (isTableView && mesasData.length > 0) renderMesas(mesasData);
@@ -3470,8 +3543,8 @@
             }
 
             // Botón de Pagar - muestra saldo restante si hay pagos parciales
-            const pagarTexto = tienePagosParciales 
-                ? `💳 Pagar Restante: $${saldoRestante.toLocaleString('es-CO')}` 
+            const pagarTexto = tienePagosParciales
+                ? `💳 Pagar Restante: $${saldoRestante.toLocaleString('es-CO')}`
                 : '💳 Pagar';
 
             if (order.estado === 'listo') {
@@ -3575,7 +3648,7 @@
             // Si hay pagos previos, mostrar resumen
             const resumenPagos = document.getElementById('resumenPagosPrevios');
             if (totalPagado > 0 && order.pagos && order.pagos.length > 0) {
-                const pagosHTML = order.pagos.map(p => 
+                const pagosHTML = order.pagos.map(p =>
                     `<div style="display: flex; justify-content: space-between; font-size: 12px; padding: 2px 0;">
                         <span>${p.metodo === 'efectivo' ? '💵' : '📱'} ${p.metodo === 'efectivo' ? 'Efectivo' : 'Transferencia'}</span>
                         <span style="font-weight: 600;">$${p.monto.toLocaleString('es-CO')}</span>
@@ -3606,9 +3679,9 @@
             const order = allLoadedOrders.find(o => o._id === currentOrderIdForPayment);
             const totalPedido = order ? order.total : 0;
             const saldoRestante = totalPedido - (order ? (order.totalPagado || 0) : 0);
-            
+
             const porcentajeLabel = document.getElementById('porcentajePago');
-            
+
             if (monto <= 0) {
                 porcentajeLabel.textContent = '';
                 return;
@@ -3622,7 +3695,7 @@
 
             const porcentajeDelTotal = Math.round((monto / totalPedido) * 100);
             const porcentajeDelRestante = Math.round((monto / saldoRestante) * 100);
-            
+
             if (porcentajeDelRestante >= 100) {
                 porcentajeLabel.textContent = `✅ Paga el 100% del saldo restante`;
                 porcentajeLabel.style.color = '#38a169';
@@ -5109,7 +5182,7 @@
                     mostrarNotificacionExito('✅ Pedido actualizado correctamente');
                     cerrarModalEditar();
                     await loadOrders(true);
-                    
+
                     // ✅ SINCRONIZAR VISTA DE MESAS SI EXISTE
                     if (typeof renderMesas === 'function' && mesasData && mesasData.length > 0) {
                         renderMesas(mesasData);
@@ -5208,14 +5281,16 @@
             style="background: white; border-radius: 16px; padding: 2rem; max-width: 420px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
             <h3 style="font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 0.5rem; text-align: center;">💰
                 Monto a Pagar</h3>
-            
+
             <div style="text-align: center; margin-bottom: 1rem;">
-                <span id="pagoMetodoSeleccionado" style="display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; background: #f0fff4; color: #38a169; border: 1px solid #c6f6d5;"></span>
+                <span id="pagoMetodoSeleccionado"
+                    style="display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; background: #f0fff4; color: #38a169; border: 1px solid #c6f6d5;"></span>
             </div>
 
             <div id="resumenPagosPrevios" style="display: none;"></div>
 
-            <div style="display: flex; justify-content: space-between; padding: 8px 12px; background: #f7fafc; border-radius: 8px; margin-bottom: 1rem;">
+            <div
+                style="display: flex; justify-content: space-between; padding: 8px 12px; background: #f7fafc; border-radius: 8px; margin-bottom: 1rem;">
                 <div>
                     <div style="font-size: 11px; color: #718096; font-weight: 600;">Total del pedido</div>
                     <div id="montoTotalPedido" style="font-size: 18px; font-weight: 800; color: #2d3748;"></div>
@@ -5233,19 +5308,22 @@
 
             <div style="position: relative; text-align: center; margin-bottom: 1rem;">
                 <div style="border-top: 1px solid #e2e8f0; position: absolute; top: 50%; left: 0; right: 0;"></div>
-                <span style="background: white; padding: 0 12px; position: relative; font-size: 12px; color: #a0aec0; font-weight: 600;">O PAGAR UN MONTO PARCIAL</span>
+                <span
+                    style="background: white; padding: 0 12px; position: relative; font-size: 12px; color: #a0aec0; font-weight: 600;">O
+                    PAGAR UN MONTO PARCIAL</span>
             </div>
 
             <div style="margin-bottom: 0.5rem;">
                 <div style="position: relative;">
-                    <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; font-weight: 700; color: #2d3748;">$</span>
-                    <input type="number" id="inputMontoPago" 
-                        oninput="actualizarPorcentajePago()"
+                    <span
+                        style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; font-weight: 700; color: #2d3748;">$</span>
+                    <input type="number" id="inputMontoPago" oninput="actualizarPorcentajePago()"
                         style="width: 100%; padding: 14px 14px 14px 30px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 18px; font-weight: 700; transition: all 0.2s; box-sizing: border-box;"
-                        placeholder="0"
-                        min="1">
+                        placeholder="0" min="1">
                 </div>
-                <div id="porcentajePago" style="font-size: 13px; font-weight: 600; margin-top: 6px; min-height: 20px; text-align: center;"></div>
+                <div id="porcentajePago"
+                    style="font-size: 13px; font-weight: 600; margin-top: 6px; min-height: 20px; text-align: center;">
+                </div>
             </div>
 
             <button onclick="pagarMontoParcial()"
@@ -5253,7 +5331,8 @@
                 Confirmar Pago Parcial
             </button>
 
-            <button onclick="document.getElementById('modalMontoPago').style.display = 'none'; document.getElementById('modalMetodoPago').style.display = 'flex';"
+            <button
+                onclick="document.getElementById('modalMontoPago').style.display = 'none'; document.getElementById('modalMetodoPago').style.display = 'flex';"
                 style="width: 100%; padding: 0.65rem; background: #f7fafc; color: #718096; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
                 ← Cambiar Método de Pago
             </button>
@@ -5375,45 +5454,62 @@
         <div class="modal-gestion-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                 <h3 style="font-size: 20px; font-weight: 700; color: #1a202c;">🪑 Gestionar Mesas</h3>
-                <button onclick="cerrarGestionMesas()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #718096;">✕</button>
+                <button onclick="cerrarGestionMesas()"
+                    style="background: none; border: none; font-size: 24px; cursor: pointer; color: #718096;">✕</button>
             </div>
 
             <!-- Agregar mesa individual -->
             <div style="display: flex; gap: 8px; margin-bottom: 1rem;">
-                <input type="text" id="nuevaMesaNombre" style="flex: 1; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px;" placeholder="Nombre de la mesa (ej: VIP 1, Terraza 3)" maxlength="30">
-                <button onclick="crearMesaIndividual()" style="padding: 12px 20px; background: linear-gradient(135deg, #48bb78, #38a169); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; white-space: nowrap;">+ Agregar</button>
+                <input type="text" id="nuevaMesaNombre"
+                    style="flex: 1; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px;"
+                    placeholder="Nombre de la mesa (ej: VIP 1, Terraza 3)" maxlength="30">
+                <button onclick="crearMesaIndividual()"
+                    style="padding: 12px 20px; background: linear-gradient(135deg, #48bb78, #38a169); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; white-space: nowrap;">+
+                    Agregar</button>
             </div>
 
             <!-- Agregar mesas en bloque -->
-            <div style="display: flex; gap: 8px; margin-bottom: 1.5rem; padding: 1rem; background: #f7fafc; border-radius: 10px; border: 1px solid #e2e8f0;">
+            <div
+                style="display: flex; gap: 8px; margin-bottom: 1.5rem; padding: 1rem; background: #f7fafc; border-radius: 10px; border: 1px solid #e2e8f0;">
                 <div style="flex: 1;">
-                    <label style="font-size: 11px; font-weight: 600; color: #718096; text-transform: uppercase; letter-spacing: 0.5px;">Crear múltiples</label>
+                    <label
+                        style="font-size: 11px; font-weight: 600; color: #718096; text-transform: uppercase; letter-spacing: 0.5px;">Crear
+                        múltiples</label>
                     <div style="display: flex; gap: 6px; margin-top: 6px;">
-                        <input type="text" id="bulkPrefix" value="Mesa" style="width: 100px; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px;" placeholder="Prefijo">
-                        <input type="number" id="bulkCantidad" min="1" max="50" value="10" style="width: 70px; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px;">
-                        <button onclick="crearMesasEnBloque()" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap;">Crear</button>
+                        <input type="text" id="bulkPrefix" value="Mesa"
+                            style="width: 100px; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px;"
+                            placeholder="Prefijo">
+                        <input type="number" id="bulkCantidad" min="1" max="50" value="10"
+                            style="width: 70px; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px;">
+                        <button onclick="crearMesasEnBloque()"
+                            style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap;">Crear</button>
                     </div>
                 </div>
             </div>
 
             <!-- Importar mesas de pedidos existentes -->
             <div style="margin-bottom: 1.5rem;">
-                <button onclick="importarMesasDePedidos()" id="btnImportarMesas" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #f6ad55, #ed8936); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s;">
+                <button onclick="importarMesasDePedidos()" id="btnImportarMesas"
+                    style="width: 100%; padding: 12px; background: linear-gradient(135deg, #f6ad55, #ed8936); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s;">
                     <span>📥</span>
                     <span>Importar mesas de pedidos existentes</span>
                 </button>
-                <p style="font-size: 11px; color: #a0aec0; text-align: center; margin-top: 6px;">Detecta automáticamente las mesas usadas en pedidos anteriores</p>
+                <p style="font-size: 11px; color: #a0aec0; text-align: center; margin-top: 6px;">Detecta automáticamente
+                    las mesas usadas en pedidos anteriores</p>
             </div>
 
             <!-- Lista de mesas -->
             <div style="margin-bottom: 1rem;">
-                <label style="font-size: 12px; font-weight: 700; color: #718096; text-transform: uppercase; letter-spacing: 0.5px;">Mesas registradas</label>
+                <label
+                    style="font-size: 12px; font-weight: 700; color: #718096; text-transform: uppercase; letter-spacing: 0.5px;">Mesas
+                    registradas</label>
             </div>
             <div id="listaMesasGestion" style="max-height: 300px; overflow-y: auto;">
                 <p style="text-align: center; color: #a0aec0; padding: 2rem;">Cargando mesas...</p>
             </div>
 
-            <button onclick="cerrarGestionMesas()" style="width: 100%; margin-top: 1rem; padding: 12px; background: #e2e8f0; color: #2d3748; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;">
+            <button onclick="cerrarGestionMesas()"
+                style="width: 100%; margin-top: 1rem; padding: 12px; background: #e2e8f0; color: #2d3748; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;">
                 Cerrar
             </button>
         </div>
@@ -5423,45 +5519,67 @@
     <div class="modal-pedido-mesa" id="modalPedidoMesa">
         <div class="modal-pedido-mesa-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3 style="font-size: 20px; font-weight: 700; color: #1a202c;" id="modalPedidoMesaTitulo">📝 Nuevo Pedido</h3>
-                <button onclick="cerrarModalPedidoMesa()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #718096;">✕</button>
+                <h3 style="font-size: 20px; font-weight: 700; color: #1a202c;" id="modalPedidoMesaTitulo">📝 Nuevo
+                    Pedido</h3>
+                <button onclick="cerrarModalPedidoMesa()"
+                    style="background: none; border: none; font-size: 24px; cursor: pointer; color: #718096;">✕</button>
             </div>
 
-            <div style="padding: 12px; background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1)); border-radius: 10px; margin-bottom: 1.5rem;">
-                <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px; text-align: center;">Mesa / Ubicación</label>
-                <input type="text" id="inputMesaMesa" style="width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; text-align: center; font-weight: 700; color: #667eea;" placeholder="Ej: Mesa 5">
-                <span style="display: none; font-size: 14px; font-weight: 700; color: #667eea;" id="mesaSeleccionadaLabel">Mesa seleccionada</span>
+            <div
+                style="padding: 12px; background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1)); border-radius: 10px; margin-bottom: 1.5rem;">
+                <label
+                    style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px; text-align: center;">Mesa
+                    / Ubicación</label>
+                <input type="text" id="inputMesaMesa"
+                    style="width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; text-align: center; font-weight: 700; color: #667eea;"
+                    placeholder="Ej: Mesa 5">
+                <span style="display: none; font-size: 14px; font-weight: 700; color: #667eea;"
+                    id="mesaSeleccionadaLabel">Mesa seleccionada</span>
             </div>
 
             <form id="orderFormMesa">
                 <div style="margin-bottom: 1.25rem;">
-                    <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px;">Seleccionar Productos *</label>
+                    <label
+                        style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px;">Seleccionar
+                        Productos *</label>
                     <div style="position: relative; margin-bottom: 8px;">
-                        <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #a0aec0;">🔍</span>
-                        <input type="text" id="searchProductMesa" style="width: 100%; padding: 10px 14px 10px 38px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;" placeholder="Buscar producto..." autocomplete="off">
+                        <span
+                            style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #a0aec0;">🔍</span>
+                        <input type="text" id="searchProductMesa"
+                            style="width: 100%; padding: 10px 14px 10px 38px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;"
+                            placeholder="Buscar producto..." autocomplete="off">
                     </div>
-                    <div id="productsListMesa" style="max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; background: #f7fafc;"></div>
+                    <div id="productsListMesa"
+                        style="max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; background: #f7fafc;">
+                    </div>
                 </div>
 
                 <div id="selectedProductsMesa" style="margin-bottom: 1.25rem;"></div>
 
                 <div style="margin-bottom: 1.25rem;">
-                    <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px;">Notas del Pedido</label>
-                    <textarea id="notasMesa" style="width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; resize: vertical; min-height: 60px; font-family: inherit;" maxlength="500" placeholder="Observaciones especiales..."></textarea>
+                    <label
+                        style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px;">Notas
+                        del Pedido</label>
+                    <textarea id="notasMesa"
+                        style="width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; resize: vertical; min-height: 60px; font-family: inherit;"
+                        maxlength="500" placeholder="Observaciones especiales..."></textarea>
                 </div>
 
-                <div id="orderSummaryMesa" style="display: none; background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
+                <div id="orderSummaryMesa"
+                    style="display: none; background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;">
                         <span>Productos:</span>
                         <span id="summaryItemsMesa">0</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; padding-top: 12px; border-top: 2px solid #e2e8f0; font-size: 18px; font-weight: 700; color: #48bb78;">
+                    <div
+                        style="display: flex; justify-content: space-between; padding-top: 12px; border-top: 2px solid #e2e8f0; font-size: 18px; font-weight: 700; color: #48bb78;">
                         <span>Total:</span>
                         <span id="summaryTotalMesa">$0</span>
                     </div>
                 </div>
 
-                <button type="button" id="btnSubmitMesa" onclick="crearPedidoMesa()" disabled style="width: 100%; padding: 14px; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; opacity: 0.5; transition: all 0.3s;">
+                <button type="button" id="btnSubmitMesa" onclick="crearPedidoMesa()" disabled
+                    style="width: 100%; padding: 14px; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; opacity: 0.5; transition: all 0.3s;">
                     🍽️ Crear Pedido
                 </button>
             </form>
@@ -5471,138 +5589,138 @@
     <script src="scripts/restaurant-switcher.js"></script>
 
     <script>
-    // ============================================
-    // SISTEMA DE VISTA DE MESAS
-    // ============================================
-    
-    let isTableView = true;
-    let mesasData = [];
-    let mesaSelectedItems = [];
-    let mesaSeleccionadaNombre = '';
-    let keySequence = [];
-    let keySequenceTimer = null;
+        // ============================================
+        // SISTEMA DE VISTA DE MESAS
+        // ============================================
 
-    // RESTAURAR MODO GUARDADO
-    document.addEventListener('DOMContentLoaded', () => {
-        const savedMode = localStorage.getItem('tableViewMode');
-        // Si el modo guardado es 'normal', cambiar a normal (porque ahora el default es mesas)
-        if (savedMode === 'normal') {
-            // Esperar a que los pedidos REALMENTE carguen
-            const waitForOrders = setInterval(() => {
-                if (window.ordersHaveLoaded) {
-                    clearInterval(waitForOrders);
-                    toggleTableView();
-                }
-            }, 300);
-        }
-    });
+        let isTableView = true;
+        let mesasData = [];
+        let mesaSelectedItems = [];
+        let mesaSeleccionadaNombre = '';
+        let keySequence = [];
+        let keySequenceTimer = null;
 
-    // ATAJO DE TECLADO: Cmd/Ctrl + J → C
-    document.addEventListener('keydown', (e) => {
-        const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-        const modKey = isMac ? e.metaKey : e.ctrlKey;
-
-        if (modKey && e.key.toLowerCase() === 'j') {
-            e.preventDefault();
-            keySequence = ['j'];
-            clearTimeout(keySequenceTimer);
-            keySequenceTimer = setTimeout(() => { keySequence = []; }, 800);
-            return;
-        }
-
-        if (keySequence.length === 1 && keySequence[0] === 'j' && e.key.toLowerCase() === 'c') {
-            e.preventDefault();
-            keySequence = [];
-            clearTimeout(keySequenceTimer);
-            toggleTableView();
-            if (typeof dismissShortcutOnboarding === 'function') dismissShortcutOnboarding();
-        }
-    });
-
-    // Lógica de cambio de vista
-    function toggleTableView() {
-        isTableView = !isTableView;
-        const defaultView = document.getElementById('defaultView');
-        const tableView = document.getElementById('tableView');
-        const headerIcon = document.getElementById('viewModeIconHeader');
-        const headerText = document.getElementById('viewModeTextHeader');
-
-        if (isTableView) {
-            defaultView.classList.add('hidden');
-            tableView.classList.add('active');
-            if (headerIcon) headerIcon.textContent = '📋';
-            if (headerText) headerText.textContent = 'Vista Normal';
-            loadMesas();
-        } else {
-            defaultView.classList.remove('hidden');
-            tableView.classList.remove('active');
-            if (headerIcon) headerIcon.textContent = '🪑';
-            if (headerText) headerText.textContent = 'Vista Mesas';
-        }
-
-        // Guardar modo en localStorage
-        localStorage.setItem('tableViewMode', isTableView ? 'mesas' : 'normal');
-
-        // Feedback
-        const notif = document.createElement('div');
-        notif.textContent = isTableView ? '🪑 Vista de Mesas activada' : '📋 Vista Normal activada';
-        notif.style.cssText = 'position:fixed;top:80px;right:20px;background:linear-gradient(135deg,#48bb78,#38a169);color:white;padding:1rem 1.5rem;border-radius:12px;font-weight:600;font-size:14px;box-shadow:0 4px 12px rgba(72,187,120,0.4);z-index:10000;animation:slideInRight 0.3s ease-out;';
-        document.body.appendChild(notif);
-        setTimeout(() => notif.remove(), 2500);
-    }
-
-    // CARGAR MESAS
-    async function loadMesas() {
-        const token = localStorage.getItem('token');
-        try {
-            const response = await fetch(`${API_URL}/mesas`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const data = await response.json();
-
-            if (data.success) {
-                mesasData = data.data;
-                renderMesas(mesasData);
+        // RESTAURAR MODO GUARDADO
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedMode = localStorage.getItem('tableViewMode');
+            // Si el modo guardado es 'normal', cambiar a normal (porque ahora el default es mesas)
+            if (savedMode === 'normal') {
+                // Esperar a que los pedidos REALMENTE carguen
+                const waitForOrders = setInterval(() => {
+                    if (window.ordersHaveLoaded) {
+                        clearInterval(waitForOrders);
+                        toggleTableView();
+                    }
+                }, 300);
             }
-        } catch (error) {
-            console.error('Error al cargar mesas:', error);
+        });
+
+        // ATAJO DE TECLADO: Cmd/Ctrl + J → C
+        document.addEventListener('keydown', (e) => {
+            const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+            const modKey = isMac ? e.metaKey : e.ctrlKey;
+
+            if (modKey && e.key.toLowerCase() === 'j') {
+                e.preventDefault();
+                keySequence = ['j'];
+                clearTimeout(keySequenceTimer);
+                keySequenceTimer = setTimeout(() => { keySequence = []; }, 800);
+                return;
+            }
+
+            if (keySequence.length === 1 && keySequence[0] === 'j' && e.key.toLowerCase() === 'c') {
+                e.preventDefault();
+                keySequence = [];
+                clearTimeout(keySequenceTimer);
+                toggleTableView();
+                if (typeof dismissShortcutOnboarding === 'function') dismissShortcutOnboarding();
+            }
+        });
+
+        // Lógica de cambio de vista
+        function toggleTableView() {
+            isTableView = !isTableView;
+            const defaultView = document.getElementById('defaultView');
+            const tableView = document.getElementById('tableView');
+            const headerIcon = document.getElementById('viewModeIconHeader');
+            const headerText = document.getElementById('viewModeTextHeader');
+
+            if (isTableView) {
+                defaultView.classList.add('hidden');
+                tableView.classList.add('active');
+                if (headerIcon) headerIcon.textContent = '📋';
+                if (headerText) headerText.textContent = 'Vista Normal';
+                loadMesas();
+            } else {
+                defaultView.classList.remove('hidden');
+                tableView.classList.remove('active');
+                if (headerIcon) headerIcon.textContent = '🪑';
+                if (headerText) headerText.textContent = 'Vista Mesas';
+            }
+
+            // Guardar modo en localStorage
+            localStorage.setItem('tableViewMode', isTableView ? 'mesas' : 'normal');
+
+            // Feedback
+            const notif = document.createElement('div');
+            notif.textContent = isTableView ? '🪑 Vista de Mesas activada' : '📋 Vista Normal activada';
+            notif.style.cssText = 'position:fixed;top:80px;right:20px;background:linear-gradient(135deg,#48bb78,#38a169);color:white;padding:1rem 1.5rem;border-radius:12px;font-weight:600;font-size:14px;box-shadow:0 4px 12px rgba(72,187,120,0.4);z-index:10000;animation:slideInRight 0.3s ease-out;';
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 2500);
         }
-    }
 
-    // RENDERIZAR MESAS CON ESTADO
-    function renderMesas(mesas) {
-        const grid = document.getElementById('mesasGrid');
-        const searchVal = document.getElementById('mesaSearchInput').value.toLowerCase().trim();
+        // CARGAR MESAS
+        async function loadMesas() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_URL}/mesas`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
 
-        let mesasFiltradas = mesas;
-        if (searchVal) {
-            mesasFiltradas = mesas.filter(m => m.nombre.toLowerCase().includes(searchVal));
+                if (data.success) {
+                    mesasData = data.data;
+                    renderMesas(mesasData);
+                }
+            } catch (error) {
+                console.error('Error al cargar mesas:', error);
+            }
         }
 
-        if (mesasFiltradas.length === 0) {
-            grid.innerHTML = `
+        // RENDERIZAR MESAS CON ESTADO
+        function renderMesas(mesas) {
+            const grid = document.getElementById('mesasGrid');
+            const searchVal = document.getElementById('mesaSearchInput').value.toLowerCase().trim();
+
+            let mesasFiltradas = mesas;
+            if (searchVal) {
+                mesasFiltradas = mesas.filter(m => m.nombre.toLowerCase().includes(searchVal));
+            }
+
+            if (mesasFiltradas.length === 0) {
+                grid.innerHTML = `
                 <div class="empty-state" style="grid-column: 1/-1;">
                     <div class="empty-icon">🪑</div>
                     <p>${mesas.length === 0 ? 'No hay mesas registradas. Usa "Gestionar Mesas" para crear.' : 'No se encontraron mesas con ese nombre.'}</p>
                 </div>
             `;
-            return;
-        }
+                return;
+            }
 
-        grid.innerHTML = mesasFiltradas.map(mesa => {
-            // Contar TODOS los pedidos activos de esta mesa
-            const pedidosActivos = allLoadedOrders.filter(o =>
-                o.mesa && String(o.mesa).toLowerCase().trim() === mesa.nombre.toLowerCase().trim() &&
-                !['entregado', 'cancelado'].includes(o.estado)
-            );
-            const isOcupada = pedidosActivos.length > 0;
-            const estadoClass = isOcupada ? 'ocupada' : 'libre';
+            grid.innerHTML = mesasFiltradas.map(mesa => {
+                // Contar TODOS los pedidos activos de esta mesa
+                const pedidosActivos = allLoadedOrders.filter(o =>
+                    o.mesa && String(o.mesa).toLowerCase().trim() === mesa.nombre.toLowerCase().trim() &&
+                    !['entregado', 'cancelado'].includes(o.estado)
+                );
+                const isOcupada = pedidosActivos.length > 0;
+                const estadoClass = isOcupada ? 'ocupada' : 'libre';
 
-            // Icono dentro del círculo
-            const iconContent = mesa.nombre.match(/\d+/) ? mesa.nombre.match(/\d+/)[0] : mesa.nombre.charAt(0).toUpperCase();
-            const badge = pedidosActivos.length > 1 ? `<div style="position:absolute;top:-4px;right:-4px;background:#e53e3e;color:white;font-size:10px;font-weight:800;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid white;">${pedidosActivos.length}</div>` : '';
+                // Icono dentro del círculo
+                const iconContent = mesa.nombre.match(/\d+/) ? mesa.nombre.match(/\d+/)[0] : mesa.nombre.charAt(0).toUpperCase();
+                const badge = pedidosActivos.length > 1 ? `<div style="position:absolute;top:-4px;right:-4px;background:#e53e3e;color:white;font-size:10px;font-weight:800;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid white;">${pedidosActivos.length}</div>` : '';
 
-            return `
+                return `
                 <div class="mesa-circle" onclick="onMesaClick('${mesa._id}', '${mesa.nombre.replace(/'/g, "\\'")}', '${isOcupada}')">
                     <div class="mesa-icon ${estadoClass}" style="position:relative;">
                         ${iconContent}${badge}
@@ -5611,55 +5729,55 @@
                     <div class="mesa-status-text ${estadoClass}">${isOcupada ? (pedidosActivos.length > 1 ? pedidosActivos.length + ' pedidos' : 'Ocupada') : 'Libre'}</div>
                 </div>
             `;
-        }).join('');
-    }
-
-    // BUSCADOR DE MESAS
-    document.addEventListener('DOMContentLoaded', () => {
-        const searchInput = document.getElementById('mesaSearchInput');
-        if (searchInput) {
-            let searchTimeout;
-            searchInput.addEventListener('input', () => {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => {
-                    renderMesas(mesasData);
-                }, 200);
-            });
+            }).join('');
         }
-    });
 
-    // CLICK EN MESA → ABRIR MODAL DE PEDIDO
-    let mesaEditingOrderId = null; // ID del pedido que se está editando
+        // BUSCADOR DE MESAS
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('mesaSearchInput');
+            if (searchInput) {
+                let searchTimeout;
+                searchInput.addEventListener('input', () => {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        renderMesas(mesasData);
+                    }, 200);
+                });
+            }
+        });
 
-    function onMesaClick(mesaId, mesaNombre, isOcupada) {
-        mesaSeleccionadaNombre = mesaNombre.trim();
-        mesaEditingOrderId = null;
+        // CLICK EN MESA → ABRIR MODAL DE PEDIDO
+        let mesaEditingOrderId = null; // ID del pedido que se está editando
 
-        // Buscar pedidos activos de esta mesa
-        const pedidosActivos = allLoadedOrders.filter(o =>
-            o.mesa && String(o.mesa).toLowerCase().trim() === mesaSeleccionadaNombre.toLowerCase().trim() &&
-            !['entregado', 'cancelado'].includes(o.estado)
-        );
+        function onMesaClick(mesaId, mesaNombre, isOcupada) {
+            mesaSeleccionadaNombre = mesaNombre.trim();
+            mesaEditingOrderId = null;
 
-        if (pedidosActivos.length > 0) {
-            // Mesa ocupada → mostrar opciones
-            mostrarMenuMesaOcupada(mesaId, mesaSeleccionadaNombre, pedidosActivos);
-        } else {
-            // Mesa libre → nuevo pedido directamente
-            abrirModalNuevoPedidoMesa();
+            // Buscar pedidos activos de esta mesa
+            const pedidosActivos = allLoadedOrders.filter(o =>
+                o.mesa && String(o.mesa).toLowerCase().trim() === mesaSeleccionadaNombre.toLowerCase().trim() &&
+                !['entregado', 'cancelado'].includes(o.estado)
+            );
+
+            if (pedidosActivos.length > 0) {
+                // Mesa ocupada → mostrar opciones
+                mostrarMenuMesaOcupada(mesaId, mesaSeleccionadaNombre, pedidosActivos);
+            } else {
+                // Mesa libre → nuevo pedido directamente
+                abrirModalNuevoPedidoMesa();
+            }
         }
-    }
 
-    function mostrarMenuMesaOcupada(mesaId, mesaNombre, pedidosActivos) {
-        const estadoEmojis = { 'pendiente': '⏳', 'preparando': '👨‍🍳', 'listo': '✅' };
-        const estadoColors = { 'pendiente': '#f6ad55', 'preparando': '#667eea', 'listo': '#48bb78' };
+        function mostrarMenuMesaOcupada(mesaId, mesaNombre, pedidosActivos) {
+            const estadoEmojis = { 'pendiente': '⏳', 'preparando': '👨‍🍳', 'listo': '✅' };
+            const estadoColors = { 'pendiente': '#f6ad55', 'preparando': '#667eea', 'listo': '#48bb78' };
 
-        const pedidosHTML = pedidosActivos.map((p, idx) => {
-            const totalItems = p.items.reduce((s, i) => s + i.cantidad, 0);
-            const productos = p.items.map(i => (i.productoInfo ? i.productoInfo.nombre : (i.nombreProducto || 'Producto'))).join(', ');
-            const truncProd = productos.length > 50 ? productos.substring(0, 50) + '...' : productos;
+            const pedidosHTML = pedidosActivos.map((p, idx) => {
+                const totalItems = p.items.reduce((s, i) => s + i.cantidad, 0);
+                const productos = p.items.map(i => (i.productoInfo ? i.productoInfo.nombre : (i.nombreProducto || 'Producto'))).join(', ');
+                const truncProd = productos.length > 50 ? productos.substring(0, 50) + '...' : productos;
 
-            return `
+                return `
                 <div style="background: ${estadoColors[p.estado]}12; border: 1px solid ${estadoColors[p.estado]}40; border-radius: 12px; padding: 14px; cursor: pointer; transition: all 0.2s; user-select: none; -webkit-user-select: none;" 
                      onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'"
                      onclick="editarPedidoExistente('${p._id}')">
@@ -5673,143 +5791,143 @@
                     <div style="font-size: 11px; color: #667eea; margin-top: 6px; font-weight: 600;">✏️ Toca para editar</div>
                 </div>
             `;
-        }).join('');
+            }).join('');
 
-        Swal.fire({
-            title: `🪑 ${mesaNombre}`,
-            html: `
+            Swal.fire({
+                title: `🪑 ${mesaNombre}`,
+                html: `
                 <div style="text-align: left; margin-bottom: 1rem;">
                     <p style="font-size: 13px; color: #718096; margin-bottom: 12px;">${pedidosActivos.length} pedido${pedidosActivos.length > 1 ? 's' : ''} activo${pedidosActivos.length > 1 ? 's' : ''}</p>
                     <div style="display: grid; gap: 10px; max-height: 300px; overflow-y: auto;">${pedidosHTML}</div>
                 </div>
             `,
-            showCancelButton: true,
-            confirmButtonText: '➕ Nuevo Pedido',
-            cancelButtonText: 'Cerrar',
-            confirmButtonColor: '#48bb78',
-            cancelButtonColor: '#e2e8f0',
-            reverseButtons: true,
-            customClass: { cancelButton: 'swal2-cancel-dark' }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                abrirModalNuevoPedidoMesa();
-            }
-        });
-    }
-
-    function abrirModalNuevoPedidoMesa() {
-        mesaEditingOrderId = null;
-        mesaSelectedItems = [];
-
-        document.getElementById('modalPedidoMesaTitulo').textContent = `📝 Nuevo Pedido - ${mesaSeleccionadaNombre}`;
-        document.getElementById('inputMesaMesa').value = mesaSeleccionadaNombre;
-
-        // Resetear formulario
-        document.getElementById('selectedProductsMesa').innerHTML = '';
-        document.getElementById('orderSummaryMesa').style.display = 'none';
-        document.getElementById('btnSubmitMesa').disabled = true;
-        document.getElementById('btnSubmitMesa').style.opacity = '0.5';
-        document.getElementById('btnSubmitMesa').textContent = '🍽️ Crear Pedido';
-        const notasInput = document.getElementById('notasMesa');
-        if (notasInput) notasInput.value = '';
-
-        // Mostrar productos
-        displayProductsMesa(availableProducts);
-
-        // Configurar buscador
-        const searchInput = document.getElementById('searchProductMesa');
-        searchInput.value = '';
-        const newSearch = searchInput.cloneNode(true);
-        searchInput.parentNode.replaceChild(newSearch, searchInput);
-        document.getElementById('searchProductMesa').addEventListener('input', (e) => {
-            const search = e.target.value.toLowerCase();
-            const filtered = availableProducts.filter(p =>
-                p.nombre.toLowerCase().includes(search) ||
-                p.categoria.toLowerCase().includes(search)
-            );
-            displayProductsMesa(filtered);
-        });
-
-        document.getElementById('modalPedidoMesa').classList.add('active');
-    }
-
-    function editarPedidoExistente(orderId) {
-        Swal.close();
-
-        const pedido = allLoadedOrders.find(o => o._id === orderId);
-        if (!pedido) return;
-
-        mesaEditingOrderId = orderId;
-        mesaSelectedItems = [];
-
-        // Pre-cargar items del pedido existente
-        pedido.items.forEach(item => {
-            const productoEnCatalogo = availableProducts.find(p => p._id === (item.producto?._id || item.producto));
-            if (productoEnCatalogo) {
-                mesaSelectedItems.push({
-                    producto: productoEnCatalogo,
-                    cantidad: item.cantidad
-                });
-            } else {
-                // Producto no encontrado en catálogo, usar datos del pedido
-                mesaSelectedItems.push({
-                    producto: {
-                        _id: item.producto?._id || item.producto,
-                        nombre: item.productoInfo ? item.productoInfo.nombre : (item.nombreProducto || 'Producto'),
-                        categoria: item.productoInfo ? item.productoInfo.categoria : (item.categoriaProducto || ''),
-                        precio: item.precio,
-                        disponible: true
-                    },
-                    cantidad: item.cantidad
-                });
-            }
-        });
-
-        document.getElementById('modalPedidoMesaTitulo').textContent = `✏️ Editar Pedido - ${mesaSeleccionadaNombre}`;
-        document.getElementById('inputMesaMesa').value = mesaSeleccionadaNombre;
-        document.getElementById('btnSubmitMesa').textContent = '💾 Guardar Cambios';
-
-        // Mostrar productos
-        displayProductsMesa(availableProducts);
-        updateSelectedProductsMesa();
-
-        // Pre-cargar notas
-        const notasInput = document.getElementById('notasMesa');
-        if (notasInput) notasInput.value = pedido.notas || '';
-
-        // Configurar buscador
-        const searchInput = document.getElementById('searchProductMesa');
-        searchInput.value = '';
-        const newSearch = searchInput.cloneNode(true);
-        searchInput.parentNode.replaceChild(newSearch, searchInput);
-        document.getElementById('searchProductMesa').addEventListener('input', (e) => {
-            const search = e.target.value.toLowerCase();
-            const filtered = availableProducts.filter(p =>
-                p.nombre.toLowerCase().includes(search) ||
-                p.categoria.toLowerCase().includes(search)
-            );
-            displayProductsMesa(filtered);
-        });
-
-        document.getElementById('modalPedidoMesa').classList.add('active');
-    }
-
-    function cerrarModalPedidoMesa() {
-        document.getElementById('modalPedidoMesa').classList.remove('active');
-        mesaSelectedItems = [];
-        mesaSeleccionadaNombre = '';
-        mesaEditingOrderId = null;
-    }
-
-    function displayProductsMesa(products) {
-        const list = document.getElementById('productsListMesa');
-        if (products.length === 0) {
-            list.innerHTML = '<div style="text-align: center; padding: 1rem; color: #a0aec0;">No hay productos</div>';
-            return;
+                showCancelButton: true,
+                confirmButtonText: '➕ Nuevo Pedido',
+                cancelButtonText: 'Cerrar',
+                confirmButtonColor: '#48bb78',
+                cancelButtonColor: '#e2e8f0',
+                reverseButtons: true,
+                customClass: { cancelButton: 'swal2-cancel-dark' }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    abrirModalNuevoPedidoMesa();
+                }
+            });
         }
-        list.innerHTML = products.map(p => {
-            const agotado = !p.disponible;
-            return `
+
+        function abrirModalNuevoPedidoMesa() {
+            mesaEditingOrderId = null;
+            mesaSelectedItems = [];
+
+            document.getElementById('modalPedidoMesaTitulo').textContent = `📝 Nuevo Pedido - ${mesaSeleccionadaNombre}`;
+            document.getElementById('inputMesaMesa').value = mesaSeleccionadaNombre;
+
+            // Resetear formulario
+            document.getElementById('selectedProductsMesa').innerHTML = '';
+            document.getElementById('orderSummaryMesa').style.display = 'none';
+            document.getElementById('btnSubmitMesa').disabled = true;
+            document.getElementById('btnSubmitMesa').style.opacity = '0.5';
+            document.getElementById('btnSubmitMesa').textContent = '🍽️ Crear Pedido';
+            const notasInput = document.getElementById('notasMesa');
+            if (notasInput) notasInput.value = '';
+
+            // Mostrar productos
+            displayProductsMesa(availableProducts);
+
+            // Configurar buscador
+            const searchInput = document.getElementById('searchProductMesa');
+            searchInput.value = '';
+            const newSearch = searchInput.cloneNode(true);
+            searchInput.parentNode.replaceChild(newSearch, searchInput);
+            document.getElementById('searchProductMesa').addEventListener('input', (e) => {
+                const search = e.target.value.toLowerCase();
+                const filtered = availableProducts.filter(p =>
+                    p.nombre.toLowerCase().includes(search) ||
+                    p.categoria.toLowerCase().includes(search)
+                );
+                displayProductsMesa(filtered);
+            });
+
+            document.getElementById('modalPedidoMesa').classList.add('active');
+        }
+
+        function editarPedidoExistente(orderId) {
+            Swal.close();
+
+            const pedido = allLoadedOrders.find(o => o._id === orderId);
+            if (!pedido) return;
+
+            mesaEditingOrderId = orderId;
+            mesaSelectedItems = [];
+
+            // Pre-cargar items del pedido existente
+            pedido.items.forEach(item => {
+                const productoEnCatalogo = availableProducts.find(p => p._id === (item.producto?._id || item.producto));
+                if (productoEnCatalogo) {
+                    mesaSelectedItems.push({
+                        producto: productoEnCatalogo,
+                        cantidad: item.cantidad
+                    });
+                } else {
+                    // Producto no encontrado en catálogo, usar datos del pedido
+                    mesaSelectedItems.push({
+                        producto: {
+                            _id: item.producto?._id || item.producto,
+                            nombre: item.productoInfo ? item.productoInfo.nombre : (item.nombreProducto || 'Producto'),
+                            categoria: item.productoInfo ? item.productoInfo.categoria : (item.categoriaProducto || ''),
+                            precio: item.precio,
+                            disponible: true
+                        },
+                        cantidad: item.cantidad
+                    });
+                }
+            });
+
+            document.getElementById('modalPedidoMesaTitulo').textContent = `✏️ Editar Pedido - ${mesaSeleccionadaNombre}`;
+            document.getElementById('inputMesaMesa').value = mesaSeleccionadaNombre;
+            document.getElementById('btnSubmitMesa').textContent = '💾 Guardar Cambios';
+
+            // Mostrar productos
+            displayProductsMesa(availableProducts);
+            updateSelectedProductsMesa();
+
+            // Pre-cargar notas
+            const notasInput = document.getElementById('notasMesa');
+            if (notasInput) notasInput.value = pedido.notas || '';
+
+            // Configurar buscador
+            const searchInput = document.getElementById('searchProductMesa');
+            searchInput.value = '';
+            const newSearch = searchInput.cloneNode(true);
+            searchInput.parentNode.replaceChild(newSearch, searchInput);
+            document.getElementById('searchProductMesa').addEventListener('input', (e) => {
+                const search = e.target.value.toLowerCase();
+                const filtered = availableProducts.filter(p =>
+                    p.nombre.toLowerCase().includes(search) ||
+                    p.categoria.toLowerCase().includes(search)
+                );
+                displayProductsMesa(filtered);
+            });
+
+            document.getElementById('modalPedidoMesa').classList.add('active');
+        }
+
+        function cerrarModalPedidoMesa() {
+            document.getElementById('modalPedidoMesa').classList.remove('active');
+            mesaSelectedItems = [];
+            mesaSeleccionadaNombre = '';
+            mesaEditingOrderId = null;
+        }
+
+        function displayProductsMesa(products) {
+            const list = document.getElementById('productsListMesa');
+            if (products.length === 0) {
+                list.innerHTML = '<div style="text-align: center; padding: 1rem; color: #a0aec0;">No hay productos</div>';
+                return;
+            }
+            list.innerHTML = products.map(p => {
+                const agotado = !p.disponible;
+                return `
                 <div style="padding: 10px; border-bottom: 1px solid #e2e8f0; cursor: ${agotado ? 'not-allowed' : 'pointer'}; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; ${agotado ? 'opacity: 0.5;' : ''}" 
                      onclick="${agotado ? '' : `addProductMesa('${p._id}')`}" onmouseover="if(!${agotado}) this.style.background='white'" onmouseout="this.style.background='transparent'">
                     <div>
@@ -5821,39 +5939,39 @@
                     </div>
                 </div>
             `;
-        }).join('');
-    }
-
-    function addProductMesa(productId) {
-        const product = availableProducts.find(p => p._id === productId);
-        if (!product) return;
-        const existing = mesaSelectedItems.find(item => item.producto._id === productId);
-        if (existing) {
-            existing.cantidad++;
-        } else {
-            mesaSelectedItems.push({ producto: product, cantidad: 1 });
-        }
-        updateSelectedProductsMesa();
-    }
-
-    function updateSelectedProductsMesa() {
-        const container = document.getElementById('selectedProductsMesa');
-        const summary = document.getElementById('orderSummaryMesa');
-        const btnSubmit = document.getElementById('btnSubmitMesa');
-
-        if (mesaSelectedItems.length === 0) {
-            container.innerHTML = '';
-            summary.style.display = 'none';
-            btnSubmit.disabled = true;
-            btnSubmit.style.opacity = '0.5';
-            return;
+            }).join('');
         }
 
-        summary.style.display = 'block';
-        btnSubmit.disabled = false;
-        btnSubmit.style.opacity = '1';
+        function addProductMesa(productId) {
+            const product = availableProducts.find(p => p._id === productId);
+            if (!product) return;
+            const existing = mesaSelectedItems.find(item => item.producto._id === productId);
+            if (existing) {
+                existing.cantidad++;
+            } else {
+                mesaSelectedItems.push({ producto: product, cantidad: 1 });
+            }
+            updateSelectedProductsMesa();
+        }
 
-        container.innerHTML = `
+        function updateSelectedProductsMesa() {
+            const container = document.getElementById('selectedProductsMesa');
+            const summary = document.getElementById('orderSummaryMesa');
+            const btnSubmit = document.getElementById('btnSubmitMesa');
+
+            if (mesaSelectedItems.length === 0) {
+                container.innerHTML = '';
+                summary.style.display = 'none';
+                btnSubmit.disabled = true;
+                btnSubmit.style.opacity = '0.5';
+                return;
+            }
+
+            summary.style.display = 'block';
+            btnSubmit.disabled = false;
+            btnSubmit.style.opacity = '1';
+
+            container.innerHTML = `
             <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 6px;">Productos Seleccionados</label>
             ${mesaSelectedItems.map((item, index) => {
                 const tieneAlimentos = allAlimentosCache.some(a => a.productos.some(p => {
@@ -5894,123 +6012,123 @@
             }).join('')}
         `;
 
-        const totalItems = mesaSelectedItems.reduce((sum, item) => sum + item.cantidad, 0);
-        const totalPrice = mesaSelectedItems.reduce((sum, item) => sum + (item.producto.precio * item.cantidad), 0);
-        document.getElementById('summaryItemsMesa').textContent = totalItems;
-        document.getElementById('summaryTotalMesa').textContent = `$${totalPrice.toLocaleString('es-CO')}`;
-    }
-
-    function changeMesaQty(index, delta) {
-        mesaSelectedItems[index].cantidad += delta;
-        if (mesaSelectedItems[index].cantidad <= 0) mesaSelectedItems.splice(index, 1);
-        updateSelectedProductsMesa();
-    }
-
-    function removeMesaItem(index) {
-        mesaSelectedItems.splice(index, 1);
-        updateSelectedProductsMesa();
-    }
-
-    // CREAR O EDITAR PEDIDO DESDE MESA
-    async function crearPedidoMesa() {
-        if (mesaSelectedItems.length === 0) return;
-
-        const btnSubmit = document.getElementById('btnSubmitMesa');
-        btnSubmit.disabled = true;
-        btnSubmit.style.opacity = '0.6';
-        btnSubmit.textContent = mesaEditingOrderId ? '⏳ Guardando...' : '⏳ Creando...';
-
-        const notas = document.getElementById('notasMesa').value.trim();
-
-        const isEditing = !!mesaEditingOrderId;
-
-        const mesaActualizada = document.getElementById('inputMesaMesa').value.trim() || mesaSeleccionadaNombre;
-        
-        const orderData = {
-            mesa: mesaActualizada,
-            items: mesaSelectedItems.map(item => ({
-                producto: item.producto._id,
-                nombreProducto: item.producto.nombre,
-                categoriaProducto: item.producto.categoria || '',
-                cantidad: item.cantidad,
-                precio: item.producto.precio,
-                alimentosExcluidos: item.alimentosExcluidos || [],
-                alimentosAjustados: item.alimentosAjustados || [],
-                nota: item.nota || ''
-            })),
-            notas: notas
-        };
-
-        if (!isEditing) {
-            orderData.userId = currentUser._id;
+            const totalItems = mesaSelectedItems.reduce((sum, item) => sum + item.cantidad, 0);
+            const totalPrice = mesaSelectedItems.reduce((sum, item) => sum + (item.producto.precio * item.cantidad), 0);
+            document.getElementById('summaryItemsMesa').textContent = totalItems;
+            document.getElementById('summaryTotalMesa').textContent = `$${totalPrice.toLocaleString('es-CO')}`;
         }
 
-        const token = localStorage.getItem('token');
+        function changeMesaQty(index, delta) {
+            mesaSelectedItems[index].cantidad += delta;
+            if (mesaSelectedItems[index].cantidad <= 0) mesaSelectedItems.splice(index, 1);
+            updateSelectedProductsMesa();
+        }
 
-        try {
-            const url = isEditing ? `${API_URL}/orders/${mesaEditingOrderId}` : `${API_URL}/orders`;
-            const method = isEditing ? 'PUT' : 'POST';
+        function removeMesaItem(index) {
+            mesaSelectedItems.splice(index, 1);
+            updateSelectedProductsMesa();
+        }
 
-            const response = await fetch(url, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(orderData)
-            });
+        // CREAR O EDITAR PEDIDO DESDE MESA
+        async function crearPedidoMesa() {
+            if (mesaSelectedItems.length === 0) return;
 
-            const data = await response.json();
+            const btnSubmit = document.getElementById('btnSubmitMesa');
+            btnSubmit.disabled = true;
+            btnSubmit.style.opacity = '0.6';
+            btnSubmit.textContent = mesaEditingOrderId ? '⏳ Guardando...' : '⏳ Creando...';
 
-            if (data.success) {
-                cerrarModalPedidoMesa();
-                mostrarNotificacionExito(isEditing 
-                    ? '✅ Pedido actualizado: ' + mesaActualizada 
-                    : '✅ Pedido creado para ' + mesaActualizada);
-                
-                // ✅ RECARGAR TODO PARA ACTUALIZAR ESTADO DE MESAS Y PEDIDOS
-                await loadOrders(true);
-                // Si hay mesas cargadas, volver a renderizarlas para que se vea la vieja libre y la nueva ocupada
-                if (mesasData && mesasData.length > 0) {
-                    renderMesas(mesasData);
-                }
-            } else {
-                Swal.fire({ icon: 'error', text: 'Error: ' + data.message, timer: 3000, showConfirmButton: false });
+            const notas = document.getElementById('notasMesa').value.trim();
+
+            const isEditing = !!mesaEditingOrderId;
+
+            const mesaActualizada = document.getElementById('inputMesaMesa').value.trim() || mesaSeleccionadaNombre;
+
+            const orderData = {
+                mesa: mesaActualizada,
+                items: mesaSelectedItems.map(item => ({
+                    producto: item.producto._id,
+                    nombreProducto: item.producto.nombre,
+                    categoriaProducto: item.producto.categoria || '',
+                    cantidad: item.cantidad,
+                    precio: item.producto.precio,
+                    alimentosExcluidos: item.alimentosExcluidos || [],
+                    alimentosAjustados: item.alimentosAjustados || [],
+                    nota: item.nota || ''
+                })),
+                notas: notas
+            };
+
+            if (!isEditing) {
+                orderData.userId = currentUser._id;
             }
-        } catch (error) {
-            console.error('Error:', error);
-            Swal.fire({ icon: 'error', text: 'Error al guardar el pedido', timer: 3000, showConfirmButton: false });
-        } finally {
-            btnSubmit.disabled = false;
-            btnSubmit.style.opacity = '1';
-            btnSubmit.textContent = mesaEditingOrderId ? '💾 Guardar Cambios' : '🍽️ Crear Pedido';
+
+            const token = localStorage.getItem('token');
+
+            try {
+                const url = isEditing ? `${API_URL}/orders/${mesaEditingOrderId}` : `${API_URL}/orders`;
+                const method = isEditing ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(orderData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    cerrarModalPedidoMesa();
+                    mostrarNotificacionExito(isEditing
+                        ? '✅ Pedido actualizado: ' + mesaActualizada
+                        : '✅ Pedido creado para ' + mesaActualizada);
+
+                    // ✅ RECARGAR TODO PARA ACTUALIZAR ESTADO DE MESAS Y PEDIDOS
+                    await loadOrders(true);
+                    // Si hay mesas cargadas, volver a renderizarlas para que se vea la vieja libre y la nueva ocupada
+                    if (mesasData && mesasData.length > 0) {
+                        renderMesas(mesasData);
+                    }
+                } else {
+                    Swal.fire({ icon: 'error', text: 'Error: ' + data.message, timer: 3000, showConfirmButton: false });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({ icon: 'error', text: 'Error al guardar el pedido', timer: 3000, showConfirmButton: false });
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.style.opacity = '1';
+                btnSubmit.textContent = mesaEditingOrderId ? '💾 Guardar Cambios' : '🍽️ Crear Pedido';
+            }
         }
-    }
 
-    // ===== GESTIÓN DE MESAS =====
-    function abrirGestionMesas() {
-        document.getElementById('modalGestionMesas').classList.add('active');
-        cargarListaMesasGestion();
-    }
+        // ===== GESTIÓN DE MESAS =====
+        function abrirGestionMesas() {
+            document.getElementById('modalGestionMesas').classList.add('active');
+            cargarListaMesasGestion();
+        }
 
-    function cerrarGestionMesas() {
-        document.getElementById('modalGestionMesas').classList.remove('active');
-        // Recargar mesas por si se hicieron cambios
-        loadMesas();
-    }
+        function cerrarGestionMesas() {
+            document.getElementById('modalGestionMesas').classList.remove('active');
+            // Recargar mesas por si se hicieron cambios
+            loadMesas();
+        }
 
-    async function cargarListaMesasGestion() {
-        const token = localStorage.getItem('token');
-        try {
-            const response = await fetch(`${API_URL}/mesas`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const data = await response.json();
+        async function cargarListaMesasGestion() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_URL}/mesas`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
 
-            const container = document.getElementById('listaMesasGestion');
+                const container = document.getElementById('listaMesasGestion');
 
-            if (data.success && data.data.length > 0) {
-                container.innerHTML = data.data.map(mesa => `
+                if (data.success && data.data.length > 0) {
+                    container.innerHTML = data.data.map(mesa => `
                     <div class="mesa-list-item" id="mesa-item-${mesa._id}">
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 13px;">
@@ -6021,138 +6139,138 @@
                         <button class="btn-delete-mesa" onclick="eliminarMesa('${mesa._id}')" title="Eliminar">🗑️</button>
                     </div>
                 `).join('');
-            } else {
-                container.innerHTML = '<p style="text-align: center; color: #a0aec0; padding: 2rem;">No hay mesas registradas</p>';
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-
-    async function crearMesaIndividual() {
-        const input = document.getElementById('nuevaMesaNombre');
-        const nombre = input.value.trim();
-        if (!nombre) {
-            Swal.fire({ icon: 'warning', text: 'Ingresa un nombre para la mesa', timer: 2000, showConfirmButton: false });
-            return;
-        }
-
-        const token = localStorage.getItem('token');
-        try {
-            const response = await fetch(`${API_URL}/mesas`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ nombre })
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                input.value = '';
-                mostrarNotificacionExito(`✅ Mesa "${nombre}" creada`);
-                cargarListaMesasGestion();
-            } else {
-                Swal.fire({ icon: 'error', text: data.message, timer: 2000, showConfirmButton: false });
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-
-    async function crearMesasEnBloque() {
-        const prefijo = document.getElementById('bulkPrefix').value.trim() || 'Mesa';
-        const cantidad = parseInt(document.getElementById('bulkCantidad').value) || 10;
-
-        const token = localStorage.getItem('token');
-        try {
-            const response = await fetch(`${API_URL}/mesas/bulk`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ prefijo, cantidad })
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                mostrarNotificacionExito(`✅ ${data.data.length} mesas creadas`);
-                cargarListaMesasGestion();
-            } else {
-                Swal.fire({ icon: 'error', text: data.message, timer: 2000, showConfirmButton: false });
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-
-    async function eliminarMesa(mesaId) {
-        if (!confirm('¿Eliminar esta mesa?')) return;
-
-        const token = localStorage.getItem('token');
-        try {
-            const response = await fetch(`${API_URL}/mesas/${mesaId}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                const item = document.getElementById(`mesa-item-${mesaId}`);
-                if (item) {
-                    item.style.animation = 'fadeOut 0.3s ease';
-                    setTimeout(() => item.remove(), 300);
+                } else {
+                    container.innerHTML = '<p style="text-align: center; color: #a0aec0; padding: 2rem;">No hay mesas registradas</p>';
                 }
-                mostrarNotificacionExito('✅ Mesa eliminada');
+            } catch (error) {
+                console.error('Error:', error);
             }
-        } catch (error) {
-            console.error('Error:', error);
         }
-    }
 
-    async function importarMesasDePedidos() {
-        const btn = document.getElementById('btnImportarMesas');
-        btn.disabled = true;
-        btn.style.opacity = '0.6';
-        btn.innerHTML = '<span>⏳</span><span>Importando...</span>';
-
-        const token = localStorage.getItem('token');
-        try {
-            const response = await fetch(`${API_URL}/mesas/seed`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                mostrarNotificacionExito(`📥 ${data.message}`);
-                cargarListaMesasGestion();
-            } else {
-                Swal.fire({ icon: 'error', text: data.message, timer: 3000, showConfirmButton: false });
+        async function crearMesaIndividual() {
+            const input = document.getElementById('nuevaMesaNombre');
+            const nombre = input.value.trim();
+            if (!nombre) {
+                Swal.fire({ icon: 'warning', text: 'Ingresa un nombre para la mesa', timer: 2000, showConfirmButton: false });
+                return;
             }
-        } catch (error) {
-            console.error('Error:', error);
-            Swal.fire({ icon: 'error', text: 'Error al importar mesas', timer: 3000, showConfirmButton: false });
-        } finally {
-            btn.disabled = false;
-            btn.style.opacity = '1';
-            btn.innerHTML = '<span>📥</span><span>Importar mesas de pedidos existentes</span>';
+
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_URL}/mesas`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ nombre })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    input.value = '';
+                    mostrarNotificacionExito(`✅ Mesa "${nombre}" creada`);
+                    cargarListaMesasGestion();
+                } else {
+                    Swal.fire({ icon: 'error', text: data.message, timer: 2000, showConfirmButton: false });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
         }
-    }
 
-    function checkAndShowShortcutOnboarding() {
-        if (localStorage.getItem('sawMinimalistShortcut')) return;
+        async function crearMesasEnBloque() {
+            const prefijo = document.getElementById('bulkPrefix').value.trim() || 'Mesa';
+            const cantidad = parseInt(document.getElementById('bulkCantidad').value) || 10;
 
-        setTimeout(() => {
-            const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-            const keyPrefix = isMac ? '⌘ Cmd' : 'Ctrl';
-            
-            const onboarding = document.createElement('div');
-            onboarding.className = 'onboarding-shortcut-popup';
-            onboarding.id = 'shortcutOnboarding';
-            onboarding.innerHTML = `
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_URL}/mesas/bulk`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ prefijo, cantidad })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    mostrarNotificacionExito(`✅ ${data.data.length} mesas creadas`);
+                    cargarListaMesasGestion();
+                } else {
+                    Swal.fire({ icon: 'error', text: data.message, timer: 2000, showConfirmButton: false });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function eliminarMesa(mesaId) {
+            if (!confirm('¿Eliminar esta mesa?')) return;
+
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_URL}/mesas/${mesaId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    const item = document.getElementById(`mesa-item-${mesaId}`);
+                    if (item) {
+                        item.style.animation = 'fadeOut 0.3s ease';
+                        setTimeout(() => item.remove(), 300);
+                    }
+                    mostrarNotificacionExito('✅ Mesa eliminada');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function importarMesasDePedidos() {
+            const btn = document.getElementById('btnImportarMesas');
+            btn.disabled = true;
+            btn.style.opacity = '0.6';
+            btn.innerHTML = '<span>⏳</span><span>Importando...</span>';
+
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_URL}/mesas/seed`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    mostrarNotificacionExito(`📥 ${data.message}`);
+                    cargarListaMesasGestion();
+                } else {
+                    Swal.fire({ icon: 'error', text: data.message, timer: 3000, showConfirmButton: false });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({ icon: 'error', text: 'Error al importar mesas', timer: 3000, showConfirmButton: false });
+            } finally {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.innerHTML = '<span>📥</span><span>Importar mesas de pedidos existentes</span>';
+            }
+        }
+
+        function checkAndShowShortcutOnboarding() {
+            if (localStorage.getItem('sawMinimalistShortcut')) return;
+
+            setTimeout(() => {
+                const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+                const keyPrefix = isMac ? '⌘ Cmd' : 'Ctrl';
+
+                const onboarding = document.createElement('div');
+                onboarding.className = 'onboarding-shortcut-popup';
+                onboarding.id = 'shortcutOnboarding';
+                onboarding.innerHTML = `
                 <div style="font-size: 32px; animation: bounceGlowIcon 2s infinite;">✨</div>
                 <div>
                     <p style="margin: 0 0 6px 0; font-weight: 800; font-size: 16px; color: #e2e8f0;">¡Prueba la nueva vista de mesas!</p>
@@ -6160,24 +6278,24 @@
                 </div>
                 <button onclick="dismissShortcutOnboarding()" style="background: rgba(99, 102, 241, 0.2); border: 1px solid rgba(99, 102, 241, 0.5); color: #818cf8; padding: 10px 16px; border-radius: 12px; cursor: pointer; font-weight: 700; transition: all 0.2s; white-space: nowrap; margin-left: auto;">¡Entendido!</button>
             `;
-            document.body.appendChild(onboarding);
-        }, 1500); 
-    }
-
-    function dismissShortcutOnboarding() {
-        const el = document.getElementById('shortcutOnboarding');
-        if (el) {
-            el.style.animation = 'slideDownFadeBtn 0.4s ease-in forwards';
-            setTimeout(() => el.remove(), 400);
+                document.body.appendChild(onboarding);
+            }, 1500);
         }
-        localStorage.setItem('sawMinimalistShortcut', 'true');
-    }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        checkAndShowShortcutOnboarding();
-    });
+        function dismissShortcutOnboarding() {
+            const el = document.getElementById('shortcutOnboarding');
+            if (el) {
+                el.style.animation = 'slideDownFadeBtn 0.4s ease-in forwards';
+                setTimeout(() => el.remove(), 400);
+            }
+            localStorage.setItem('sawMinimalistShortcut', 'true');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAndShowShortcutOnboarding();
+        });
     </script>
-<script src="scripts/print-monitor.js"></script>
+    <script src="scripts/print-monitor.js"></script>
 </body>
 
 </html>

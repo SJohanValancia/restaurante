@@ -9,8 +9,8 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = 3001;
-// Usamos process.execPath para que los archivos se guarden en la carpeta REAL del usuario, no dentro del ejecutable.
-const baseDir = path.dirname(process.execPath);
+// Usamos process.pkg para detectar si estamos en el ejecutable o en desarrollo
+const baseDir = process.pkg ? path.dirname(process.execPath) : __dirname;
 const CONFIG_PATH = path.join(baseDir, 'config.json');
 const PRINTED_PATH = path.join(baseDir, 'printed.json');
 const API_BASE = 'https://restaurante-co77.onrender.com/api';
@@ -41,14 +41,102 @@ if (fs.existsSync(PRINTED_PATH)) {
  * Función para inicializar la impresora
  */
 function initPrinter(pConfig) {
-    return new ThermalPrinter({
-        type: pConfig.tipo === 'epson' ? PrinterTypes.EPSON : PrinterTypes.STAR,
-        interface: pConfig.conexion === 'red' ? `tcp://${pConfig.interface}` : `printer:${pConfig.interface}`,
-        driver: require('node-thermal-printer').driver,
-        characterSet: 'PC850',
-        removeSpecialCharacters: false,
-        options: { timeout: 5000 }
-    });
+    const isNetwork = pConfig.conexion === 'red';
+    const printerInterface = isNetwork ? `tcp://${pConfig.interface}` : `printer:${pConfig.interface}`;
+
+    let driver = null;
+    if (!isNetwork) {
+        try {
+            driver = require('printer');
+        } catch (e) {
+            // DRIVER UNIVERSAL (Fallback para cuando no hay módulos nativos)
+            driver = {
+                getPrinters: () => [],
+                getPrinter: (name) => ({ name, status: [] }),
+                printDirect: (options) => {
+                    const { spawnSync } = require('child_process');
+                    try {
+                        if (process.platform === 'darwin' || process.platform === 'linux') {
+                            // MacOS / Linux: Usar comando lp
+                            const result = spawnSync('lp', ['-d', options.printer, '-o', 'raw'], { input: options.data });
+                            if (result.status === 0) options.success?.("ok");
+                            else options.error?.(result.stderr.toString());
+                        } 
+                        else if (process.platform === 'win32') {
+                            // Windows: Usar PowerShell para enviar datos RAW (Sin compartir impresora)
+                            const base64Data = options.data.toString('base64');
+                            const psCommand = `
+                                $data = [System.Convert]::FromBase64String('${base64Data}');
+                                $printer = '${options.printer}';
+                                $code = @"
+                                using System;
+                                using System.Runtime.InteropServices;
+                                public class RawPrint {
+                                    [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Ansi)]
+                                    public class DOCINFOA {
+                                        [MarshalAs(UnmanagedType.LPStr)] public string pDocName;
+                                        [MarshalAs(UnmanagedType.LPStr)] public string pOutputFile;
+                                        [MarshalAs(UnmanagedType.LPStr)] public string pDataType;
+                                    }
+                                    [DllImport("winspool.Drv", EntryPoint="OpenPrinterA", SetLastError=true, CharSet=CharSet.Ansi)]
+                                    public static extern bool OpenPrinter(string szPrinter, out IntPtr hPrinter, IntPtr pd);
+                                    [DllImport("winspool.Drv", EntryPoint="ClosePrinter", SetLastError=true)]
+                                    public static extern bool ClosePrinter(IntPtr hPrinter);
+                                    [DllImport("winspool.Drv", EntryPoint="StartDocPrinterA", SetLastError=true, CharSet=CharSet.Ansi)]
+                                    public static extern bool StartDocPrinter(IntPtr hPrinter, Int32 level, [In, MarshalAs(UnmanagedType.LPStruct)] DOCINFOA di);
+                                    [DllImport("winspool.Drv", EntryPoint="EndDocPrinter", SetLastError=true)]
+                                    public static extern bool EndDocPrinter(IntPtr hPrinter);
+                                    [DllImport("winspool.Drv", EntryPoint="WritePrinter", SetLastError=true)]
+                                    public static extern bool WritePrinter(IntPtr hPrinter, IntPtr pBytes, Int32 dwCount, out Int32 dwWritten);
+                                    public static void Send(string szPrinterName, byte[] pBytes) {
+                                        IntPtr hPrinter = new IntPtr(0);
+                                        DOCINFOA di = new DOCINFOA();
+                                        di.pDocName = "JC-RT Print"; di.pDataType = "RAW";
+                                        if (OpenPrinter(szPrinterName, out hPrinter, IntPtr.Zero)) {
+                                            if (StartDocPrinter(hPrinter, 1, di)) {
+                                                IntPtr pUnmanagedBytes = Marshal.AllocCoTaskMem(pBytes.Length);
+                                                Marshal.Copy(pBytes, 0, pUnmanagedBytes, pBytes.Length);
+                                                Int32 dwWritten = 0;
+                                                WritePrinter(hPrinter, pUnmanagedBytes, pBytes.Length, out dwWritten);
+                                                EndDocPrinter(hPrinter);
+                                                Marshal.FreeCoTaskMem(pUnmanagedBytes);
+                                            }
+                                            ClosePrinter(hPrinter);
+                                        }
+                                    }
+                                }
+"@
+                                Add-Type -TypeDefinition $code;
+                                [RawPrint]::Send($printer, $data);
+                            `;
+                            const result = spawnSync('powershell', ['-Command', psCommand]);
+                            if (result.status === 0) options.success?.("ok");
+                            else options.error?.(result.stderr.toString());
+                        }
+                    } catch (err) {
+                        options.error?.(err.message);
+                    }
+                }
+            };
+            console.log(`ℹ️ Driver Universal activado (${process.platform})`);
+        }
+    }
+
+    try {
+        return new ThermalPrinter({
+            type: pConfig.tipo === 'epson' ? PrinterTypes.EPSON : PrinterTypes.STAR,
+            interface: printerInterface,
+            driver: driver,
+            characterSet: 'PC850',
+            removeSpecialCharacters: false,
+            options: { timeout: 5000 }
+        });
+    } catch (error) {
+        if (error.message.includes("No driver set") && !isNetwork) {
+            throw new Error("No hay driver compatible para impresión USB. Verifica el nombre de la impresora.");
+        }
+        throw error;
+    }
 }
 
 /**
