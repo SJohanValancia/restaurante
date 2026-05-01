@@ -47,7 +47,7 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Conexión a MongoDB Atlas
 mongoose.connect(process.env.MONGO_URI)
@@ -68,9 +68,9 @@ app.use('/api/admin-meseros', protect, adminMeserosRoutes);
 app.use('/api/alimentos', alimentosRoutes);
 app.use('/api/mesas', protect, mesasRoutes);
 
-// Ruta principal (sirve index.html)
+// Ruta principal (sirve index.html desde public)
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Manejo de errores 404

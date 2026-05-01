@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajustes - JC-RT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #764ba2;
+            --secondary: #64748b;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --success: #10b981;
+            --border: #e2e8f0;
+            --sidebar-width: 280px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR (Copy from common style) */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: white;
+        }
+
+        .brand-icon {
+            font-size: 24px;
+        }
+
+        .brand-text h2 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .brand-text p {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+            overflow-y: auto;
+        }
+
+        .nav-section-title {
+            padding: 0.5rem 1.5rem;
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border-right: 3px solid #667eea;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+        }
+
+        /* MAIN CONTENT */
+        .content {
+            margin-left: 0;
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .page-subtitle {
+            font-size: 15px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--primary);
+        }
+
+        .card-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 0;
+        }
+
+        .setting-info {
+            flex: 1;
+        }
+
+        .setting-name {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .setting-description {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-top: 2px;
+        }
+
+        /* TOGGLE SWITCH */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e1;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        /* INPUTS */
+        .form-group {
+            margin-top: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-save {
+            margin-top: 2rem;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-save:active {
+            transform: scale(0.98);
+        }
+
+        /* GUIDE SECTION */
+        .guide-box {
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-top: 1.5rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .guide-box h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .guide-box p {
+            font-size: 13px;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        .guide-list {
+            margin-top: 8px;
+            padding-left: 1rem;
+        }
+
+        .guide-list li {
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: var(--text-light);
+        }
+
+        code {
+            background: #e2e8f0;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 11px;
+        }
+
+        /* MOBILE */
+        .menu-toggle {
+            display: block;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1100;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: none;
+            cursor: pointer;
+        }
+
+        @media (max-width: 1024px) {
+            .content {
+                padding: 5rem 1rem 2rem;
+            }
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="administrador.html" class="sidebar-brand">
+                <div class="brand-icon">⚙️</div>
+                <div class="brand-text">
+                    <h2>Configuración</h2>
+                    <p>JC-RT Restaurante</p>
+                </div>
+            </a>
+        </div>
+
+        <nav class="sidebar-nav">
+            <!-- Los links se actualizarán dinámicamente o se mantendrán consistentes -->
+            <div class="nav-section">
+                <div class="nav-section-title">Principal</div>
+                <a href="productos.html" class="nav-item">
+                    <span class="nav-icon">📦</span>
+                    <span>Platos</span>
+                </a>
+                <a href="pedidos.html" class="nav-item">
+                    <span class="nav-icon">🍽️</span>
+                    <span>Pedidos</span>
+                </a>
+                <a href="gastos.html" class="nav-item">
+                    <span class="nav-icon">🧾</span>
+                    <span>Gastos</span>
+                </a>
+                <a href="reportes.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>Reportes</span>
+                </a>
+                <a href="alimentos.html" class="nav-item">
+                    <span class="nav-icon">🥘</span>
+                    <span>Alimentos</span>
+                </a>
+            </div>
+
+            <div class="nav-section-title">Administración</div>
+            <a href="administrador.html" class="nav-item">
+                <span class="nav-icon">👥</span>
+                <span>Meseros</span>
+            </a>
+            <a href="liquidacion.html" class="nav-item">
+                <span class="nav-icon">💵</span>
+                <span>Liquidación</span>
+            </a>
+            <a href="ajustes.html" class="nav-item active">
+                <span class="nav-icon">⚙️</span>
+                <span>Ajustes</span>
+            </a>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <div class="page-header">
+            <h1 class="page-title">⚙️ Ajustes del Sistema</h1>
+            <p class="page-subtitle">Configura el comportamiento global de tu aplicación</p>
+        </div>
+
+        <div class="settings-grid">
+            <!-- IMPRESION PRO -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🖨️</div>
+                    <div style="flex: 1;">
+                        <h3 style="display: flex; align-items: center; gap: 8px;">
+                            Impresión Profesional (Pro)
+                        </h3>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-name">Activar Estación de Impresión</div>
+                        <div class="setting-description">Habilita esta PC para procesar y enviar comandas automáticamente.</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="autoPrintSwitch">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div id="print-config-section" style="margin-top: 1rem; border-top: 1px solid #f1f5f9; padding-top: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Conexión</label>
+                        <div style="display: flex; gap: 10px;">
+                            <button id="btn-conn-sistema" class="conn-type-btn active" onclick="setConnType('sistema')">USB / Bluetooth</button>
+                            <button id="btn-conn-red" class="conn-type-btn" onclick="setConnType('red')">WiFi / Red (IP)</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="group-interface-sistema">
+                        <label class="form-label">Nombre de la Impresora en el Sistema</label>
+                        <input type="text" id="printerInterfaceSistema" class="form-input" placeholder="Ej: Epson_TM_T20">
+                    </div>
+
+                    <div class="form-group" id="group-interface-red" style="display: none;">
+                        <label class="form-label">Dirección IP de la Impresora</label>
+                        <input type="text" id="printerInterfaceRed" class="form-input" placeholder="Ej: 192.168.1.100">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Marca/Modelo de Impresora</label>
+                        <select id="printerModel" class="form-input">
+                            <option value="epson">Epson (O Genérica ESC/POS)</option>
+                            <option value="star">Star / Otros</option>
+                        </select>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-top: 1.5rem;">
+                        <button class="btn-save" onclick="saveSettings()" style="flex: 2; margin-top: 0; background: var(--success);">
+                            <span>💾</span> 1. Guardar Configuración
+                        </button>
+                        <button class="btn-save" onclick="generateLinkCode()" style="flex: 2; margin-top: 0;">
+                            <span>🔗</span> 2. Vincular Bridge
+                        </button>
+                    </div>
+
+                    <!-- CODIGO DE VINCULACION -->
+                    <div id="link-code-box" style="margin-top: 1.5rem; background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px dashed #cbd5e1; display: none;">
+                        <h5 style="font-size: 13px; color: #1e293b; margin-bottom: 8px;">🔑 Código de Vinculación</h5>
+                        <textarea id="linkCodeText" readonly style="width: 100%; height: 60px; font-size: 10px; padding: 8px; border-radius: 4px; border: 1px solid #e2e8f0; background: #fff;"></textarea>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <button class="btn-save" onclick="copyLinkCode()" style="flex: 1; margin-top: 0; padding: 8px; font-size: 12px;">📋 Copiar</button>
+                            <a href="http://127.0.0.1:3001" target="_blank" class="download-btn-pro" style="flex: 2; padding: 8px; font-size: 12px; border-color: #10b981; color: #059669;">⚡ Abrir Panel del Bridge</a>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; background: #fff; padding: 1rem; border-radius: 8px; border: 1px solid #dbeafe;">
+                        <h5 style="font-size: 13px; color: #1d4ed8; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                            📥 Descarga para Clientes
+                        </h5>
+                        <p style="font-size: 11px; color: #64748b; margin-bottom: 15px;">Para que este restaurante pueda imprimir, descarga y ejecuta el conector en la PC de la cocina:</p>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <a href="https://drive.google.com/file/d/1Ql8GuVm4gSaGkf7dIDKGe1MWYqNzcGnV/view?usp=sharing" target="_blank" class="download-btn-pro">
+                                <span>🪟 Windows (.zip)</span>
+                            </a>
+                            <a href="TU_LINK_DE_DRIVE_AQUI" target="_blank" class="download-btn-pro">
+                                <span>🍎 MacOS (.zip)</span>
+                            </a>
+                        </div>
+                        <p style="font-size: 10px; color: #94a3b8; margin-top: 10px; text-align: center;">Nota: Una vez descargado, ábrelo y manténlo activo.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MANTENIMIENTO -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🛠️</div>
+                    <div style="flex: 1;">
+                        <h3>Mantenimiento de Datos</h3>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-name">Sincronizar nombres en pedidos</div>
+                        <div class="setting-description">Actualiza los pedidos antiguos con el nombre del usuario que los creó para que aparezcan en las tarjetas.</div>
+                    </div>
+                    <button class="btn-save" onclick="sincronizarMeseros()" style="margin-top: 0; padding: 8px 15px; font-size: 13px; background: #667eea;">
+                        🔄 Sincronizar
+                    </button>
+                </div>
+            </div>
+
+            <!-- MANUAL O INVISIBLE (Placeholder) -->
+            <div class="card" style="opacity: 0.6; pointer-events: none;">
+                <div class="card-header">
+                    <div class="card-icon">🔒</div>
+                    <h3>Seguridad Avanzada</h3>
+                </div>
+                <p style="font-size: 13px; color: var(--text-light);">Restricción de impresión por usuario.</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .conn-type-btn {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .conn-type-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .download-btn-pro {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            background: #f8fafc;
+            border: 1.5px solid #3b82f6;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #1e40af;
+            font-size: 13px;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+        .download-btn-pro:hover {
+            background: #3b82f6;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+    </style>
+
+    <script>
+        const API_URL = 'https://restaurante-co77.onrender.com/api';
+        let currentConnType = 'sistema';
+        const BRIDGE_URL = 'http://127.0.0.1:3001';
+
+        // Cargar ajustes al iniciar
+        window.addEventListener('DOMContentLoaded', () => {
+            const autoPrint = localStorage.getItem('autoPrintComanda') === 'true';
+            currentConnType = localStorage.getItem('printerConnType') || 'sistema';
+            const printerIntSistema = localStorage.getItem('printerInterfaceSistema') || '';
+            const printerIntRed = localStorage.getItem('printerInterfaceRed') || '';
+            const printerModel = localStorage.getItem('printerModel') || 'epson';
+
+            document.getElementById('autoPrintSwitch').checked = autoPrint;
+            document.getElementById('printerInterfaceSistema').value = printerIntSistema;
+            document.getElementById('printerInterfaceRed').value = printerIntRed;
+            document.getElementById('printerModel').value = printerModel;
+
+            setConnType(currentConnType);
+        });
+
+        function setConnType(type) {
+            currentConnType = type;
+            document.getElementById('btn-conn-sistema').classList.toggle('active', type === 'sistema');
+            document.getElementById('btn-conn-red').classList.toggle('active', type === 'red');
+            document.getElementById('group-interface-sistema').style.display = type === 'sistema' ? 'block' : 'none';
+            document.getElementById('group-interface-red').style.display = type === 'red' ? 'block' : 'none';
+        }
+
+        function saveSettings() {
+            const autoPrint = document.getElementById('autoPrintSwitch').checked;
+            const printerIntSistema = document.getElementById('printerInterfaceSistema').value;
+            const printerIntRed = document.getElementById('printerInterfaceRed').value;
+            const printerModel = document.getElementById('printerModel').value;
+
+            if (autoPrint) {
+                localStorage.setItem('printActivationTime', new Date().toISOString());
+            }
+
+            localStorage.setItem('autoPrintComanda', autoPrint);
+            localStorage.setItem('printerConnType', currentConnType);
+            localStorage.setItem('printerInterfaceSistema', printerIntSistema);
+            localStorage.setItem('printerInterfaceRed', printerIntRed);
+            localStorage.setItem('printerModel', printerModel);
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Ajustes guardados',
+                text: 'Configuración actualizada correctamente.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+
+        function generateLinkCode() {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('usuario') || '{}');
+            
+            if (!token || !user._id) {
+                Swal.fire('Atención', 'Debes iniciar sesión para generar el código.', 'warning');
+                return;
+            }
+
+            const config = {
+                userId: user._id,
+                token: token,
+                printer: {
+                    tipo: document.getElementById('printerModel').value,
+                    conexion: currentConnType,
+                    interface: currentConnType === 'sistema' ? 
+                               document.getElementById('printerInterfaceSistema').value : 
+                               document.getElementById('printerInterfaceRed').value
+                }
+            };
+
+            const jsonStr = JSON.stringify(config);
+            const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
+            document.getElementById('linkCodeText').value = base64;
+            document.getElementById('link-code-box').style.display = 'block';
+            
+            Swal.fire({
+                icon: 'info',
+                title: 'Código Generado',
+                text: 'Copia el código de abajo y pégalo en el panel del Bridge.',
+                confirmButtonText: 'Entendido'
+            });
+        }
+
+        function copyLinkCode() {
+            const text = document.getElementById('linkCodeText');
+            text.select();
+            document.execCommand('copy');
+            Swal.fire({
+                icon: 'success',
+                title: 'Copiado',
+                text: 'Código copiado al portapapeles.',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
+
+        async function testPrintPro() {
+            const config = {
+                tipo: document.getElementById('printerModel').value,
+                conexion: currentConnType,
+                interface: currentConnType === 'sistema' ? 
+                           document.getElementById('printerInterfaceSistema').value : 
+                           document.getElementById('printerInterfaceRed').value
+            };
+
+            if (!config.interface) {
+                Swal.fire('Error', 'Debes ingresar el Nombre o IP de la impresora.', 'error');
+                return;
+            }
+
+            Swal.fire({
+                title: 'Enviando prueba...',
+                didOpen: () => Swal.showLoading(),
+                allowOutsideClick: false
+            });
+
+            try {
+                const response = await fetch(`${BRIDGE_URL}/test`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    Swal.fire('¡Éxito!', 'Mensaje "prueba de impresion JC-RT" enviado.', 'success');
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                Swal.fire('Error de Conector', 'No se pudo contactar con el Print Bridge. ¿Está encendido?', 'error');
+            }
+        }
+
+        async function sincronizarMeseros() {
+            const { isConfirmed } = await Swal.fire({
+                title: '¿Sincronizar nombres?',
+                text: 'Esto buscará los nombres de los usuarios que crearon los pedidos antiguos para que aparezcan en las tarjetas de cocina y pedidos.',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, sincronizar',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (!isConfirmed) return;
+
+            Swal.fire({ title: 'Sincronizando...', didOpen: () => Swal.showLoading() });
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_URL}/orders/sync-meseros`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sincronización exitosa',
+                        text: result.message
+                    });
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({ icon: 'error', text: 'Error al sincronizar: ' + error.message });
+            }
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+    </script>
+<script src="scripts/print-monitor.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,1920 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            color: #1a202c;
+        }
+
+        /* OVERLAY PARA MÓVIL */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* BOTÓN HAMBURGUESA */
+        .menu-toggle {
+            display: flex;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            transition: transform 0.2s;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hamburger {
+            position: relative;
+            width: 24px;
+            height: 18px;
+            margin: auto;
+        }
+
+        .hamburger span {
+            display: block;
+            position: absolute;
+            height: 3px;
+            width: 100%;
+            background: white;
+            border-radius: 3px;
+            opacity: 1;
+            left: 0;
+            transition: all 0.25s ease;
+        }
+
+        .hamburger span:nth-child(1) {
+            top: 0;
+        }
+
+        .hamburger span:nth-child(2) {
+            top: 7px;
+        }
+
+        .hamburger span:nth-child(3) {
+            top: 14px;
+        }
+
+        .menu-toggle.active .hamburger span:nth-child(1) {
+            top: 7px;
+            transform: rotate(135deg);
+        }
+
+        .menu-toggle.active .hamburger span:nth-child(2) {
+            opacity: 0;
+            left: -60px;
+        }
+
+        .menu-toggle.active .hamburger span:nth-child(3) {
+            top: 7px;
+            transform: rotate(-135deg);
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
+            padding: 0;
+            z-index: 1000;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            transform: translateX(-100%);
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .brand-text h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .brand-text p {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+            margin: 2px 0 0 0;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+            max-height: calc(100vh - 250px);
+            overflow-y: auto;
+        }
+
+        .sidebar-nav::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        .nav-section-title {
+            padding: 0.5rem 1.5rem;
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.2) 0%, transparent 100%);
+            color: white;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .user-avatar-sidebar {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .user-details h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .user-details p {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.6);
+            margin: 2px 0 0 0;
+        }
+
+        .btn-logout-sidebar {
+            width: 100%;
+            padding: 10px;
+            background: rgba(229, 62, 62, 0.2);
+            color: #fc8181;
+            border: 1px solid rgba(229, 62, 62, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-logout-sidebar:hover {
+            background: #e53e3e;
+            color: white;
+            border-color: #e53e3e;
+        }
+
+        .content-wrapper {
+            margin-left: 0;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            color: #718096;
+        }
+
+        .search-section {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-search {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-search:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .result-card.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-card-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .user-avatar-large {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .user-card-info h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 4px;
+        }
+
+        .user-card-info p {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 2px;
+        }
+
+        .user-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #e6fffa;
+            color: #047857;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-inspect {
+            background: #e6f2ff;
+            color: #2563eb;
+            border: 1px solid #bfdbfe;
+        }
+
+        .btn-inspect:hover {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-permissions {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+        }
+
+        .btn-permissions:hover {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+            color: white;
+        }
+
+        .meseros-section {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 2rem;
+        }
+
+        .meseros-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .meseros-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .meseros-count {
+            background: #667eea;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .mesero-card {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+
+        .mesero-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .mesero-card-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .mesero-info-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+        }
+
+        .mesero-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .mesero-details h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 4px;
+        }
+
+        .mesero-details p {
+            font-size: 13px;
+            color: #718096;
+        }
+
+        .mesero-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-icon {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-icon-inspect {
+            background: #e6f2ff;
+            color: #2563eb;
+        }
+
+        .btn-icon-inspect:hover {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-icon-permissions {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .btn-icon-permissions:hover {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-icon-delete {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .btn-icon-delete:hover {
+            background: #dc2626;
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #a0aec0;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-text {
+            font-size: 16px;
+            color: #718096;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 14px;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .alert.show {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #6ee7b7;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .permissions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .permission-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: #f7fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .permission-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .permission-label {
+            font-size: 14px;
+            color: #2d3748;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-modal {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-modal-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-modal-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-modal-secondary {
+            background: white;
+            color: #2d3748;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-modal-secondary:hover {
+            background: #f7fafc;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 5rem 1rem 2rem 1rem;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+
+            .page-subtitle {
+                font-size: 14px;
+            }
+
+            .search-section,
+            .result-card,
+            .meseros-section {
+                padding: 1.5rem;
+            }
+
+            .search-form {
+                flex-direction: column;
+            }
+
+            .btn-search {
+                width: 100%;
+            }
+
+            .user-card-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .user-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .mesero-card-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .mesero-actions {
+                width: 100%;
+                justify-content: stretch;
+            }
+
+            .btn-icon {
+                flex: 1;
+            }
+
+            .permissions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-buttons {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 5rem 0.75rem 1rem 0.75rem;
+            }
+
+            .search-section,
+            .result-card,
+            .meseros-section {
+                padding: 1rem;
+                border-radius: 8px;
+            }
+
+            .page-title {
+                font-size: 20px;
+            }
+
+            .user-avatar-large {
+                width: 60px;
+                height: 60px;
+                font-size: 24px;
+            }
+
+            .user-card-info h3 {
+                font-size: 18px;
+            }
+
+            .modal-content {
+                padding: 1.5rem;
+            }
+        }
+
+        /* ESTILOS PARA EL ENLACE DE MÁS PROGRAMAS */
+        .menu-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 600;
+            position: relative;
+            margin: 0.5rem 1rem;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            overflow: hidden;
+        }
+
+        .menu-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .menu-link:hover::before {
+            left: 100%;
+        }
+
+        .menu-link:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            border-color: transparent;
+        }
+
+        .menu-link:active {
+            transform: translateX(5px) scale(0.98);
+        }
+
+        /* Animación de pulso para llamar la atención */
+        @keyframes pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+            }
+
+            50% {
+                box-shadow: 0 0 0 8px rgba(102, 126, 234, 0);
+            }
+        }
+
+        .menu-link {
+            animation: pulse 2s infinite;
+        }
+
+        .menu-link:hover {
+            animation: none;
+        }
+
+        /* Banner de notificación de vencimiento */
+        .notification-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+            animation: slideDownBanner 0.5s ease-out;
+            display: none;
+        }
+
+        .notification-banner.show {
+            display: block;
+        }
+
+        @keyframes slideDownBanner {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .notification-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .notification-text {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .notification-icon {
+            font-size: 2.5rem;
+            animation: pulse-icon 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-icon {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .notification-message {
+            flex: 1;
+        }
+
+        .notification-message h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .notification-message p {
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+
+        .btn-renovar {
+            background: white;
+            color: #d97706;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            white-space: nowrap;
+        }
+
+        .btn-renovar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Ajustar el contenido para que no quede debajo del banner */
+        body.has-notification {
+            padding-top: 100px;
+        }
+
+        @media (max-width: 768px) {
+            .notification-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .notification-text {
+                flex-direction: column;
+            }
+
+            .notification-message h3 {
+                font-size: 1.1rem;
+            }
+
+            .notification-message p {
+                font-size: 0.9rem;
+            }
+
+            .btn-renovar {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Banner de Notificación -->
+    <div id="notificationBanner" class="notification-banner">
+        <div class="notification-content">
+            <div class="notification-text">
+                <div class="notification-icon">⚠️</div>
+                <div class="notification-message">
+                    <h3>¡Atención! Tu licencia está por vencer</h3>
+                    <p id="notificationText">Su licencia vence en X días. Por favor renueve su mensualidad para seguir
+                        utilizando JC-RT</p>
+                </div>
+            </div>
+            <a href="https://wa.me/573128540908?text=Hola,%20necesito%20renovar%20mi%20licencia%20de%20JC-RT"
+                target="_blank">
+                <button class="btn-renovar">
+                    📱 Renovar Ahora
+                </button>
+            </a>
+        </div>
+    </div>
+
+    <!-- Overlay para móvil -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- Botón hamburguesa -->
+    <button class="menu-toggle" id="menuToggle" onclick="toggleSidebar()">
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </button>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="administrador.html" class="sidebar-brand">
+                <div class="brand-icon">👨‍💼</div>
+                <div class="brand-text">
+                    <h2>Admin Panel</h2>
+                    <p>Sistema de gestión</p>
+                </div>
+            </a>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Principal</div>
+                <a href="productos.html" class="nav-item">
+                    <span class="nav-icon">🍔</span>
+                    <span>Platos</span>
+                </a>
+                <a href="pedidos.html" class="nav-item">
+                    <span class="nav-icon">📝</span>
+                    <span>Pedidos</span>
+                </a>
+                <a href="gastos.html" class="nav-item">
+                    <span class="nav-icon">💰</span>
+                    <span>Gastos</span>
+                </a>
+                <a href="qr-generator.html" class="nav-item">
+                    <span class="nav-icon">🔗</span>
+                    <span>QR Generador</span>
+                </a>
+                <a href="reportes.html" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span>Reportes</span>
+                </a>
+                <a href="cocina.html" class="nav-item">
+                    <span class="nav-icon">👨‍🍳</span>
+                    <span>Cocina</span>
+                </a>
+                <a href="catalogo-productos.html" class="nav-item">
+                    <span class="nav-icon">📋</span>
+                    <span>Todos los platos</span>
+                </a>
+                <a href="alimentos.html" class="nav-item">
+                    <span class="nav-icon">🥑</span>
+                    <span>Alimentos</span>
+                </a>
+            </div>
+
+            <!-- SOLO PARA ADMINISTRADORES -->
+            <div class="nav-section" id="adminSection" style="display: none;">
+                <div class="nav-section-title">Administración</div>
+                <a href="administrador.html" class="nav-item active">
+                    <span class="nav-icon">👔</span>
+                    <span>Gestión de Meseros</span>
+                </a>
+                <a href="liquidacion.html" class="nav-item">
+                    <span class="nav-icon">💎</span>
+                    <span>Liquidación</span>
+                </a>
+                <a href="historial-liquidaciones.html" class="nav-item">
+                    <span class="nav-icon">📓</span>
+                    <span>Hist. Liquidaciones</span>
+                </a>
+                <a href="solicitudes.html" class="nav-item">
+                    <span class="nav-icon">✔️</span>
+                    <span>Aceptación de Empleados</span>
+                </a>
+                <a href="ajustes.html" class="nav-item">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Ajustes</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar-sidebar" id="sidebarUserAvatar">A</div>
+                <div class="user-details">
+                    <h4 id="sidebarUserName">Cargando...</h4>
+                    <p>Administrador</p>
+                </div>
+            </div>
+            <button class="btn-logout-sidebar" onclick="logout()">
+                <span>🚪</span>
+                <span>Cerrar Sesión</span>
+            </button>
+        </div>
+    </aside>
+
+    <div class="content-wrapper">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">👨‍💼 Panel de Administración</h1>
+                <p class="page-subtitle">Gestiona y supervisa a tus meseros</p>
+            </div>
+
+            <div id="alert" class="alert"></div>
+
+            <div class="search-section">
+                <div class="search-header">
+                    <h2>🔍 Buscar Usuario por ID</h2>
+                </div>
+                <form class="search-form" id="searchForm">
+                    <input type="text" class="search-input" id="userIdInput"
+                        placeholder="Ingrese el ID de MongoDB (24 caracteres)" pattern="[a-fA-F0-9]{24}" required>
+                    <button type="submit" class="btn-search" id="searchBtn">
+                        <span>🔍</span>
+                        <span>Buscar</span>
+                    </button>
+                </form>
+            </div>
+
+            <div class="result-card" id="resultCard">
+                <div class="user-card-header">
+                    <div class="user-avatar-large" id="userAvatar">U</div>
+                    <div class="user-card-info">
+                        <h3 id="userName">Nombre Usuario</h3>
+                        <p id="userEmail">📧 usuario@email.com</p>
+                        <p id="userRestaurant">🏪 Restaurante - Sede</p>
+                        <span class="user-badge" id="userRole">Mesero</span>
+                    </div>
+                </div>
+                <div class="user-actions">
+                    <button class="btn-action btn-inspect" onclick="inspectUser()">
+                        <span>👁️</span>
+                        <span>Inspeccionar</span>
+                    </button>
+                    <button class="btn-action btn-permissions" onclick="openPermissionsModal()">
+                        <span>🔐</span>
+                        <span>Permisos</span>
+                    </button>
+                    <button class="btn-action btn-delete" onclick="confirmDelete()">
+                        <span>🗑️</span>
+                        <span>Eliminar</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="meseros-section">
+                <div class="meseros-header">
+                    <h2>👥 Mis Meseros</h2>
+                    <span class="meseros-count" id="meserosCount">0</span>
+                </div>
+                <div id="meserosList">
+                    <div class="empty-state">
+                        <div class="empty-icon">👥</div>
+                        <p class="empty-text">No has agregado meseros aún</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Permisos -->
+    <div class="modal" id="permissionsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔐 Gestionar Permisos</h2>
+            </div>
+            <form id="permissionsForm">
+                <div class="permissions-grid">
+                    <!-- PRODUCTOS -->
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_verProductos" class="permission-checkbox">
+                        <label for="perm_verProductos" class="permission-label">Ver Productos</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_crearProductos" class="permission-checkbox">
+                        <label for="perm_crearProductos" class="permission-label">Crear Productos</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_editarProductos" class="permission-checkbox">
+                        <label for="perm_editarProductos" class="permission-label">Editar Productos</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_eliminarProductos" class="permission-checkbox">
+                        <label for="perm_eliminarProductos" class="permission-label">Eliminar Productos</label>
+                    </div>
+
+                    <!-- PEDIDOS -->
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_verPedidos" class="permission-checkbox">
+                        <label for="perm_verPedidos" class="permission-label">Ver Pedidos</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_crearPedidos" class="permission-checkbox">
+                        <label for="perm_crearPedidos" class="permission-label">Crear Pedidos</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_editarPedidos" class="permission-checkbox">
+                        <label for="perm_editarPedidos" class="permission-label">Editar Pedidos</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_cancelarPedidos" class="permission-checkbox">
+                        <label for="perm_cancelarPedidos" class="permission-label">Cancelar Pedidos</label>
+                    </div>
+
+                    <!-- GASTOS -->
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_verGastos" class="permission-checkbox">
+                        <label for="perm_verGastos" class="permission-label">Ver Gastos</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_crearGastos" class="permission-checkbox">
+                        <label for="perm_crearGastos" class="permission-label">Crear Gastos</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_editarGastos" class="permission-checkbox">
+                        <label for="perm_editarGastos" class="permission-label">Editar Gastos</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_eliminarGastos" class="permission-checkbox">
+                        <label for="perm_eliminarGastos" class="permission-label">Eliminar Gastos</label>
+                    </div>
+
+                    <!-- OTROS -->
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_verReportes" class="permission-checkbox">
+                        <label for="perm_verReportes" class="permission-label">Ver Reportes</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_verLiquidaciones" class="permission-checkbox">
+                        <label for="perm_verLiquidaciones" class="permission-label">Ver Liquidaciones</label>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-modal btn-modal-secondary" onclick="closePermissionsModal()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn-modal btn-modal-primary">
+                        Guardar Permisos
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://restaurante-co77.onrender.com/api';
+        let currentUser = null;
+        let currentSearchedUser = null;
+        let currentRelacionId = null;
+
+        // Toggle Sidebar para móvil
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const menuToggle = document.getElementById('menuToggle');
+
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            menuToggle.classList.toggle('active');
+        }
+
+        // Cerrar sidebar al hacer clic en un nav-item en móvil
+        document.addEventListener('DOMContentLoaded', () => {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    if (window.innerWidth <= 1024) {
+                        toggleSidebar();
+                    }
+                });
+            });
+        });
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.status === 401) {
+                    console.warn('⚠️ Token expirado');
+                    localStorage.removeItem('token');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                if (!response.ok) {
+                    console.error('Error al cargar usuario');
+                    Swal.fire({ icon: (('Error al cargar datos. Intente recargar.').toLowerCase().includes("error") || ('Error al cargar datos. Intente recargar.').toLowerCase().includes("falla") || ('Error al cargar datos. Intente recargar.').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al cargar datos. Intente recargar.', timer: 3000, showConfirmButton: false });
+                    return;
+                }
+
+                const data = await response.json();
+                currentUser = data.data;
+                
+                if (data.data) {
+                    localStorage.setItem('usuario', JSON.stringify(data.data));
+                }
+
+                if (currentUser.rol !== 'admin') {
+                    window.location.href = 'productos.html';
+                    return;
+                }
+
+                document.getElementById('sidebarUserName').textContent = currentUser.nombre;
+                document.getElementById('sidebarUserAvatar').textContent =
+                    currentUser.nombre.charAt(0).toUpperCase();
+
+                await cargarMeseros();
+            } catch (error) {
+                console.error('❌ Error de red:', error);
+                Swal.fire({ icon: (('Error de conexión. Recargue la página.').toLowerCase().includes("error") || ('Error de conexión. Recargue la página.').toLowerCase().includes("falla") || ('Error de conexión. Recargue la página.').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error de conexión. Recargue la página.', timer: 3000, showConfirmButton: false });
+            }
+        });
+
+        function showAlert(message, type = 'info') {
+            const iconType = type === 'success' ? 'success' : (type === 'error' ? 'error' : 'info');
+            Swal.fire({
+                icon: iconType,
+                text: message,
+                timer: 3000,
+                showConfirmButton: false,
+                allowOutsideClick: true
+            });
+        }
+
+        document.getElementById('searchForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const userId = document.getElementById('userIdInput').value.trim();
+            const searchBtn = document.getElementById('searchBtn');
+
+            if (userId.length !== 24) {
+                showAlert('El ID debe tener 24 caracteres', 'error');
+                return;
+            }
+
+            searchBtn.disabled = true;
+            searchBtn.innerHTML = '<span class="loading-spinner"></span><span>Buscando...</span>';
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_URL}/admin-meseros/buscar/${userId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentSearchedUser = data.data;
+                    mostrarUsuario(data.data);
+                    showAlert('Usuario encontrado exitosamente', 'success');
+                } else {
+                    showAlert(data.message || 'Usuario no encontrado', 'error');
+                    document.getElementById('resultCard').classList.remove('show');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Error al buscar usuario', 'error');
+            } finally {
+                searchBtn.disabled = false;
+                searchBtn.innerHTML = '<span>🔍</span><span>Buscar</span>';
+            }
+        });
+
+        function mostrarUsuario(user) {
+            document.getElementById('userAvatar').textContent =
+                user.nombre.charAt(0).toUpperCase();
+            document.getElementById('userName').textContent = user.nombre;
+            document.getElementById('userEmail').textContent = `📧 ${user.email}`;
+            document.getElementById('userRestaurant').textContent =
+                `🏪 ${user.nombreRestaurante}${user.sede ? ' - ' + user.sede : ''}`;
+            document.getElementById('userRole').textContent = user.rol;
+
+            document.getElementById('resultCard').classList.add('show');
+        }
+
+        async function inspectUser() {
+            if (!currentSearchedUser) return;
+
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch(`${API_URL}/admin-meseros/agregar`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        adminId: currentUser._id,
+                        meseroId: currentSearchedUser._id
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('Usuario agregado exitosamente', 'success');
+                    await cargarMeseros();
+                } else {
+                    showAlert(data.message || 'Error al agregar usuario', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Error al agregar usuario', 'error');
+            }
+        }
+
+        async function cargarMeseros() {
+            const token = localStorage.getItem('token');
+            const container = document.getElementById('meserosList');
+
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">⏳</div>
+                    <p class="empty-text">Cargando meseros...</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(`${API_URL}/admin-meseros/meseros/${currentUser._id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    console.log(`✅ ${data.count} meseros cargados`);
+                    mostrarMeseros(data.data);
+                    document.getElementById('meserosCount').textContent = data.count;
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">❌</div>
+                            <p class="empty-text">Error al cargar meseros</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">❌</div>
+                        <p class="empty-text">Error de conexión. Recarga la página.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function mostrarMeseros(meseros) {
+            const container = document.getElementById('meserosList');
+
+            if (meseros.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">👥</div>
+                        <p class="empty-text">No has agregado meseros aún</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = meseros.map(item => {
+                const inicial = item.mesero.nombre.charAt(0).toUpperCase();
+                return `
+                    <div class="mesero-card">
+                        <div class="mesero-card-content">
+                            <div class="mesero-info-wrapper">
+                                <div class="mesero-avatar">${inicial}</div>
+                                <div class="mesero-details">
+                                    <h4>${item.mesero.nombre}</h4>
+                                    <p>${item.mesero.email} • ${item.mesero.rol}</p>
+                                </div>
+                            </div>
+                            <div class="mesero-actions">
+                                <button class="btn-icon btn-icon-permissions" onclick="editMeseroPermisos('${item.relacionId}', '${item.mesero._id}')">
+                                    🔐 Permisos
+                                </button>
+                                <button class="btn-icon btn-icon-delete" onclick="deleteMesero('${item.relacionId}', '${item.mesero.nombre}')">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = html;
+        }
+
+        async function editMeseroPermisos(relacionId, meseroId) {
+            currentRelacionId = relacionId;
+
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch(`${API_URL}/admin-meseros/meseros/${currentUser._id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const mesero = data.data.find(m => m.relacionId === relacionId);
+
+                    if (mesero && mesero.permisos) {
+                        document.getElementById('perm_verProductos').checked = mesero.permisos.verProductos ?? true;
+                        document.getElementById('perm_crearProductos').checked = mesero.permisos.crearProductos || false;
+                        document.getElementById('perm_editarProductos').checked = mesero.permisos.editarProductos || false;
+                        document.getElementById('perm_eliminarProductos').checked = mesero.permisos.eliminarProductos || false;
+                        document.getElementById('perm_verPedidos').checked = mesero.permisos.verPedidos ?? true;
+                        document.getElementById('perm_crearPedidos').checked = mesero.permisos.crearPedidos ?? true;
+                        document.getElementById('perm_editarPedidos').checked = mesero.permisos.editarPedidos || false;
+                        document.getElementById('perm_cancelarPedidos').checked = mesero.permisos.cancelarPedidos || false;
+                        document.getElementById('perm_verGastos').checked = mesero.permisos.verGastos ?? true;
+                        document.getElementById('perm_crearGastos').checked = mesero.permisos.crearGastos ?? true;
+                        document.getElementById('perm_editarGastos').checked = mesero.permisos.editarGastos || false;
+                        document.getElementById('perm_eliminarGastos').checked = mesero.permisos.eliminarGastos || false;
+                        document.getElementById('perm_verReportes').checked = mesero.permisos.verReportes || false;
+                        document.getElementById('perm_verLiquidaciones').checked = mesero.permisos.verLiquidaciones || false;
+                    }
+                }
+            } catch (error) {
+                console.error('Error al cargar permisos:', error);
+            }
+
+            document.getElementById('permissionsModal').classList.add('active');
+        }
+
+        function openPermissionsModal() {
+            if (!currentSearchedUser) return;
+            document.getElementById('permissionsModal').classList.add('active');
+        }
+
+        function closePermissionsModal() {
+            document.getElementById('permissionsModal').classList.remove('active');
+            currentRelacionId = null;
+        }
+
+        document.getElementById('permissionsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!currentRelacionId) {
+                showAlert('No hay mesero seleccionado', 'error');
+                return;
+            }
+
+            const permisos = {
+                verProductos: document.getElementById('perm_verProductos').checked,
+                crearProductos: document.getElementById('perm_crearProductos').checked,
+                editarProductos: document.getElementById('perm_editarProductos').checked,
+                eliminarProductos: document.getElementById('perm_eliminarProductos').checked,
+                verPedidos: document.getElementById('perm_verPedidos').checked,
+                crearPedidos: document.getElementById('perm_crearPedidos').checked,
+                editarPedidos: document.getElementById('perm_editarPedidos').checked,
+                cancelarPedidos: document.getElementById('perm_cancelarPedidos').checked,
+                verGastos: document.getElementById('perm_verGastos').checked,
+                crearGastos: document.getElementById('perm_crearGastos').checked,
+                editarGastos: document.getElementById('perm_editarGastos').checked,
+                eliminarGastos: document.getElementById('perm_eliminarGastos').checked,
+                verReportes: document.getElementById('perm_verReportes').checked,
+                verLiquidaciones: document.getElementById('perm_verLiquidaciones').checked
+            };
+
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch(`${API_URL}/admin-meseros/permisos/${currentRelacionId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ permisos })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('✅ Permisos actualizados exitosamente', 'success');
+                    closePermissionsModal();
+                    await cargarMeseros();
+                } else {
+                    showAlert(data.message || 'Error al actualizar permisos', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Error al actualizar permisos', 'error');
+            }
+        });
+
+        async function deleteMesero(relacionId, nombre) {
+            if (!confirm(`¿Estás seguro de eliminar a ${nombre}?`)) {
+                return;
+            }
+
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch(`${API_URL}/admin-meseros/${relacionId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('Mesero eliminado exitosamente', 'success');
+                    await cargarMeseros();
+                } else {
+                    showAlert(data.message || 'Error al eliminar mesero', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Error al eliminar mesero', 'error');
+            }
+        }
+
+        function confirmDelete() {
+            if (!currentSearchedUser) return;
+
+            if (confirm(`¿Eliminar a ${currentSearchedUser.nombre}?`)) {
+                showAlert('Función de eliminación directa no disponible. Usa "Inspeccionar" para agregar primero.', 'info');
+            }
+        }
+
+        function logout() {
+            if (confirm('¿Cerrar sesión?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('usuario');
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Verificar fecha de vencimiento
+        // Verificar fecha de vencimiento
+        async function verificarFechaVencimiento() {
+            try {
+                // Esperar a que currentUser esté cargado
+                if (!currentUser) {
+                    console.log('Esperando a que currentUser se cargue...');
+                    setTimeout(verificarFechaVencimiento, 1000);
+                    return;
+                }
+
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_URL}/auth/verify`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) return;
+
+                const data = await response.json();
+                const usuario = data.usuario;
+
+                console.log('Verificando fecha de pago:', usuario.fechaPago);
+
+                if (usuario.fechaPago) {
+                    const fechaPago = new Date(usuario.fechaPago);
+                    const hoy = new Date();
+                    // Reiniciar horas para comparación correcta de días
+                    fechaPago.setHours(0, 0, 0, 0);
+                    hoy.setHours(0, 0, 0, 0);
+
+                    const diferenciaDias = Math.ceil((fechaPago - hoy) / (1000 * 60 * 60 * 24));
+
+                    console.log('Días restantes:', diferenciaDias);
+
+                    // Mostrar notificación si faltan 5 días o menos
+                    if (diferenciaDias <= 5 && diferenciaDias >= 0) {
+                        const banner = document.getElementById('notificationBanner');
+                        const texto = document.getElementById('notificationText');
+
+                        texto.textContent = `Su licencia vence en ${diferenciaDias} día${diferenciaDias !== 1 ? 's' : ''}. Por favor renueve su mensualidad para seguir utilizando JC-RT`;
+
+                        banner.classList.add('show');
+                        document.body.classList.add('has-notification');
+
+                        console.log('✅ Banner de advertencia mostrado');
+                    } else if (diferenciaDias < 0) {
+                        // Licencia vencida
+                        const banner = document.getElementById('notificationBanner');
+                        const texto = document.getElementById('notificationText');
+
+                        banner.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                        texto.textContent = `¡Su licencia ha vencido! Por favor renueve su mensualidad para seguir utilizando JC-RT`;
+
+                        banner.classList.add('show');
+                        document.body.classList.add('has-notification');
+
+                        console.log('❌ Banner de vencimiento mostrado');
+                    } else {
+                        console.log(`ℹ️ Licencia válida por ${diferenciaDias} días más`);
+                    }
+                } else {
+                    console.log('ℹ️ No hay fecha de pago asignada');
+                }
+            } catch (error) {
+                console.error('Error al verificar fecha de vencimiento:', error);
+            }
+        }
+
+        // Ejecutar después de que se cargue el usuario
+        setTimeout(verificarFechaVencimiento, 2000);
+
+        // Verificar cada hora
+        setInterval(verificarFechaVencimiento, 3600000);
+        // Ejecutar al cargar la página
+        verificarFechaVencimiento();
+
+        // Verificar cada hora
+        setInterval(verificarFechaVencimiento, 3600000);
+
+    </script>
+    <!-- Scripts for Mandao Welcome -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('welcome_mandao')) {
+                localStorage.removeItem('welcome_mandao');
+
+                // 1. Efecto de Confeti (Explosión)
+                const duration = 3000;
+                const end = Date.now() + duration;
+
+                (function frame() {
+                    confetti({
+                        particleCount: 7,
+                        angle: 60,
+                        spread: 55,
+                        origin: { x: 0 },
+                        colors: ['#667eea', '#764ba2', '#ffffff']
+                    });
+                    confetti({
+                        particleCount: 7,
+                        angle: 120,
+                        spread: 55,
+                        origin: { x: 1 },
+                        colors: ['#667eea', '#764ba2', '#ffffff']
+                    });
+
+                    if (Date.now() < end) {
+                        requestAnimationFrame(frame);
+                    }
+                }());
+
+                // 2. Modal Bonito
+                const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+                const nombre = usuario.nombre || 'Usuario';
+
+                Swal.fire({
+                    title: `<strong>¡Bienvenido ${nombre}! 🚀</strong>`,
+                    html: `
+                        <div style="font-size: 1.1em; line-height: 1.6;">
+                            <p>¡Qué alegría tenerte aquí!</p>
+                            <p>Tu cuenta ha sido creada exitosamente con los datos de <strong>${usuario.nombreRestaurante || 'Tu Restaurante'}</strong>.</p>
+                            <div style="margin-top: 20px; padding: 15px; background: #f0fdf4; border-radius: 10px; border: 1px solid #bbf7d0;">
+                                <span style="font-size: 24px;">🎁</span>
+                                <p style="color: #166534; font-weight: bold; margin-top: 5px;">¡Disfruta de 1 MES GRATIS de prueba!</p>
+                            </div>
+                        </div>
+                    `,
+                    icon: 'success',
+                    showConfirmButton: true,
+                    confirmButtonText: '¡A trabajar!',
+                    confirmButtonColor: '#667eea',
+                    backdrop: `rgba(0,0,0,0.4)`
+                });
+            }
+        });
+    </script>
+    <script src="scripts/restaurant-switcher.js"></script>
+<script src="scripts/print-monitor.js"></script>
+</body>
+
+</html>

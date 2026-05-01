@@ -1,0 +1,1825 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Alimentos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            color: #1a202c;
+        }
+
+        /* ESTILOS DEL SIDEBAR */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
+            padding: 0;
+            z-index: 1000;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            transform: translateX(-280px);
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .brand-text h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .brand-text p {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+            margin: 2px 0 0 0;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+            max-height: calc(100vh - 250px);
+            overflow-y: auto;
+        }
+
+        .sidebar-nav::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section-title {
+            padding: 0.5rem 1.5rem;
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.2) 0%, transparent 100%);
+            color: white;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .user-avatar-sidebar {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .user-details h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .user-details p {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.6);
+            margin: 2px 0 0 0;
+        }
+
+        .btn-logout-sidebar {
+            width: 100%;
+            padding: 10px;
+            background: rgba(229, 62, 62, 0.2);
+            color: #fc8181;
+            border: 1px solid rgba(229, 62, 62, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-logout-sidebar:hover {
+            background: #e53e3e;
+            color: white;
+            border-color: #e53e3e;
+        }
+
+        .menu-toggle {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            transition: all 0.2s;
+        }
+
+        .menu-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* CONTENIDO PRINCIPAL */
+        .content-wrapper {
+            margin-left: 0;
+            transition: margin-left 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.5s ease;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            color: #718096;
+        }
+
+        /* LAYOUT */
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+            height: -300px;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 6px;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* SELECT CON BÚSQUEDA */
+        .select-search-wrapper {
+            position: relative;
+        }
+
+        /* SELECT CON BÚSQUEDA */
+        .select-search-wrapper {
+            position: relative;
+        }
+
+        .producto-list {
+            max-height: 350px;
+            /* ✅ Aumentado de 200px a 350px */
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            display: none;
+            position: absolute;
+            background: white;
+            width: 100%;
+            z-index: 1000;
+            margin-top: 4px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            /* ✅ Sombra más pronunciada */
+            animation: fadeIn 0.2s ease;
+        }
+
+        .producto-list.show {
+            display: block;
+        }
+
+        .producto-list::-webkit-scrollbar {
+            width: 10px;
+            /* ✅ Aumentado de 8px a 10px */
+        }
+
+        .producto-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 5px;
+        }
+
+        .producto-list::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 5px;
+        }
+
+        .producto-list::-webkit-scrollbar-thumb:hover {
+            background: #5568d3;
+        }
+
+        .producto-option {
+            padding: 16px;
+            /* ✅ Aumentado de 12px a 16px */
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid #f7fafc;
+        }
+
+        .producto-option:last-child {
+            border-bottom: none;
+        }
+
+        .producto-option:hover {
+            background: #f7fafc;
+            transform: translateX(4px);
+        }
+
+        .selected-producto-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-size: 14px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .producto-option {
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid #f7fafc;
+        }
+
+        .producto-option:last-child {
+            border-bottom: none;
+        }
+
+        .producto-option:hover {
+            background: #f7fafc;
+            transform: translateX(4px);
+        }
+
+        .selected-producto-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-size: 14px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 12px;
+            background: #e2e8f0;
+            color: #2d3748;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        /* GRID DE ALIMENTOS */
+        .alimentos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .alimento-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .alimento-card:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-4px);
+            border-color: #667eea;
+        }
+
+        .alimento-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .alimento-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin: 0;
+        }
+
+        .alimento-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .alimento-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-item {
+            background: #f7fafc;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+
+        .info-label {
+            font-size: 0.75rem;
+            color: #718096;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .alimento-producto {
+            background: #e6f2ff;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 3px solid #3182ce;
+        }
+
+        .alimento-producto-title {
+            font-size: 0.75rem;
+            color: #2c5282;
+            margin-bottom: 4px;
+        }
+
+        .alimento-producto-name {
+            font-weight: 600;
+            color: #2c5282;
+        }
+
+        .alimento-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-edit,
+        .btn-delete {
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .btn-edit {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e2e8f0;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        /* ESTADÍSTICAS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-4px);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #718096;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1a202c;
+            margin: 0.5rem 0;
+        }
+
+        .stat-description {
+            font-size: 12px;
+            color: #a0aec0;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .alimentos-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+
+            .alimento-info {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* SELECT CON BÚSQUEDA */
+        .select-search-wrapper {
+            position: relative;
+        }
+
+        .producto-list {
+            max-height: 500px;
+            /* ✅ */
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            display: none;
+            position: absolute;
+            background: white;
+            width: 100%;
+            z-index: 1000;
+            margin-top: 4px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            animation: fadeIn 0.2s ease;
+        }
+
+        .producto-list.show {
+            display: block;
+        }
+
+        .producto-list::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .producto-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 5px;
+        }
+
+        .producto-list::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 5px;
+        }
+
+        .producto-list::-webkit-scrollbar-thumb:hover {
+            background: #5568d3;
+        }
+
+        .producto-option {
+            padding: 16px;
+            /* ✅ */
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid #f7fafc;
+        }
+
+        .producto-option:last-child {
+            border-bottom: none;
+        }
+
+        .producto-option:hover {
+            background: #f7fafc;
+            transform: translateX(4px);
+        }
+
+        .selected-producto-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-size: 14px;
+            animation: fadeIn 0.3s ease;
+        }
+        /* Ocultar flechas en inputs de numero */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        /* ESTILOS CARGA MASIVA */
+        .bulk-add-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px dashed #e2e8f0;
+        }
+
+        .bulk-add-container {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            margin-top: 0.5rem;
+        }
+
+        .bulk-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 8px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .bulk-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .bulk-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-add-more {
+            width: 100%;
+            padding: 10px;
+            background: #edf2f7;
+            color: #4a5568;
+            border: 1px dashed #cbd5e0;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-add-more:hover {
+            background: #e2e8f0;
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .bulk-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .btn-bulk-save {
+            flex: 2;
+            padding: 8px;
+            background: #48bb78;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-bulk-cancel {
+            flex: 1;
+            padding: 8px;
+            background: #a0aec0;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .badge-stock {
+            font-weight: 700;
+            color: #2d3748;
+            background: #edf2f7;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+    <!-- Menú Toggle -->
+    <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">☰</button>
+
+    <!-- Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="productos.html" class="sidebar-brand">
+                <div class="brand-icon">🍽️</div>
+                <div class="brand-text">
+                    <h2>JC-RT</h2>
+                    <p>Sistema de gestión</p>
+                </div>
+            </a>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Principal</div>
+                <a href="productos.html" class="nav-item">
+                    <span class="nav-icon">📦</span>
+                    <span>Platos</span>
+                </a>
+                <a href="pedidos.html" class="nav-item">
+                    <span class="nav-icon">🍽️</span>
+                    <span>Pedidos</span>
+                </a>
+                <a href="gastos.html" class="nav-item">
+                    <span class="nav-icon">🧾</span>
+                    <span>Gastos</span>
+                </a>
+                <a href="qr-generator.html" class="nav-item">
+                    <span class="nav-icon">📱</span>
+                    <span>QR Generador</span>
+                </a>
+                <a href="reportes.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>Reportes</span>
+                </a>
+                <a href="cocina.html" class="nav-item">
+                    <span class="nav-icon">👨‍🍳</span>
+                    <span>Cocina</span>
+                </a>
+                <a href="catalogo-productos.html" class="nav-item">
+                    <span class="nav-icon">📜📦</span>
+                    <span>Inventario</span>
+                </a>
+                <a href="alimentos.html" class="nav-item active">
+                    <span class="nav-icon">🥘</span>
+                    <span>Alimentos</span>
+                </a>
+            </div>
+
+            <!-- SOLO PARA ADMINISTRADORES -->
+            <div class="nav-section" id="adminSection" style="display: none;">
+                <div class="nav-section-title">Administración</div>
+                <a href="administrador.html" class="nav-item">
+                    <span class="nav-icon">👥</span>
+                    <span>Gestión de Meseros</span>
+                </a>
+                <a href="liquidacion.html" class="nav-item">
+                    <span class="nav-icon">💵</span>
+                    <span>Liquidación</span>
+                </a>
+                <a href="historial-liquidaciones.html" class="nav-item">
+                    <span class="nav-icon">📋</span>
+                    <span>Hist. Liquidaciones</span>
+                </a>
+                <a href="solicitudes.html" class="nav-item">
+                    <span class="nav-icon">👤✅</span>
+                    <span>Aceptación de Empleados</span>
+                </a>
+                <a href="ajustes.html" class="nav-item">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Ajustes</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar-sidebar" id="sidebarUserAvatar">U</div>
+                <div class="user-details">
+                    <h4 id="sidebarUserName">Cargando...</h4>
+                    <p id="sidebarUserRole">Usuario</p>
+                </div>
+            </div>
+            <button class="btn-logout-sidebar" onclick="logout()">
+                <span>🚪</span>
+                <span>Cerrar Sesión</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Contenido Principal -->
+    <div class="content-wrapper" id="contentWrapper">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">🥘 Gestión de Alimentos</h1>
+                <p class="page-subtitle">Configura tus recetas y monitorea tu inventario en un solo lugar</p>
+            </div>
+
+            <!-- Estadísticas Consolidadas -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">🥘</div>
+                    </div>
+                    <div class="stat-label">Total Ingredientes</div>
+                    <div class="stat-value" id="totalAlimentos">0</div>
+                    <div class="stat-description">Registrados en el sistema</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">✅</div>
+                    </div>
+                    <div class="stat-label">En Stock</div>
+                    <div class="stat-value" id="alimentosEnStock">0</div>
+                    <div class="stat-description">Disponibilidad normal</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">⚠️</div>
+                    </div>
+                    <div class="stat-label">Stock Bajo</div>
+                    <div class="stat-value" id="alimentosStockBajo">0</div>
+                    <div class="stat-description">Requieren reposición inmediata</div>
+                </div>
+            </div>
+
+            <div class="layout">
+                <!-- Lista de alimentos (Centrada en platos) -->
+                <div class="card">
+                    <div class="card-header">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                            <h2>Recetario por Platos</h2>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <button class="btn-primary" onclick="sincronizarDuplicados()" style="padding: 8px 15px; font-size: 13px; width: auto; margin: 0; background: #48bb78; white-space: nowrap;">✨ Sincronizar Inventario</button>
+                                <input type="text" id="alimentoSearch" class="form-input" placeholder="🔍 Buscar plato o ingrediente..." style="max-width: 300px;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="alimentos-grid" id="alimentosGrid">
+                            <div class="loading-spinner">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://restaurante-co77.onrender.com/api';
+        let currentUser = null;
+        let productos = [];
+        let editState = { id: null, cardId: null };
+        window.dataCache = { alimentos: [] };
+
+        // CARGA INICIAL
+        window.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.status === 401) {
+                    console.warn('⚠️ Token expirado');
+                    localStorage.removeItem('token');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                if (!response.ok) {
+                    console.error('Error al cargar usuario');
+                    Swal.fire({ icon: (('Error al cargar datos. Intente recargar.').toLowerCase().includes("error") || ('Error al cargar datos. Intente recargar.').toLowerCase().includes("falla") || ('Error al cargar datos. Intente recargar.').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error al cargar datos. Intente recargar.', timer: 3000, showConfirmButton: false });
+                    return;
+                }
+
+                const data = await response.json();
+                currentUser = data.data;
+                
+                if (data.data) {
+                    localStorage.setItem('usuario', JSON.stringify(data.data));
+                }
+
+                if (currentUser.id && !currentUser._id) {
+                    currentUser._id = currentUser.id;
+                }
+
+                if (!currentUser || !currentUser._id) {
+                    throw new Error('Datos de usuario incompletos');
+                }
+
+                console.log('✅ Usuario cargado:', currentUser);
+
+                document.getElementById('sidebarUserName').textContent = currentUser.nombre;
+                document.getElementById('sidebarUserAvatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
+                document.getElementById('sidebarUserRole').textContent = currentUser.rol === 'admin' ? 'Administrador' : 'Usuario';
+
+                if (currentUser.rol === 'admin') {
+                    document.getElementById('adminSection').style.display = 'block';
+                }
+
+                await cargarProductos();
+                await cargarAlimentos();
+            } catch (error) {
+                console.error('❌ Error de red:', error);
+                Swal.fire({ icon: (('Error de conexión. Recargue la página.').toLowerCase().includes("error") || ('Error de conexión. Recargue la página.').toLowerCase().includes("falla") || ('Error de conexión. Recargue la página.').toLowerCase().includes("incorrect")) ? "error" : "success", text: 'Error de conexión. Recargue la página.', timer: 3000, showConfirmButton: false });
+            }
+        });
+
+        // ACTUALIZAR ESTADÍSTICAS
+        function actualizarEstadisticas(alimentos) {
+            const totalAlimentos = alimentos.length;
+            const alimentosEnStock = alimentos.filter(a => (a.stock || 0) > 10).length;
+            const alimentosStockBajo = alimentos.filter(a => {
+                const stock = a.stock || 0;
+                return stock > 0 && stock <= 10;
+            }).length;
+
+            document.getElementById('totalAlimentos').textContent = totalAlimentos;
+            document.getElementById('alimentosEnStock').textContent = alimentosEnStock;
+            document.getElementById('alimentosStockBajo').textContent = alimentosStockBajo;
+        }
+
+        // CARGAR PRODUCTOS
+        async function cargarProductos() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_URL}/products`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    productos = result.data;
+                    console.log('✅ Productos cargados:', productos.length);
+                }
+            } catch (error) {
+                console.error('Error al cargar productos:', error);
+            }
+        }
+
+        // MOSTRAR PRODUCTOS EN LISTA DE BÚSQUEDA
+        function mostrarProductos(productosAMostrar) {
+            const productoList = document.getElementById('productoList');
+            productoList.innerHTML = '';
+
+            if (productosAMostrar.length === 0) {
+                productoList.innerHTML = '<div class="producto-option" style="color: #718096; text-align: center; padding: 1rem;">No se encontraron productos</div>';
+                return;
+            }
+
+            productosAMostrar.forEach(producto => {
+                const div = document.createElement('div');
+                div.className = 'producto-option';
+                div.innerHTML = `
+            <strong style="color: #1a202c;">${producto.nombre}</strong><br>
+            <small style="color: #718096;">${producto.categoria} - $${producto.precio.toLocaleString('es-CO')}</small>
+        `;
+                div.addEventListener('click', () => agregarProductoSeleccionado(producto));
+                productoList.appendChild(div);
+            });
+        }
+
+
+
+        // AGREGAR PRODUCTO A LA LISTA SELECCIONADA
+        function agregarProductoSeleccionado(producto) {
+            const yaExiste = productosSeleccionados.find(p => p.productoId === producto._id);
+            if (yaExiste) {
+                Swal.fire({ icon: (('⚠️ Este producto ya está en la lista').toLowerCase().includes("error") || ('⚠️ Este producto ya está en la lista').toLowerCase().includes("falla") || ('⚠️ Este producto ya está en la lista').toLowerCase().includes("incorrect")) ? "error" : "success", text: '⚠️ Este producto ya está en la lista', timer: 3000, showConfirmButton: false });
+                return;
+            }
+
+            productosSeleccionados.push({
+                productoId: producto._id,
+                nombre: producto.nombre,
+                categoria: producto.categoria,
+                cantidadRequerida: 1
+            });
+
+            document.getElementById('productoSearch').value = '';
+            document.getElementById('productoList').classList.remove('show');
+
+            actualizarListaProductosSeleccionados();
+        }
+
+        // ACTUALIZAR VISTA DE PRODUCTOS SELECCIONADOS
+        function actualizarListaProductosSeleccionados() {
+            const container = document.getElementById('selectedProducto');
+
+            if (productosSeleccionados.length === 0) {
+                container.innerHTML = '<p style="color: #a0aec0; font-size: 14px; text-align: center; padding: 1rem; background: #f7fafc; border-radius: 8px; border: 1px dashed #cbd5e0;">No hay productos seleccionados</p>';
+                return;
+            }
+
+            container.innerHTML = productosSeleccionados.map((prod, index) => `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3); transition: all 0.2s;">
+            <div style="flex: 1;">
+                <div style="font-weight: 700; font-size: 15px; margin-bottom: 2px;">${prod.nombre}</div>
+                <div style="font-size: 12px; opacity: 0.9;">${prod.categoria}</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.2); padding: 6px 10px; border-radius: 8px;">
+                    <button type="button" onclick="cambiarCantidad(${index}, -1)" 
+                            style="width: 28px; height: 28px; background: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.5); border-radius: 6px; color: white; cursor: pointer; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;"
+                            onmouseover="this.style.background='rgba(255,255,255,0.4)'"
+                            onmouseout="this.style.background='rgba(255,255,255,0.3)'">
+                        −
+                    </button>
+                    <input type="number" value="${prod.cantidadRequerida}" onchange="cambiarCantidadManual(${index}, this.value)" style="width: 50px; text-align: center; border-radius: 6px; border: 1px solid rgba(255,255,255,0.5); background: rgba(255,255,255,0.2); color: white; font-weight: 800; font-size: 16px; padding: 4px; /* remove arrows */ -moz-appearance: textfield;" min="0" step="any">
+                    <button type="button" onclick="cambiarCantidad(${index}, 1)" 
+                            style="width: 28px; height: 28px; background: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.5); border-radius: 6px; color: white; cursor: pointer; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;"
+                            onmouseover="this.style.background='rgba(255,255,255,0.4)'"
+                            onmouseout="this.style.background='rgba(255,255,255,0.3)'">
+                        +
+                    </button>
+                </div>
+                <button onclick="eliminarProductoSeleccionado(${index})" 
+                        style="background: rgba(239, 68, 68, 0.9); color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s;"
+                        onmouseover="this.style.background='#ef4444'"
+                        onmouseout="this.style.background='rgba(239, 68, 68, 0.9)'">
+                    🗑️
+                </button>
+            </div>
+        </div>
+    `).join('');
+        }
+
+        // CARGAR ALIMENTOS
+        async function cargarAlimentos() {
+            const token = localStorage.getItem('token');
+
+            // Siempre hacer fetch fresco para mantener datos actualizados
+            try {
+                const response = await fetch(`${API_URL}/alimentos?userId=${currentUser._id}&limit=50000`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    window.dataCache.alimentos = result.data;
+                    mostrarAlimentos(result.data);
+                    actualizarEstadisticas(result.data);
+                }
+            } catch (error) {
+                console.error('Error al cargar alimentos:', error);
+                document.getElementById('alimentosGrid').innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">⚠️</div>
+                <p style="font-size: 1.2rem; font-weight: 600;">Error al cargar alimentos</p>
+                <p>Por favor, recargue la página</p>
+            </div>
+        `;
+            }
+        }
+
+        // MOSTRAR ALIMENTOS
+        // MOSTRAR ALIMENTOS
+        function mostrarAlimentos(alimentos, searchTerm = '') {
+            const grid = document.getElementById('alimentosGrid');
+            const term = searchTerm.toLowerCase().trim();
+
+            if (!productos || productos.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📦</div>
+                        <p style="font-size: 1.2rem; font-weight: 600;">Cargando platos...</p>
+                    </div>`;
+                return;
+            }
+
+            // Agrupar alimentos por producto
+            const recetas = {};
+            productos.forEach(p => {
+                recetas[p._id] = {
+                    producto: p,
+                    ingredientes: alimentos.filter(a => 
+                        a.productos && a.productos.some(ap => (ap.productoId?._id || ap.productoId) === p._id)
+                    )
+                };
+            });
+
+            // Alimentos sin plato
+            const alimentosSinPlato = alimentos.filter(a => !a.productos || a.productos.length === 0);
+
+            let html = '';
+
+            // Renderizar tarjetas de Platos
+            Object.values(recetas).forEach(receta => {
+                const p = receta.producto;
+                
+                // Si hay búsqueda, solo mostrar si el plato coincide o tiene ingredientes que coincidan
+                if (term) {
+                    const nombrePlatoMatches = p.nombre.toLowerCase().includes(term);
+                    const tieneIngredientesMatch = receta.ingredientes.length > 0;
+                    if (!nombrePlatoMatches && !tieneIngredientesMatch) return;
+                }
+
+                html += `
+                <div class="alimento-card" id="card-${p._id}">
+                    <div class="alimento-header">
+                        <h3 class="alimento-title">${p.nombre}</h3>
+                        <span class="alimento-badge">🍽️ PLATO</span>
+                    </div>
+                    
+                    <div class="alimento-producto-title" style="margin-top: 10px; color: #718096; font-size: 12px; text-transform: uppercase;">Ingredientes:</div>
+                    <div class="recipe-list" style="margin: 10px 0;">
+                        ${receta.ingredientes.length > 0 ? receta.ingredientes.map(a => {
+                            const rel = a.productos.find(ap => (ap.productoId?._id || ap.productoId) === p._id);
+                            const isEditing = editState.id === a._id && editState.cardId === p._id;
+
+                            if (isEditing) {
+                                return `
+                                <div style="padding: 12px; background: #fff; border: 2px solid #667eea; border-radius: 10px; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(102,126,234,0.1);">
+                                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-bottom: 8px;">
+                                        <input type="text" id="edit-nombre-${a._id}" class="bulk-input" value="${a.nombre}" placeholder="Nombre">
+                                        <input type="text" id="edit-medida-${a._id}" class="bulk-input" value="${a.medida || ''}" placeholder="g, kg, ml">
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                                        <div>
+                                            <div style="font-size: 10px; color: #718096; margin-left: 4px;">STOCK</div>
+                                            <input type="number" id="edit-stock-${a._id}" class="bulk-input" value="${a.stock}" step="any">
+                                        </div>
+                                        <div>
+                                            <div style="font-size: 10px; color: #718096; margin-left: 4px;">USA EN PLATO</div>
+                                            <input type="number" id="edit-uso-${a._id}" class="bulk-input" value="${rel.cantidadRequerida}" step="any">
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 6px;">
+                                        <button onclick="saveEditInline('${a._id}', '${p._id}')" class="btn-bulk-save" style="font-size: 12px; padding: 6px;">✅ Guardar</button>
+                                        <button onclick="cancelarEditInline()" class="btn-bulk-cancel" style="font-size: 12px; padding: 6px;">❌</button>
+                                    </div>
+                                </div>`;
+                            }
+
+                            return `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f8fafc; border-radius: 8px; margin-bottom: 6px; border-left: 3px solid #667eea;">
+                                <div style="flex: 1;">
+                                    <div style="font-size: 14px; font-weight: 600;">${a.nombre}</div>
+                                    <div style="font-size: 11px; color: #718096;">Stock: ${a.stock} ${a.medida || ''}</div>
+                                </div>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <div style="font-size: 13px; color: #667eea; font-weight: 800;">x${rel.cantidadRequerida} ${a.medida || ''}</div>
+                                    <div style="display: flex; gap: 4px;">
+                                        <button onclick="editarAlimentoInline('${a._id}', '${p._id}')" style="background: #ebf4ff; color: #3182ce; border: none; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center;">✏️</button>
+                                        <button onclick="eliminarAlimento('${a._id}', '${a.nombre}')" style="background: #fff5f5; color: #e53e3e; border: none; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center;">🗑️</button>
+                                    </div>
+                                </div>
+                            </div>`;
+                        }).join('') : '<p style="color: #a0aec0; font-size: 13px; font-style: italic;">Sin ingredientes asignados</p>'}
+                    </div>
+
+                    <div class="bulk-add-section" id="bulk-section-${p._id}">
+                        <button class="btn-add-more" onclick="expandirCargaMasiva('${p._id}')">
+                            ➕ Agregar más alimentos
+                        </button>
+                    </div>
+                </div>`;
+            });
+
+            // Sección opcional para alimentos huérfanos
+            let orphansToDisplay = alimentosSinPlato;
+            if (term) {
+                orphansToDisplay = alimentosSinPlato.filter(a => a.nombre.toLowerCase().includes(term));
+            }
+
+            if (orphansToDisplay.length > 0) {
+                html += `
+                <div class="alimento-card" style="grid-column: 1 / -1; background: #f1f5f9; border: 2px dashed #cbd5e0;">
+                    <h3 class="alimento-title" style="margin-bottom: 1rem;">🥘 Alimentos sin asignar a un plato</h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                        ${orphansToDisplay.map(a => `
+                            <div style="background: white; padding: 8px 15px; border-radius: 20px; border: 1px solid #e2e8f0; display: flex; gap: 10px; align-items: center;">
+                                <strong>${a.nombre}</strong>
+                                <span style="font-size: 12px; color: #718096;">Stock: ${a.stock} ${a.medida || ''}</span>
+                                <div style="display: flex; gap: 5px;">
+                                    <button onclick="editarAlimentoInline('${a._id}', 'orphans')" style="background: none; border: none; cursor: pointer; font-size: 14px;">✏️</button>
+                                    <button onclick="eliminarAlimento('${a._id}', '${a.nombre}')" style="background: none; border: none; cursor: pointer; font-size: 14px;">🗑️</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>`;
+            }
+
+            grid.innerHTML = html;
+        }
+
+        // FUNCIONES PARA CARGA MASIVA
+        function expandirCargaMasiva(productId) {
+            const container = document.getElementById(`bulk-section-${productId}`);
+            container.innerHTML = `
+                <div class="bulk-add-container">
+                    <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">¿Cuántos ingredientes nuevos quieres agregar?</div>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="number" id="count-${productId}" class="bulk-input" min="1" max="10" value="1" style="width: 80px;">
+                        <button class="btn-bulk-save" onclick="generarInputsMasivos('${productId}')" style="background: #667eea;">Generar</button>
+                        <button class="btn-bulk-cancel" onclick="restaurarBotonAdd('${productId}')">❌</button>
+                    </div>
+                    <div id="inputs-container-${productId}" style="margin-top: 15px;"></div>
+                </div>`;
+        }
+
+        function generarInputsMasivos(productId) {
+            const count = parseInt(document.getElementById(`count-${productId}`).value);
+            const container = document.getElementById(`inputs-container-${productId}`);
+            
+            if (count < 1 || count > 10) {
+                Swal.fire({ icon: 'warning', text: 'Elige un número entre 1 y 10' });
+                return;
+            }
+
+            let html = `
+                <div class="bulk-row" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; margin-bottom: 10px;">
+                    <div style="font-size: 11px; font-weight: 700; color: #718096;">NOMBRE</div>
+                    <div style="font-size: 11px; font-weight: 700; color: #718096; text-align: center;">STOCK</div>
+                    <div style="font-size: 11px; font-weight: 700; color: #718096; text-align: center;">UNIDAD</div>
+                    <div style="font-size: 11px; font-weight: 700; color: #718096; text-align: center;">USA</div>
+                </div>`;
+
+            for (let i = 0; i < count; i++) {
+                html += `
+                <div class="bulk-row">
+                    <input type="text" class="bulk-input name-input-${productId}" 
+                           placeholder="Nombre" list="alimentosDataList"
+                           oninput="checkExistingAlimento(this, '${productId}', ${i})">
+                    <input type="number" id="stock-${productId}-${i}" class="bulk-input stock-input-${productId}" value="0" step="any">
+                    <input type="text" id="measure-${productId}-${i}" class="bulk-input measure-input-${productId}" placeholder="g, kg..." value="uds">
+                    <input type="number" class="bulk-input usage-input-${productId}" value="0" step="any">
+                </div>`;
+            }
+
+            html += `
+                <div class="bulk-actions">
+                    <button class="btn-bulk-save" onclick="guardarCargaMasiva('${productId}')">💾 Guardar ${count} Ingredientes</button>
+                    <button class="btn-bulk-cancel" onclick="restaurarBotonAdd('${productId}')">Cancelar</button>
+                </div>`;
+            
+            container.innerHTML = html;
+        }
+
+        function restaurarBotonAdd(productId) {
+            const container = document.getElementById(`bulk-section-${productId}`);
+            container.innerHTML = `
+                <button class="btn-add-more" onclick="expandirCargaMasiva('${productId}')">
+                    ➕ Agregar más alimentos
+                </button>`;
+        }
+
+        async function guardarCargaMasiva(productId) {
+            const names = document.querySelectorAll(`.name-input-${productId}`);
+            const stocks = document.querySelectorAll(`.stock-input-${productId}`);
+            const measures = document.querySelectorAll(`.measure-input-${productId}`);
+            const usages = document.querySelectorAll(`.usage-input-${productId}`);
+            
+            const ingredientes = [];
+            for (let i = 0; i < names.length; i++) {
+                const nombre = names[i].value.trim();
+                const stock = parseFloat(stocks[i].value) || 0;
+                const medida = measures[i].value.trim() || 'uds';
+                const usage = parseFloat(usages[i].value) || 0;
+
+                if (!nombre) continue;
+
+                ingredientes.push({
+                    nombre: nombre,
+                    stock: stock,
+                    medida: medida,
+                    valor: 0,
+                    productos: productId !== 'orphans' ? [{
+                        productoId: productId,
+                        cantidadRequerida: usage
+                    }] : []
+                });
+            }
+
+            if (ingredientes.length === 0) {
+                Swal.fire({ icon: 'warning', text: 'Ingresa al menos un nombre de ingrediente' });
+                return;
+            }
+
+            Swal.fire({
+                title: 'Guardando ingredientes...',
+                didOpen: () => Swal.showLoading()
+            });
+
+            try {
+                const token = localStorage.getItem('token');
+                const promesas = ingredientes.map(data => 
+                    fetch(`${API_URL}/alimentos`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(data)
+                    })
+                );
+
+                const resultados = await Promise.all(promesas);
+                const errores = resultados.filter(r => !r.ok);
+
+                if (errores.length > 0) {
+                    Swal.fire({ icon: 'error', text: `Se guardaron ${ingredientes.length - errores.length} ingredientes, pero hubo errores en ${errores.length}.` });
+                } else {
+                    Swal.fire({ icon: 'success', text: `✅ Se agregaron ${ingredientes.length} ingredientes correctamente`, timer: 2000, showConfirmButton: false });
+                    await cargarAlimentos();
+                }
+            } catch (error) {
+                console.error('Error en carga masiva:', error);
+                Swal.fire({ icon: 'error', text: 'Error de conexión' });
+            }
+        }
+
+        // INLINE EDITING FUNCTIONS
+        function editarAlimentoInline(id, cardId) {
+            editState = { id, cardId };
+            mostrarAlimentos(window.dataCache.alimentos);
+        }
+
+        function cancelarEditInline() {
+            editState = { id: null, cardId: null };
+            mostrarAlimentos(window.dataCache.alimentos);
+        }
+
+        async function saveEditInline(id, productId) {
+            const nombre = document.getElementById(`edit-nombre-${id}`).value.trim();
+            const stock = parseFloat(document.getElementById(`edit-stock-${id}`).value);
+            const medida = document.getElementById(`edit-medida-${id}`).value.trim();
+            const uso = parseFloat(document.getElementById(`edit-uso-${id}`).value);
+
+            if (!nombre) {
+                Swal.fire({ icon: 'warning', text: 'El nombre es obligatorio' });
+                return;
+            }
+
+            Swal.fire({ title: 'Guardando...', didOpen: () => Swal.showLoading() });
+
+            try {
+                // Primero obtener el alimento actual para no perder otros productos vinculados
+                const token = localStorage.getItem('token');
+                const responseGet = await fetch(`${API_URL}/alimentos/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const currentData = await responseGet.json();
+                
+                if (!currentData.success) throw new Error('No se pudo obtener el dato actual');
+
+                const alimento = currentData.data;
+                
+                // Actualizar info básica
+                const updateData = {
+                    nombre,
+                    stock,
+                    medida,
+                    valor: alimento.valor || 0,
+                    productos: [...alimento.productos]
+                };
+
+                // Actualizar uso en este producto específico
+                if (productId !== 'orphans') {
+                    const prodIndex = updateData.productos.findIndex(p => (p.productoId?._id || p.productoId) === productId);
+                    if (prodIndex >= 0) {
+                        updateData.productos[prodIndex].cantidadRequerida = uso;
+                    } else {
+                        // Si era huérfano o no estaba en este plato, lo añadimos
+                        updateData.productos.push({ productoId: productId, cantidadRequerida: uso });
+                    }
+                }
+
+                const responsePut = await fetch(`${API_URL}/alimentos/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                if (responsePut.ok) {
+                    Swal.fire({ icon: 'success', text: 'Actualizado correctamente', timer: 1500, showConfirmButton: false });
+                    editState = { id: null, cardId: null };
+                    await cargarAlimentos();
+                } else {
+                    const err = await responsePut.json();
+                    throw new Error(err.message || 'Error al actualizar');
+                }
+            } catch (error) {
+                console.error('Error al editar inline:', error);
+                Swal.fire({ icon: 'error', text: error.message });
+            }
+        }
+
+        // ELIMINAR ALIMENTO
+        async function eliminarAlimento(id, nombre) {
+            if (!confirm(`¿Eliminar "${nombre}"?\n\nEsta acción no se puede deshacer.`)) {
+                return;
+            }
+
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch(`${API_URL}/alimentos/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    Swal.fire({ icon: 'success', text: 'Alimento eliminado', timer: 1500, showConfirmButton: false });
+                    await cargarAlimentos();
+                } else {
+                    Swal.fire({ icon: 'error', text: result.message || 'Error al eliminar' });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({ icon: 'error', text: 'Error de conexión' });
+            }
+        }
+
+        // LOGOUT Y MENU (Simplificados)
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const contentWrapper = document.getElementById('contentWrapper');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            if (window.innerWidth > 1024) {
+                sidebar.classList.toggle('collapsed');
+                contentWrapper.classList.toggle('expanded');
+            }
+        }
+
+        function logout() {
+            if (confirm('¿Cerrar sesión?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('usuario');
+                window.location.href = 'index.html';
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 1024) {
+                document.getElementById('sidebarOverlay').classList.remove('active');
+            }
+        });
+
+        // ✅ FUNCIÓN PARA SINCRONIZAR DUPLICADOS
+        async function sincronizarDuplicados() {
+            const { isConfirmed } = await Swal.fire({
+                title: '¿Sincronizar Inventario?',
+                text: 'Esto unificará los ingredientes que tengan el mismo nombre para que compartan el mismo stock y medida. Se eliminarán los duplicados y se conservará el más reciente.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, sincronizar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#48bb78'
+            });
+
+            if (!isConfirmed) return;
+
+            Swal.fire({ title: 'Sincronizando...', didOpen: () => Swal.showLoading() });
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_URL}/alimentos/sync-duplicates`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Sincronizado!',
+                        text: result.message,
+                        timer: 3000
+                    });
+                    await cargarAlimentos();
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('Error al sincronizar:', error);
+                Swal.fire({ icon: 'error', text: 'Error al sincronizar: ' + error.message });
+            }
+        }
+
+        // Búsqueda local y actualización de datalist
+        document.getElementById('alimentoSearch').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = window.dataCache.alimentos.filter(a => 
+                a.nombre.toLowerCase().includes(term) || 
+                (a.productos && a.productos.some(p => {
+                    const pNombre = p.productoId?.nombre || '';
+                    return pNombre.toLowerCase().includes(term);
+                }))
+            );
+            mostrarAlimentos(filtered, term);
+        });
+
+        // ✅ AUTO-RELLENO DE INGREDIENTES EXISTENTES
+        function checkExistingAlimento(input, productId, index) {
+            const nombre = input.value.trim().toLowerCase();
+            const alimento = window.dataCache.alimentos.find(a => a.nombre.toLowerCase() === nombre);
+            
+            if (alimento) {
+                const stockInput = document.getElementById(`stock-${productId}-${index}`);
+                const measureInput = document.getElementById(`measure-${productId}-${index}`);
+                
+                if (stockInput) stockInput.value = alimento.stock;
+                if (measureInput) measureInput.value = alimento.medida;
+                
+                // Feedback visual sutil
+                input.style.borderColor = '#48bb78';
+                input.style.background = '#f0fff4';
+            } else {
+                input.style.borderColor = '';
+                input.style.background = '';
+            }
+        }
+
+        function actualizarDataList() {
+            let datalist = document.getElementById('alimentosDataList');
+            if (!datalist) {
+                datalist = document.createElement('datalist');
+                datalist.id = 'alimentosDataList';
+                document.body.appendChild(datalist);
+            }
+            
+            // ✅ Mostrar solo nombres únicos ignorando mayúsculas/minúsculas
+            const nombresVistos = new Set();
+            const nombresUnicos = [];
+            
+            if (window.dataCache && window.dataCache.alimentos) {
+                window.dataCache.alimentos.forEach(a => {
+                    const low = a.nombre.toLowerCase().trim();
+                    if (!nombresVistos.has(low)) {
+                        nombresVistos.add(low);
+                        nombresUnicos.push(a.nombre);
+                    }
+                });
+            }
+            
+            datalist.innerHTML = nombresUnicos.sort().map(n => `<option value="${n}">`).join('');
+        }
+
+        // Modificar cargarAlimentos para actualizar el datalist
+        const oldCargarAlimentos = cargarAlimentos;
+        cargarAlimentos = async function() {
+            await oldCargarAlimentos();
+            actualizarDataList();
+        };
+
+    </script>
+    <script src="scripts/print-monitor.js"></script>
+</body>
+</html>
