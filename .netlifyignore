@@ -1,0 +1,6 @@
+conector/
+print-bridge/
+node_modules/
+dist/
+*.zip
+*.exe

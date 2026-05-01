@@ -28,13 +28,21 @@ let config = {
 
 // Cargar configuración inicial
 if (fs.existsSync(CONFIG_PATH)) {
-    config = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
+    try {
+        config = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
+    } catch (e) {
+        console.error("Error al cargar config.json:", e.message);
+    }
 }
 
 // Cargar IDs ya impresos
 let printedIds = [];
 if (fs.existsSync(PRINTED_PATH)) {
-    printedIds = JSON.parse(fs.readFileSync(PRINTED_PATH, 'utf8'));
+    try {
+        printedIds = JSON.parse(fs.readFileSync(PRINTED_PATH, 'utf8'));
+    } catch (e) {
+        console.error("Error al cargar printed.json:", e.message);
+    }
 }
 
 /**
@@ -47,9 +55,10 @@ function initPrinter(pConfig) {
     let driver = null;
     if (!isNetwork) {
         try {
+            // 1. Intentamos cargar el driver nativo si existe
             driver = require('printer');
         } catch (e) {
-            // DRIVER UNIVERSAL (Fallback para cuando no hay módulos nativos)
+            // 2. Si no existe (común en Mac/Windows sin instalar nada), usamos el Driver Universal
             driver = {
                 getPrinters: () => [],
                 getPrinter: (name) => ({ name, status: [] }),
@@ -63,7 +72,7 @@ function initPrinter(pConfig) {
                             else options.error?.(result.stderr.toString());
                         } 
                         else if (process.platform === 'win32') {
-                            // Windows: Usar PowerShell para enviar datos RAW (Sin compartir impresora)
+                            // Windows: Usar PowerShell para enviar datos RAW
                             const base64Data = options.data.toString('base64');
                             const psCommand = `
                                 $data = [System.Convert]::FromBase64String('${base64Data}');
@@ -127,7 +136,7 @@ function initPrinter(pConfig) {
             type: pConfig.tipo === 'epson' ? PrinterTypes.EPSON : PrinterTypes.STAR,
             interface: printerInterface,
             driver: driver,
-            characterSet: 'PC850',
+            characterSet: 'PC437_USA',
             removeSpecialCharacters: false,
             options: { timeout: 5000 }
         });
@@ -215,10 +224,9 @@ async function imprimirPedido(order) {
 }
 
 /**
- * RUTAS DE CONFIGURACIÓN (Panel Local)
+ * RUTAS DE CONFIGURACIÓN
  */
 
-// Página de Control Local
 app.get('/', (req, res) => {
     res.send(`
     <html>
@@ -242,12 +250,31 @@ app.get('/', (req, res) => {
                 <div class="status ${config.active ? 'active' : 'inactive'}">
                     Estado: ${config.active ? 'VIGILANDO PEDIDOS' : 'PAUSADO / SIN VINCULAR'}
                 </div>
-                <p style="font-size: 13px; color: #64748b;">Pega aquí el código de vinculación de tu aplicación:</p>
+                
+                <div id="printers-list" style="margin-bottom: 1rem; padding: 10px; background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0;">
+                    <p style="font-size: 11px; font-weight: bold; margin: 0 0 5px 0; color: #64748b;">🖨️ Impresoras detectadas:</p>
+                    <div id="list" style="font-size: 10px; color: #1e293b;">Cargando impresoras...</div>
+                </div>
+
+                <p style="font-size: 13px; color: #64748b;">Pega aquí el código de vinculación:</p>
                 <textarea id="code" placeholder="Pega el código aquí..."></textarea>
                 <button onclick="save()">Vincular y Activar</button>
                 <div id="msg" style="margin-top: 10px; font-size: 12px; text-align: center;"></div>
             </div>
             <script>
+                async function loadPrinters() {
+                    try {
+                        const res = await fetch('/printers');
+                        const data = await res.json();
+                        if(data.success) {
+                            document.getElementById('list').innerHTML = data.printers.map(p => "• " + p).join('<br>') || 'No se detectaron impresoras.';
+                        }
+                    } catch(e) {
+                        document.getElementById('list').innerText = 'Error al cargar impresoras.';
+                    }
+                }
+                loadPrinters();
+
                 async function save() {
                     const code = document.getElementById('code').value;
                     const res = await fetch('/save-config', {
@@ -263,6 +290,23 @@ app.get('/', (req, res) => {
         </body>
     </html>
     `);
+});
+
+app.get('/printers', async (req, res) => {
+    const { execSync } = require('child_process');
+    let printers = [];
+    try {
+        if (process.platform === 'darwin') {
+            const output = execSync('lpstat -e').toString();
+            printers = output.split('\n').filter(p => p.trim());
+        } else if (process.platform === 'win32') {
+            const output = execSync('wmic printer get name').toString();
+            printers = output.split('\n').map(p => p.trim()).filter(p => p && p !== 'Name');
+        }
+        res.json({ success: true, printers });
+    } catch (e) {
+        res.json({ success: false, message: e.message });
+    }
 });
 
 app.post('/save-config', (req, res) => {
@@ -281,13 +325,11 @@ app.post('/save-config', (req, res) => {
         res.json({ success: true, message: "Vinculación exitosa. Iniciando vigilancia..." });
     } catch (e) {
         console.error("❌ Error al decodificar código:", e.message);
-        res.status(400).json({ success: false, message: "Código inválido. Asegúrate de copiarlo completo y sin espacios extra." });
+        res.status(400).json({ success: false, message: "Código inválido." });
     }
 });
 
-// Endpoint para test rápido desde la web (si el usuario desbloquea el candado)
 app.post('/test', async (req, res) => {
-    // Implementación similar a la anterior para pruebas rápidas
     const printer = initPrinter(req.body);
     try {
         printer.println("Prueba de conexión JC-RT");
