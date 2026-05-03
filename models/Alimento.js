@@ -47,7 +47,8 @@ const alimentoSchema = new mongoose.Schema({
 });
 
 // Índices
-alimentoSchema.index({ nombre: 1 });
+// ✅ Índice compuesto para búsquedas de ingredientes por restaurante (multi-tenant)
+alimentoSchema.index({ userId: 1, nombre: 1 });
 alimentoSchema.index({ 'productos.productoId': 1 });
 alimentoSchema.index({ userId: 1 });
 

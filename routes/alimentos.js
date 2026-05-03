@@ -55,8 +55,11 @@ router.get('/public/restaurante', async (req, res) => {
 // Obtener todos los alimentos del restaurante
 router.get('/', protect, async (req, res) => {
   try {
+    // ✅ FIX MULTI-TENANT: Filtrar SOLO por el admin principal del restaurante actual
+    // NO usar req.userIdsRestaurante porque para Hub Meseros incluye admins de OTROS restaurantes
+    const ownerId = req.mainAdminId || req.user._id;
     const alimentos = await Alimento.find({ 
-      userId: { $in: req.userIdsRestaurante } 
+      userId: ownerId 
     })
     .populate('productos.productoId', 'nombre categoria precio')
     .sort({ nombre: 1 });
@@ -317,10 +320,9 @@ router.delete('/:id', protect, async (req, res) => {
 router.post('/sync-duplicates', protect, async (req, res) => {
   try {
     const ownerId = req.mainAdminId || req.user._id;
-    const userIds = req.userIdsRestaurante;
 
-    // 1. Obtener todos los alimentos de este restaurante
-    const alimentos = await Alimento.find({ userId: { $in: userIds } });
+    // 1. Obtener todos los alimentos de este restaurante (SOLO del admin principal)
+    const alimentos = await Alimento.find({ userId: ownerId });
 
     // 2. Agrupar por nombre (normalizado)
     const grupos = {};
