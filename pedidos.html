@@ -5603,13 +5603,26 @@
         // RESTAURAR MODO GUARDADO
         document.addEventListener('DOMContentLoaded', () => {
             const savedMode = localStorage.getItem('tableViewMode');
-            // Si el modo guardado es 'normal', cambiar a normal (porque ahora el default es mesas)
+            
             if (savedMode === 'normal') {
-                // Esperar a que los pedidos REALMENTE carguen
+                // Esperar a que los pedidos REALMENTE carguen para cambiar a normal
                 const waitForOrders = setInterval(() => {
                     if (window.ordersHaveLoaded) {
                         clearInterval(waitForOrders);
                         toggleTableView();
+                    }
+                }, 300);
+            } else {
+                // ✅ FIX: Modo mesas es el default — cargar mesas inmediatamente
+                // No esperar a ordersHaveLoaded, cargar mesas en paralelo
+                loadMesas();
+                
+                // Además, cuando los pedidos terminen de cargar, re-renderizar
+                // para que las mesas muestren su estado (ocupada/libre)
+                const waitForOrdersThenRefresh = setInterval(() => {
+                    if (window.ordersHaveLoaded) {
+                        clearInterval(waitForOrdersThenRefresh);
+                        if (mesasData.length > 0) renderMesas(mesasData);
                     }
                 }, 300);
             }

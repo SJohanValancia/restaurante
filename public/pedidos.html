@@ -3965,7 +3965,275 @@
             }
         }
 
-        // La lógica de impresión ahora se encuentra en /scripts/print-logic.js
+        async function imprimirFacturaPOS() {
+            if (!pedidoParaImprimir) {
+                throw new Error('No hay datos del pedido para imprimir');
+            }
+
+            try {
+                // Crear elemento de impresión
+                crearElementoImpresion();
+
+                // Esperar un momento para que se renderice
+                await new Promise(resolve => setTimeout(resolve, 300));
+
+                // Imprimir
+                window.print();
+
+                // Remover después de imprimir o cancelar
+                window.onafterprint = () => {
+                    removerElementoImpresion();
+                };
+
+                console.log('✅ Diálogo de impresión abierto');
+
+            } catch (error) {
+                console.error('Error al imprimir:', error);
+                removerElementoImpresion();
+                throw error;
+            }
+        }
+
+        function crearElementoImpresion() {
+            // Remover si ya existe
+            removerElementoImpresion();
+
+            const fecha = new Date(pedidoParaImprimir.createdAt);
+            const fechaStr = fecha.toLocaleDateString('es-CO', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            const horaStr = fecha.toLocaleTimeString('es-CO', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const metodoPagoTexto = metodoPagoSeleccionado === 'transferencia' ? 'TRANSFERENCIA' : 'EFECTIVO';
+            const nombreRestaurante = currentUser.nombreRestaurante || 'RESTAURANTE';
+            const nitRestaurante = currentUser.nitRestaurante ? `NIT: ${currentUser.nitRestaurante}` : '';
+
+            // Datos del cliente
+            const clienteHTML = pedidoParaImprimir.clienteNombre || clienteNombreSeleccionado ? `
+                <div class="print-info-row">
+                    <span class="print-info-label">Cliente:</span>
+                    <span>${(pedidoParaImprimir.clienteNombre || clienteNombreSeleccionado).toUpperCase()} 222222222222</span>
+                </div>
+                <div class="print-info-row">
+                    <span class="print-info-label">CC/NIT:</span>
+                    <span>${pedidoParaImprimir.clienteCcNit || clienteCcNitSeleccionado || '---'}</span>
+                </div>
+            ` : '';
+
+            // Generar filas de productos
+            const productosHTML = pedidoParaImprimir.items.map(item => {
+                const nombre = item.productoInfo ? item.productoInfo.nombre :
+                    (item.nombreProducto || 'Producto');
+                const cantidad = item.cantidad;
+                const precio = item.precio;
+                const subtotal = cantidad * precio;
+
+                return `
+            <tr>
+                <td>${nombre}</td>
+                <td style="text-align: center;">${cantidad}</td>
+                <td style="text-align: right;">$${precio.toLocaleString('es-CO')}</td>
+                <td style="text-align: right; font-weight: bold;">$${subtotal.toLocaleString('es-CO')}</td>
+            </tr>
+        `;
+            }).join('');
+
+            // Crear contenedor de impresión
+            const printContainer = document.createElement('div');
+            printContainer.id = 'print-container';
+            printContainer.innerHTML = `
+        <div class="print-header">
+            <h1>${nombreRestaurante}</h1>
+            ${nitRestaurante ? `<div style="font-size: 12px; font-weight: bold; margin-bottom: 5px;">${nitRestaurante}</div>` : ''}
+            <div class="print-subtitle">FACTURA DE VENTA</div>
+        </div>
+        
+        <div class="print-info-section">
+            <div class="print-info-row">
+                <span class="print-info-label">Fecha:</span>
+                <span>${fechaStr}</span>
+            </div>
+            <div class="print-info-row">
+                <span class="print-info-label">Hora:</span>
+                <span>${horaStr}</span>
+            </div>
+            ${clienteHTML}
+            <div class="print-info-row">
+                <span class="print-info-label">Mesa:</span>
+                <span>${pedidoParaImprimir.mesa}</span>
+            </div>
+            <div class="print-info-row">
+                <span class="print-info-label">Pedido:</span>
+                <span>#${pedidoParaImprimir._id.slice(-6).toUpperCase()}</span>
+            </div>
+        </div>
+        
+        <div class="print-metodo-pago">
+            💳 ${metodoPagoTexto}
+        </div>
+        
+        <table class="print-table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th style="text-align: center;">Cant.</th>
+                    <th style="text-align: right;">Precio</th>
+                    <th style="text-align: right;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${productosHTML}
+            </tbody>
+        </table>
+        
+        <div class="print-total-section">
+            <div class="print-total-row">
+                <span>TOTAL:</span>
+                <span>$${pedidoParaImprimir.total.toLocaleString('es-CO')}</span>
+            </div>
+        </div>
+        
+        <div class="print-footer">
+            <p><strong>¡Gracias por su compra!</strong></p>
+            <p>Vuelva pronto</p>
+        </div>
+    `;
+
+            document.body.appendChild(printContainer);
+        }
+
+        function removerElementoImpresion() {
+            const printContainer = document.getElementById('print-container');
+            if (printContainer) {
+                printContainer.remove();
+            }
+        }
+
+        function generarComandosESCPOS() {
+            const ESC = 0x1B;
+            const GS = 0x1D;
+            const LF = 0x0A;
+            const comandos = [];
+
+            // Inicializar impresora
+            comandos.push(ESC, 0x40);
+
+            // Centrar texto
+            comandos.push(ESC, 0x61, 0x01);
+
+            // Negrita ON
+            comandos.push(ESC, 0x45, 0x01);
+
+            // Nombre del restaurante
+            const nombreRestaurante = currentUser.nombreRestaurante || 'RESTAURANTE';
+            agregarTexto(comandos, nombreRestaurante);
+            comandos.push(LF);
+
+            // NIT del restaurante
+            if (currentUser.nitRestaurante) {
+                agregarTexto(comandos, `NIT: ${currentUser.nitRestaurante}`);
+                comandos.push(LF);
+            }
+
+            // Negrita OFF
+            comandos.push(ESC, 0x45, 0x00);
+
+            // Información adicional
+            agregarTexto(comandos, '================================');
+            comandos.push(LF);
+            agregarTexto(comandos, 'FACTURA DE VENTA');
+            comandos.push(LF);
+            agregarTexto(comandos, '================================');
+            comandos.push(LF, LF);
+
+            // Alinear a la izquierda
+            comandos.push(ESC, 0x61, 0x00);
+
+            // Fecha y hora
+            const fecha = new Date(pedidoParaImprimir.createdAt);
+            const fechaStr = fecha.toLocaleDateString('es-CO');
+            const horaStr = fecha.toLocaleTimeString('es-CO');
+            agregarTexto(comandos, `Fecha: ${fechaStr}`);
+            comandos.push(LF);
+            agregarTexto(comandos, `Hora: ${horaStr}`);
+            comandos.push(LF);
+
+            // Datos del cliente
+            const cliNombre = (pedidoParaImprimir.clienteNombre || clienteNombreSeleccionado || '').toUpperCase();
+            if (cliNombre) {
+                agregarTexto(comandos, `Cliente: ${cliNombre} 222222222222`);
+                comandos.push(LF);
+                const cliCcNit = pedidoParaImprimir.clienteCcNit || clienteCcNitSeleccionado || '---';
+                agregarTexto(comandos, `CC/NIT: ${cliCcNit}`);
+                comandos.push(LF);
+            }
+
+            // Mesa
+            agregarTexto(comandos, `Mesa: ${pedidoParaImprimir.mesa}`);
+            comandos.push(LF);
+
+            // Método de pago
+            const metodoPagoTexto = metodoPagoSeleccionado === 'transferencia' ? 'TRANSFERENCIA' : 'EFECTIVO';
+            agregarTexto(comandos, `Metodo de pago: ${metodoPagoTexto}`);
+            comandos.push(LF, LF);
+
+            // Línea separadora
+            agregarTexto(comandos, '--------------------------------');
+            comandos.push(LF);
+
+            // Encabezado de productos
+            agregarTexto(comandos, 'PRODUCTO        CANT   PRECIO   TOTAL');
+            comandos.push(LF);
+            agregarTexto(comandos, '--------------------------------');
+            comandos.push(LF);
+
+            // Lista de productos
+            pedidoParaImprimir.items.forEach(item => {
+                const nombre = item.productoInfo ? item.productoInfo.nombre :
+                    (item.nombreProducto || 'Producto');
+                const cantidad = item.cantidad;
+                const precio = item.precio;
+                const subtotal = cantidad * precio;
+
+                // Formatear línea de producto (limitando nombre a 15 caracteres)
+                const nombreCorto = nombre.substring(0, 15).padEnd(15);
+                const cantStr = String(cantidad).padStart(4);
+                const precioStr = formatearPrecio(precio).padStart(8);
+                const totalStr = formatearPrecio(subtotal).padStart(8);
+
+                agregarTexto(comandos, `${nombreCorto} ${cantStr} ${precioStr} ${totalStr}`);
+                comandos.push(LF);
+            });
+
+            // Línea separadora
+            agregarTexto(comandos, '--------------------------------');
+            comandos.push(LF);
+
+            // Total
+            comandos.push(ESC, 0x45, 0x01); // Negrita ON
+            agregarTexto(comandos, `TOTAL: $${pedidoParaImprimir.total.toLocaleString('es-CO')}`);
+            comandos.push(LF);
+            comandos.push(ESC, 0x45, 0x00); // Negrita OFF
+
+            comandos.push(LF, LF);
+
+            // Centrar
+            comandos.push(ESC, 0x61, 0x01);
+            agregarTexto(comandos, 'Gracias por su compra!');
+            comandos.push(LF);
+            agregarTexto(comandos, 'Vuelva pronto');
+            comandos.push(LF, LF, LF);
+
+            // Cortar papel
+            comandos.push(GS, 0x56, 0x00);
+
+            return new Uint8Array(comandos);
+        }
 
         function agregarTexto(comandos, texto) {
             for (let i = 0; i < texto.length; i++) {
@@ -4373,47 +4641,6 @@
                     }
                 });
             }
-
-        async function imprimirFacturaPOS() {
-            if (!pedidoActual) return;
-            
-            const btn = document.querySelector('.btn-primary[onclick*="imprimirFacturaPOS"]');
-            if(btn) btn.disabled = true;
-
-            mostrarModalImpresion();
-            actualizarEstadoImpresion('preparando', 'Generando factura...');
-
-            try {
-                // Preparamos los datos del pedido para el Bridge
-                const datosFactura = {
-                    _id: pedidoActual._id,
-                    mesa: pedidoActual.mesa,
-                    items: pedidoActual.items,
-                    total: pedidoActual.total,
-                    restauranteNombre: "NÁPOLES GASTRO-BAR" // Puedes hacerlo dinámico si quieres
-                };
-
-                const response = await fetch('http://127.0.0.1:3001/print-factura', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(datosFactura)
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    actualizarEstadoImpresion('exito', 'Factura impresa correctamente');
-                    setTimeout(cerrarModalImpresion, 2000);
-                } else {
-                    throw new Error(data.message);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                actualizarEstadoImpresion('error', 'No se pudo imprimir. ¿El Bridge está abierto?');
-            } finally {
-                if(btn) btn.disabled = false;
-            }
-        }
 
             try {
                 const response = await fetch(`${API_URL}/orders/${orderId}/item/${itemIndex}/estado`, {
@@ -5376,13 +5603,26 @@
         // RESTAURAR MODO GUARDADO
         document.addEventListener('DOMContentLoaded', () => {
             const savedMode = localStorage.getItem('tableViewMode');
-            // Si el modo guardado es 'normal', cambiar a normal (porque ahora el default es mesas)
+            
             if (savedMode === 'normal') {
-                // Esperar a que los pedidos REALMENTE carguen
+                // Esperar a que los pedidos REALMENTE carguen para cambiar a normal
                 const waitForOrders = setInterval(() => {
                     if (window.ordersHaveLoaded) {
                         clearInterval(waitForOrders);
                         toggleTableView();
+                    }
+                }, 300);
+            } else {
+                // ✅ FIX: Modo mesas es el default — cargar mesas inmediatamente
+                // No esperar a ordersHaveLoaded, cargar mesas en paralelo
+                loadMesas();
+                
+                // Además, cuando los pedidos terminen de cargar, re-renderizar
+                // para que las mesas muestren su estado (ocupada/libre)
+                const waitForOrdersThenRefresh = setInterval(() => {
+                    if (window.ordersHaveLoaded) {
+                        clearInterval(waitForOrdersThenRefresh);
+                        if (mesasData.length > 0) renderMesas(mesasData);
                     }
                 }, 300);
             }
@@ -5479,6 +5719,7 @@
             `;
                 return;
             }
+            
 
             grid.innerHTML = mesasFiltradas.map(mesa => {
                 // Contar TODOS los pedidos activos de esta mesa
@@ -6069,7 +6310,6 @@
         });
     </script>
     <script src="scripts/print-monitor.js"></script>
-    <script src="scripts/print-logic.js"></script>
 </body>
 
 </html>
