@@ -577,7 +577,12 @@
         async function sendToBluetoothPrinter(data) {
             if (!bluetoothCharacteristic) throw new Error('No hay impresora Bluetooth conectada');
 
-            const CHUNK_SIZE = 512;
+            // Chunk pequeño + pausa larga para no desbordar el buffer BT
+            const CHUNK_SIZE = 128;
+            const DELAY_MS = 100;
+            const totalChunks = Math.ceil(data.length / CHUNK_SIZE);
+            addLog(`Enviando ${data.length} bytes en ${totalChunks} chunks...`, 'info');
+
             for (let i = 0; i < data.length; i += CHUNK_SIZE) {
                 const chunk = data.slice(i, i + CHUNK_SIZE);
                 try {
@@ -588,6 +593,10 @@
                     } catch (e2) {
                         throw new Error(`Error enviando datos: ${e2.message}`);
                     }
+                }
+                // Pausa obligatoria entre chunks
+                if (i + CHUNK_SIZE < data.length) {
+                    await new Promise(r => setTimeout(r, DELAY_MS));
                 }
             }
         }

@@ -208,19 +208,34 @@
     async function _sendData(data) {
         if (!bluetoothCharacteristic) throw new Error('No hay impresora Bluetooth conectada');
 
-        const CHUNK_SIZE = 512;
+        // Chunk pequeño (128 bytes) + pausa larga (100ms) para evitar
+        // desbordamiento del buffer Bluetooth de la impresora térmica.
+        // Con 512/10ms solo se imprimía el primer plato porque el buffer
+        // se saturaba y se perdían los bytes intermedios.
+        const CHUNK_SIZE = 128;
+        const DELAY_MS = 100;
+        const totalChunks = Math.ceil(data.length / CHUNK_SIZE);
+        console.log(`[BT-Printer] Enviando ${data.length} bytes en ${totalChunks} chunks de ${CHUNK_SIZE}...`);
+
         for (let i = 0; i < data.length; i += CHUNK_SIZE) {
             const chunk = data.slice(i, i + CHUNK_SIZE);
+            const chunkNum = Math.floor(i / CHUNK_SIZE) + 1;
             try {
                 await bluetoothCharacteristic.writeValueWithoutResponse(chunk);
             } catch (e) {
                 try {
                     await bluetoothCharacteristic.writeValueWithResponse(chunk);
                 } catch (e2) {
-                    throw new Error(`Error enviando datos: ${e2.message}`);
+                    console.error(`[BT-Printer] Error en chunk ${chunkNum}/${totalChunks}: ${e2.message}`);
+                    throw new Error(`Error enviando datos (chunk ${chunkNum}): ${e2.message}`);
                 }
             }
+            // Pausa obligatoria entre cada chunk para que la impresora procese
+            if (i + CHUNK_SIZE < data.length) {
+                await new Promise(r => setTimeout(r, DELAY_MS));
+            }
         }
+        console.log(`[BT-Printer] ✅ ${data.length} bytes enviados completos (${totalChunks} chunks)`);
     }
 
     // ============================================================
@@ -234,7 +249,9 @@
             const words = String(text).split(' ');
             const lines = [];
             let current = '';
+            let iterations = 0;
             words.forEach(word => {
+                if (iterations++ > 1000) return; // Safety limit
                 if ((current + (current ? ' ' : '') + word).length <= maxW) {
                     current += (current ? ' ' : '') + word;
                 } else {
@@ -256,6 +273,10 @@
         const addRaw = (bytes) => { parts.push(bytes); };
         const nl = () => addRaw(NL);
         const nl2 = () => addRaw(NL2);
+
+        // DEBUG: Log items received
+        console.log('[BT-Printer] Items received:', JSON.stringify(order.items));
+        console.log('[BT-Printer] Items count:', order.items ? order.items.length : 0);
 
         // Init
         addRaw(ESC_INIT);
@@ -295,30 +316,41 @@
             add('(Sin productos)');
             nl();
         } else {
-            order.items.forEach((item, idx) => {
-                const nombre = item.productoInfo
-                    ? item.productoInfo.nombre
-                    : (item.nombreProducto || item.nombre || 'Producto');
-                const cantidad = item.cantidad || 1;
+            for (let idx = 0; idx < order.items.length; idx++) {
+                const item = order.items[idx];
+                try {
+                    console.log(`[BT-Printer] Raw item ${idx}:`, JSON.stringify(item));
+                    
+                    const nombre = item.productoInfo
+                        ? item.productoInfo.nombre
+                        : (item.nombreProducto || item.nombre || 'Producto');
+                    const cantidad = item.cantidad || 1;
 
-                addRaw(ESC_BOLD_ON);
-                const linNombre = `${cantidad}x ${nombre}`;
-                const nombreWrapped = wrapText(linNombre, W);
-                nombreWrapped.forEach(l => { add(l); nl(); });
-                addRaw(ESC_BOLD_OFF);
+                    console.log(`[BT-Printer] Processing item ${idx}:`, nombre, 'cantidad:', cantidad);
 
-                // Notas del ítem
-                const nota = item.notas || item.nota || '';
-                if (nota && nota.trim()) {
-                    const notaLines = wrapText(`  >> ${nota.trim()}`, W);
-                    notaLines.forEach(l => { add(l); nl(); });
+                    addRaw(ESC_BOLD_ON);
+                    const linNombre = `${cantidad}x ${nombre}`;
+                    const nombreWrapped = wrapText(linNombre, W);
+                    console.log(`[BT-Printer] Wrapped lines for item ${idx}:`, nombreWrapped);
+                    nombreWrapped.forEach(l => { add(l); nl(); });
+                    addRaw(ESC_BOLD_OFF);
+
+                    // Notas del ítem
+                    const nota = item.notas || item.nota || '';
+                    if (nota && nota.trim()) {
+                        const notaLines = wrapText(`  >> ${nota.trim()}`, W);
+                        notaLines.forEach(l => { add(l); nl(); });
+                    }
+
+                    if (idx < order.items.length - 1) {
+                        add(sep('.'));
+                        nl();
+                    }
+                } catch (itemError) {
+                    console.error(`[BT-Printer] Error processing item ${idx}:`, itemError);
                 }
-
-                if (idx < order.items.length - 1) {
-                    add(sep('.'));
-                    nl();
-                }
-            });
+            }
+            console.log('[BT-Printer] Loop completed, total items processed:', order.items.length);
         }
         nl();
 
@@ -350,7 +382,9 @@
         addRaw(ESC_FEED_12);
         addRaw(ESC_CUT);
 
-        return buildEscPosBytes(parts);
+        const finalBytes = buildEscPosBytes(parts);
+        console.log(`[BT-Printer] Total bytes generados: ${finalBytes.length}`);
+        return finalBytes;
     }
 
     // ============================================================
@@ -361,10 +395,15 @@
             throw new Error('Impresora Bluetooth no conectada');
         }
 
-        const bytes = _generateComandaBytes(orderData);
-        await _sendData(bytes);
-        console.log(`[BT-Printer] ✅ Comanda impresa: Mesa ${orderData.mesa}`);
-        return true;
+        try {
+            const bytes = _generateComandaBytes(orderData);
+            await _sendData(bytes);
+            console.log(`[BT-Printer] ✅ Comanda impresa: Mesa ${orderData.mesa}`);
+            return true;
+        } catch (e) {
+            console.error('[BT-Printer] Error in printComanda:', e);
+            throw e;
+        }
     }
 
     // ============================================================
